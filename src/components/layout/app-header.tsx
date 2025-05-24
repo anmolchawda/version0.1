@@ -16,19 +16,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, PlusSquare, User, Settings, LogOut, Store } from 'lucide-react';
+import { Search, PlusSquare, User, Settings, LogOut, Store, Home } from 'lucide-react'; // Added Home
 import { getPlaceholderUser } from '@/lib/placeholders'; // Import user fetching utility
 import type { User as UserType } from '@/types'; // Import User type
 
+// Mock user data, replace with actual auth state
+const MOCK_USER_ID = '1'; // Corresponds to FarmerJohn in placeholders
+
 const navLinks = [
-  { href: '/', label: 'Feed', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+  { href: '/', label: 'Feed', icon: <Home /> }, // Changed icon to Home for clarity
   { href: '/discover', label: 'Discover', icon: <Search /> },
   { href: '/post/create', label: 'Create Post', icon: <PlusSquare /> },
   { href: '/mandi', label: 'Mandi', icon: <Store /> },
+  { href: `/profile/${MOCK_USER_ID}`, label: 'Profile', icon: <User /> }, // Added Profile link
 ];
 
-// Mock user data, replace with actual auth state
-const MOCK_USER_ID = '1'; // Corresponds to FarmerJohn in placeholders
 
 export function AppHeader() {
   const pathname = usePathname();
