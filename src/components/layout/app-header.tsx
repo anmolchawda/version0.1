@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation'; // Import useRouter
 import { AppLogo } from '@/components/core/app-logo';
 import { MainNav } from '@/components/layout/main-nav';
 import { MobileNav } from '@/components/layout/mobile-nav';
@@ -29,6 +29,14 @@ const MOCK_USER_ID = '1'; // Corresponds to FarmerJohn in placeholders
 
 export function AppHeader() {
   const pathname = usePathname();
+  const router = useRouter(); // Initialize useRouter
+
+  const handleLogout = () => {
+    // Clear mock authentication flag from localStorage
+    localStorage.removeItem('isMockAuthenticated');
+    // Redirect to login page
+    router.push('/login');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -76,7 +84,7 @@ export function AppHeader() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => alert('Logout clicked!')}>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +15,7 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter(); // Initialize useRouter
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -22,14 +24,15 @@ export function LoginForm() {
     console.log('Logging in with:', { email, password });
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // On real app, redirect to '/' or '/feed' upon successful login
-    // For now, just show a toast
+    // Set mock authentication flag in localStorage
+    localStorage.setItem('isMockAuthenticated', 'true');
+
     toast({
       title: 'Login Successful (Simulated)',
       description: `Welcome back, ${email}!`,
     });
     setIsLoading(false);
-     // router.push('/'); // If using next/navigation
+    router.push('/'); // Redirect to the main feed page
   };
 
   return (
