@@ -2,11 +2,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // useRouter for logout
+import { useRouter, usePathname } from 'next/navigation';
 import { AppLogo } from '@/components/core/app-logo';
-// MainNav and MobileNav are removed as per the new bottom navigation approach
-// import { MainNav } from '@/components/layout/main-nav';
-// import { MobileNav } from '@/components/layout/mobile-nav';
+import { MainNav } from '@/components/layout/main-nav';
+import { MobileNav } from '@/components/layout/mobile-nav';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -17,17 +16,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, User, Settings, LogOut } from 'lucide-react';
+import { Home, Search, PlusSquare, Store, User, Settings, LogOut } from 'lucide-react';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import type { User as UserType } from '@/types';
 
 // Mock user data, replace with actual auth state
-const MOCK_USER_ID = '1'; 
+const MOCK_USER_ID = '1';
 
-// navLinks definition is removed as it's now centralized or handled by BottomNavBar
+// NavLink interface definition for top navigation
+interface NavLink {
+  href: string;
+  label: string;
+  icon?: JSX.Element; // Icons are JSX elements for MainNav/MobileNav
+}
 
 export function AppHeader() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const mockUser: UserType | undefined = getPlaceholderUser(MOCK_USER_ID);
 
@@ -40,17 +45,25 @@ export function AppHeader() {
   const userNameDisplay = mockUser?.name || mockUser?.username || 'FARMDOCC User';
   const userHandleDisplay = mockUser?.username ? `@${mockUser.username}` : 'user@farmdocc.com';
 
+  // Define navigation links for MainNav and MobileNav
+  const navLinks: NavLink[] = [
+    { href: '/', label: 'Feed', icon: <Home className="h-5 w-5" /> },
+    { href: '/discover', label: 'Discover', icon: <Search className="h-5 w-5" /> },
+    { href: `/profile/${MOCK_USER_ID}`, label: 'Profile', icon: <User className="h-5 w-5" /> },
+    { href: '/post/create', label: 'Create Post', icon: <PlusSquare className="h-5 w-5" /> },
+    { href: '/mandi', label: 'Mandi', icon: <Store className="h-5 w-5" /> },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between max-w-xl mx-auto px-4"> {/* Matched max-w-xl from app layout */}
+      <div className="container flex h-16 items-center justify-between max-w-xl mx-auto px-4">
         <div className="flex items-center gap-6">
           <AppLogo />
-          {/* MainNav is removed */}
+          <MainNav links={navLinks} currentPath={pathname} className="hidden md:flex" />
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4"> {/* Adjusted gap for better spacing */}
-          {/* Search button can remain if desired, or be moved to Discover page */}
-          <Button variant="ghost" size="icon" className="h-9 w-9"> {/* Standardized icon button size */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <Button variant="ghost" size="icon" className="h-9 w-9">
             <Search className="h-5 w-5" />
             <span className="sr-only">Search</span>
           </Button>
@@ -94,7 +107,7 @@ export function AppHeader() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          {/* MobileNav is removed, its functionality is replaced by BottomNavBar */}
+          <MobileNav links={navLinks} currentPath={pathname} className="md:hidden" />
         </div>
       </div>
     </header>

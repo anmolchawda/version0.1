@@ -2,8 +2,7 @@
 'use client';
 
 import { AppHeader } from '@/components/layout/app-header';
-import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
-import { mainNavLinks } from '@/lib/navigation';
+// BottomNavBar is removed
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -48,12 +47,12 @@ export default function AppPagesLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <main className="flex-1 bg-background pb-16 md:pb-0"> {/* Added padding for bottom nav */}
+      <main className="flex-1 bg-background"> {/* Removed pb-16 md:pb-0 */}
         <div className="container mx-auto max-w-xl px-4 py-8">
          {children}
         </div>
       </main>
-      <BottomNavBar links={mainNavLinks} />
+      {/* BottomNavBar removed from here */}
     </div>
   );
 }
