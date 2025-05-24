@@ -1,16 +1,14 @@
-// This component is no longer used for main navigation after implementing BottomNavBar.
-// It can be kept for potential future use or removed.
-// For now, I will leave its content as is but it won't be rendered by AppHeader.
+
 'use client';
 
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react'; // Removed Leaf as it's not used here
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { AppLogo } from '@/components/core/app-logo';
 import { cn } from '@/lib/utils';
-import type { NavLink } from '@/lib/navigation';
+import type { NavLink } from '@/types'; // Updated NavLink import
 
 interface MobileNavProps {
   links: NavLink[];

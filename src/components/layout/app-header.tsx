@@ -18,17 +18,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Home, Search, PlusSquare, Store, User, Settings, LogOut } from 'lucide-react';
 import { getPlaceholderUser } from '@/lib/placeholders';
-import type { User as UserType } from '@/types';
+import type { User as UserType, NavLink } from '@/types'; // Updated NavLink import
 
 // Mock user data, replace with actual auth state
 const MOCK_USER_ID = '1';
 
-// NavLink interface definition for top navigation
-interface NavLink {
-  href: string;
-  label: string;
-  icon?: JSX.Element; // Icons are JSX elements for MainNav/MobileNav
-}
+// NavLink interface definition is now imported from '@/types'
 
 export function AppHeader() {
   const router = useRouter();

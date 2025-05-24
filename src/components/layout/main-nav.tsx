@@ -1,9 +1,7 @@
-// This component is no longer used for main navigation after implementing BottomNavBar.
-// It can be kept for potential future use or removed.
-// For now, I will leave its content as is but it won't be rendered by AppHeader.
+
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import type { NavLink } from '@/lib/navigation';
+import type { NavLink } from '@/types'; // Updated NavLink import
 
 interface MainNavProps {
   links: NavLink[];
@@ -13,7 +11,7 @@ interface MainNavProps {
 
 export function MainNav({ links, currentPath, className }: MainNavProps) {
   return (
-    <nav className={cn("flex items-center space-x-4 lg:space-x-6", className)}>
+    <nav className={cn("flex items-center space-x-6 lg:space-x-8", className)}> {/* Increased spacing */}
       {links.map((link) => (
         <Link
           key={link.href}
@@ -23,7 +21,8 @@ export function MainNav({ links, currentPath, className }: MainNavProps) {
             currentPath === link.href ? "text-primary" : "text-muted-foreground"
           )}
         >
-          {link.icon && <span className="mr-2 md:hidden lg:inline-block">{link.icon}</span>}
+          {/* Icons in MainNav are typically hidden on smaller md screens if labels are present, shown on lg */}
+          {link.icon && <span className="mr-1.5 hidden lg:inline-block">{link.icon}</span>}
           {link.label}
         </Link>
       ))}

@@ -32,3 +32,9 @@ export interface Comment {
   parentId?: string | null; // ID of the comment this is a reply to
   replies?: Comment[]; // Nested replies
 }
+
+export interface NavLink {
+  href: string;
+  label: string;
+  icon?: JSX.Element;
+}
