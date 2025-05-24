@@ -29,40 +29,61 @@ import { format } from 'date-fns';
 
 // Placeholder data
 const placeholderStates = [
-  { value: 'ca', label: 'California' },
-  { value: 'tx', label: 'Texas' },
-  { value: 'fl', label: 'Florida' },
-  { value: 'ny', label: 'New York' },
-  { value: 'il', label: 'Illinois' },
+  { value: 'ap', label: 'Andhra Pradesh' },
+  { value: 'ar', label: 'Arunachal Pradesh' },
+  { value: 'as', label: 'Assam' },
+  { value: 'br', label: 'Bihar' },
+  { value: 'cg', label: 'Chhattisgarh' },
+  { value: 'ga', label: 'Goa' },
+  { value: 'gj', label: 'Gujarat' },
+  { value: 'hr', label: 'Haryana' },
+  { value: 'hp', label: 'Himachal Pradesh' },
+  { value: 'jh', label: 'Jharkhand' },
+  { value: 'ka', label: 'Karnataka' },
+  { value: 'kl', label: 'Kerala' },
+  { value: 'mp', label: 'Madhya Pradesh' },
+  { value: 'mh', label: 'Maharashtra' },
+  { value: 'mn', label: 'Manipur' },
+  { value: 'ml', label: 'Meghalaya' },
+  { value: 'mz', label: 'Mizoram' },
+  { value: 'nl', label: 'Nagaland' },
+  { value: 'od', label: 'Odisha' },
+  { value: 'pb', label: 'Punjab' },
+  { value: 'rj', label: 'Rajasthan' },
+  { value: 'sk', label: 'Sikkim' },
+  { value: 'tn', label: 'Tamil Nadu' },
+  { value: 'ts', label: 'Telangana' },
+  { value: 'tr', label: 'Tripura' },
+  { value: 'up', label: 'Uttar Pradesh' },
+  { value: 'uk', label: 'Uttarakhand' },
+  { value: 'wb', label: 'West Bengal' },
+  { value: 'an', label: 'Andaman and Nicobar Islands' },
+  { value: 'ch', label: 'Chandigarh' },
+  { value: 'dn', label: 'Dadra and Nagar Haveli and Daman and Diu' },
+  { value: 'dl', label: 'Delhi' },
+  { value: 'jk', label: 'Jammu and Kashmir' },
+  { value: 'la', label: 'Ladakh' },
+  { value: 'ld', label: 'Lakshadweep' },
+  { value: 'py', label: 'Puducherry' },
 ];
 
 const placeholderCities: Record<string, { value: string; label: string }[]> = {
-  ca: [
-    { value: 'sf', label: 'San Francisco' },
-    { value: 'la', label: 'Los Angeles' },
-    { value: 'sd', label: 'San Diego' },
+  ap: [], ar: [], as: [], br: [], cg: [], ga: [], gj: [], hr: [], hp: [], jh: [], ka: [], kl: [], mp: [],
+  mh: [
+    { value: 'mum', label: 'Mumbai' },
+    { value: 'pun', label: 'Pune' },
+    { value: 'ngp', label: 'Nagpur' },
   ],
-  tx: [
-    { value: 'aus', label: 'Austin' },
-    { value: 'dal', label: 'Dallas' },
-    { value: 'hou', label: 'Houston' },
+  mn: [], ml: [], mz: [], nl: [], od: [], pb: [], rj: [], sk: [], tn: [], ts: [], tr: [], up: [], uk: [], wb: [],
+  an: [], ch: [], dn: [],
+  dl: [
+    { value: 'nd', label: 'New Delhi' },
+    { value: 'sd', label: 'South Delhi' },
+    { value: 'wd', label: 'West Delhi' },
   ],
-  fl: [
-    { value: 'mia', label: 'Miami' },
-    { value: 'orl', label: 'Orlando' },
-    { value: 'tpa', label: 'Tampa' },
-  ],
-  ny: [
-    { value: 'nyc', label: 'New York City' },
-    { value: 'buf', label: 'Buffalo' },
-    { value: 'alb', label: 'Albany' },
-  ],
-  il: [
-    { value: 'chi', label: 'Chicago' },
-    { value: 'spr', label: 'Springfield' },
-    { value: 'nap', label: 'Naperville' },
-  ],
+  jk: [], la: [], ld: [], py: [],
 };
+
 
 const placeholderCrops = [
   {
@@ -75,7 +96,7 @@ const placeholderCrops = [
     aiHint: 'tomatoes vegetable',
     seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
     listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
-    location: 'Sunnyvale, CA'
+    location: 'Mumbai, MH'
   },
   {
     id: 'crop2',
@@ -87,7 +108,7 @@ const placeholderCrops = [
     aiHint: 'corn vegetable',
     seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
     listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-    location: 'Green Valley, OR'
+    location: 'New Delhi, DL'
   },
   {
     id: 'crop3',
@@ -99,7 +120,7 @@ const placeholderCrops = [
     aiHint: 'apples fruit',
     seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
     listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
-    location: 'Sunnyvale, CA'
+    location: 'Pune, MH'
   },
   {
     id: 'crop4',
@@ -111,7 +132,7 @@ const placeholderCrops = [
     aiHint: 'peppers vegetable',
     seller: { id: '3', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
     listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-    location: 'Metro City, NY'
+    location: 'South Delhi, DL'
   },
 ];
 
@@ -138,11 +159,14 @@ export default function MandiPage() {
                           crop.variety.toLowerCase().includes(searchLower) ||
                           crop.seller.username.toLowerCase().includes(searchLower) ||
                           crop.location.toLowerCase().includes(searchLower);
-    // Placeholder for state/city filtering logic:
-    // const matchesState = selectedState ? crop.location.toLowerCase().includes(placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() || '') : true;
-    // const matchesCity = selectedCity ? crop.location.toLowerCase().includes(availableCities.find(c => c.value === selectedCity)?.label.toLowerCase() || '') : true;
-    // return matchesSearch && matchesState && matchesCity;
-    return matchesSearch;
+    
+    const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
+    const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
+
+    const matchesState = stateLabel ? crop.location.toLowerCase().includes(stateLabel) || crop.location.toLowerCase().includes(selectedState) : true;
+    const matchesCity = cityLabel ? crop.location.toLowerCase().includes(cityLabel) : true;
+    
+    return matchesSearch && matchesState && matchesCity;
   });
 
 
@@ -189,13 +213,13 @@ export default function MandiPage() {
                   <SelectValue placeholder="Filter by City" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableCities.map(city => (
+                  {availableCities.length > 0 ? availableCities.map(city => (
                     <SelectItem key={city.value} value={city.value}>{city.label}</SelectItem>
-                  ))}
+                  )) : <SelectItem value="no-cities" disabled>No cities for this state</SelectItem>}
                 </SelectContent>
               </Select>
               <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1 md:col-start-3">
-                <ListFilter className="mr-2 h-5 w-5" /> Apply Filters
+                <ListFilter className="mr-2 h-5 w-5" /> Apply Filters (WIP)
               </Button>
             </div>
           </div>
@@ -267,3 +291,5 @@ export default function MandiPage() {
     </div>
   );
 }
+
+    
