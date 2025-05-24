@@ -27,7 +27,6 @@ import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, CalendarDays, Building2, Wheat, ShoppingCart, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
-// Placeholder data
 const placeholderStates = [
   { value: 'ap', label: 'Andhra Pradesh' },
   { value: 'ar', label: 'Arunachal Pradesh' },
@@ -68,203 +67,165 @@ const placeholderStates = [
 ];
 
 const placeholderCities: Record<string, { value: string; label: string }[]> = {
-  ap: [
-    { value: 'vizag', label: 'Visakhapatnam' },
-    { value: 'vijayawada', label: 'Vijayawada' },
-    { value: 'guntur', label: 'Guntur' },
-    { value: 'nellore', label: 'Nellore' },
-    { value: 'kurnool', label: 'Kurnool' },
-    { value: 'tirupati', label: 'Tirupati' },
-    { value: 'rajahmundry', label: 'Rajahmundry' },
-    { value: 'kakinada', label: 'Kakinada' },
+  ap: [ /* Andhra Pradesh */
+    { value: 'vizag', label: 'Visakhapatnam' }, { value: 'vijayawada', label: 'Vijayawada' },
+    { value: 'guntur', label: 'Guntur' }, { value: 'nellore', label: 'Nellore' },
+    { value: 'kurnool', label: 'Kurnool' }, { value: 'tirupati', label: 'Tirupati' },
+    { value: 'rajahmundry', label: 'Rajahmundry' }, { value: 'kakinada', label: 'Kakinada' },
+    { value: 'eluru', label: 'Eluru'}, { value: 'kadapa', label: 'Kadapa'}
   ],
-  ar: [
-    { value: 'itanagar', label: 'Itanagar' },
-    { value: 'naharlagun', label: 'Naharlagun' },
-    { value: 'tawang', label: 'Tawang' },
+  ar: [ /* Arunachal Pradesh */
+    { value: 'itanagar', label: 'Itanagar' }, { value: 'naharlagun', label: 'Naharlagun' },
+    { value: 'tawang', label: 'Tawang' }, { value: 'pasighat', label: 'Pasighat' }
   ],
-  as: [
-    { value: 'guwahati', label: 'Guwahati' },
-    { value: 'dibrugarh', label: 'Dibrugarh' },
-    { value: 'silchar', label: 'Silchar' },
-    { value: 'jorhat', label: 'Jorhat' },
-    { value: 'tezpur', label: 'Tezpur' },
+  as: [ /* Assam */
+    { value: 'guwahati', label: 'Guwahati' }, { value: 'dibrugarh', label: 'Dibrugarh' },
+    { value: 'silchar', label: 'Silchar' }, { value: 'jorhat', label: 'Jorhat' },
+    { value: 'tezpur', label: 'Tezpur' }, { value: 'nagaon', label: 'Nagaon' }
   ],
-  br: [
-    { value: 'patna', label: 'Patna' },
-    { value: 'gaya', label: 'Gaya' },
-    { value: 'bhagalpur', label: 'Bhagalpur' },
-    { value: 'muzaffarpur', label: 'Muzaffarpur' },
-    { value: 'purnia', label: 'Purnia' },
+  br: [ /* Bihar */
+    { value: 'patna', label: 'Patna' }, { value: 'gaya', label: 'Gaya' },
+    { value: 'bhagalpur', label: 'Bhagalpur' }, { value: 'muzaffarpur', label: 'Muzaffarpur' },
+    { value: 'purnia', label: 'Purnia' }, { value: 'darbhanga', label: 'Darbhanga' }
   ],
-  cg: [
-    { value: 'raipur', label: 'Raipur' },
-    { value: 'bilaspur', label: 'Bilaspur' },
-    { value: 'durg', label: 'Durg' },
-    { value: 'bhilai', label: 'Bhilai' },
-    { value: 'korba', label: 'Korba' },
+  cg: [ /* Chhattisgarh */
+    { value: 'raipur', label: 'Raipur' }, { value: 'bilaspur', label: 'Bilaspur' },
+    { value: 'durg', label: 'Durg' }, { value: 'bhilai', label: 'Bhilai' },
+    { value: 'korba', label: 'Korba' }, { value: 'raigarh', label: 'Raigarh' }
   ],
-  dl: [
-    { value: 'nd', label: 'New Delhi' },
-    { value: 'sd', label: 'South Delhi' },
-    { value: 'wd', label: 'West Delhi' },
-    { value: 'ed', label: 'East Delhi' },
-    { value: 'nod', label: 'North Delhi' },
-    { value: 'dwarka', label: 'Dwarka' },
-    { value: 'rohini', label: 'Rohini' },
+  dl: [ /* Delhi */
+    { value: 'nd', label: 'New Delhi' }, { value: 'sd', label: 'South Delhi' },
+    { value: 'wd', label: 'West Delhi' }, { value: 'ed', label: 'East Delhi' },
+    { value: 'nod', label: 'North Delhi' }, { value: 'dwarka', label: 'Dwarka' },
+    { value: 'rohini', label: 'Rohini' }, { value: 'noida', label: 'Noida (NCR)'}, { value: 'gurgaon', label: 'Gurgaon (NCR)'}
   ],
-  ga: [
-    { value: 'panaji', label: 'Panaji' },
-    { value: 'margao', label: 'Margao' },
-    { value: 'vasco', label: 'Vasco da Gama' },
-    { value: 'mapusa', label: 'Mapusa' },
+  ga: [ /* Goa */
+    { value: 'panaji', label: 'Panaji' }, { value: 'margao', label: 'Margao' },
+    { value: 'vasco', label: 'Vasco da Gama' }, { value: 'mapusa', label: 'Mapusa' },
+    { value: 'ponda', label: 'Ponda' }
   ],
-  gj: [
-    { value: 'ahmedabad', label: 'Ahmedabad' },
-    { value: 'surat', label: 'Surat' },
-    { value: 'vadodara', label: 'Vadodara' },
-    { value: 'rajkot', label: 'Rajkot' },
-    { value: 'bhavnagar', label: 'Bhavnagar' },
-    { value: 'jamnagar', label: 'Jamnagar' },
+  gj: [ /* Gujarat */
+    { value: 'ahmedabad', label: 'Ahmedabad' }, { value: 'surat', label: 'Surat' },
+    { value: 'vadodara', label: 'Vadodara' }, { value: 'rajkot', label: 'Rajkot' },
+    { value: 'bhavnagar', label: 'Bhavnagar' }, { value: 'jamnagar', label: 'Jamnagar' },
+    { value: 'gandhinagar', label: 'Gandhinagar' }
   ],
-  hr: [
-    { value: 'faridabad', label: 'Faridabad' },
-    { value: 'gurugram', label: 'Gurugram' },
-    { value: 'panipat', label: 'Panipat' },
-    { value: 'ambala', label: 'Ambala' },
-    { value: 'rohtak', label: 'Rohtak' },
-    { value: 'hisar', label: 'Hisar' },
+  hr: [ /* Haryana */
+    { value: 'faridabad', label: 'Faridabad' }, { value: 'gurugram', label: 'Gurugram' },
+    { value: 'panipat', label: 'Panipat' }, { value: 'ambala', label: 'Ambala' },
+    { value: 'rohtak', label: 'Rohtak' }, { value: 'hisar', label: 'Hisar' },
+    { value: 'karnal', label: 'Karnal' }
   ],
-  hp: [
-    { value: 'shimla', label: 'Shimla' },
-    { value: 'manali', label: 'Manali' },
-    { value: 'dharamshala', label: 'Dharamshala' },
-    { value: 'kullu', label: 'Kullu' },
-    { value: 'mandi', label: 'Mandi' },
+  hp: [ /* Himachal Pradesh */
+    { value: 'shimla', label: 'Shimla' }, { value: 'manali', label: 'Manali' },
+    { value: 'dharamshala', label: 'Dharamshala' }, { value: 'kullu', label: 'Kullu' },
+    { value: 'mandi', label: 'Mandi Town' }, { value: 'solan', label: 'Solan' } // Renamed 'mandi' to avoid conflict
   ],
-  jh: [
-    { value: 'ranchi', label: 'Ranchi' },
-    { value: 'jamshedpur', label: 'Jamshedpur' },
-    { value: 'dhanbad', label: 'Dhanbad' },
-    { value: 'bokaro', label: 'Bokaro Steel City' },
+  jh: [ /* Jharkhand */
+    { value: 'ranchi', label: 'Ranchi' }, { value: 'jamshedpur', label: 'Jamshedpur' },
+    { value: 'dhanbad', label: 'Dhanbad' }, { value: 'bokaro', label: 'Bokaro Steel City' },
+    { value: 'hazaribagh', label: 'Hazaribagh'}
   ],
-  ka: [
-    { value: 'bengaluru', label: 'Bengaluru' },
-    { value: 'mysuru', label: 'Mysuru' },
-    { value: 'mangaluru', label: 'Mangaluru' },
-    { value: 'hubli', label: 'Hubli-Dharwad' },
-    { value: 'belagavi', label: 'Belagavi' },
-    { value: 'davangere', label: 'Davangere' },
+  ka: [ /* Karnataka */
+    { value: 'bengaluru', label: 'Bengaluru' }, { value: 'mysuru', label: 'Mysuru' },
+    { value: 'mangaluru', label: 'Mangaluru' }, { value: 'hubli', label: 'Hubli-Dharwad' },
+    { value: 'belagavi', label: 'Belagavi' }, { value: 'davangere', label: 'Davangere' },
+    { value: 'ballari', label: 'Ballari'}
   ],
-  kl: [
-    { value: 'thiruvananthapuram', label: 'Thiruvananthapuram' },
-    { value: 'kochi', label: 'Kochi' },
-    { value: 'kozhikode', label: 'Kozhikode' },
-    { value: 'thrissur', label: 'Thrissur' },
-    { value: 'kollam', label: 'Kollam' },
-    { value: 'alappuzha', label: 'Alappuzha' },
+  kl: [ /* Kerala */
+    { value: 'thiruvananthapuram', label: 'Thiruvananthapuram' }, { value: 'kochi', label: 'Kochi' },
+    { value: 'kozhikode', label: 'Kozhikode' }, { value: 'thrissur', label: 'Thrissur' },
+    { value: 'kollam', label: 'Kollam' }, { value: 'alappuzha', label: 'Alappuzha' },
+    { value: 'kannur', label: 'Kannur' }
   ],
-  mp: [
-    { value: 'indore', label: 'Indore' },
-    { value: 'bhopal', label: 'Bhopal' },
-    { value: 'jabalpur', label: 'Jabalpur' },
-    { value: 'gwalior', label: 'Gwalior' },
-    { value: 'ujjain', label: 'Ujjain' },
-    { value: 'sagar', label: 'Sagar' },
+  mp: [ /* Madhya Pradesh */
+    { value: 'indore', label: 'Indore' }, { value: 'bhopal', label: 'Bhopal' },
+    { value: 'jabalpur', label: 'Jabalpur' }, { value: 'gwalior', label: 'Gwalior' },
+    { value: 'ujjain', label: 'Ujjain' }, { value: 'sagar', label: 'Sagar' },
+    { value: 'rewa', label: 'Rewa'}
   ],
-  mh: [
-    { value: 'mum', label: 'Mumbai' },
-    { value: 'pun', label: 'Pune' },
-    { value: 'ngp', label: 'Nagpur' },
-    { value: 'nsk', label: 'Nashik' },
-    { value: 'aur', label: 'Aurangabad' },
-    { value: 'solapur', label: 'Solapur' },
-    { value: 'thane', label: 'Thane' },
+  mh: [ /* Maharashtra */
+    { value: 'mum', label: 'Mumbai' }, { value: 'pun', label: 'Pune' },
+    { value: 'ngp', label: 'Nagpur' }, { value: 'nsk', label: 'Nashik' },
+    { value: 'aur', label: 'Aurangabad (Chhatrapati Sambhajinagar)' }, { value: 'solapur', label: 'Solapur' },
+    { value: 'thane', label: 'Thane' }, { value: 'kolhapur', label: 'Kolhapur'}
   ],
-  mn: [{ value: 'imphal', label: 'Imphal' }],
-  ml: [{ value: 'shillong', label: 'Shillong' }],
-  mz: [{ value: 'aizawl', label: 'Aizawl' }],
-  nl: [
-    { value: 'kohima', label: 'Kohima' },
-    { value: 'dimapur', label: 'Dimapur' },
+  mn: [ /* Manipur */
+    { value: 'imphal', label: 'Imphal' }, { value: 'churachandpur', label: 'Churachandpur' }
   ],
-  od: [
-    { value: 'bhubaneswar', label: 'Bhubaneswar' },
-    { value: 'cuttack', label: 'Cuttack' },
-    { value: 'rourkela', label: 'Rourkela' },
-    { value: 'puri', label: 'Puri' },
-    { value: 'sambalpur', label: 'Sambalpur' },
+  ml: [ /* Meghalaya */
+    { value: 'shillong', label: 'Shillong' }, { value: 'tura', label: 'Tura' }
   ],
-  pb: [
-    { value: 'ludhiana', label: 'Ludhiana' },
-    { value: 'amritsar', label: 'Amritsar' },
-    { value: 'jalandhar', label: 'Jalandhar' },
-    { value: 'patiala', label: 'Patiala' },
-    { value: 'bathinda', label: 'Bathinda' },
+  mz: [ /* Mizoram */
+    { value: 'aizawl', label: 'Aizawl' }, { value: 'lunglei', label: 'Lunglei' }
   ],
-  rj: [
-    { value: 'jaipur', label: 'Jaipur' },
-    { value: 'jodhpur', label: 'Jodhpur' },
-    { value: 'kota', label: 'Kota' },
-    { value: 'udaipur', label: 'Udaipur' },
-    { value: 'ajmer', label: 'Ajmer' },
-    { value: 'bikaner', label: 'Bikaner' },
+  nl: [ /* Nagaland */
+    { value: 'kohima', label: 'Kohima' }, { value: 'dimapur', label: 'Dimapur' }
   ],
-  sk: [{ value: 'gangtok', label: 'Gangtok' }],
-  tn: [
-    { value: 'chennai', label: 'Chennai' },
-    { value: 'coimbatore', label: 'Coimbatore' },
-    { value: 'madurai', label: 'Madurai' },
-    { value: 'trichy', label: 'Tiruchirappalli' },
-    { value: 'salem', label: 'Salem' },
-    { value: 'tirunelveli', label: 'Tirunelveli' },
+  od: [ /* Odisha */
+    { value: 'bhubaneswar', label: 'Bhubaneswar' }, { value: 'cuttack', label: 'Cuttack' },
+    { value: 'rourkela', label: 'Rourkela' }, { value: 'puri', label: 'Puri' },
+    { value: 'sambalpur', label: 'Sambalpur' }, { value: 'berhampur', label: 'Berhampur' }
   ],
-  ts: [
-    { value: 'hyderabad', label: 'Hyderabad' },
-    { value: 'warangal', label: 'Warangal' },
-    { value: 'nizamabad', label: 'Nizamabad' },
-    { value: 'karimnagar', label: 'Karimnagar' },
+  pb: [ /* Punjab */
+    { value: 'ludhiana', label: 'Ludhiana' }, { value: 'amritsar', label: 'Amritsar' },
+    { value: 'jalandhar', label: 'Jalandhar' }, { value: 'patiala', label: 'Patiala' },
+    { value: 'bathinda', label: 'Bathinda' }, { value: 'mohali', label: 'Mohali' }
   ],
-  tr: [{ value: 'agartala', label: 'Agartala' }],
-  up: [
-    { value: 'lucknow', label: 'Lucknow' },
-    { value: 'kanpur', label: 'Kanpur' },
-    { value: 'ghaziabad', label: 'Ghaziabad' },
-    { value: 'agra', label: 'Agra' },
-    { value: 'varanasi', label: 'Varanasi' },
-    { value: 'meerut', label: 'Meerut' },
-    { value: 'allahabad', label: 'Prayagraj' },
-    { value: 'noida', label: 'Noida' },
+  rj: [ /* Rajasthan */
+    { value: 'jaipur', label: 'Jaipur' }, { value: 'jodhpur', label: 'Jodhpur' },
+    { value: 'kota', label: 'Kota' }, { value: 'udaipur', label: 'Udaipur' },
+    { value: 'ajmer', label: 'Ajmer' }, { value: 'bikaner', label: 'Bikaner' },
+    { value: 'alwar', label: 'Alwar' }
   ],
-  uk: [
-    { value: 'dehradun', label: 'Dehradun' },
-    { value: 'haridwar', label: 'Haridwar' },
-    { value: 'roorkee', label: 'Roorkee' },
-    { value: 'nainital', label: 'Nainital' },
+  sk: [ /* Sikkim */
+    { value: 'gangtok', label: 'Gangtok' }, { value: 'namchi', label: 'Namchi' }
   ],
-  wb: [
-    { value: 'kolkata', label: 'Kolkata' },
-    { value: 'howrah', label: 'Howrah' },
-    { value: 'durgapur', label: 'Durgapur' },
-    { value: 'siliguri', label: 'Siliguri' },
-    { value: 'asansol', label: 'Asansol' },
+  tn: [ /* Tamil Nadu */
+    { value: 'chennai', label: 'Chennai' }, { value: 'coimbatore', label: 'Coimbatore' },
+    { value: 'madurai', label: 'Madurai' }, { value: 'trichy', label: 'Tiruchirappalli' },
+    { value: 'salem', label: 'Salem' }, { value: 'tirunelveli', label: 'Tirunelveli' },
+    { value: 'erode', label: 'Erode' }
   ],
-  an: [{ value: 'portblair', label: 'Port Blair' }],
-  ch: [{ value: 'chandigarh', label: 'Chandigarh' }],
-  dn: [
-    { value: 'daman', label: 'Daman' },
-    { value: 'silvassa', label: 'Silvassa' },
+  ts: [ /* Telangana */
+    { value: 'hyderabad', label: 'Hyderabad' }, { value: 'warangal', label: 'Warangal' },
+    { value: 'nizamabad', label: 'Nizamabad' }, { value: 'karimnagar', label: 'Karimnagar' },
+    { value: 'khammam', label: 'Khammam' }
   ],
-  jk: [
-    { value: 'srinagar', label: 'Srinagar' },
-    { value: 'jammu', label: 'Jammu' },
+  tr: [ /* Tripura */
+    { value: 'agartala', label: 'Agartala' }, { value: 'udaipur_tr', label: 'Udaipur (Tripura)' } // Distinguish from Rajasthan's Udaipur
   ],
-  la: [
-    { value: 'leh', label: 'Leh' },
-    { value: 'kargil', label: 'Kargil' },
+  up: [ /* Uttar Pradesh */
+    { value: 'lucknow', label: 'Lucknow' }, { value: 'kanpur', label: 'Kanpur' },
+    { value: 'ghaziabad', label: 'Ghaziabad' }, { value: 'agra', label: 'Agra' },
+    { value: 'varanasi', label: 'Varanasi' }, { value: 'meerut', label: 'Meerut' },
+    { value: 'prayagraj', label: 'Prayagraj' }, { value: 'noida', label: 'Noida' },
+    { value: 'bareilly', label: 'Bareilly' }
   ],
-  ld: [{ value: 'kavaratti', label: 'Kavaratti' }],
-  py: [{ value: 'puducherry', label: 'Puducherry' }],
+  uk: [ /* Uttarakhand */
+    { value: 'dehradun', label: 'Dehradun' }, { value: 'haridwar', label: 'Haridwar' },
+    { value: 'roorkee', label: 'Roorkee' }, { value: 'nainital', label: 'Nainital' },
+    { value: 'haldwani', label: 'Haldwani' }
+  ],
+  wb: [ /* West Bengal */
+    { value: 'kolkata', label: 'Kolkata' }, { value: 'howrah', label: 'Howrah' },
+    { value: 'durgapur', label: 'Durgapur' }, { value: 'siliguri', label: 'Siliguri' },
+    { value: 'asansol', label: 'Asansol' }, { value: 'darjeeling', label: 'Darjeeling' }
+  ],
+  an: [{ value: 'portblair', label: 'Port Blair' }], // Andaman and Nicobar Islands
+  ch: [{ value: 'chandigarh', label: 'Chandigarh' }], // Chandigarh
+  dn: [ /* Dadra and Nagar Haveli and Daman and Diu */
+    { value: 'daman', label: 'Daman' }, { value: 'silvassa', label: 'Silvassa' }
+  ],
+  jk: [ /* Jammu and Kashmir */
+    { value: 'srinagar', label: 'Srinagar' }, { value: 'jammu', label: 'Jammu' },
+    { value: 'anantnag', label: 'Anantnag' }
+  ],
+  la: [ /* Ladakh */
+    { value: 'leh', label: 'Leh' }, { value: 'kargil', label: 'Kargil' }
+  ],
+  ld: [{ value: 'kavaratti', label: 'Kavaratti' }], // Lakshadweep
+  py: [{ value: 'puducherry', label: 'Puducherry' }], // Puducherry
 };
 
 
@@ -328,14 +289,13 @@ export default function MandiPage() {
   useEffect(() => {
     if (selectedState) {
       setAvailableCities(placeholderCities[selectedState as keyof typeof placeholderCities] || []);
-      setSelectedCity(undefined); // Reset city when state changes
+      setSelectedCity(undefined); 
     } else {
       setAvailableCities([]);
       setSelectedCity(undefined);
     }
   }, [selectedState]);
 
-  // Filtering logic
   const filteredCrops = placeholderCrops.filter(crop => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = crop.name.toLowerCase().includes(searchLower) ||
@@ -346,10 +306,16 @@ export default function MandiPage() {
     const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
     const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
 
-    const matchesState = stateLabel ? crop.location.toLowerCase().includes(stateLabel) : true;
-    const matchesCity = selectedState ? (cityLabel ? crop.location.toLowerCase().includes(cityLabel) : true) : true;
+    let matchesLocation = true;
+    if (selectedState) {
+        if (cityLabel) { // If a city is selected, location must contain the city
+            matchesLocation = crop.location.toLowerCase().includes(cityLabel);
+        } else if (stateLabel) { // If only a state is selected, location must contain the state
+            matchesLocation = crop.location.toLowerCase().includes(stateLabel);
+        }
+    }
     
-    return matchesSearch && matchesState && matchesCity;
+    return matchesSearch && matchesLocation;
   });
 
 
@@ -368,7 +334,6 @@ export default function MandiPage() {
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-8">
-          {/* Search and Filters */}
           <div className="space-y-4 p-4 border rounded-lg shadow-sm bg-card">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -398,27 +363,28 @@ export default function MandiPage() {
                 <SelectContent>
                   {availableCities.length > 0 ? availableCities.map(city => (
                     <SelectItem key={city.value} value={city.value}>{city.label}</SelectItem>
-                  )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed for this state"}</SelectItem>}
+                  )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed/select state"}</SelectItem>}
                 </SelectContent>
               </Select>
               <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1">
-                Apply Filters
+                 Apply Filters
               </Button>
             </div>
           </div>
 
-          {/* Crop Listings */}
           <section>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-primary flex items-center">
                 <Wheat className="mr-3 h-7 w-7"/> Available Crops
               </h2>
               <Button 
+                asChild
                 variant="default" 
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                onClick={() => alert('Add Crop button clicked! Form/Modal to be implemented.')}
               >
-                <PlusCircle className="mr-2 h-5 w-5" /> List Your Crop
+                <Link href="/mandi/add-crop">
+                  <PlusCircle className="mr-2 h-5 w-5" /> List Your Crop
+                </Link>
               </Button>
             </div>
             {filteredCrops.length > 0 ? (
@@ -483,6 +449,3 @@ export default function MandiPage() {
     </div>
   );
 }
-
-
-    
