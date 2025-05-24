@@ -52,7 +52,7 @@ export function ProfileEditForm() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-xl">
+    <Card className="w-full max-w-lg mx-auto shadow-xl rounded-xl">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-primary">Edit Profile</CardTitle>
         <CardDescription>Update your personal and farming information.</CardDescription>

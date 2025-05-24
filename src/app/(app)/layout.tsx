@@ -9,7 +9,7 @@ export default function AppPagesLayout({
     <div className="flex min-h-screen flex-col">
       <AppHeader />
       <main className="flex-1 bg-background">
-        <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="container mx-auto max-w-xl px-4 py-8">
          {children}
         </div>
       </main>
