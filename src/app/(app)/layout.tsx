@@ -1,6 +1,9 @@
+// src/app/(app)/layout.tsx
 'use client';
 
 import { AppHeader } from '@/components/layout/app-header';
+import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
+import { mainNavLinks } from '@/lib/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -15,7 +18,6 @@ export default function AppPagesLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check mock authentication status from localStorage
     const loggedIn = localStorage.getItem('isMockAuthenticated') === 'true';
     setIsAuthenticated(loggedIn);
     setIsLoading(false);
@@ -35,8 +37,6 @@ export default function AppPagesLayout({
   }
 
   if (!isAuthenticated) {
-    // This state should ideally be brief as the redirect happens in useEffect.
-    // It serves as a fallback to prevent rendering children if not authenticated.
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
          <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -48,11 +48,12 @@ export default function AppPagesLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pb-16 md:pb-0"> {/* Added padding for bottom nav */}
         <div className="container mx-auto max-w-xl px-4 py-8">
          {children}
         </div>
       </main>
+      <BottomNavBar links={mainNavLinks} />
     </div>
   );
 }

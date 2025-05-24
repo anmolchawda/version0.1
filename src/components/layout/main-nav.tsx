@@ -1,11 +1,9 @@
+// This component is no longer used for main navigation after implementing BottomNavBar.
+// It can be kept for potential future use or removed.
+// For now, I will leave its content as is but it won't be rendered by AppHeader.
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-
-interface NavLink {
-  href: string;
-  label: string;
-  icon?: React.ReactNode;
-}
+import type { NavLink } from '@/lib/navigation';
 
 interface MainNavProps {
   links: NavLink[];

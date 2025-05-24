@@ -1,18 +1,16 @@
+// This component is no longer used for main navigation after implementing BottomNavBar.
+// It can be kept for potential future use or removed.
+// For now, I will leave its content as is but it won't be rendered by AppHeader.
 'use client';
 
 import Link from 'next/link';
-import React, { useState } from 'react'; // Corrected and combined import
-import { Menu, X, Leaf } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, X } from 'lucide-react'; // Removed Leaf as it's not used here
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { AppLogo } from '@/components/core/app-logo';
 import { cn } from '@/lib/utils';
-
-interface NavLink {
-  href: string;
-  label: string;
-  icon?: React.ReactNode;
-}
+import type { NavLink } from '@/lib/navigation';
 
 interface MobileNavProps {
   links: NavLink[];
@@ -61,7 +59,6 @@ export function MobileNav({ links, currentPath, className }: MobileNavProps) {
                 </SheetClose>
               ))}
             </nav>
-            {/* Optional: Add search or other actions here for mobile */}
           </div>
         </SheetContent>
       </Sheet>
