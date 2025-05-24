@@ -36,7 +36,7 @@ export function LoginForm() {
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary">Welcome Back!</CardTitle>
-        <CardDescription>Log in to continue to FieldVerse.</CardDescription>
+        <CardDescription>Log in to continue to FARMDOCC.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6">

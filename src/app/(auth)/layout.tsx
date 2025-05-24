@@ -12,7 +12,7 @@ export default function AuthLayout({
       </div>
       {children}
        <footer className="absolute bottom-4 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} FieldVerse. Connect & Grow.
+        © {new Date().getFullYear()} FARMDOCC. Connect & Grow.
       </footer>
     </div>
   );

@@ -14,7 +14,7 @@ export default function AppPagesLayout({
         </div>
       </main>
       {/* <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} FieldVerse. All rights reserved.
+        © {new Date().getFullYear()} FARMDOCC. All rights reserved.
       </footer> */}
     </div>
   );

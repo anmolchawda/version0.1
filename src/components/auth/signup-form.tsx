@@ -34,7 +34,7 @@ export function SignupForm() {
 
     toast({
       title: 'Signup Successful (Simulated)',
-      description: `Welcome to FieldVerse, ${username}! Please log in.`,
+      description: `Welcome to FARMDOCC, ${username}! Please log in.`,
     });
     setIsLoading(false);
     // router.push('/login'); // If using next/navigation
@@ -43,7 +43,7 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary">Join FieldVerse</CardTitle>
+        <CardTitle className="text-3xl font-bold text-primary">Join FARMDOCC</CardTitle>
         <CardDescription>Create your account and connect with farmers.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
