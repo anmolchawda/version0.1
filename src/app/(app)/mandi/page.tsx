@@ -74,26 +74,35 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'guntur', label: 'Guntur' },
     { value: 'nellore', label: 'Nellore' },
     { value: 'kurnool', label: 'Kurnool' },
+    { value: 'tirupati', label: 'Tirupati' },
+    { value: 'rajahmundry', label: 'Rajahmundry' },
+    { value: 'kakinada', label: 'Kakinada' },
   ],
   ar: [
     { value: 'itanagar', label: 'Itanagar' },
     { value: 'naharlagun', label: 'Naharlagun' },
+    { value: 'tawang', label: 'Tawang' },
   ],
   as: [
     { value: 'guwahati', label: 'Guwahati' },
     { value: 'dibrugarh', label: 'Dibrugarh' },
     { value: 'silchar', label: 'Silchar' },
+    { value: 'jorhat', label: 'Jorhat' },
+    { value: 'tezpur', label: 'Tezpur' },
   ],
   br: [
     { value: 'patna', label: 'Patna' },
     { value: 'gaya', label: 'Gaya' },
     { value: 'bhagalpur', label: 'Bhagalpur' },
     { value: 'muzaffarpur', label: 'Muzaffarpur' },
+    { value: 'purnia', label: 'Purnia' },
   ],
   cg: [
     { value: 'raipur', label: 'Raipur' },
     { value: 'bilaspur', label: 'Bilaspur' },
     { value: 'durg', label: 'Durg' },
+    { value: 'bhilai', label: 'Bhilai' },
+    { value: 'korba', label: 'Korba' },
   ],
   dl: [
     { value: 'nd', label: 'New Delhi' },
@@ -101,58 +110,76 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'wd', label: 'West Delhi' },
     { value: 'ed', label: 'East Delhi' },
     { value: 'nod', label: 'North Delhi' },
+    { value: 'dwarka', label: 'Dwarka' },
+    { value: 'rohini', label: 'Rohini' },
   ],
   ga: [
     { value: 'panaji', label: 'Panaji' },
     { value: 'margao', label: 'Margao' },
     { value: 'vasco', label: 'Vasco da Gama' },
+    { value: 'mapusa', label: 'Mapusa' },
   ],
   gj: [
     { value: 'ahmedabad', label: 'Ahmedabad' },
     { value: 'surat', label: 'Surat' },
     { value: 'vadodara', label: 'Vadodara' },
     { value: 'rajkot', label: 'Rajkot' },
+    { value: 'bhavnagar', label: 'Bhavnagar' },
+    { value: 'jamnagar', label: 'Jamnagar' },
   ],
   hr: [
     { value: 'faridabad', label: 'Faridabad' },
     { value: 'gurugram', label: 'Gurugram' },
     { value: 'panipat', label: 'Panipat' },
     { value: 'ambala', label: 'Ambala' },
+    { value: 'rohtak', label: 'Rohtak' },
+    { value: 'hisar', label: 'Hisar' },
   ],
   hp: [
     { value: 'shimla', label: 'Shimla' },
     { value: 'manali', label: 'Manali' },
     { value: 'dharamshala', label: 'Dharamshala' },
+    { value: 'kullu', label: 'Kullu' },
+    { value: 'mandi', label: 'Mandi' },
   ],
   jh: [
     { value: 'ranchi', label: 'Ranchi' },
     { value: 'jamshedpur', label: 'Jamshedpur' },
     { value: 'dhanbad', label: 'Dhanbad' },
+    { value: 'bokaro', label: 'Bokaro Steel City' },
   ],
   ka: [
     { value: 'bengaluru', label: 'Bengaluru' },
     { value: 'mysuru', label: 'Mysuru' },
     { value: 'mangaluru', label: 'Mangaluru' },
     { value: 'hubli', label: 'Hubli-Dharwad' },
+    { value: 'belagavi', label: 'Belagavi' },
+    { value: 'davangere', label: 'Davangere' },
   ],
   kl: [
     { value: 'thiruvananthapuram', label: 'Thiruvananthapuram' },
     { value: 'kochi', label: 'Kochi' },
     { value: 'kozhikode', label: 'Kozhikode' },
     { value: 'thrissur', label: 'Thrissur' },
+    { value: 'kollam', label: 'Kollam' },
+    { value: 'alappuzha', label: 'Alappuzha' },
   ],
   mp: [
     { value: 'indore', label: 'Indore' },
     { value: 'bhopal', label: 'Bhopal' },
     { value: 'jabalpur', label: 'Jabalpur' },
     { value: 'gwalior', label: 'Gwalior' },
+    { value: 'ujjain', label: 'Ujjain' },
+    { value: 'sagar', label: 'Sagar' },
   ],
   mh: [
     { value: 'mum', label: 'Mumbai' },
     { value: 'pun', label: 'Pune' },
     { value: 'ngp', label: 'Nagpur' },
     { value: 'nsk', label: 'Nashik' },
-    { value: 'aur', label: 'Aurangabad' },
+    { value: 'aur', label: 'Aurangabad' }, // Corrected to Aurangabad (Chhatrapati Sambhajinagar)
+    { value: 'solapur', label: 'Solapur' },
+    { value: 'thane', label: 'Thane' },
   ],
   mn: [{ value: 'imphal', label: 'Imphal' }],
   ml: [{ value: 'shillong', label: 'Shillong' }],
@@ -165,17 +192,23 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'bhubaneswar', label: 'Bhubaneswar' },
     { value: 'cuttack', label: 'Cuttack' },
     { value: 'rourkela', label: 'Rourkela' },
+    { value: 'puri', label: 'Puri' },
+    { value: 'sambalpur', label: 'Sambalpur' },
   ],
   pb: [
     { value: 'ludhiana', label: 'Ludhiana' },
     { value: 'amritsar', label: 'Amritsar' },
     { value: 'jalandhar', label: 'Jalandhar' },
+    { value: 'patiala', label: 'Patiala' },
+    { value: 'bathinda', label: 'Bathinda' },
   ],
   rj: [
     { value: 'jaipur', label: 'Jaipur' },
     { value: 'jodhpur', label: 'Jodhpur' },
     { value: 'kota', label: 'Kota' },
     { value: 'udaipur', label: 'Udaipur' },
+    { value: 'ajmer', label: 'Ajmer' },
+    { value: 'bikaner', label: 'Bikaner' },
   ],
   sk: [{ value: 'gangtok', label: 'Gangtok' }],
   tn: [
@@ -183,11 +216,14 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'coimbatore', label: 'Coimbatore' },
     { value: 'madurai', label: 'Madurai' },
     { value: 'trichy', label: 'Tiruchirappalli' },
+    { value: 'salem', label: 'Salem' },
+    { value: 'tirunelveli', label: 'Tirunelveli' },
   ],
   ts: [
     { value: 'hyderabad', label: 'Hyderabad' },
     { value: 'warangal', label: 'Warangal' },
     { value: 'nizamabad', label: 'Nizamabad' },
+    { value: 'karimnagar', label: 'Karimnagar' },
   ],
   tr: [{ value: 'agartala', label: 'Agartala' }],
   up: [
@@ -196,17 +232,22 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'ghaziabad', label: 'Ghaziabad' },
     { value: 'agra', label: 'Agra' },
     { value: 'varanasi', label: 'Varanasi' },
+    { value: 'meerut', label: 'Meerut' },
+    { value: 'allahabad', label: 'Prayagraj' }, // Corrected to Prayagraj
+    { value: 'noida', label: 'Noida' },
   ],
   uk: [
     { value: 'dehradun', label: 'Dehradun' },
     { value: 'haridwar', label: 'Haridwar' },
     { value: 'roorkee', label: 'Roorkee' },
+    { value: 'nainital', label: 'Nainital' },
   ],
   wb: [
     { value: 'kolkata', label: 'Kolkata' },
     { value: 'howrah', label: 'Howrah' },
     { value: 'durgapur', label: 'Durgapur' },
     { value: 'siliguri', label: 'Siliguri' },
+    { value: 'asansol', label: 'Asansol' },
   ],
   an: [{ value: 'portblair', label: 'Port Blair' }],
   ch: [{ value: 'chandigarh', label: 'Chandigarh' }],
@@ -364,7 +405,7 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
               <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1">
-                <ListFilter className="mr-2 h-5 w-5" /> Apply Filters
+                Apply Filters
               </Button>
             </div>
           </div>
