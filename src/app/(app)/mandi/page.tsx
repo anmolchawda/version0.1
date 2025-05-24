@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, CalendarDays, ListFilter, Building2, Wheat, ShoppingCart } from 'lucide-react';
+import { Search, MapPin, CalendarDays, Building2, Wheat, ShoppingCart, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 // Placeholder data
@@ -177,7 +177,7 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'pun', label: 'Pune' },
     { value: 'ngp', label: 'Nagpur' },
     { value: 'nsk', label: 'Nashik' },
-    { value: 'aur', label: 'Aurangabad' }, // Corrected to Aurangabad (Chhatrapati Sambhajinagar)
+    { value: 'aur', label: 'Aurangabad' },
     { value: 'solapur', label: 'Solapur' },
     { value: 'thane', label: 'Thane' },
   ],
@@ -233,7 +233,7 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'agra', label: 'Agra' },
     { value: 'varanasi', label: 'Varanasi' },
     { value: 'meerut', label: 'Meerut' },
-    { value: 'allahabad', label: 'Prayagraj' }, // Corrected to Prayagraj
+    { value: 'allahabad', label: 'Prayagraj' },
     { value: 'noida', label: 'Noida' },
   ],
   uk: [
@@ -343,13 +343,10 @@ export default function MandiPage() {
                           crop.seller.username.toLowerCase().includes(searchLower) ||
                           crop.location.toLowerCase().includes(searchLower);
     
-    // Get full state label for matching, e.g. "Maharashtra" from "mh"
     const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
-    // Get full city label for matching
     const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
 
     const matchesState = stateLabel ? crop.location.toLowerCase().includes(stateLabel) : true;
-    // If a state is selected, also check if city matches if selected, or pass if no city is selected
     const matchesCity = selectedState ? (cityLabel ? crop.location.toLowerCase().includes(cityLabel) : true) : true;
     
     return matchesSearch && matchesState && matchesCity;
@@ -412,9 +409,18 @@ export default function MandiPage() {
 
           {/* Crop Listings */}
           <section>
-            <h2 className="text-2xl font-semibold mb-6 text-primary flex items-center">
-              <Wheat className="mr-3 h-7 w-7"/> Available Crops
-            </h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold text-primary flex items-center">
+                <Wheat className="mr-3 h-7 w-7"/> Available Crops
+              </h2>
+              <Button 
+                variant="default" 
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                onClick={() => alert('Add Crop button clicked! Form/Modal to be implemented.')}
+              >
+                <PlusCircle className="mr-2 h-5 w-5" /> List Your Crop
+              </Button>
+            </div>
             {filteredCrops.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredCrops.map((crop) => (
@@ -478,3 +484,5 @@ export default function MandiPage() {
   );
 }
 
+
+    
