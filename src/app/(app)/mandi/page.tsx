@@ -364,7 +364,7 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
               <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1">
-                <ListFilter className="mr-2 h-5 w-5" /> Apply Filters (WIP)
+                <ListFilter className="mr-2 h-5 w-5" /> Apply Filters
               </Button>
             </div>
           </div>
@@ -436,3 +436,4 @@ export default function MandiPage() {
     </div>
   );
 }
+
