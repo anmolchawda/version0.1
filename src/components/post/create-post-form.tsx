@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
@@ -9,41 +10,63 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { HashtagSuggester } from './hashtag-suggester';
-import { ImageUp, Send, Tag, X, Loader2 } from 'lucide-react';
+import { ImageUp, Send, Tag, X, Loader2, Video } from 'lucide-react'; // Added Video icon
 import { useToast } from '@/hooks/use-toast';
 
 export function CreatePostForm() {
   const [caption, setCaption] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  const [imageDataUri, setImageDataUri] = useState<string | undefined>(undefined);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaPreviewUrl, setMediaPreviewUrl] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<'image' | 'video' | null>(null);
+  const [mediaDataUri, setMediaDataUri] = useState<string | undefined>(undefined);
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [currentHashtagInput, setCurrentHashtagInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImageFile(file);
+      setMediaFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreviewUrl(reader.result as string);
-        setImageDataUri(reader.result as string); 
+        setMediaPreviewUrl(reader.result as string);
+        setMediaDataUri(reader.result as string); 
       };
       reader.readAsDataURL(file);
+      if (file.type.startsWith('image/')) {
+        setMediaType('image');
+      } else if (file.type.startsWith('video/')) {
+        setMediaType('video');
+         // Basic video length check (client-side, should be validated server-side too)
+        const videoElement = document.createElement('video');
+        videoElement.preload = 'metadata';
+        videoElement.onloadedmetadata = () => {
+          window.URL.revokeObjectURL(videoElement.src);
+          if (videoElement.duration > 60) {
+            toast({
+              title: "Video Too Long",
+              description: "Please select a video that is 60 seconds or shorter.",
+              variant: "destructive",
+            });
+            removeMedia(); // Reset if video is too long
+          }
+        }
+        videoElement.src = URL.createObjectURL(file);
+      } else {
+        setMediaType(null);
+      }
     } else {
-      setImageFile(null);
-      setImagePreviewUrl(null);
-      setImageDataUri(undefined);
+      removeMedia();
     }
   };
 
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreviewUrl(null);
-    setImageDataUri(undefined);
+  const removeMedia = () => {
+    setMediaFile(null);
+    setMediaPreviewUrl(null);
+    setMediaDataUri(undefined);
+    setMediaType(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // Reset file input
     }
@@ -80,17 +103,17 @@ export function CreatePostForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!caption && !imageFile) {
+    if (!caption && !mediaFile) {
       toast({
         title: "Empty Post",
-        description: "Please add a caption or an image to your post.",
+        description: "Please add a caption or an image/video to your post.",
         variant: "destructive",
       });
       return;
     }
     setIsSubmitting(true);
     // Simulate API call
-    console.log('Submitting post:', { caption, imageFile, hashtags, imageDataUri });
+    console.log('Submitting post:', { caption, mediaFile, mediaType, hashtags, mediaDataUri });
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     toast({
@@ -100,14 +123,9 @@ export function CreatePostForm() {
     
     // Reset form
     setCaption('');
-    setImageFile(null);
-    setImagePreviewUrl(null);
-    setImageDataUri(undefined);
+    removeMedia();
     setHashtags([]);
     setCurrentHashtagInput('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
     setIsSubmitting(false);
   };
 
@@ -131,34 +149,47 @@ export function CreatePostForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUpload" className="text-base">Image (Optional)</Label>
+            <Label htmlFor="mediaUpload" className="text-base">Image / Video (Optional)</Label>
             <Input
-              id="imageUpload"
+              id="mediaUpload"
               type="file"
-              accept="image/*"
-              onChange={handleImageChange}
+              accept="image/*, video/*"
+              onChange={handleMediaChange}
               ref={fileInputRef}
               className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
             />
-            {imagePreviewUrl && (
+            <p className="text-xs text-muted-foreground">(Max 60 seconds for videos)</p>
+            {mediaPreviewUrl && (
               <div className="relative mt-2 group">
-                <Image
-                  src={imagePreviewUrl}
-                  alt="Image preview"
-                  width={500}
-                  height={300}
-                  className="rounded-md object-cover aspect-video"
-                  data-ai-hint="farm activity"
-                />
+                {mediaType === 'image' && (
+                  <Image
+                    src={mediaPreviewUrl}
+                    alt="Media preview"
+                    width={500}
+                    height={300}
+                    className="rounded-md object-cover aspect-video"
+                    data-ai-hint="farm activity"
+                  />
+                )}
+                {mediaType === 'video' && (
+                   <div className="rounded-md object-cover aspect-video bg-muted flex items-center justify-center">
+                    <video
+                      src={mediaPreviewUrl}
+                      controls
+                      className="max-h-[300px] rounded-md"
+                      data-ai-hint="farm video"
+                    />
+                  </div>
+                )}
                 <Button
                   type="button"
                   variant="destructive"
                   size="icon"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-full h-8 w-8"
-                  onClick={removeImage}
+                  onClick={removeMedia}
                 >
                   <X className="h-4 w-4" />
-                  <span className="sr-only">Remove image</span>
+                  <span className="sr-only">Remove media</span>
                 </Button>
               </div>
             )}
@@ -199,7 +230,7 @@ export function CreatePostForm() {
           
           <HashtagSuggester
             postText={caption}
-            postImageDataUri={imageDataUri}
+            postImageDataUri={mediaType === 'image' ? mediaDataUri : undefined} // Only pass URI if it's an image
             onSuggestionClick={handleSuggestedHashtagClick}
             className="pt-2"
           />
@@ -219,3 +250,5 @@ export function CreatePostForm() {
     </Card>
   );
 }
+
+    
