@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,6 +17,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Search, PlusSquare, User, Settings, LogOut, Store } from 'lucide-react';
+import { getPlaceholderUser } from '@/lib/placeholders'; // Import user fetching utility
+import type { User as UserType } from '@/types'; // Import User type
 
 const navLinks = [
   { href: '/', label: 'Feed', icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
@@ -31,12 +34,19 @@ export function AppHeader() {
   const pathname = usePathname();
   const router = useRouter(); // Initialize useRouter
 
+  // Fetch mock user details
+  const mockUser: UserType | undefined = getPlaceholderUser(MOCK_USER_ID);
+
   const handleLogout = () => {
     // Clear mock authentication flag from localStorage
     localStorage.removeItem('isMockAuthenticated');
     // Redirect to login page
     router.push('/login');
   };
+
+  const userAvatarFallback = mockUser?.username ? mockUser.username.substring(0, 2).toUpperCase() : 'U';
+  const userNameDisplay = mockUser?.name || mockUser?.username || 'FARMDOCC User';
+  const userHandleDisplay = mockUser?.username ? `@${mockUser.username}` : 'user@farmdocc.com';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -56,17 +66,17 @@ export function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={`https://placehold.co/40x40.png?text=FD`} alt="User Avatar" data-ai-hint="person farmer" />
-                  <AvatarFallback>FD</AvatarFallback>
+                  <AvatarImage src={mockUser?.avatarUrl || `https://placehold.co/40x40.png?text=${userAvatarFallback}`} alt={mockUser?.username || "User Avatar"} data-ai-hint="person farmer" />
+                  <AvatarFallback>{userAvatarFallback}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">FarmerJohn</p>
+                  <p className="text-sm font-medium leading-none">{userNameDisplay}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    john.appleseed@example.com
+                    {userHandleDisplay}
                   </p>
                 </div>
               </DropdownMenuLabel>
