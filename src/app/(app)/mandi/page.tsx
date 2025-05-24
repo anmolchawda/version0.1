@@ -34,6 +34,7 @@ const placeholderStates = [
   { value: 'as', label: 'Assam' },
   { value: 'br', label: 'Bihar' },
   { value: 'cg', label: 'Chhattisgarh' },
+  { value: 'dl', label: 'Delhi' },
   { value: 'ga', label: 'Goa' },
   { value: 'gj', label: 'Gujarat' },
   { value: 'hr', label: 'Haryana' },
@@ -60,7 +61,6 @@ const placeholderStates = [
   { value: 'an', label: 'Andaman and Nicobar Islands' },
   { value: 'ch', label: 'Chandigarh' },
   { value: 'dn', label: 'Dadra and Nagar Haveli and Daman and Diu' },
-  { value: 'dl', label: 'Delhi' },
   { value: 'jk', label: 'Jammu and Kashmir' },
   { value: 'la', label: 'Ladakh' },
   { value: 'ld', label: 'Lakshadweep' },
@@ -68,20 +68,162 @@ const placeholderStates = [
 ];
 
 const placeholderCities: Record<string, { value: string; label: string }[]> = {
-  ap: [], ar: [], as: [], br: [], cg: [], ga: [], gj: [], hr: [], hp: [], jh: [], ka: [], kl: [], mp: [],
-  mh: [
-    { value: 'mum', label: 'Mumbai' },
-    { value: 'pun', label: 'Pune' },
-    { value: 'ngp', label: 'Nagpur' },
+  ap: [
+    { value: 'vizag', label: 'Visakhapatnam' },
+    { value: 'vijayawada', label: 'Vijayawada' },
+    { value: 'guntur', label: 'Guntur' },
+    { value: 'nellore', label: 'Nellore' },
+    { value: 'kurnool', label: 'Kurnool' },
   ],
-  mn: [], ml: [], mz: [], nl: [], od: [], pb: [], rj: [], sk: [], tn: [], ts: [], tr: [], up: [], uk: [], wb: [],
-  an: [], ch: [], dn: [],
+  ar: [
+    { value: 'itanagar', label: 'Itanagar' },
+    { value: 'naharlagun', label: 'Naharlagun' },
+  ],
+  as: [
+    { value: 'guwahati', label: 'Guwahati' },
+    { value: 'dibrugarh', label: 'Dibrugarh' },
+    { value: 'silchar', label: 'Silchar' },
+  ],
+  br: [
+    { value: 'patna', label: 'Patna' },
+    { value: 'gaya', label: 'Gaya' },
+    { value: 'bhagalpur', label: 'Bhagalpur' },
+    { value: 'muzaffarpur', label: 'Muzaffarpur' },
+  ],
+  cg: [
+    { value: 'raipur', label: 'Raipur' },
+    { value: 'bilaspur', label: 'Bilaspur' },
+    { value: 'durg', label: 'Durg' },
+  ],
   dl: [
     { value: 'nd', label: 'New Delhi' },
     { value: 'sd', label: 'South Delhi' },
     { value: 'wd', label: 'West Delhi' },
+    { value: 'ed', label: 'East Delhi' },
+    { value: 'nod', label: 'North Delhi' },
   ],
-  jk: [], la: [], ld: [], py: [],
+  ga: [
+    { value: 'panaji', label: 'Panaji' },
+    { value: 'margao', label: 'Margao' },
+    { value: 'vasco', label: 'Vasco da Gama' },
+  ],
+  gj: [
+    { value: 'ahmedabad', label: 'Ahmedabad' },
+    { value: 'surat', label: 'Surat' },
+    { value: 'vadodara', label: 'Vadodara' },
+    { value: 'rajkot', label: 'Rajkot' },
+  ],
+  hr: [
+    { value: 'faridabad', label: 'Faridabad' },
+    { value: 'gurugram', label: 'Gurugram' },
+    { value: 'panipat', label: 'Panipat' },
+    { value: 'ambala', label: 'Ambala' },
+  ],
+  hp: [
+    { value: 'shimla', label: 'Shimla' },
+    { value: 'manali', label: 'Manali' },
+    { value: 'dharamshala', label: 'Dharamshala' },
+  ],
+  jh: [
+    { value: 'ranchi', label: 'Ranchi' },
+    { value: 'jamshedpur', label: 'Jamshedpur' },
+    { value: 'dhanbad', label: 'Dhanbad' },
+  ],
+  ka: [
+    { value: 'bengaluru', label: 'Bengaluru' },
+    { value: 'mysuru', label: 'Mysuru' },
+    { value: 'mangaluru', label: 'Mangaluru' },
+    { value: 'hubli', label: 'Hubli-Dharwad' },
+  ],
+  kl: [
+    { value: 'thiruvananthapuram', label: 'Thiruvananthapuram' },
+    { value: 'kochi', label: 'Kochi' },
+    { value: 'kozhikode', label: 'Kozhikode' },
+    { value: 'thrissur', label: 'Thrissur' },
+  ],
+  mp: [
+    { value: 'indore', label: 'Indore' },
+    { value: 'bhopal', label: 'Bhopal' },
+    { value: 'jabalpur', label: 'Jabalpur' },
+    { value: 'gwalior', label: 'Gwalior' },
+  ],
+  mh: [
+    { value: 'mum', label: 'Mumbai' },
+    { value: 'pun', label: 'Pune' },
+    { value: 'ngp', label: 'Nagpur' },
+    { value: 'nsk', label: 'Nashik' },
+    { value: 'aur', label: 'Aurangabad' },
+  ],
+  mn: [{ value: 'imphal', label: 'Imphal' }],
+  ml: [{ value: 'shillong', label: 'Shillong' }],
+  mz: [{ value: 'aizawl', label: 'Aizawl' }],
+  nl: [
+    { value: 'kohima', label: 'Kohima' },
+    { value: 'dimapur', label: 'Dimapur' },
+  ],
+  od: [
+    { value: 'bhubaneswar', label: 'Bhubaneswar' },
+    { value: 'cuttack', label: 'Cuttack' },
+    { value: 'rourkela', label: 'Rourkela' },
+  ],
+  pb: [
+    { value: 'ludhiana', label: 'Ludhiana' },
+    { value: 'amritsar', label: 'Amritsar' },
+    { value: 'jalandhar', label: 'Jalandhar' },
+  ],
+  rj: [
+    { value: 'jaipur', label: 'Jaipur' },
+    { value: 'jodhpur', label: 'Jodhpur' },
+    { value: 'kota', label: 'Kota' },
+    { value: 'udaipur', label: 'Udaipur' },
+  ],
+  sk: [{ value: 'gangtok', label: 'Gangtok' }],
+  tn: [
+    { value: 'chennai', label: 'Chennai' },
+    { value: 'coimbatore', label: 'Coimbatore' },
+    { value: 'madurai', label: 'Madurai' },
+    { value: 'trichy', label: 'Tiruchirappalli' },
+  ],
+  ts: [
+    { value: 'hyderabad', label: 'Hyderabad' },
+    { value: 'warangal', label: 'Warangal' },
+    { value: 'nizamabad', label: 'Nizamabad' },
+  ],
+  tr: [{ value: 'agartala', label: 'Agartala' }],
+  up: [
+    { value: 'lucknow', label: 'Lucknow' },
+    { value: 'kanpur', label: 'Kanpur' },
+    { value: 'ghaziabad', label: 'Ghaziabad' },
+    { value: 'agra', label: 'Agra' },
+    { value: 'varanasi', label: 'Varanasi' },
+  ],
+  uk: [
+    { value: 'dehradun', label: 'Dehradun' },
+    { value: 'haridwar', label: 'Haridwar' },
+    { value: 'roorkee', label: 'Roorkee' },
+  ],
+  wb: [
+    { value: 'kolkata', label: 'Kolkata' },
+    { value: 'howrah', label: 'Howrah' },
+    { value: 'durgapur', label: 'Durgapur' },
+    { value: 'siliguri', label: 'Siliguri' },
+  ],
+  an: [{ value: 'portblair', label: 'Port Blair' }],
+  ch: [{ value: 'chandigarh', label: 'Chandigarh' }],
+  dn: [
+    { value: 'daman', label: 'Daman' },
+    { value: 'silvassa', label: 'Silvassa' },
+  ],
+  jk: [
+    { value: 'srinagar', label: 'Srinagar' },
+    { value: 'jammu', label: 'Jammu' },
+  ],
+  la: [
+    { value: 'leh', label: 'Leh' },
+    { value: 'kargil', label: 'Kargil' },
+  ],
+  ld: [{ value: 'kavaratti', label: 'Kavaratti' }],
+  py: [{ value: 'puducherry', label: 'Puducherry' }],
 };
 
 
@@ -152,7 +294,7 @@ export default function MandiPage() {
     }
   }, [selectedState]);
 
-  // Filtering logic (simplified: only search term is applied for now)
+  // Filtering logic
   const filteredCrops = placeholderCrops.filter(crop => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = crop.name.toLowerCase().includes(searchLower) ||
@@ -160,11 +302,14 @@ export default function MandiPage() {
                           crop.seller.username.toLowerCase().includes(searchLower) ||
                           crop.location.toLowerCase().includes(searchLower);
     
+    // Get full state label for matching, e.g. "Maharashtra" from "mh"
     const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
+    // Get full city label for matching
     const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
 
-    const matchesState = stateLabel ? crop.location.toLowerCase().includes(stateLabel) || crop.location.toLowerCase().includes(selectedState) : true;
-    const matchesCity = cityLabel ? crop.location.toLowerCase().includes(cityLabel) : true;
+    const matchesState = stateLabel ? crop.location.toLowerCase().includes(stateLabel) : true;
+    // If a state is selected, also check if city matches if selected, or pass if no city is selected
+    const matchesCity = selectedState ? (cityLabel ? crop.location.toLowerCase().includes(cityLabel) : true) : true;
     
     return matchesSearch && matchesState && matchesCity;
   });
@@ -215,10 +360,10 @@ export default function MandiPage() {
                 <SelectContent>
                   {availableCities.length > 0 ? availableCities.map(city => (
                     <SelectItem key={city.value} value={city.value}>{city.label}</SelectItem>
-                  )) : <SelectItem value="no-cities" disabled>No cities for this state</SelectItem>}
+                  )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed for this state"}</SelectItem>}
                 </SelectContent>
               </Select>
-              <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1 md:col-start-3">
+              <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1">
                 <ListFilter className="mr-2 h-5 w-5" /> Apply Filters (WIP)
               </Button>
             </div>
@@ -291,5 +436,3 @@ export default function MandiPage() {
     </div>
   );
 }
-
-    
