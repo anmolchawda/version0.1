@@ -1,3 +1,4 @@
+
 import type { User, Post, Comment } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -48,7 +49,7 @@ export const placeholderPosts: Post[] = [
     caption: 'Beautiful sunrise over the cornfields today! Feeling blessed. 🌽☀️ #farminglife #sunrise #cornfield',
     hashtags: ['#farminglife', '#sunrise', '#cornfield', '#organic'],
     likesCount: 152,
-    commentsCount: 2, // Updated to reflect actual comments below
+    commentsCount: 3, // Updated to reflect actual comments and replies
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
   },
   {
@@ -58,7 +59,7 @@ export const placeholderPosts: Post[] = [
     caption: 'Harvesting our first batch of organic tomatoes. They are looking juicy! 🍅😋 #organic #harvest #tomatoes #farmtotable',
     hashtags: ['#organic', '#harvest', '#tomatoes', '#farmtotable', '#growyourown'],
     likesCount: 230,
-    commentsCount: 1, // Updated to reflect actual comments below
+    commentsCount: 1,
     createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5 hours ago
   },
   {
@@ -82,13 +83,14 @@ export const placeholderPosts: Post[] = [
   },
 ];
 
-export const placeholderComments: Comment[] = [
+export const placeholderCommentsData: Comment[] = [
   {
     id: 'c1',
     postId: 'p1',
     user: placeholderUsers[1], // GreenThumbSarah
     text: 'Absolutely stunning view, John!',
     createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
+    parentId: null,
   },
   {
     id: 'c2',
@@ -96,6 +98,7 @@ export const placeholderComments: Comment[] = [
     user: placeholderUsers[2], // UrbanHarvester
     text: 'Makes me miss the countryside. Great shot!',
     createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+    parentId: null,
   },
   {
     id: 'c3',
@@ -103,8 +106,28 @@ export const placeholderComments: Comment[] = [
     user: placeholderUsers[0], // FarmerJohn
     text: 'Those tomatoes look delicious, Sarah! Well done.',
     createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+    parentId: null,
+  },
+  {
+    id: 'c4', // A reply to c1
+    postId: 'p1',
+    user: placeholderUsers[0], // FarmerJohn replies to GreenThumbSarah
+    text: 'Thanks Sarah! The early bird gets the worm, or in this case, the view! 😉',
+    createdAt: new Date(Date.now() - 50 * 60 * 1000).toISOString(), // 50 minutes ago
+    parentId: 'c1',
   },
 ];
+
+// Helper function to build the comment tree
+const buildCommentTree = (comments: Comment[], parentId: string | null = null): Comment[] => {
+  return comments
+    .filter(comment => comment.parentId === parentId)
+    .map(comment => ({
+      ...comment,
+      replies: buildCommentTree(comments, comment.id).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+    })).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+};
+
 
 export function getPlaceholderUser(userId: string): User | undefined {
   return placeholderUsers.find(user => user.id === userId);
@@ -119,7 +142,8 @@ export function getPlaceholderPostsForUser(userId: string): Post[] {
 }
 
 export function getPlaceholderCommentsForPost(postId: string): Comment[] {
-  return placeholderComments.filter(comment => comment.postId === postId).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const flatComments = placeholderCommentsData.filter(comment => comment.postId === postId);
+  return buildCommentTree(flatComments);
 }
 
 export function formatTimeAgo(dateString: string): string {

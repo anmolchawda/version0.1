@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   username: string;
@@ -28,4 +29,6 @@ export interface Comment {
   postId: string;
   text: string;
   createdAt: string; // ISO date string
+  parentId?: string | null; // ID of the comment this is a reply to
+  replies?: Comment[]; // Nested replies
 }
