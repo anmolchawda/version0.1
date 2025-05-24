@@ -1,3 +1,4 @@
+
 // src/components/layout/bottom-nav-bar.tsx
 'use client';
 
@@ -17,6 +18,7 @@ export function BottomNavBar({ links }: BottomNavBarProps) {
     <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 border-t bg-background shadow-sm md:hidden">
       <div className="grid h-full grid-cols-5 mx-auto">
         {links.map((link) => {
+          const IconComponent = link.icon;
           // More specific active check: exact match for root, startsWith for others.
           const isActive = (pathname === '/' && link.href === '/') || 
                            (link.href !== '/' && pathname.startsWith(link.href));
@@ -29,7 +31,7 @@ export function BottomNavBar({ links }: BottomNavBarProps) {
                 isActive ? 'text-primary' : 'text-muted-foreground'
               )}
             >
-              {link.icon}
+              <IconComponent className="h-6 w-6" />
               <span
                 className={cn(
                   'text-[10px] leading-tight mt-0.5', // Smaller text, tighter leading
@@ -46,3 +48,4 @@ export function BottomNavBar({ links }: BottomNavBarProps) {
     </nav>
   );
 }
+
