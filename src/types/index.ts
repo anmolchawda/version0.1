@@ -24,8 +24,8 @@ export interface Post {
 
 export interface Comment {
   id: string;
-  user: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  user: Pick<User, 'id' | 'username' | 'avatarUrl'>; // User who made the comment
   postId: string;
   text: string;
-  createdAt: string;
+  createdAt: string; // ISO date string
 }

@@ -6,14 +6,14 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatTimeAgo } from '@/lib/placeholders'; // Using the new utility
 
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const timeAgo = formatTimeAgo(post.createdAt);
 
   return (
     <Card className="overflow-hidden shadow-lg rounded-xl">
@@ -31,16 +31,16 @@ export function PostCard({ post }: PostCardProps) {
       </CardHeader>
       
       {post.imageUrl && (
-        <div className="relative aspect-square sm:aspect-video w-full bg-muted">
+        <Link href={`/post/${post.id}`} className="block relative aspect-square sm:aspect-video w-full bg-muted cursor-pointer">
           <Image
             src={post.imageUrl}
-            alt={`Post by ${post.user.username}`}
+            alt={`Post by ${post.user.username}: ${post.caption.substring(0,50)}`}
             layout="fill"
             objectFit="cover"
             className="rounded-none"
-            data-ai-hint="farm field"
+            data-ai-hint="farm field crop"
           />
-        </div>
+        </Link>
       )}
 
       <CardContent className="p-4 space-y-3">
@@ -49,10 +49,12 @@ export function PostCard({ post }: PostCardProps) {
             <Heart className="h-6 w-6" />
             <span className="sr-only">Like</span>
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <MessageCircle className="h-6 w-6" />
-            <span className="sr-only">Comment</span>
-          </Button>
+          <Link href={`/post/${post.id}#comments`}> {/* Link to comments section */}
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <MessageCircle className="h-6 w-6" />
+              <span className="sr-only">Comment</span>
+            </Button>
+          </Link>
           <Button variant="ghost" size="icon" className="rounded-full">
             <Send className="h-6 w-6" />
             <span className="sr-only">Share</span>
@@ -83,7 +85,7 @@ export function PostCard({ post }: PostCardProps) {
         )}
 
         {post.commentsCount > 0 && (
-          <Link href={`/post/${post.id}/comments`} className="text-sm text-muted-foreground hover:underline">
+          <Link href={`/post/${post.id}`} className="text-sm text-muted-foreground hover:underline">
             View all {post.commentsCount} comments
           </Link>
         )}
