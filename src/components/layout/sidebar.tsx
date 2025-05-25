@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, type ReactNode } from 'react'; 
+import { useState, type ReactNode } from 'react';
 import { AppLogo } from '@/components/core/app-logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,7 +12,7 @@ import type { NavLink, User } from '@/types';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import {
   ChevronLeft,
-  ChevronRight, 
+  ChevronRight,
   FlaskConical,
   SprayCan,
   Bug,
@@ -57,7 +57,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-card text-card-foreground border-r flex flex-col h-screen sticky top-0 transition-all duration-300 ease-in-out z-30", // Added z-30
+        "bg-card text-card-foreground border-r flex flex-col h-screen sticky top-0 transition-all duration-300 ease-in-out z-30",
         isCollapsed ? 'w-20' : 'w-64'
       )}
     >
@@ -65,12 +65,10 @@ export function Sidebar() {
         <div className={cn("flex flex-col w-full", isCollapsed ? "items-center" : "items-center")}>
           <AppLogo
             className={cn("h-10", isCollapsed ? "justify-center" : "")}
-            iconClassName={isCollapsed ? "h-8 w-8" : ""} 
+            iconClassName={isCollapsed ? "h-8 w-8" : ""}
             textClassName={isCollapsed ? "hidden" : ""}
           />
-          {!isCollapsed && (
-            <span className="text-sm font-semibold text-primary mt-1">KRISHIX</span>
-          )}
+          {/* "KRISHIX" text removed from here */}
         </div>
         <Button variant="ghost" size="icon" onClick={handleCollapse} className={cn(isCollapsed ? "w-full mt-1" : "ml-auto -mr-2")}>
           {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
@@ -151,7 +149,7 @@ export function Sidebar() {
                     <AvatarFallback>{userAvatarFallback}</AvatarFallback>
                   </Avatar>
                   {!isCollapsed && (
-                    <div className="flex flex-col overflow-hidden"> 
+                    <div className="flex flex-col overflow-hidden">
                       <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
                       <span className="text-xs text-muted-foreground truncate">@{mockUser.username}</span>
                     </div>
