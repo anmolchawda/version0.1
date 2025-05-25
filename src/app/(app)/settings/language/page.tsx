@@ -3,11 +3,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Globe } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 interface Language {
   code: string;
@@ -34,6 +36,7 @@ const DEFAULT_LANG_CODE = 'en';
 
 export default function LanguageSettingsPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [selectedLanguage, setSelectedLanguage] = useState<string>(DEFAULT_LANG_CODE);
 
   useEffect(() => {
@@ -56,10 +59,21 @@ export default function LanguageSettingsPage() {
   return (
     <div className="space-y-6">
       <Card className="shadow-xl rounded-xl p-4 sm:p-6">
-        <CardTitle className="text-center mb-8">
-          <span className="block text-3xl font-bold text-foreground">भाषा चुनें</span>
-          <span className="block text-xl font-semibold text-primary mt-1">SELECT LANGUAGE</span>
-        </CardTitle>
+        <CardHeader className="relative pt-2 pb-6 px-0 sm:px-2"> {/* Adjusted padding */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="absolute left-0 top-1/2 -translate-y-1/2 sm:left-0 h-9 w-9"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <CardTitle className="text-center w-full"> {/* Ensure title is centered */}
+            <span className="block text-3xl font-bold text-foreground">भाषा चुनें</span>
+            <span className="block text-xl font-semibold text-primary mt-1">SELECT LANGUAGE</span>
+          </CardTitle>
+        </CardHeader>
         <CardContent className="px-0 sm:px-2">
           <RadioGroup value={selectedLanguage} onValueChange={handleLanguageChange} className="space-y-0">
             <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
@@ -94,4 +108,3 @@ export default function LanguageSettingsPage() {
     </div>
   );
 }
-
