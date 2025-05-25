@@ -36,7 +36,7 @@ export interface Comment {
 export interface NavLink {
   href: string;
   label: string;
-  icon?: JSX.Element;
+  icon?: JSX.Element; // Changed from ReactNode to JSX.Element for more specific typing
 }
 
 export interface MandiListing {
@@ -51,4 +51,11 @@ export interface MandiListing {
   seller: { id: string; username: string; avatarUrl: string };
   listedDate: string; // ISO date string
   location: string; // City, State
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string; // ID of the user who sent this message (e.g., MOCK_USER_ID or chatPartnerId)
+  text: string;
+  timestamp: string; // ISO date string
 }

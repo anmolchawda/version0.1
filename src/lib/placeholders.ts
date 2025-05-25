@@ -1,6 +1,8 @@
 
-import type { User, Post, Comment, MandiListing } from '@/types';
+import type { User, Post, Comment, MandiListing, ChatMessage } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+
+export const MOCK_USER_ID = '1'; // Current logged-in user
 
 export const placeholderUsers: User[] = [
   {
@@ -438,4 +440,20 @@ export const placeholderListings: MandiListing[] = [
   },
 ];
 
-    
+// Mock Chat Messages
+const placeholderChatMessages: Record<string, ChatMessage[]> = {
+  '2': [ // Chat between MOCK_USER_ID ('1') and User '2' (Sarah Green)
+    { id: 'msg1', senderId: '2', text: 'Hey John, are you going to the farmers market this weekend?', timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
+    { id: 'msg2', senderId: MOCK_USER_ID, text: 'Hi Sarah! Yes, I plan to. Will have lots of fresh apples!', timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString() },
+    { id: 'msg3', senderId: '2', text: 'Great! I might need some for my pies.', timestamp: new Date(Date.now() - 7 * 60 * 1000).toISOString() },
+    { id: 'msg4', senderId: MOCK_USER_ID, text: 'Sounds good, see you there!', timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString() },
+  ],
+  '3': [ // Chat between MOCK_USER_ID ('1') and User '3' (Mike Chen)
+    { id: 'msg5', senderId: MOCK_USER_ID, text: 'Mike, your microgreens setup looks amazing!', timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString() },
+    { id: 'msg6', senderId: '3', text: 'Thanks John! It\'s a lot of fun. Let me know if you want some samples.', timestamp: new Date(Date.now() - 18 * 60 * 1000).toISOString() },
+  ]
+};
+
+export function getPlaceholderMessagesForChat(chatPartnerId: string): ChatMessage[] {
+  return placeholderChatMessages[chatPartnerId] || [];
+}

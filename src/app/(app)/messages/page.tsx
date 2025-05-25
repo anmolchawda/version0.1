@@ -1,3 +1,4 @@
+
 // src/app/(app)/messages/page.tsx
 'use client';
 
@@ -7,20 +8,24 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquareText, Search, Edit3, Users } from 'lucide-react'; // Using Users as placeholder for conversation icon
-import { placeholderUsers } from '@/lib/placeholders'; // For mock data
+import { MessageSquareText, Search, Edit3, Users } from 'lucide-react'; 
+import { placeholderUsers } from '@/lib/placeholders'; 
 import type { User } from '@/types';
+import { MOCK_USER_ID } from '@/lib/placeholders'; // Import MOCK_USER_ID
 
 interface MockConversation {
   id: string;
   user: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   lastMessage: string;
-  lastMessageTime: string; // e.g., "2h ago", "Yesterday"
+  lastMessageTime: string; 
   unread?: boolean;
 }
 
-// Create mock conversations using placeholder users
-const mockConversations: MockConversation[] = placeholderUsers.slice(0, 3).map((user, index) => ({
+// Create mock conversations using placeholder users, excluding the current mock user
+const mockConversations: MockConversation[] = placeholderUsers
+  .filter(user => user.id !== MOCK_USER_ID) // Exclude current user from conversations list
+  .slice(0, 3) // Take a few for demo
+  .map((user, index) => ({
   id: `conv_${user.id}`,
   user: {
     id: user.id,
@@ -36,7 +41,7 @@ const mockConversations: MockConversation[] = placeholderUsers.slice(0, 3).map((
 
 export default function MessagesPage() {
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-5rem)]"> {/* Adjust height based on navbars */}
+    <div className="flex flex-col h-full max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-5rem)]">
       <Card className="shadow-xl rounded-xl flex-grow flex flex-col overflow-hidden">
         <CardHeader className="border-b sticky top-0 bg-card z-10">
           <div className="flex items-center justify-between">
@@ -63,16 +68,16 @@ export default function MessagesPage() {
             {mockConversations.length > 0 ? (
               <div className="divide-y">
                 {mockConversations.map((convo) => (
-                  <Link key={convo.id} href={`#`} passHref> {/* Placeholder link, replace with actual chat route later */}
+                  <Link key={convo.id} href={`/messages/${convo.user.id}`} passHref>
                     <div className="flex items-center p-4 hover:bg-muted/50 cursor-pointer transition-colors">
                       <Avatar className="h-12 w-12 mr-4 border">
-                        <AvatarImage src={convo.user.avatarUrl} alt={convo.user.name} data-ai-hint="person user"/>
-                        <AvatarFallback>{convo.user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={convo.user.avatarUrl} alt={convo.user.name || convo.user.username} data-ai-hint="person user"/>
+                        <AvatarFallback>{(convo.user.name || convo.user.username)?.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="flex-grow overflow-hidden">
                         <div className="flex justify-between items-center">
                           <h3 className={`font-semibold truncate ${convo.unread ? 'text-foreground' : 'text-foreground'}`}>
-                            {convo.user.name}
+                            {convo.user.name || convo.user.username}
                           </h3>
                           <span className={`text-xs ${convo.unread ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                             {convo.lastMessageTime}
