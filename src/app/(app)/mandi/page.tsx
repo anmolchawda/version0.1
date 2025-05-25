@@ -424,7 +424,7 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
               <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10">
-                 <Filter className="mr-2 h-4 w-4"/> Apply Filters
+                 Apply
               </Button>
             </div>
           </div>
