@@ -38,3 +38,17 @@ export interface NavLink {
   label: string;
   icon?: JSX.Element;
 }
+
+export interface MandiListing {
+  id: string;
+  name: string; // Product name
+  category: string; // e.g., 'Crops', 'Seeds', 'Tractors'
+  description?: string; // For variety, specs, etc.
+  quantity: string; // e.g., '120 lbs', '1 unit', '5 liters'
+  price: string; // e.g., '₹275/kg', '$5000'
+  imageUrl: string;
+  aiHint: string;
+  seller: { id: string; username: string; avatarUrl: string };
+  listedDate: string; // ISO date string
+  location: string; // City, State
+}

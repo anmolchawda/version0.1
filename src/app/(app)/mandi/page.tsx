@@ -2,6 +2,7 @@
 // src/app/(app)/mandi/page.tsx
 'use client';
 
+import type { MandiListing } from '@/types';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, CalendarDays, Building2, Wheat, ShoppingCart, PlusCircle } from 'lucide-react';
+import { Search, MapPin, CalendarDays, Building2, ListChecks, ShoppingCart, PlusCircle, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 
 const placeholderStates = [
@@ -119,7 +120,7 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
   hp: [ /* Himachal Pradesh */
     { value: 'shimla', label: 'Shimla' }, { value: 'manali', label: 'Manali' },
     { value: 'dharamshala', label: 'Dharamshala' }, { value: 'kullu', label: 'Kullu' },
-    { value: 'mandi', label: 'Mandi Town' }, { value: 'solan', label: 'Solan' } // Renamed 'mandi' to avoid conflict
+    { value: 'mandi_town', label: 'Mandi Town' }, { value: 'solan', label: 'Solan' }
   ],
   jh: [ /* Jharkhand */
     { value: 'ranchi', label: 'Ranchi' }, { value: 'jamshedpur', label: 'Jamshedpur' },
@@ -193,7 +194,7 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'khammam', label: 'Khammam' }
   ],
   tr: [ /* Tripura */
-    { value: 'agartala', label: 'Agartala' }, { value: 'udaipur_tr', label: 'Udaipur (Tripura)' } // Distinguish from Rajasthan's Udaipur
+    { value: 'agartala', label: 'Agartala' }, { value: 'udaipur_tr', label: 'Udaipur (Tripura)' }
   ],
   up: [ /* Uttar Pradesh */
     { value: 'lucknow', label: 'Lucknow' }, { value: 'kanpur', label: 'Kanpur' },
@@ -212,71 +213,104 @@ const placeholderCities: Record<string, { value: string; label: string }[]> = {
     { value: 'durgapur', label: 'Durgapur' }, { value: 'siliguri', label: 'Siliguri' },
     { value: 'asansol', label: 'Asansol' }, { value: 'darjeeling', label: 'Darjeeling' }
   ],
-  an: [{ value: 'portblair', label: 'Port Blair' }], // Andaman and Nicobar Islands
-  ch: [{ value: 'chandigarh', label: 'Chandigarh' }], // Chandigarh
-  dn: [ /* Dadra and Nagar Haveli and Daman and Diu */
-    { value: 'daman', label: 'Daman' }, { value: 'silvassa', label: 'Silvassa' }
-  ],
-  jk: [ /* Jammu and Kashmir */
-    { value: 'srinagar', label: 'Srinagar' }, { value: 'jammu', label: 'Jammu' },
-    { value: 'anantnag', label: 'Anantnag' }
-  ],
-  la: [ /* Ladakh */
-    { value: 'leh', label: 'Leh' }, { value: 'kargil', label: 'Kargil' }
-  ],
-  ld: [{ value: 'kavaratti', label: 'Kavaratti' }], // Lakshadweep
-  py: [{ value: 'puducherry', label: 'Puducherry' }], // Puducherry
+  an: [{ value: 'portblair', label: 'Port Blair' }],
+  ch: [{ value: 'chandigarh', label: 'Chandigarh' }],
+  dn: [ { value: 'daman', label: 'Daman' }, { value: 'silvassa', label: 'Silvassa' } ],
+  jk: [ { value: 'srinagar', label: 'Srinagar' }, { value: 'jammu', label: 'Jammu' }, { value: 'anantnag', label: 'Anantnag' } ],
+  la: [ { value: 'leh', label: 'Leh' }, { value: 'kargil', label: 'Kargil' } ],
+  ld: [{ value: 'kavaratti', label: 'Kavaratti' }],
+  py: [{ value: 'puducherry', label: 'Puducherry' }],
 };
 
+const placeholderCategories = [
+  { value: 'all', label: 'All Categories' },
+  { value: 'crops', label: 'Crops' },
+  { value: 'seeds', label: 'Seeds' },
+  { value: 'fertilizers', label: 'Fertilizers' },
+  { value: 'tractors', label: 'Tractors' },
+  { value: 'farm_equipment', label: 'Farm Equipment' },
+  { value: 'pesticides', label: 'Pesticides' },
+  { value: 'fungicides', label: 'Fungicides' },
+];
 
-const placeholderCrops = [
+const placeholderListings: MandiListing[] = [
   {
-    id: 'crop1',
+    id: 'item1',
     name: 'Organic Tomatoes',
-    variety: 'Heirloom Blend',
+    category: 'Crops',
+    description: 'Heirloom Blend, juicy and ripe.',
     quantity: '120 lbs',
-    price: '$2.75/lb',
+    price: '₹210/kg', // Example price in INR
     imageUrl: 'https://placehold.co/300x200.png?text=Tomatoes',
     aiHint: 'tomatoes vegetable',
     seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
-    listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'Mumbai, MH'
   },
   {
-    id: 'crop2',
-    name: 'Sweet Corn',
-    variety: 'Golden Bantam',
-    quantity: '75 dozen',
-    price: '$3.50/dozen',
-    imageUrl: 'https://placehold.co/300x200.png?text=Corn',
-    aiHint: 'corn vegetable',
+    id: 'item2',
+    name: 'Hybrid Corn Seeds',
+    category: 'Seeds',
+    description: 'High yield, disease-resistant variety. Germination rate: 95%.',
+    quantity: '50 kg bags',
+    price: '₹1500/bag',
+    imageUrl: 'https://placehold.co/300x200.png?text=Corn+Seeds',
+    aiHint: 'corn seeds',
     seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
-    listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+    listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'New Delhi, DL'
   },
   {
-    id: 'crop3',
-    name: 'Fresh Apples',
-    variety: 'Gala Supreme',
-    quantity: '25 bushels',
-    price: '$18.00/bushel',
-    imageUrl: 'https://placehold.co/300x200.png?text=Apples',
-    aiHint: 'apples fruit',
+    id: 'item3',
+    name: 'Used Tractor - Model X',
+    category: 'Tractors',
+    description: '55 HP, 2018 model, well-maintained. 1200 hours run.',
+    quantity: '1 unit',
+    price: '₹3,50,000',
+    imageUrl: 'https://placehold.co/300x200.png?text=Tractor',
+    aiHint: 'tractor farm',
     seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
-    listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+    listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     location: 'Pune, MH'
   },
   {
-    id: 'crop4',
-    name: 'Bell Peppers',
-    variety: 'Mixed Colors',
-    quantity: '50 lbs',
-    price: '$2.00/lb',
-    imageUrl: 'https://placehold.co/300x200.png?text=Peppers',
-    aiHint: 'peppers vegetable',
+    id: 'item4',
+    name: 'Organic Fertilizer Mix',
+    category: 'Fertilizers',
+    description: 'NPK rich, suitable for all vegetables. Compost based.',
+    quantity: '25 kg bags',
+    price: '₹800/bag',
+    imageUrl: 'https://placehold.co/300x200.png?text=Fertilizer',
+    aiHint: 'fertilizer organic',
     seller: { id: '3', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
-    listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+    listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'South Delhi, DL'
+  },
+  {
+    id: 'item5',
+    name: 'Power Tiller',
+    category: 'Farm Equipment',
+    description: 'Brand Y, 8 HP, Petrol Engine. Good for small to medium farms.',
+    quantity: '1 unit',
+    price: '₹45,000',
+    imageUrl: 'https://placehold.co/300x200.png?text=Power+Tiller',
+    aiHint: 'tiller equipment',
+    seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    location: 'Bengaluru, KA'
+  },
+  {
+    id: 'item6',
+    name: 'Neem Oil Pesticide',
+    category: 'Pesticides',
+    description: 'Organic, cold-pressed neem oil. Effective against common pests.',
+    quantity: '5 Liters',
+    price: '₹1200/can',
+    imageUrl: 'https://placehold.co/300x200.png?text=Pesticide',
+    aiHint: 'neem oil',
+    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+    location: 'Ludhiana, PB'
   },
 ];
 
@@ -284,38 +318,51 @@ export default function MandiPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
   const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [availableCities, setAvailableCities] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     if (selectedState) {
       setAvailableCities(placeholderCities[selectedState as keyof typeof placeholderCities] || []);
-      setSelectedCity(undefined); 
+      setSelectedCity(undefined);
     } else {
       setAvailableCities([]);
       setSelectedCity(undefined);
     }
   }, [selectedState]);
 
-  const filteredCrops = placeholderCrops.filter(crop => {
+  const filteredListings = placeholderListings.filter(listing => {
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = crop.name.toLowerCase().includes(searchLower) ||
-                          crop.variety.toLowerCase().includes(searchLower) ||
-                          crop.seller.username.toLowerCase().includes(searchLower) ||
-                          crop.location.toLowerCase().includes(searchLower);
-    
+    const matchesSearch = listing.name.toLowerCase().includes(searchLower) ||
+                          (listing.description && listing.description.toLowerCase().includes(searchLower)) ||
+                          listing.category.toLowerCase().includes(searchLower) ||
+                          listing.seller.username.toLowerCase().includes(searchLower) ||
+                          listing.location.toLowerCase().includes(searchLower);
+
     const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
     const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
 
     let matchesLocation = true;
     if (selectedState) {
-        if (cityLabel) { // If a city is selected, location must contain the city
-            matchesLocation = crop.location.toLowerCase().includes(cityLabel);
-        } else if (stateLabel) { // If only a state is selected, location must contain the state
-            matchesLocation = crop.location.toLowerCase().includes(stateLabel);
+        if (cityLabel) {
+            matchesLocation = listing.location.toLowerCase().includes(cityLabel);
+        } else if (stateLabel) {
+             // If only state is selected, we assume it means any city in that state.
+             // The location string format is "City, ST_ABBREVIATION" or "City, State Name"
+             // We'll check if the location string contains the state label (e.g., "Maharashtra")
+             // or the state abbreviation (e.g., "MH" for Maharashtra).
+             const stateObj = placeholderStates.find(s => s.value === selectedState);
+             if (stateObj) {
+                matchesLocation = listing.location.toLowerCase().includes(stateObj.label.toLowerCase()) || listing.location.toUpperCase().includes(`, ${stateObj.value.toUpperCase()}`);
+             } else {
+                matchesLocation = false;
+             }
         }
     }
     
-    return matchesSearch && matchesLocation;
+    const matchesCategory = selectedCategory === 'all' || listing.category.toLowerCase() === selectedCategory.toLowerCase();
+    
+    return matchesSearch && matchesLocation && matchesCategory;
   });
 
 
@@ -339,13 +386,23 @@ export default function MandiPage() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search crops, varieties, sellers, or locations..."
+                placeholder="Search products, categories, sellers, locations..."
                 className="w-full pl-12 py-3 text-base rounded-lg"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full py-3 text-base rounded-lg">
+                  <SelectValue placeholder="Filter by Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {placeholderCategories.map(cat => (
+                    <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Select value={selectedState} onValueChange={setSelectedState}>
                 <SelectTrigger className="w-full py-3 text-base rounded-lg">
                   <SelectValue placeholder="Filter by State" />
@@ -366,8 +423,8 @@ export default function MandiPage() {
                   )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed/select state"}</SelectItem>}
                 </SelectContent>
               </Select>
-              <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10 md:col-span-1">
-                 Apply Filters
+              <Button variant="outline" className="w-full py-3 text-base rounded-lg border-primary text-primary hover:bg-primary/10">
+                 <Filter className="mr-2 h-4 w-4"/> Apply Filters
               </Button>
             </div>
           </div>
@@ -375,60 +432,65 @@ export default function MandiPage() {
           <section>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold text-primary flex items-center">
-                <Wheat className="mr-3 h-7 w-7"/> Available Crops
+                <ListChecks className="mr-3 h-7 w-7"/> Marketplace Listings
               </h2>
-              <Button 
+              <Button
                 asChild
-                variant="default" 
+                variant="default"
                 className="bg-accent hover:bg-accent/90 text-accent-foreground"
               >
-                <Link href="/mandi/add-crop">
-                  <PlusCircle className="mr-2 h-5 w-5" /> List Your Crop
+                <Link href="/mandi/add-crop"> {/* Link remains /mandi/add-crop for now */}
+                  <PlusCircle className="mr-2 h-5 w-5" /> List New Item
                 </Link>
               </Button>
             </div>
-            {filteredCrops.length > 0 ? (
+            {filteredListings.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredCrops.map((crop) => (
-                  <Card key={crop.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                {filteredListings.map((listing) => (
+                  <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
                     <div className="relative w-full h-52 bg-muted">
                       <Image
-                        src={crop.imageUrl}
-                        alt={crop.name}
+                        src={listing.imageUrl}
+                        alt={listing.name}
                         layout="fill"
                         objectFit="cover"
-                        data-ai-hint={crop.aiHint}
+                        data-ai-hint={listing.aiHint}
                       />
                        <Badge variant="default" className="absolute top-2 left-2 bg-primary/80 text-primary-foreground">
-                          {crop.price}
+                          {listing.price}
+                       </Badge>
+                       <Badge variant="secondary" className="absolute top-2 right-2 bg-secondary/80 text-secondary-foreground">
+                          {listing.category}
                        </Badge>
                     </div>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xl text-primary hover:underline">
-                        <Link href={`/mandi/crop/${crop.id}`}>{crop.name}</Link>
+                        {/* Link to a future item detail page: /mandi/item/{listing.id} */}
+                        <Link href={`#`}>{listing.name}</Link>
                       </CardTitle>
-                      <CardDescription>{crop.variety}</CardDescription>
+                      {listing.description && <CardDescription className="line-clamp-2">{listing.description}</CardDescription>}
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm flex-grow">
-                      <p><strong className="text-foreground">Quantity:</strong> {crop.quantity}</p>
+                      <p><strong className="text-foreground">Quantity:</strong> {listing.quantity}</p>
                        <div className="flex items-center text-muted-foreground">
-                        <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {crop.location}
+                        <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {listing.location}
                       </div>
                       <div className="flex items-center text-muted-foreground">
                         <CalendarDays className="h-4 w-4 mr-1.5 text-primary" />
-                        Listed: {format(new Date(crop.listedDate), "MMM d, yyyy")}
+                        Listed: {format(new Date(listing.listedDate), "MMM d, yyyy")}
                       </div>
                       <div className="flex items-center pt-2">
                         <Avatar className="h-7 w-7 mr-2 border">
-                          <AvatarImage src={crop.seller.avatarUrl} alt={crop.seller.username} data-ai-hint="person farmer" />
-                          <AvatarFallback>{crop.seller.username.charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.username} data-ai-hint="person farmer" />
+                          <AvatarFallback>{listing.seller.username.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
-                        <Link href={`/profile/${crop.seller.id}`} className="text-xs text-muted-foreground hover:text-primary hover:underline">
-                          Sold by: @{crop.seller.username}
+                        <Link href={`/profile/${listing.seller.id}`} className="text-xs text-muted-foreground hover:text-primary hover:underline">
+                          Sold by: @{listing.seller.username}
                         </Link>
                       </div>
                     </CardContent>
                     <CardFooter className="p-4 mt-auto">
+                       {/* This button can link to /mandi/item/{listing.id} in the future */}
                       <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
                         <ShoppingCart className="mr-2 h-4 w-4" /> View Details & Contact
                       </Button>
@@ -438,8 +500,8 @@ export default function MandiPage() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <Wheat className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-                <p className="text-xl font-semibold text-muted-foreground">No crops found matching your criteria.</p>
+                <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+                <p className="text-xl font-semibold text-muted-foreground">No listings found matching your criteria.</p>
                 <p className="text-sm text-muted-foreground mt-2">Try adjusting your search or filters, or check back later!</p>
               </div>
             )}
@@ -449,4 +511,3 @@ export default function MandiPage() {
     </div>
   );
 }
-
