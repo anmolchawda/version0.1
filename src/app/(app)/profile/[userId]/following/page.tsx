@@ -4,12 +4,13 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ProfileCard } from '@/components/profile/profile-card';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { getPlaceholderUser, placeholderUsers } from '@/lib/placeholders';
 import type { User } from '@/types';
-import { ChevronLeft, Users, ListChecks } from 'lucide-react';
+import { ChevronLeft, Users, ListChecks, ChevronRight } from 'lucide-react';
 
 export default function FollowingPage() {
   const params = useParams();
@@ -79,18 +80,37 @@ export default function FollowingPage() {
             <Users className="mr-2 h-6 w-6 sm:mr-3 sm:h-7 sm:w-7" />
             Following
           </CardTitle>
-          {/* Spacer to help center title if needed */}
-          <div className="h-9 w-9 ml-2 hidden sm:block"></div>
+          <div className="h-9 w-9 ml-2 hidden sm:block"></div> {/* Spacer */}
         </CardHeader>
-        <CardContent className="pt-6">
+        <CardContent className="pt-0"> {/* Changed pt-6 to pt-0 */}
           {followingList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="divide-y divide-border">
               {followingList.map((followedUser) => (
-                <ProfileCard key={followedUser.id} user={followedUser} />
+                <Link
+                  key={followedUser.id}
+                  href={`/profile/${followedUser.id}`}
+                  className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="h-10 w-10 border">
+                      <AvatarImage src={followedUser.avatarUrl || `https://placehold.co/40x40.png?text=${followedUser.username.charAt(0)}`} alt={followedUser.username} data-ai-hint="person user"/>
+                      <AvatarFallback>{(followedUser.name || followedUser.username)?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-semibold text-sm text-foreground">
+                        {followedUser.name || followedUser.username}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        @{followedUser.username}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-10 text-muted-foreground">
+            <div className="text-center py-10 text-muted-foreground px-4">
               <Users className="mx-auto h-12 w-12 mb-4 text-gray-400" />
               <p className="text-lg">@{profileUser.username} isn't following anyone yet.</p>
               <p className="text-sm">When they follow people, they'll appear here.</p>
