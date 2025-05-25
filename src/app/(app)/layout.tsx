@@ -47,7 +47,7 @@ export default function AppPagesLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <AppHeader />
-      <main className="flex-1 bg-background pb-16 md:pb-0"> {/* Added padding for bottom nav */}
+      <main className="flex-1 bg-background pb-16"> {/* Always apply pb-16 */}
         <div className="container mx-auto max-w-xl px-4 py-8">
          {children}
         </div>
