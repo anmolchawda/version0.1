@@ -1,4 +1,5 @@
 
+// src/app/(app)/settings/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   UserCircle2,
@@ -7,7 +8,7 @@ import {
   Smartphone,
   CloudUpload,
   BarChart3,
-  Bookmark, // Changed from Heart
+  Bookmark, // Icon for Favorites is Bookmark
   HelpCircle,
   ChevronRight,
   Settings as SettingsIcon // For page title
@@ -21,7 +22,7 @@ const settingsItems = [
   { label: "Devices", icon: Smartphone, href: "/settings/devices" },
   { label: "Uploads", icon: CloudUpload, href: "/settings/uploads" },
   { label: "Stats", icon: BarChart3, href: "/settings/stats" },
-  { label: "Favorites", icon: Bookmark, href: "/settings/favorites" }, // Changed from Heart
+  { label: "Favorites", icon: Bookmark, href: "/settings/favorites" }, // Using Bookmark icon
   { label: "Help", icon: HelpCircle, href: "/settings/help" },
 ];
 
@@ -58,7 +59,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* You can add other settings categories here if needed, e.g., App Settings */}
-      {/* 
+      {/*
       <Card className="shadow-lg rounded-xl mt-6">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">App Settings</CardTitle>
