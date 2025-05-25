@@ -4,8 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { PostCard } from '@/components/feed/post-card';
-import { placeholderPosts, getPlaceholderPostById } from '@/lib/placeholders';
+import { UserPostGrid } from '@/components/profile/user-post-grid'; // Import UserPostGrid
+import { getPlaceholderPostById } from '@/lib/placeholders';
 import type { Post } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,11 +80,8 @@ export default function FavoritesPage() {
         </CardHeader>
         <CardContent>
           {favoritePosts.length > 0 ? (
-            <div className="space-y-6">
-              {favoritePosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            // Use UserPostGrid to display posts in a grid
+            <UserPostGrid posts={favoritePosts} />
           ) : (
             <div className="text-center py-10 text-muted-foreground">
               <Heart className="mx-auto h-12 w-12 mb-4 text-gray-400" />
