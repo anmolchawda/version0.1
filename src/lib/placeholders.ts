@@ -1,5 +1,5 @@
 
-import type { User, Post, Comment } from '@/types';
+import type { User, Post, Comment, MandiListing } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
 export const placeholderUsers: User[] = [
@@ -149,3 +149,293 @@ export function getPlaceholderCommentsForPost(postId: string): Comment[] {
 export function formatTimeAgo(dateString: string): string {
   return formatDistanceToNow(new Date(dateString), { addSuffix: true });
 }
+
+
+// Mandi specific placeholder data
+export const placeholderStates = [
+  { value: 'ap', label: 'Andhra Pradesh' },
+  { value: 'ar', label: 'Arunachal Pradesh' },
+  { value: 'as', label: 'Assam' },
+  { value: 'br', label: 'Bihar' },
+  { value: 'cg', label: 'Chhattisgarh' },
+  { value: 'dl', label: 'Delhi' },
+  { value: 'ga', label: 'Goa' },
+  { value: 'gj', label: 'Gujarat' },
+  { value: 'hr', label: 'Haryana' },
+  { value: 'hp', label: 'Himachal Pradesh' },
+  { value: 'jh', label: 'Jharkhand' },
+  { value: 'ka', label: 'Karnataka' },
+  { value: 'kl', label: 'Kerala' },
+  { value: 'mp', label: 'Madhya Pradesh' },
+  { value: 'mh', label: 'Maharashtra' },
+  { value: 'mn', label: 'Manipur' },
+  { value: 'ml', label: 'Meghalaya' },
+  { value: 'mz', label: 'Mizoram' },
+  { value: 'nl', label: 'Nagaland' },
+  { value: 'od', label: 'Odisha' },
+  { value: 'pb', label: 'Punjab' },
+  { value: 'rj', label: 'Rajasthan' },
+  { value: 'sk', label: 'Sikkim' },
+  { value: 'tn', label: 'Tamil Nadu' },
+  { value: 'ts', label: 'Telangana' },
+  { value: 'tr', label: 'Tripura' },
+  { value: 'up', label: 'Uttar Pradesh' },
+  { value: 'uk', label: 'Uttarakhand' },
+  { value: 'wb', label: 'West Bengal' },
+  { value: 'an', label: 'Andaman and Nicobar Islands' },
+  { value: 'ch', label: 'Chandigarh' },
+  { value: 'dn', label: 'Dadra and Nagar Haveli and Daman and Diu' },
+  { value: 'jk', label: 'Jammu and Kashmir' },
+  { value: 'la', label: 'Ladakh' },
+  { value: 'ld', label: 'Lakshadweep' },
+  { value: 'py', label: 'Puducherry' },
+];
+
+export const placeholderCities: Record<string, { value: string; label: string }[]> = {
+  ap: [ /* Andhra Pradesh */
+    { value: 'vizag', label: 'Visakhapatnam' }, { value: 'vijayawada', label: 'Vijayawada' },
+    { value: 'guntur', label: 'Guntur' }, { value: 'nellore', label: 'Nellore' },
+    { value: 'kurnool', label: 'Kurnool' }, { value: 'tirupati', label: 'Tirupati' },
+    { value: 'rajahmundry', label: 'Rajahmundry' }, { value: 'kakinada', label: 'Kakinada' },
+    { value: 'eluru', label: 'Eluru'}, { value: 'kadapa', label: 'Kadapa'}
+  ],
+  ar: [ /* Arunachal Pradesh */
+    { value: 'itanagar', label: 'Itanagar' }, { value: 'naharlagun', label: 'Naharlagun' },
+    { value: 'tawang', label: 'Tawang' }, { value: 'pasighat', label: 'Pasighat' }
+  ],
+  as: [ /* Assam */
+    { value: 'guwahati', label: 'Guwahati' }, { value: 'dibrugarh', label: 'Dibrugarh' },
+    { value: 'silchar', label: 'Silchar' }, { value: 'jorhat', label: 'Jorhat' },
+    { value: 'tezpur', label: 'Tezpur' }, { value: 'nagaon', label: 'Nagaon' }
+  ],
+  br: [ /* Bihar */
+    { value: 'patna', label: 'Patna' }, { value: 'gaya', label: 'Gaya' },
+    { value: 'bhagalpur', label: 'Bhagalpur' }, { value: 'muzaffarpur', label: 'Muzaffarpur' },
+    { value: 'purnia', label: 'Purnia' }, { value: 'darbhanga', label: 'Darbhanga' }
+  ],
+  cg: [ /* Chhattisgarh */
+    { value: 'raipur', label: 'Raipur' }, { value: 'bilaspur', label: 'Bilaspur' },
+    { value: 'durg', label: 'Durg' }, { value: 'bhilai', label: 'Bhilai' },
+    { value: 'korba', label: 'Korba' }, { value: 'raigarh', label: 'Raigarh' }
+  ],
+  dl: [ /* Delhi */
+    { value: 'nd', label: 'New Delhi' }, { value: 'sd', label: 'South Delhi' },
+    { value: 'wd', label: 'West Delhi' }, { value: 'ed', label: 'East Delhi' },
+    { value: 'nod', label: 'North Delhi' }, { value: 'dwarka', label: 'Dwarka' },
+    { value: 'rohini', label: 'Rohini' }, { value: 'noida', label: 'Noida (NCR)'}, { value: 'gurgaon', label: 'Gurgaon (NCR)'}
+  ],
+  ga: [ /* Goa */
+    { value: 'panaji', label: 'Panaji' }, { value: 'margao', label: 'Margao' },
+    { value: 'vasco', label: 'Vasco da Gama' }, { value: 'mapusa', label: 'Mapusa' },
+    { value: 'ponda', label: 'Ponda' }
+  ],
+  gj: [ /* Gujarat */
+    { value: 'ahmedabad', label: 'Ahmedabad' }, { value: 'surat', label: 'Surat' },
+    { value: 'vadodara', label: 'Vadodara' }, { value: 'rajkot', label: 'Rajkot' },
+    { value: 'bhavnagar', label: 'Bhavnagar' }, { value: 'jamnagar', label: 'Jamnagar' },
+    { value: 'gandhinagar', label: 'Gandhinagar' }
+  ],
+  hr: [ /* Haryana */
+    { value: 'faridabad', label: 'Faridabad' }, { value: 'gurugram', label: 'Gurugram' },
+    { value: 'panipat', label: 'Panipat' }, { value: 'ambala', label: 'Ambala' },
+    { value: 'rohtak', label: 'Rohtak' }, { value: 'hisar', label: 'Hisar' },
+    { value: 'karnal', label: 'Karnal' }
+  ],
+  hp: [ /* Himachal Pradesh */
+    { value: 'shimla', label: 'Shimla' }, { value: 'manali', label: 'Manali' },
+    { value: 'dharamshala', label: 'Dharamshala' }, { value: 'kullu', label: 'Kullu' },
+    { value: 'mandi_town', label: 'Mandi Town' }, { value: 'solan', label: 'Solan' }
+  ],
+  jh: [ /* Jharkhand */
+    { value: 'ranchi', label: 'Ranchi' }, { value: 'jamshedpur', label: 'Jamshedpur' },
+    { value: 'dhanbad', label: 'Dhanbad' }, { value: 'bokaro', label: 'Bokaro Steel City' },
+    { value: 'hazaribagh', label: 'Hazaribagh'}
+  ],
+  ka: [ /* Karnataka */
+    { value: 'bengaluru', label: 'Bengaluru' }, { value: 'mysuru', label: 'Mysuru' },
+    { value: 'mangaluru', label: 'Mangaluru' }, { value: 'hubli', label: 'Hubli-Dharwad' },
+    { value: 'belagavi', label: 'Belagavi' }, { value: 'davangere', label: 'Davangere' },
+    { value: 'ballari', label: 'Ballari'}
+  ],
+  kl: [ /* Kerala */
+    { value: 'thiruvananthapuram', label: 'Thiruvananthapuram' }, { value: 'kochi', label: 'Kochi' },
+    { value: 'kozhikode', label: 'Kozhikode' }, { value: 'thrissur', label: 'Thrissur' },
+    { value: 'kollam', label: 'Kollam' }, { value: 'alappuzha', label: 'Alappuzha' },
+    { value: 'kannur', label: 'Kannur' }
+  ],
+  mp: [ /* Madhya Pradesh */
+    { value: 'indore', label: 'Indore' }, { value: 'bhopal', label: 'Bhopal' },
+    { value: 'jabalpur', label: 'Jabalpur' }, { value: 'gwalior', label: 'Gwalior' },
+    { value: 'ujjain', label: 'Ujjain' }, { value: 'sagar', label: 'Sagar' },
+    { value: 'rewa', label: 'Rewa'}
+  ],
+  mh: [ /* Maharashtra */
+    { value: 'mum', label: 'Mumbai' }, { value: 'pun', label: 'Pune' },
+    { value: 'ngp', label: 'Nagpur' }, { value: 'nsk', label: 'Nashik' },
+    { value: 'aur', label: 'Aurangabad (Chhatrapati Sambhajinagar)' }, { value: 'solapur', label: 'Solapur' },
+    { value: 'thane', label: 'Thane' }, { value: 'kolhapur', label: 'Kolhapur'}
+  ],
+  mn: [ /* Manipur */
+    { value: 'imphal', label: 'Imphal' }, { value: 'churachandpur', label: 'Churachandpur' }
+  ],
+  ml: [ /* Meghalaya */
+    { value: 'shillong', label: 'Shillong' }, { value: 'tura', label: 'Tura' }
+  ],
+  mz: [ /* Mizoram */
+    { value: 'aizawl', label: 'Aizawl' }, { value: 'lunglei', label: 'Lunglei' }
+  ],
+  nl: [ /* Nagaland */
+    { value: 'kohima', label: 'Kohima' }, { value: 'dimapur', label: 'Dimapur' }
+  ],
+  od: [ /* Odisha */
+    { value: 'bhubaneswar', label: 'Bhubaneswar' }, { value: 'cuttack', label: 'Cuttack' },
+    { value: 'rourkela', label: 'Rourkela' }, { value: 'puri', label: 'Puri' },
+    { value: 'sambalpur', label: 'Sambalpur' }, { value: 'berhampur', label: 'Berhampur' }
+  ],
+  pb: [ /* Punjab */
+    { value: 'ludhiana', label: 'Ludhiana' }, { value: 'amritsar', label: 'Amritsar' },
+    { value: 'jalandhar', label: 'Jalandhar' }, { value: 'patiala', label: 'Patiala' },
+    { value: 'bathinda', label: 'Bathinda' }, { value: 'mohali', label: 'Mohali' }
+  ],
+  rj: [ /* Rajasthan */
+    { value: 'jaipur', label: 'Jaipur' }, { value: 'jodhpur', label: 'Jodhpur' },
+    { value: 'kota', label: 'Kota' }, { value: 'udaipur', label: 'Udaipur' },
+    { value: 'ajmer', label: 'Ajmer' }, { value: 'bikaner', label: 'Bikaner' },
+    { value: 'alwar', label: 'Alwar' }
+  ],
+  sk: [ /* Sikkim */
+    { value: 'gangtok', label: 'Gangtok' }, { value: 'namchi', label: 'Namchi' }
+  ],
+  tn: [ /* Tamil Nadu */
+    { value: 'chennai', label: 'Chennai' }, { value: 'coimbatore', label: 'Coimbatore' },
+    { value: 'madurai', label: 'Madurai' }, { value: 'trichy', label: 'Tiruchirappalli' },
+    { value: 'salem', label: 'Salem' }, { value: 'tirunelveli', label: 'Tirunelveli' },
+    { value: 'erode', label: 'Erode' }
+  ],
+  ts: [ /* Telangana */
+    { value: 'hyderabad', label: 'Hyderabad' }, { value: 'warangal', label: 'Warangal' },
+    { value: 'nizamabad', label: 'Nizamabad' }, { value: 'karimnagar', label: 'Karimnagar' },
+    { value: 'khammam', label: 'Khammam' }
+  ],
+  tr: [ /* Tripura */
+    { value: 'agartala', label: 'Agartala' }, { value: 'udaipur_tr', label: 'Udaipur (Tripura)' }
+  ],
+  up: [ /* Uttar Pradesh */
+    { value: 'lucknow', label: 'Lucknow' }, { value: 'kanpur', label: 'Kanpur' },
+    { value: 'ghaziabad', label: 'Ghaziabad' }, { value: 'agra', label: 'Agra' },
+    { value: 'varanasi', label: 'Varanasi' }, { value: 'meerut', label: 'Meerut' },
+    { value: 'prayagraj', label: 'Prayagraj' }, { value: 'noida', label: 'Noida' },
+    { value: 'bareilly', label: 'Bareilly' }
+  ],
+  uk: [ /* Uttarakhand */
+    { value: 'dehradun', label: 'Dehradun' }, { value: 'haridwar', label: 'Haridwar' },
+    { value: 'roorkee', label: 'Roorkee' }, { value: 'nainital', label: 'Nainital' },
+    { value: 'haldwani', label: 'Haldwani' }
+  ],
+  wb: [ /* West Bengal */
+    { value: 'kolkata', label: 'Kolkata' }, { value: 'howrah', label: 'Howrah' },
+    { value: 'durgapur', label: 'Durgapur' }, { value: 'siliguri', label: 'Siliguri' },
+    { value: 'asansol', label: 'Asansol' }, { value: 'darjeeling', label: 'Darjeeling' }
+  ],
+  an: [{ value: 'portblair', label: 'Port Blair' }],
+  ch: [{ value: 'chandigarh', label: 'Chandigarh' }],
+  dn: [ { value: 'daman', label: 'Daman' }, { value: 'silvassa', label: 'Silvassa' } ],
+  jk: [ { value: 'srinagar', label: 'Srinagar' }, { value: 'jammu', label: 'Jammu' }, { value: 'anantnag', label: 'Anantnag' } ],
+  la: [ { value: 'leh', label: 'Leh' }, { value: 'kargil', label: 'Kargil' } ],
+  ld: [{ value: 'kavaratti', label: 'Kavaratti' }],
+  py: [{ value: 'puducherry', label: 'Puducherry' }],
+};
+
+export const placeholderCategories = [
+  { value: 'all', label: 'All Categories' },
+  { value: 'crops', label: 'Crops' },
+  { value: 'seeds', label: 'Seeds' },
+  { value: 'fertilizers', label: 'Fertilizers' },
+  { value: 'tractors', label: 'Tractors' },
+  { value: 'farm_equipment', label: 'Farm Equipment' },
+  { value: 'pesticides', label: 'Pesticides' },
+  { value: 'fungicides', label: 'Fungicides' },
+];
+
+export const placeholderListings: MandiListing[] = [
+  {
+    id: 'item1',
+    name: 'Organic Tomatoes',
+    category: 'Crops',
+    description: 'Heirloom Blend, juicy and ripe.',
+    quantity: '120 lbs',
+    price: '₹210/kg', // Example price in INR
+    imageUrl: 'https://placehold.co/300x200.png?text=Tomatoes',
+    aiHint: 'tomatoes vegetable',
+    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    location: 'Mumbai, MH'
+  },
+  {
+    id: 'item2',
+    name: 'Hybrid Corn Seeds',
+    category: 'Seeds',
+    description: 'High yield, disease-resistant variety. Germination rate: 95%.',
+    quantity: '50 kg bags',
+    price: '₹1500/bag',
+    imageUrl: 'https://placehold.co/300x200.png?text=Corn+Seeds',
+    aiHint: 'corn seeds',
+    seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    location: 'New Delhi, DL'
+  },
+  {
+    id: 'item3',
+    name: 'Used Tractor - Model X',
+    category: 'Tractors',
+    description: '55 HP, 2018 model, well-maintained. 1200 hours run.',
+    quantity: '1 unit',
+    price: '₹3,50,000',
+    imageUrl: 'https://placehold.co/300x200.png?text=Tractor',
+    aiHint: 'tractor farm',
+    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+    location: 'Pune, MH'
+  },
+  {
+    id: 'item4',
+    name: 'Organic Fertilizer Mix',
+    category: 'Fertilizers',
+    description: 'NPK rich, suitable for all vegetables. Compost based.',
+    quantity: '25 kg bags',
+    price: '₹800/bag',
+    imageUrl: 'https://placehold.co/300x200.png?text=Fertilizer',
+    aiHint: 'fertilizer organic',
+    seller: { id: '3', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
+    listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    location: 'South Delhi, DL'
+  },
+  {
+    id: 'item5',
+    name: 'Power Tiller',
+    category: 'Farm Equipment',
+    description: 'Brand Y, 8 HP, Petrol Engine. Good for small to medium farms.',
+    quantity: '1 unit',
+    price: '₹45,000',
+    imageUrl: 'https://placehold.co/300x200.png?text=Power+Tiller',
+    aiHint: 'tiller equipment',
+    seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    location: 'Bengaluru, KA'
+  },
+  {
+    id: 'item6',
+    name: 'Neem Oil Pesticide',
+    category: 'Pesticides',
+    description: 'Organic, cold-pressed neem oil. Effective against common pests.',
+    quantity: '5 Liters',
+    price: '₹1200/can',
+    imageUrl: 'https://placehold.co/300x200.png?text=Pesticide',
+    aiHint: 'neem oil',
+    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+    location: 'Ludhiana, PB'
+  },
+];
+
+    
