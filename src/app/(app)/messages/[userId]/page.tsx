@@ -2,7 +2,7 @@
 // src/app/(app)/messages/[userId]/page.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -18,6 +18,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { getPlaceholderUser, getPlaceholderMessagesForChat, MOCK_USER_ID, formatTimeAgo } from '@/lib/placeholders';
 import type { User, ChatMessage } from '@/types';
 import { cn } from '@/lib/utils';
@@ -33,6 +43,7 @@ export default function ChatPage() {
   const [chatPartner, setChatPartner] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -54,7 +65,7 @@ export default function ChatPage() {
   }, [messages]);
 
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !chatPartner) return;
     const newMsgObject: ChatMessage = {
@@ -76,120 +87,154 @@ export default function ChatPage() {
   }
   const currentUser = getPlaceholderUser(MOCK_USER_ID);
 
-  const handleAction = (action: string) => {
+  const handleDropdownAction = (action: string) => {
     toast({
       title: `${action} (Simulated)`,
       description: `The '${action.toLowerCase()}' action for ${chatPartner.name || chatPartner.username} would be processed here.`,
     });
   };
 
-  return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-0rem)]"> {/* Adjusted height */}
-      <Card className="shadow-none rounded-none border-0 flex-grow flex flex-col overflow-hidden">
-        {/* Chat Header */}
-        <CardHeader className="flex flex-row items-center space-x-3 p-3 border-b sticky top-0 bg-card z-10">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-9 w-9">
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-          <Avatar className="h-10 w-10 border">
-            <AvatarImage src={chatPartner.avatarUrl} alt={chatPartner.name || chatPartner.username} data-ai-hint="person user"/>
-            <AvatarFallback>{(chatPartner.name || chatPartner.username)?.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div className="flex-grow">
-            <h2 className="font-semibold text-base">{chatPartner.name || chatPartner.username}</h2>
-            <p className="text-xs text-muted-foreground">Online</p> {/* Placeholder status */}
-          </div>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Phone className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Video className="h-5 w-5" />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleAction('Delete Conversation')}>
-                <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                <span className="text-destructive">Delete Conversation</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleAction('Block User')}>
-                <UserX className="mr-2 h-4 w-4" />
-                <span>Block User</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAction('Report User')}>
-                <ShieldAlert className="mr-2 h-4 w-4" />
-                <span>Report</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </CardHeader>
+  const handleDeleteConfirmed = () => {
+    toast({
+      title: "Conversation Deleted (Simulated)",
+      description: `Conversation with ${chatPartner.name || chatPartner.username} has been removed.`,
+    });
+    // In a real app, you would call an API to delete the conversation here
+    router.push('/messages');
+  };
 
-        {/* Messages Area */}
-        <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-          {messages.map((msg) => {
-            const isCurrentUserSender = msg.senderId === MOCK_USER_ID;
-            const senderDetails = isCurrentUserSender ? currentUser : chatPartner;
-            return (
-              <div
-                key={msg.id}
-                className={cn(
-                  "flex items-end space-x-2 max-w-[75%]",
-                  isCurrentUserSender ? "ml-auto flex-row-reverse space-x-reverse" : "mr-auto"
-                )}
-              >
-                 {!isCurrentUserSender && (
-                    <Link href={`/profile/${senderDetails?.id}`}>
-                        <Avatar className="h-7 w-7 border self-start shrink-0">
-                        <AvatarImage src={senderDetails?.avatarUrl} alt={senderDetails?.username} data-ai-hint="person user"/>
-                        <AvatarFallback>{senderDetails?.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                    </Link>
-                 )}
+  return (
+    <>
+      <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-0rem)]"> {/* Adjusted height */}
+        <Card className="shadow-none rounded-none border-0 flex-grow flex flex-col overflow-hidden">
+          {/* Chat Header */}
+          <CardHeader className="flex flex-row items-center space-x-3 p-3 border-b sticky top-0 bg-card z-10">
+            <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-9 w-9">
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            <Avatar className="h-10 w-10 border">
+              <AvatarImage src={chatPartner.avatarUrl} alt={chatPartner.name || chatPartner.username} data-ai-hint="person user"/>
+              <AvatarFallback>{(chatPartner.name || chatPartner.username)?.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-grow">
+              <h2 className="font-semibold text-base">{chatPartner.name || chatPartner.username}</h2>
+              <p className="text-xs text-muted-foreground">Online</p> {/* Placeholder status */}
+            </div>
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Phone className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Video className="h-5 w-5" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setShowDeleteConfirmDialog(true)}>
+                  <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                  <span className="text-destructive">Delete Conversation</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleDropdownAction('Block User')}>
+                  <UserX className="mr-2 h-4 w-4" />
+                  <span>Block User</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDropdownAction('Report User')}>
+                  <ShieldAlert className="mr-2 h-4 w-4" />
+                  <span>Report</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </CardHeader>
+
+          {/* Messages Area */}
+          <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
+            {messages.map((msg) => {
+              const isCurrentUserSender = msg.senderId === MOCK_USER_ID;
+              const senderDetails = isCurrentUserSender ? currentUser : chatPartner;
+              return (
                 <div
+                  key={msg.id}
                   className={cn(
-                    "p-3 rounded-xl shadow-md",
-                    isCurrentUserSender
-                      ? "bg-primary text-primary-foreground rounded-br-none"
-                      : "bg-muted text-foreground rounded-bl-none"
+                    "flex items-end space-x-2 max-w-[75%]",
+                    isCurrentUserSender ? "ml-auto flex-row-reverse space-x-reverse" : "mr-auto"
                   )}
                 >
-                  <p className="text-sm">{msg.text}</p>
-                  <p className={cn("text-xs mt-1", isCurrentUserSender ? "text-primary-foreground/70" : "text-muted-foreground/70", isCurrentUserSender ? "text-right" : "text-left")}>
-                    {formatTimeAgo(msg.timestamp)}
-                  </p>
+                  {!isCurrentUserSender && (
+                      <Link href={`/profile/${senderDetails?.id}`}>
+                          <Avatar className="h-7 w-7 border self-start shrink-0">
+                          <AvatarImage src={senderDetails?.avatarUrl} alt={senderDetails?.username} data-ai-hint="person user"/>
+                          <AvatarFallback>{senderDetails?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                          </Avatar>
+                      </Link>
+                  )}
+                  <div
+                    className={cn(
+                      "p-3 rounded-xl shadow-md",
+                      isCurrentUserSender
+                        ? "bg-primary text-primary-foreground rounded-br-none"
+                        : "bg-muted text-foreground rounded-bl-none"
+                    )}
+                  >
+                    <p className="text-sm">{msg.text}</p>
+                    <p className={cn("text-xs mt-1", isCurrentUserSender ? "text-primary-foreground/70" : "text-muted-foreground/70", isCurrentUserSender ? "text-right" : "text-left")}>
+                      {formatTimeAgo(msg.timestamp)}
+                    </p>
+                  </div>
                 </div>
+              );
+            })}
+            {messages.length === 0 && (
+              <div className="text-center text-muted-foreground py-10">
+                No messages yet. Start the conversation!
               </div>
-            );
-          })}
-           {messages.length === 0 && (
-            <div className="text-center text-muted-foreground py-10">
-              No messages yet. Start the conversation!
-            </div>
-          )}
-        </ScrollArea>
+            )}
+          </ScrollArea>
 
-        {/* Message Input Area */}
-        <CardFooter className="p-3 border-t sticky bottom-0 bg-card">
-          <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
-            <Input
-              type="text"
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-grow rounded-full py-2.5 px-4 h-auto text-sm"
-              autoComplete="off"
-            />
-            <Button type="submit" size="icon" className="rounded-full h-10 w-10 bg-accent hover:bg-accent/80" disabled={!newMessage.trim()}>
-              <Send className="h-5 w-5" />
-            </Button>
-          </form>
-        </CardFooter>
-      </Card>
-    </div>
+          {/* Message Input Area */}
+          <CardFooter className="p-3 border-t sticky bottom-0 bg-card">
+            <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
+              <Input
+                type="text"
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-grow rounded-full py-2.5 px-4 h-auto text-sm"
+                autoComplete="off"
+              />
+              <Button type="submit" size="icon" className="rounded-full h-10 w-10 bg-accent hover:bg-accent/80" disabled={!newMessage.trim()}>
+                <Send className="h-5 w-5" />
+              </Button>
+            </form>
+          </CardFooter>
+        </Card>
+      </div>
+
+      <AlertDialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this conversation? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDeleteConfirmDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowDeleteConfirmDialog(false);
+                handleDeleteConfirmed();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
