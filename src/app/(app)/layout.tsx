@@ -1,8 +1,8 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 
 import { Sidebar } from '@/components/layout/sidebar';
+import { BottomNavBar } from '@/components/layout/bottom-nav-bar'; // Import BottomNavBar
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -45,13 +45,16 @@ export default function AppPagesLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
-        <div className="max-w-4xl mx-auto"> {/* Optional: constrain content width */}
-         {children}
-        </div>
-      </main>
-    </div>
+    <>
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto pb-20"> {/* Added pb-20 for bottom nav space */}
+          <div className="max-w-xl mx-auto"> 
+           {children}
+          </div>
+        </main>
+      </div>
+      <BottomNavBar />
+    </>
   );
 }

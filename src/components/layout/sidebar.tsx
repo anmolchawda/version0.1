@@ -19,11 +19,6 @@ import {
   Code2,
   Brain,
   Settings as SettingsIcon,
-  Search,       // Explicitly import Search
-  PlusSquare,   // Explicitly import PlusSquare
-  Store,        // Explicitly import Store
-  Home,         // Explicitly import Home
-  User as UserIconLucide, // Explicitly import User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -33,24 +28,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Define icons as standard function declarations for hoisting
-function HomeIcon(props: { className?: string }) { return <Home className={props.className} />; }
-function SearchIcon(props: { className?: string }) { return <Search className={props.className} />; }
-function PlusSquareIcon(props: { className?: string }) { return <PlusSquare className={props.className} />; }
-function StoreIcon(props: { className?: string }) { return <Store className={props.className} />; }
-function UserProfileIcon(props: { className?: string }) { return <UserIconLucide className={props.className} />; }
-
-
 // Mock user data, replace with actual auth state
 const MOCK_USER_ID = '1';
 
-const sidebarNavLinks: NavLink[] = [
-  { href: '/', label: 'Feed', icon: <HomeIcon className="h-5 w-5" /> },
-  { href: '/discover', label: 'Discover', icon: <SearchIcon className="h-5 w-5" /> },
-  { href: '/post/create', label: 'Create Post', icon: <PlusSquareIcon className="h-5 w-5" /> },
-  { href: '/mandi', label: 'Mandi', icon: <StoreIcon className="h-5 w-5" /> },
-  // Profile link can be dynamically generated or link to a generic edit page if MOCK_USER_ID is primary
-  { href: `/profile/${MOCK_USER_ID}`, label: 'Profile', icon: <UserProfileIcon className="h-5 w-5" /> }, 
+const secondaryNavLinks: NavLink[] = [
   { href: '/crop-science', label: 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
   { href: '/fungicides', label: 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
   { href: '/insecticides', label: 'Insecticides', icon: <Bug className="h-5 w-5" /> },
@@ -76,7 +57,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-card text-card-foreground border-r flex flex-col h-screen sticky top-0 transition-all duration-300 ease-in-out",
+        "bg-card text-card-foreground border-r flex flex-col h-screen sticky top-0 transition-all duration-300 ease-in-out z-30", // Added z-30
         isCollapsed ? 'w-20' : 'w-64'
       )}
     >
@@ -98,7 +79,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {sidebarNavLinks.map((link) => {
+        {secondaryNavLinks.map((link) => {
           const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
           return (
             <TooltipProvider key={link.label} delayDuration={0}>
