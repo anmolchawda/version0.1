@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, type ReactNode } from 'react';
-// AppLogo is now in AppHeader
+import { AppLogo } from '@/components/core/app-logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -17,14 +17,10 @@ import {
   Code2,
   Brain,
   Settings as SettingsIcon,
+  ChevronLeft,
+  Menu, // Icon for opening sidebar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 const MOCK_USER_ID = '1';
 
@@ -37,13 +33,10 @@ const getSecondaryNavLinks = (lang: string): NavLink[] => [
   { href: '/ai-features', label: lang === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Brain className="h-5 w-5" /> },
 ];
 
-interface SidebarProps {
-  isCollapsed: boolean;
-}
-
-export function Sidebar({ isCollapsed }: SidebarProps) {
+export function Sidebar() {
   const pathname = usePathname();
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
+  const [isFullyCollapsed, setIsFullyCollapsed] = useState(true); // Start fully collapsed
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [secondaryLinks, setSecondaryLinks] = useState(() => getSecondaryNavLinks('en'));
@@ -73,96 +66,94 @@ export function Sidebar({ isCollapsed }: SidebarProps) {
   const userAvatarFallback = mockUser?.username ? mockUser.username.substring(0, 2).toUpperCase() : 'U';
   const userNameDisplay = mockUser?.name || mockUser?.username || 'FARMDOCC User';
 
+  const toggleSidebar = () => setIsFullyCollapsed(!isFullyCollapsed);
+
   return (
-    <TooltipProvider delayDuration={0}>
-      <aside
+    <aside
+      className={cn(
+        "bg-card text-card-foreground border-r flex flex-col h-screen", // Full height
+        "fixed top-0 left-0 transition-all duration-300 ease-in-out z-30",
+        isFullyCollapsed ? 'w-[72px]' : 'w-64 shadow-lg'
+      )}
+    >
+      {/* Sidebar Header - Logo and Toggle Button */}
+      <div
         className={cn(
-          "bg-card text-card-foreground border-r flex flex-col h-[calc(100vh-4rem)]", // Full height minus header
-          "sticky transition-all duration-300 ease-in-out z-30",
-          "top-16", // Positioned below the AppHeader (h-16 or 4rem)
-          isCollapsed ? 'w-[72px]' : 'w-64'
+          "p-3 border-b",
+          isFullyCollapsed ? "flex flex-col items-center space-y-3" : "flex items-center justify-between"
         )}
       >
-        {/* Header section (logo and toggle) is now moved to AppHeader */}
+        <AppLogo
+          iconClassName="h-8 w-8"
+          textClassName={isFullyCollapsed ? "hidden" : "text-xl"}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-8 w-8"
+          aria-label={isFullyCollapsed ? "Open sidebar" : "Close sidebar"}
+        >
+          {isFullyCollapsed ? <Menu className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+        </Button>
+      </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-          {secondaryLinks.map((link) => {
-            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
-            const linkContent = (
-              <>
-                {link.icon}
-                {!isCollapsed && <span className="truncate">{link.label}</span>}
-              </>
-            );
-
-            return (
-              <Tooltip key={link.label}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                      isCollapsed ? 'justify-center' : '',
-                      isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                    )}
-                  >
-                    {linkContent}
-                  </Link>
-                </TooltipTrigger>
-                {isCollapsed && <TooltipContent side="right"><p>{link.label}</p></TooltipContent>}
-              </Tooltip>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto p-2 space-y-2 border-t">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn("w-full justify-start gap-3", isCollapsed ? "justify-center px-0" : "")}
-                asChild
-              >
-                <Link href="/settings">
-                  <SettingsIcon className="h-5 w-5" />
-                  {!isCollapsed && <span>{settingsLabel}</span>}
-                </Link>
-              </Button>
-            </TooltipTrigger>
-             {isCollapsed && <TooltipContent side="right"><p>{settingsLabel}</p></TooltipContent>}
-          </Tooltip>
-
-          {!isCollapsed && <Separator />}
-
-          {mockUser && (
-             <Tooltip>
-              <TooltipTrigger asChild>
+      {/* Main Sidebar Content - Rendered only if not fully collapsed */}
+      {!isFullyCollapsed && (
+        <>
+          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+            {secondaryLinks.map((link) => {
+              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
+              return (
                 <Link
-                  href={`/profile/${mockUser.id}`}
+                  key={link.label}
+                  href={link.href}
                   className={cn(
-                    "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
-                     isCollapsed ? "justify-center" : ""
+                    'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
-                  <Avatar className="h-9 w-9 border">
-                    <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
-                    <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-                  </Avatar>
-                  {!isCollapsed && (
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
-                      <span className="text-xs text-muted-foreground truncate">@{mockUser.username}</span>
-                    </div>
-                  )}
+                  {link.icon}
+                  <span>{link.label}</span>
                 </Link>
-              </TooltipTrigger>
-              {isCollapsed && <TooltipContent side="right"><p>{userNameDisplay} (@{mockUser.username})</p></TooltipContent>}
-            </Tooltip>
-          )}
-        </div>
-      </aside>
-    </TooltipProvider>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto p-2 space-y-2 border-t">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3"
+              asChild
+            >
+              <Link href="/settings">
+                <SettingsIcon className="h-5 w-5" />
+                <span>{settingsLabel}</span>
+              </Link>
+            </Button>
+
+            <Separator />
+
+            {mockUser && (
+              <Link
+                href={`/profile/${mockUser.id}`}
+                className="flex items-center gap-3 group p-2 rounded-md hover:bg-muted"
+              >
+                <Avatar className="h-9 w-9 border">
+                  <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
+                  <AvatarFallback>{userAvatarFallback}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
+                  <span className="text-xs text-muted-foreground truncate">@{mockUser.username}</span>
+                </div>
+              </Link>
+            )}
+          </div>
+        </>
+      )}
+    </aside>
   );
 }
