@@ -1,8 +1,8 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 
-import { AppHeader } from '@/components/layout/app-header';
-import { BottomNavBar } from '@/components/layout/bottom-nav-bar'; // Import BottomNavBar
+import { Sidebar } from '@/components/layout/sidebar';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -45,14 +45,13 @@ export default function AppPagesLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <AppHeader />
-      <main className="flex-1 bg-background pb-16"> {/* Always apply pb-16 */}
-        <div className="container mx-auto max-w-xl px-4 py-8">
+    <div className="flex min-h-screen bg-background">
+      <Sidebar />
+      <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
+        <div className="max-w-4xl mx-auto"> {/* Optional: constrain content width */}
          {children}
         </div>
       </main>
-      <BottomNavBar /> {/* Add BottomNavBar here */}
     </div>
   );
 }

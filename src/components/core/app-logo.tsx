@@ -1,15 +1,17 @@
-import Link from 'next/link';
 
-export function AppLogo({ className }: { className?: string }) {
+import Link from 'next/link';
+import { cn } from '@/lib/utils'; // Import cn for conditional classNames
+
+export function AppLogo({ className, textClassName, iconClassName }: { className?: string; textClassName?: string; iconClassName?: string }) {
   // Base path for a single leaf, pointing upwards, height 15 units
   const baseLeafPath = "M0,0 C3,-5 4,-12 0,-15 C-4,-12 -3,-5 0,0 Z";
 
   return (
-    <Link href="/" className={`flex items-center gap-2 text-2xl font-bold text-primary ${className}`}>
+    <Link href="/" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 100 100" // Using a 100x100 viewBox for easier path definition
-        className="h-8 w-8" // Maintains the original icon size
+        className={cn("h-8 w-8", iconClassName)} // Allow overriding icon size
         aria-hidden="true" // Decorative icon
       >
         {/* Main bubble shape, fill will be text-primary color */}
@@ -25,7 +27,7 @@ export function AppLogo({ className }: { className?: string }) {
         {/* Right Leaf: Positioned to the right, smaller, rotated */}
         <path fill="white" d={baseLeafPath} transform="translate(59 53) rotate(35) scale(2.3 2.1)" />
       </svg>
-      <span>FARMDOCC</span>
+      <span className={cn(textClassName)}>FARMDOCC</span>
     </Link>
   );
 }

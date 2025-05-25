@@ -1,2 +1,15 @@
-// This file is intentionally left empty as it's being replaced by the bottom navigation.
-// In a real filesystem, this file would be deleted.
+
+// src/components/layout/mobile-nav.tsx
+// This component is no longer used.
+// It will be empty.
+import type React from 'react'; // Keep type import
+import type { NavLink } from '@/types'; // Keep type import
+
+interface MobileNavProps {
+  navLinks: NavLink[];
+  onLinkClick?: () => void;
+}
+
+export function MobileNav({ navLinks, onLinkClick }: MobileNavProps) {
+  return null;
+}
