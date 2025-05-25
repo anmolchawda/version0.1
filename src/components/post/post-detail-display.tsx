@@ -1,6 +1,6 @@
 
 // src/components/post/post-detail-display.tsx
-'use client'; // Required for useState and window object
+'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -12,23 +12,51 @@ import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark, CalendarDays } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
-import { ShareModal } from './share-modal'; // Import the new modal
+import { ShareModal } from './share-modal';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostDetailDisplayProps {
   post: Post;
 }
 
+const MOCK_USER_ID = '1'; // Simulate a logged-in user
+
 export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const timeAgo = formatTimeAgo(post.createdAt);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [currentPostUrl, setCurrentPostUrl] = useState('');
+  const { toast } = useToast();
+  const [isSaved, setIsSaved] = useState(false);
+
+  const getSavedPostsFromStorage = (): string[] => {
+    if (typeof window === 'undefined') return [];
+    const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
+    return saved ? JSON.parse(saved) : [];
+  };
 
   useEffect(() => {
-    // Ensure window object is available
     if (typeof window !== 'undefined') {
       setCurrentPostUrl(window.location.href);
+      const savedPosts = getSavedPostsFromStorage();
+      setIsSaved(savedPosts.includes(post.id));
     }
-  }, []);
+  }, [post.id]);
+
+  const handleToggleSave = () => {
+    const savedPosts = getSavedPostsFromStorage();
+    let updatedSavedPosts: string[];
+
+    if (savedPosts.includes(post.id)) {
+      updatedSavedPosts = savedPosts.filter(id => id !== post.id);
+      toast({ title: "Post Unsaved", description: "Removed from your favorites." });
+    } else {
+      updatedSavedPosts = [...savedPosts, post.id];
+      toast({ title: "Post Saved!", description: "Added to your favorites." });
+    }
+    localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
+    setIsSaved(!isSaved);
+  };
+
 
   return (
     <>
@@ -47,7 +75,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
         </CardHeader>
         
         {post.imageUrl && (
-          <div className="relative w-full bg-muted" style={{ aspectRatio: '1 / 1' }}> {/* Common aspect ratio for feed images */}
+          <div className="relative w-full bg-muted" style={{ aspectRatio: '1 / 1' }}>
             <Image
               src={post.imageUrl}
               alt={`Post by ${post.user.username}: ${post.caption.substring(0,50)}`}
@@ -55,7 +83,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
               objectFit="cover"
               className="rounded-none"
               data-ai-hint="farm field crop"
-              priority // Prioritize loading image for LCP
+              priority
             />
           </div>
         )}
@@ -95,8 +123,8 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
               <Send className="h-6 w-6" />
               <span className="sr-only">Share</span>
             </Button>
-            <Button variant="ghost" size="icon" className="ml-auto rounded-full hover:bg-accent/20">
-              <Bookmark className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="ml-auto rounded-full hover:bg-accent/20" onClick={handleToggleSave}>
+              <Bookmark className={`h-6 w-6 ${isSaved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
               <span className="sr-only">Save</span>
             </Button>
           </div>

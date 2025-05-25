@@ -1,5 +1,5 @@
 
-'use client'; // Required for useState and window object
+'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -10,23 +10,51 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
-import { formatTimeAgo } from '@/lib/placeholders';
-import { ShareModal } from '../post/share-modal'; // Import the ShareModal
+import { formatTimeAgo, getPlaceholderUser } from '@/lib/placeholders';
+import { ShareModal } from '../post/share-modal';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostCardProps {
   post: Post;
 }
 
+const MOCK_USER_ID = '1'; // Simulate a logged-in user
+
 export function PostCard({ post }: PostCardProps) {
   const timeAgo = formatTimeAgo(post.createdAt);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
+  const { toast } = useToast();
+
+  const [isSaved, setIsSaved] = useState(false);
+
+  const getSavedPostsFromStorage = (): string[] => {
+    const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
+    return saved ? JSON.parse(saved) : [];
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPostFullUrl(`${window.location.origin}/post/${post.id}`);
+      const savedPosts = getSavedPostsFromStorage();
+      setIsSaved(savedPosts.includes(post.id));
     }
   }, [post.id]);
+
+  const handleToggleSave = () => {
+    const savedPosts = getSavedPostsFromStorage();
+    let updatedSavedPosts: string[];
+
+    if (savedPosts.includes(post.id)) {
+      updatedSavedPosts = savedPosts.filter(id => id !== post.id);
+      toast({ title: "Post Unsaved", description: "Removed from your favorites." });
+    } else {
+      updatedSavedPosts = [...savedPosts, post.id];
+      toast({ title: "Post Saved!", description: "Added to your favorites." });
+    }
+    localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
+    setIsSaved(!isSaved);
+  };
 
   return (
     <>
@@ -63,7 +91,7 @@ export function PostCard({ post }: PostCardProps) {
               <Heart className="h-6 w-6" />
               <span className="sr-only">Like</span>
             </Button>
-            <Link href={`/post/${post.id}#comments`}> {/* Link to comments section */}
+            <Link href={`/post/${post.id}#comments`}>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <MessageCircle className="h-6 w-6" />
                 <span className="sr-only">Comment</span>
@@ -73,8 +101,8 @@ export function PostCard({ post }: PostCardProps) {
               <Send className="h-6 w-6" />
               <span className="sr-only">Share</span>
             </Button>
-            <Button variant="ghost" size="icon" className="ml-auto rounded-full">
-              <Bookmark className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave}>
+              <Bookmark className={`h-6 w-6 ${isSaved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
               <span className="sr-only">Save</span>
             </Button>
           </div>
