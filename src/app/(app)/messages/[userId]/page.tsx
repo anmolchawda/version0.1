@@ -7,17 +7,26 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; // Using Input for simplicity, can be Textarea
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { ChevronLeft, Send, UserCircle, MoreVertical, Phone, Video } from 'lucide-react';
+import { ChevronLeft, Send, MoreVertical, Phone, Video, Trash2, ShieldAlert, UserX } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getPlaceholderUser, getPlaceholderMessagesForChat, MOCK_USER_ID, formatTimeAgo } from '@/lib/placeholders';
 import type { User, ChatMessage } from '@/types';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const userId = params.userId as string;
@@ -48,7 +57,6 @@ export default function ChatPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !chatPartner) return;
-    // In a real app, this would send the message to a backend
     const newMsgObject: ChatMessage = {
       id: `msg${Date.now()}`,
       senderId: MOCK_USER_ID,
@@ -68,6 +76,12 @@ export default function ChatPage() {
   }
   const currentUser = getPlaceholderUser(MOCK_USER_ID);
 
+  const handleAction = (action: string) => {
+    toast({
+      title: `${action} (Simulated)`,
+      description: `The '${action.toLowerCase()}' action for ${chatPartner.name || chatPartner.username} would be processed here.`,
+    });
+  };
 
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-0rem)]"> {/* Adjusted height */}
@@ -91,9 +105,28 @@ export default function ChatPage() {
           <Button variant="ghost" size="icon" className="h-9 w-9">
             <Video className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleAction('Delete Conversation')}>
+                <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                <span className="text-destructive">Delete Conversation</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAction('Block User')}>
+                <UserX className="mr-2 h-4 w-4" />
+                <span>Block User</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAction('Report User')}>
+                <ShieldAlert className="mr-2 h-4 w-4" />
+                <span>Report</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </CardHeader>
 
         {/* Messages Area */}
