@@ -9,7 +9,7 @@ import { getPlaceholderPostById } from '@/lib/placeholders';
 import type { Post } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, ListChecks, ChevronLeft } from 'lucide-react';
+import { Bookmark, ListChecks, ChevronLeft } from 'lucide-react'; // Changed Heart to Bookmark
 
 const MOCK_USER_ID = '1'; // Simulate a logged-in user
 
@@ -72,7 +72,7 @@ export default function FavoritesPage() {
               <ChevronLeft className="h-6 w-6" />
             </Button>
           <CardTitle className="text-2xl font-bold text-primary flex items-center flex-grow justify-center">
-            <Heart className="mr-3 h-7 w-7 text-red-500 fill-red-500" />
+            <Bookmark className="mr-3 h-7 w-7 text-primary fill-primary" /> {/* Changed Icon and added fill */}
             Your Favorite Posts
           </CardTitle>
            {/* Spacer to help center title if back button takes space, or remove if not needed */}
@@ -84,7 +84,7 @@ export default function FavoritesPage() {
             <UserPostGrid posts={favoritePosts} />
           ) : (
             <div className="text-center py-10 text-muted-foreground">
-              <Heart className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+              <Bookmark className="mx-auto h-12 w-12 mb-4 text-gray-400" /> {/* Changed Icon here too for consistency */}
               <p className="text-lg">You haven't saved any posts yet.</p>
               <p className="text-sm">Click the bookmark icon on a post to save it here.</p>
             </div>
