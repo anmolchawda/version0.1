@@ -9,6 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -17,15 +24,26 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, X, Save, Loader2, Wheat } from 'lucide-react';
+import { UploadCloud, X, Save, Loader2, ListPlus, PackagePlus } from 'lucide-react'; // Updated icon
+
+const itemCategories = [
+  { value: 'crops', label: 'Crops' },
+  { value: 'seeds', label: 'Seeds' },
+  { value: 'fertilizers', label: 'Fertilizers' },
+  { value: 'tractors', label: 'Tractors' },
+  { value: 'farm_equipment', label: 'Farm Equipment' },
+  { value: 'pesticides', label: 'Pesticides' },
+  { value: 'fungicides', label: 'Fungicides' },
+];
 
 export function AddCropForm() {
   const router = useRouter();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [cropName, setCropName] = useState('');
-  const [variety, setVariety] = useState('');
+  const [itemName, setItemName] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [details, setDetails] = useState(''); // Renamed from variety
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
@@ -59,19 +77,20 @@ export function AddCropForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!cropName || !quantity || !price || !location) {
+    if (!itemName || !selectedCategory || !quantity || !price || !location) {
       toast({
         title: 'Missing Information',
-        description: 'Please fill in all required fields (Crop Name, Quantity, Price, Location).',
+        description: 'Please fill in all required fields (Item Name, Category, Quantity, Price, Location).',
         variant: 'destructive',
       });
       return;
     }
     setIsSubmitting(true);
 
-    const cropData = {
-      cropName,
-      variety,
+    const listingData = {
+      itemName,
+      category: selectedCategory,
+      details,
       quantity,
       price,
       location,
@@ -79,12 +98,12 @@ export function AddCropForm() {
       imageFile, 
       listedDate: new Date().toISOString(),
     };
-    console.log('Submitting crop:', cropData);
+    console.log('Submitting listing:', listingData);
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     toast({
-      title: 'Crop Listed!',
-      description: `${cropName} has been successfully listed in the Mandi.`,
+      title: 'Item Listed!',
+      description: `${itemName} has been successfully listed in the Mandi.`,
     });
 
     setIsSubmitting(false);
@@ -94,33 +113,48 @@ export function AddCropForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-xl">
       <CardHeader className="text-center">
-        <Wheat className="mx-auto h-12 w-12 text-primary mb-2" />
-        <CardTitle className="text-3xl font-bold text-primary">List Your Crop in Mandi</CardTitle>
-        <CardDescription>Share details about your produce to reach buyers.</CardDescription>
+        <PackagePlus className="mx-auto h-12 w-12 text-primary mb-2" />
+        <CardTitle className="text-3xl font-bold text-primary">List New Item in Mandi</CardTitle>
+        <CardDescription>Share details about your product or equipment to reach buyers.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="cropName" className="text-base font-medium">Crop Name <span className="text-destructive">*</span></Label>
+              <Label htmlFor="itemName" className="text-base font-medium">Item Name <span className="text-destructive">*</span></Label>
               <Input
-                id="cropName"
-                value={cropName}
-                onChange={(e) => setCropName(e.target.value)}
-                placeholder="e.g., Organic Tomatoes"
+                id="itemName"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                placeholder="e.g., Organic Tomatoes, Power Tiller"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="variety" className="text-base font-medium">Variety (Optional)</Label>
-              <Input
-                id="variety"
-                value={variety}
-                onChange={(e) => setVariety(e.target.value)}
-                placeholder="e.g., Heirloom, Roma"
-              />
+             <div className="space-y-2">
+              <Label htmlFor="category" className="text-base font-medium">Category <span className="text-destructive">*</span></Label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
+                <SelectTrigger id="category" className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {itemCategories.map(cat => (
+                    <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="details" className="text-base font-medium">Details / Specifications (Optional)</Label>
+            <Input
+              id="details"
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="e.g., Heirloom, 50HP, 10kg bag"
+            />
+          </div>
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -129,7 +163,7 @@ export function AddCropForm() {
                 id="quantity"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                placeholder="e.g., 100 kg, 50 dozen"
+                placeholder="e.g., 100 kg, 1 unit, 50 bags"
                 required
               />
             </div>
@@ -139,7 +173,7 @@ export function AddCropForm() {
                 id="price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="e.g., ₹25/kg, $3/dozen"
+                placeholder="e.g., ₹25/kg, ₹50,000, $10/bag"
                 required
               />
             </div>
@@ -157,18 +191,18 @@ export function AddCropForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-base font-medium">Description (Optional)</Label>
+            <Label htmlFor="description" className="text-base font-medium">Further Description (Optional)</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Add more details like farming practices, harvest date, etc."
+              placeholder="Add more details like condition, age, farming practices, harvest date, etc."
               rows={3}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUploadField" className="text-base font-medium">Crop Photo (Optional)</Label>
+            <Label htmlFor="imageUploadField" className="text-base font-medium">Item Photo (Optional)</Label>
             <div className={`
               mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
               rounded-md group hover:border-primary transition-colors
@@ -179,11 +213,11 @@ export function AddCropForm() {
                   <div className="relative mx-auto mb-4 h-48 w-auto max-w-md group">
                     <Image
                       src={imagePreviewUrl}
-                      alt="Crop preview"
+                      alt="Item preview"
                       layout="fill"
                       objectFit="contain"
                       className="rounded-md"
-                      data-ai-hint="crop product"
+                      data-ai-hint="product item agriculture"
                     />
                     <Button
                       type="button"
@@ -229,7 +263,7 @@ export function AddCropForm() {
             ) : (
               <Save className="mr-2 h-5 w-5" />
             )}
-            {isSubmitting ? 'Listing Crop...' : 'List This Crop'}
+            {isSubmitting ? 'Listing Item...' : 'List This Item'}
           </Button>
         </CardFooter>
       </form>
