@@ -1,16 +1,16 @@
-
 // src/components/post/post-detail-display.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
-import { Heart, MessageCircle, Send, Bookmark, CalendarDays } from 'lucide-react';
+import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft } from 'lucide-react'; // Added ChevronLeft
 import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from './share-modal';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +27,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const [currentPostUrl, setCurrentPostUrl] = useState('');
   const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
+  const router = useRouter(); // Initialize router
 
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
@@ -61,17 +62,27 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   return (
     <>
       <Card className="overflow-hidden shadow-xl rounded-xl">
-        <CardHeader className="flex flex-row items-center space-x-3 p-4 bg-card">
-          <Link href={`/profile/${post.user.id}`} className="flex items-center space-x-3">
-            <Avatar className="h-11 w-11 border-2 border-primary">
+        <CardHeader className="flex flex-row items-center space-x-3 p-3 sm:p-4 bg-card border-b">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="h-9 w-9 sm:h-10 sm:w-10"
+            aria-label="Go back"
+          >
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+          </Button>
+          <Link href={`/profile/${post.user.id}`} className="flex items-center space-x-2 sm:space-x-3 flex-grow">
+            <Avatar className="h-9 w-9 sm:h-11 sm:w-11 border-2 border-primary">
               <AvatarImage src={post.user.avatarUrl || `https://placehold.co/44x44.png?text=${post.user.username.charAt(0)}`} alt={post.user.username} data-ai-hint="person farmer" />
-              <AvatarFallback className="text-lg">{post.user.username.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="text-base sm:text-lg">{post.user.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <div>
-              <CardTitle className="text-md font-semibold hover:underline">{post.user.username}</CardTitle>
-              {post.user.location && <p className="text-xs text-muted-foreground">{post.user.location}</p>}
+            <div className="overflow-hidden">
+              <CardTitle className="text-sm sm:text-md font-semibold hover:underline truncate">{post.user.username}</CardTitle>
+              {post.user.location && <p className="text-xs text-muted-foreground truncate">{post.user.location}</p>}
             </div>
           </Link>
+          {/* Optional: Add a More Options button here if needed in the future */}
         </CardHeader>
         
         {post.imageUrl && (
