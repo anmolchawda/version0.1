@@ -3,17 +3,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { PostCard } from '@/components/feed/post-card';
 import { placeholderPosts, getPlaceholderPostById } from '@/lib/placeholders';
 import type { Post } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, ListChecks } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, ListChecks, ChevronLeft } from 'lucide-react';
 
 const MOCK_USER_ID = '1'; // Simulate a logged-in user
 
 export default function FavoritesPage() {
   const [favoritePosts, setFavoritePosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFavorites = () => {
@@ -58,11 +61,22 @@ export default function FavoritesPage() {
   return (
     <div className="space-y-6">
       <Card className="shadow-xl rounded-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-primary flex items-center">
+        <CardHeader className="relative flex flex-row items-center pt-4 pb-4 pr-4 pl-2 sm:pl-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-9 w-9 mr-2"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+          <CardTitle className="text-2xl font-bold text-primary flex items-center flex-grow justify-center">
             <Heart className="mr-3 h-7 w-7 text-red-500 fill-red-500" />
             Your Favorite Posts
           </CardTitle>
+           {/* Spacer to help center title if back button takes space, or remove if not needed */}
+           <div className="h-9 w-9 ml-2"></div>
         </CardHeader>
         <CardContent>
           {favoritePosts.length > 0 ? (
@@ -83,3 +97,4 @@ export default function FavoritesPage() {
     </div>
   );
 }
+
