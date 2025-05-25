@@ -94,7 +94,7 @@ export default function LanguageSettingsPage() {
           </CardHeader>
           <CardContent className="px-0 sm:px-2">
             <RadioGroup value={selectedLanguage} onValueChange={handleLanguageChange} className="space-y-0">
-              <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
                 {mainLanguages.map((lang) => (
                   <Label
                     key={lang.code}

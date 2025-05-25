@@ -62,17 +62,8 @@ export default function AppPagesLayout({
 
       <div className="flex min-h-screen bg-background">
         <Sidebar />
-        {/* 
-          NOTE: For a truly dynamic layout where main content's left margin/padding
-          adjusts to the sidebar's self-managed collapsed state, you'd typically
-          need to lift the 'isFullyCollapsed' state up to this layout component
-          or use a global state management solution (Context API, Zustand, etc.).
-          For simplicity here, main content has a fixed pl-64 assuming sidebar expanded width.
-          This means there will be a gap when the sidebar is collapsed.
-          A more advanced solution would apply 'pl-[72px]' or 'pl-64' dynamically.
-        */}
-        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto pb-20 pl-64"> {/* pl-64 for expanded sidebar */}
-          <div className="max-w-xl mx-auto">
+        <main className="flex-1 py-6 overflow-y-auto mb-16 ml-[72px] lg:ml-64">
+          <div className="max-w-xl mx-auto px-4">
            {children}
           </div>
         </main>
