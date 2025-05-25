@@ -328,7 +328,7 @@ export default function MandiPage() {
             <div>
               <CardTitle className="text-3xl font-bold">Mandi (Marketplace)</CardTitle>
               <CardDescription className="text-md text-muted-foreground">
-                Discover and trade agricultural produce directly from farmers.
+                Discover and trade agriculture products from here
               </CardDescription>
             </div>
           </div>
@@ -449,3 +449,4 @@ export default function MandiPage() {
     </div>
   );
 }
+
