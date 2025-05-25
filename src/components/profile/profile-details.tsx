@@ -1,9 +1,10 @@
+
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import type { User } from '@/types';
-import { MapPin, Leaf, UserPlus, MessageSquare, Settings } from 'lucide-react';
+import { MapPin, Leaf, UserPlus, MessageSquare, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 
 interface ProfileDetailsProps {
@@ -48,20 +49,22 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
               <p className="font-bold text-lg">{user.postCount ?? 0}</p>
               <p className="text-xs text-muted-foreground">Posts</p>
             </div>
+            {/* Followers (conditionally make clickable if needed later) */}
             <div className="text-center">
-              <p className="font-bold text-lg">{user.followersCount ?? 0}</p>
-              <p className="text-xs text-muted-foreground">Followers</p>
+                <p className="font-bold text-lg">{user.followersCount ?? 0}</p>
+                <p className="text-xs text-muted-foreground">Followers</p>
             </div>
-            <div className="text-center">
+             {/* Following */}
+            <Link href={`/profile/${user.id}/following`} className="text-center hover:opacity-80 transition-opacity">
               <p className="font-bold text-lg">{user.followingCount ?? 0}</p>
               <p className="text-xs text-muted-foreground">Following</p>
-            </div>
+            </Link>
         </div>
 
         <div className="pt-4 flex justify-center gap-3">
           {isCurrentUser ? (
             <Button asChild variant="outline">
-              <Link href="/profile/edit">
+              <Link href="/settings/account"> {/* Updated to go to account settings which has profile edit form */}
                 <Settings className="mr-2 h-4 w-4" /> Edit Profile
               </Link>
             </Button>
@@ -70,8 +73,10 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
               <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <UserPlus className="mr-2 h-4 w-4" /> Follow
               </Button>
-              <Button variant="outline">
-                <MessageSquare className="mr-2 h-4 w-4" /> Message
+              <Button variant="outline" asChild>
+                <Link href={`/messages/${user.id}`}>
+                    <MessageSquare className="mr-2 h-4 w-4" /> Message
+                </Link>
               </Button>
             </>
           )}
