@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Post } from '@/types';
@@ -19,7 +20,7 @@ export function UserPostGrid({ posts }: UserPostGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-2 md:gap-4 pt-8">
       {posts.map((post) => (
-        <Link href={`/post/${post.id}`} key={post.id} className="group relative aspect-square block w-full overflow-hidden rounded-md shadow-sm hover:shadow-md transition-shadow">
+        <Link href={`/post/${post.id}#comments`} key={post.id} className="group relative aspect-square block w-full overflow-hidden rounded-md shadow-sm hover:shadow-md transition-shadow">
           {post.imageUrl ? (
             <Image
               src={post.imageUrl}

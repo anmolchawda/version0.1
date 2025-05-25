@@ -102,7 +102,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
 
 
   return (
-    <Card className="mt-6 shadow-lg rounded-xl">
+    <Card id="comments" className="mt-6 shadow-lg rounded-xl">
       <CardHeader>
         <CardTitle className="text-xl flex items-center">
           <MessageCircle className="mr-2 h-5 w-5 text-primary" />

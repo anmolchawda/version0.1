@@ -73,7 +73,7 @@ export function PostCard({ post }: PostCardProps) {
         </CardHeader>
         
         {post.imageUrl && (
-          <Link href={`/post/${post.id}`} className="block relative aspect-square sm:aspect-video w-full bg-muted cursor-pointer">
+          <Link href={`/post/${post.id}#comments`} className="block relative aspect-square sm:aspect-video w-full bg-muted cursor-pointer">
             <Image
               src={post.imageUrl}
               alt={`Post by ${post.user.username}: ${post.caption.substring(0,50)}`}
@@ -127,7 +127,7 @@ export function PostCard({ post }: PostCardProps) {
           )}
 
           {post.commentsCount > 0 && (
-            <Link href={`/post/${post.id}`} className="text-sm text-muted-foreground hover:underline">
+            <Link href={`/post/${post.id}#comments`} className="text-sm text-muted-foreground hover:underline">
               View all {post.commentsCount} comments
             </Link>
           )}
