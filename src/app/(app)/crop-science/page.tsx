@@ -21,7 +21,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Potato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/potato.jpg', aiHint: 'potato vegetable', slug: 'potato', unoptimized: true },
   { name: 'Onion', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ONION.jpeg', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJyb3R8ZW58MHx8fHwxNzQ4MjM5Mzc2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable', slug: 'carrot' },
-  { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1615485291234-9d694218aeb3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8YnJvY29sbGl8ZW58MHx8fHwxNzQ4MjM5NTU0fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable', slug: 'broccoli' },
+  { name: 'Broccoli', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/BROCCOLI.jpg', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves', slug: 'spinach' },
   { name: 'Bell Pepper', imageUrl: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiZWxsJTIwcGVwcGVyfGVufDB8fHx8MTc0ODIzOTY4OHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'bell pepper', slug: 'bell-pepper' },
   { name: 'Cucumber', imageUrl: 'https://images.unsplash.com/photo-1587411768638-ec71f8e33b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjdWN1bWJlcnxlbnwwfHx8fDE3NDgyMzk4MDl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'cucumber vegetable', slug: 'cucumber' },
@@ -85,6 +85,8 @@ export default function CropSciencePage() {
     </div>
   );
 }
+    
+
     
 
     
