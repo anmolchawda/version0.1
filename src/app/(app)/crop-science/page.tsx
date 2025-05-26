@@ -22,7 +22,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Bell Pepper', imageUrl: 'https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiZWxsJTIwcGVwcGVyfGVufDB8fHx8MTc0ODIzOTY4OHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'bell pepper' },
   { name: 'Cucumber', imageUrl: 'https://images.unsplash.com/photo-1587411768638-ec71f8e33b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjdWN1bWJlcnxlbnwwfHx8fDE3NDgyMzk4MDl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'cucumber vegetable' },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves' },
-  { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1526049332082-27f8e41d5e8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlZ2dwbGFudCUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable' },
+  { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable' },
   // Fruits
   { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit' },
   { name: 'Banana', imageUrl: 'https://images.unsplash.com/photo-1666287536047-fe01c391671a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiYW5hbmElMjBmcnVpdHxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'banana fruit' },
@@ -78,3 +78,4 @@ export default function CropSciencePage() {
     </div>
   );
 }
+
