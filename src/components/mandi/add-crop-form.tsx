@@ -24,7 +24,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, X, Save, Loader2, ListPlus, PackagePlus } from 'lucide-react'; // Updated icon
+import { UploadCloud, X, Save, Loader2, PackagePlus, ChevronLeft } from 'lucide-react';
 
 const itemCategories = [
   { value: 'crops', label: 'Crops' },
@@ -44,7 +44,7 @@ export function AddCropForm() {
 
   const [itemName, setItemName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [details, setDetails] = useState(''); // Renamed from variety
+  const [details, setDetails] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
@@ -113,10 +113,22 @@ export function AddCropForm() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-xl">
-      <CardHeader className="text-center">
-        <PackagePlus className="mx-auto h-12 w-12 text-primary mb-2" />
-        <CardTitle className="text-3xl font-bold text-primary">List New Item in Mandi</CardTitle>
-        <CardDescription>Share details about your product or equipment to reach buyers.</CardDescription>
+      <CardHeader className="relative flex items-center border-b pb-4 pt-4 pr-4 pl-2 sm:pl-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.back()}
+          className="h-9 w-9 mr-2"
+          aria-label="Go back"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+        <div className="flex flex-col items-center text-center flex-grow">
+          <PackagePlus className="h-8 w-8 sm:h-10 sm:w-10 text-primary mb-1" />
+          <CardTitle className="text-xl sm:text-2xl font-bold text-primary">List New Item in Mandi</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">Share details about your product or equipment to reach buyers.</CardDescription>
+        </div>
+        <div className="h-9 w-9 ml-2 sm:w-9"></div> {/* Spacer for balance */}
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 p-6">
@@ -271,5 +283,3 @@ export function AddCropForm() {
     </Card>
   );
 }
-
-    
