@@ -15,7 +15,7 @@ const commonCrops: CropInfo[] = [
   // Vegetables
   { name: 'Tomato', imageUrl: 'https://images.unsplash.com/photo-1571680322279-a226e6a4cc2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx0b21hdG98ZW58MHx8fHwxNzQ4MjM5MDMzfDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'tomato white-background' },
   { name: 'Potato', imageUrl: 'https://images.unsplash.com/photo-1578594640334-b71fbed2a406?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8cG90YXRvfGVufDB8fHx8MTc0ODIzOTAwNnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'potato vegetable' },
-  { name: 'Onion', imageUrl: 'https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8b25pb24lMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'onion vegetable' },
+  { name: 'Onion', imageUrl: 'https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxvbmlvbnxlbnwwfHx8fDE3NDgyMzkzMzV8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'onion vegetable' },
   { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjYXJyb3QlMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable' },
   { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1511410188607-eca3f2f341bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxicm9jY29saSUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable' },
   { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves' },
@@ -78,4 +78,3 @@ export default function CropSciencePage() {
     </div>
   );
 }
-
