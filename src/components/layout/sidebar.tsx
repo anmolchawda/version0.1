@@ -10,17 +10,17 @@ import { Separator } from '@/components/ui/separator';
 import type { NavLink, User } from '@/types';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import {
-  Home,
-  Search,
-  PlusSquare,
-  Store,
-  User as UserProfileIcon,
   FlaskConical,
   SprayCan,
   Bug,
   Code2,
   Brain,
   Settings as SettingsIcon,
+  Home,
+  Search,
+  PlusSquare,
+  Store,
+  User as UserProfileIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -84,11 +84,7 @@ export function Sidebar() {
 
 
   const mainNavLinks = useMemo((): NavLink[] => [
-    // { href: '/', label: currentLanguage === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> }, // Feed link removed
-    // { href: '/discover', label: currentLanguage === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> }, // Discover link removed
-    { href: '/post/create', label: currentLanguage === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
-    { href: '/mandi', label: currentLanguage === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
-    { href: `/profile/${MOCK_USER_ID}`, label: currentLanguage === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserProfileIcon className="h-5 w-5" /> },
+    // Feed, Discover, Create, Mandi, Profile links removed as per user request
   ], [currentLanguage]);
 
   const secondaryNavLinks = useMemo((): NavLink[] => [
@@ -116,16 +112,20 @@ export function Sidebar() {
       )}
     >
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {mainNavLinks.map((link) => (
-          <NavLinkItem
-            key={link.href} 
-            link={link}
-            isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
-            isSidebarOpen={isSidebarOpen}
-            onClick={closeSidebar}
-          />
-        ))}
-        <Separator className="my-3" />
+        {mainNavLinks.length > 0 && (
+          <>
+            {mainNavLinks.map((link) => (
+              <NavLinkItem
+                key={link.href} 
+                link={link}
+                isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
+                isSidebarOpen={isSidebarOpen}
+                onClick={closeSidebar}
+              />
+            ))}
+            <Separator className="my-3" />
+          </>
+        )}
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
