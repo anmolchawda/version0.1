@@ -58,13 +58,13 @@ export default function CropSciencePage() {
               {commonCrops.map((crop) => (
                 <Link key={crop.slug} href={`/crop-science/${crop.slug}`} passHref>
                   <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 rounded-lg h-full flex flex-col cursor-pointer">
-                    <div className="aspect-square bg-card flex items-center justify-center p-1 relative"> {/* Added relative for potential badge */}
+                    <div className="aspect-square bg-card flex items-center justify-center p-1 relative">
                       <Image
                         src={crop.imageUrl}
                         alt={crop.name}
-                        width={150}
-                        height={150}
-                        className="object-contain rounded-md max-h-full max-w-full"
+                        layout="fill"
+                        objectFit="contain"
+                        className="rounded-md max-h-full max-w-full"
                         data-ai-hint={crop.aiHint}
                       />
                     </div>
