@@ -10,11 +10,11 @@ import { Separator } from '@/components/ui/separator';
 import type { NavLink, User } from '@/types';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import {
-  Home, // For Feed
-  Search, // For Discover
-  PlusSquare, // For Create Post
-  Store, // For Mandi
-  User as UserProfileIcon, // For Profile
+  Home,
+  Search,
+  PlusSquare,
+  Store,
+  User as UserProfileIcon,
   FlaskConical,
   SprayCan,
   Bug,
@@ -64,11 +64,28 @@ export function Sidebar() {
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  const [settingsLabel, setSettingsLabel] = useState('Settings');
+  
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem('selectedAppLanguage');
+    if (storedLanguage) {
+      setCurrentLanguage(storedLanguage);
+    }
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'selectedAppLanguage' && event.newValue) {
+        setCurrentLanguage(event.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
 
   // Define main navigation links
   const mainNavLinks = useMemo((): NavLink[] => [
-    { href: '/', label: currentLanguage === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
+    // { href: '/', label: currentLanguage === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> }, // Feed link removed
     { href: '/discover', label: currentLanguage === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
     { href: '/post/create', label: currentLanguage === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
     { href: '/mandi', label: currentLanguage === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
@@ -85,25 +102,8 @@ export function Sidebar() {
     { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Brain className="h-5 w-5" /> },
   ], [currentLanguage]);
 
+  const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
 
-  useEffect(() => {
-    const storedLanguage = localStorage.getItem('selectedAppLanguage');
-    if (storedLanguage) {
-      setCurrentLanguage(storedLanguage);
-      setSettingsLabel(storedLanguage === 'hi' ? 'सेटिंग्स' : 'Settings');
-    }
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'selectedAppLanguage' && event.newValue) {
-        setCurrentLanguage(event.newValue);
-        setSettingsLabel(event.newValue === 'hi' ? 'सेटिंग्स' : 'Settings');
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
 
   const userAvatarFallback = mockUser?.username ? mockUser.username.substring(0, 2).toUpperCase() : 'U';
   const userNameDisplay = mockUser?.name || mockUser?.username || 'FARMDOCC User';
@@ -113,14 +113,14 @@ export function Sidebar() {
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
         "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
-        "top-16",
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
+        "top-16", // Positioned below the TopHeader
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides in and out
       )}
     >
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {mainNavLinks.map((link) => (
           <NavLinkItem
-            key={link.href} // Use href for key as label can change
+            key={link.href} 
             link={link}
             isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
             isSidebarOpen={isSidebarOpen}
