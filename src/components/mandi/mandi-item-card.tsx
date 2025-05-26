@@ -42,7 +42,7 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
         </Badge>
       </div>
       <CardHeader className="pb-2 pt-3 px-3">
-        <CardTitle className="text-base sm:text-md font-semibold text-primary hover:underline line-clamp-1">
+        <CardTitle className="text-sm sm:text-base font-semibold text-primary hover:underline line-clamp-1">
           <Link href={`#`}>{listing.name}</Link> {/* Placeholder link */}
         </CardTitle>
         {listing.description && <CardDescription className="text-xs line-clamp-2">{listing.description}</CardDescription>}

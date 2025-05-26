@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, MapPin, CalendarDays, ListChecks, ShoppingCart, PlusCircle, Store } from 'lucide-react';
 import { format } from 'date-fns';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
+import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 
 
 export default function MandiPage() {
@@ -83,10 +84,10 @@ export default function MandiPage() {
       <Card className="shadow-xl rounded-xl overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-primary/10 via-background to-accent/10 p-6">
           <div className="flex items-center space-x-4 text-primary">
-            <Store className="h-10 w-10" /> {/* Updated Icon */}
+            <Store className="h-10 w-10" />
             <div>
-              <CardTitle className="text-3xl font-bold">Mandi (Marketplace)</CardTitle>
-              <CardDescription className="text-md text-muted-foreground">
+              <CardTitle className="text-2xl sm:text-3xl font-bold">Mandi (Marketplace)</CardTitle>
+              <CardDescription className="text-sm sm:text-md text-muted-foreground">
                 Discover and trade agriculture products from here
               </CardDescription>
             </div>
@@ -99,14 +100,14 @@ export default function MandiPage() {
               <Input
                 type="search"
                 placeholder="Search products, categories, sellers, locations..."
-                className="w-full pl-12 py-3 text-base rounded-lg"
+                className="w-full pl-12 py-3 rounded-lg text-sm sm:text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full py-3 text-base rounded-lg">
+                <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
                   <SelectValue placeholder="Filter by Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -116,7 +117,7 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
               <Select value={selectedState} onValueChange={setSelectedState}>
-                <SelectTrigger className="w-full py-3 text-base rounded-lg">
+                <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
                   <SelectValue placeholder="Filter by State" />
                 </SelectTrigger>
                 <SelectContent>
@@ -126,7 +127,7 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
               <Select value={selectedCity} onValueChange={setSelectedCity} disabled={!selectedState || availableCities.length === 0}>
-                <SelectTrigger className="w-full py-3 text-base rounded-lg">
+                <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
                   <SelectValue placeholder="Filter by City" />
                 </SelectTrigger>
                 <SelectContent>
@@ -140,7 +141,7 @@ export default function MandiPage() {
 
           <section>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-primary flex items-center">
+              <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
                 <ListChecks className="mr-3 h-7 w-7"/> Marketplace Listings
               </h2>
               <Button
@@ -154,62 +155,16 @@ export default function MandiPage() {
               </Button>
             </div>
             {filteredListings.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> {/* Updated grid layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredListings.map((listing) => (
-                  <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                    <div className="relative w-full aspect-square bg-muted">
-                      <Image
-                        src={listing.imageUrl}
-                        alt={listing.name}
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint={listing.aiHint}
-                      />
-                       <Badge variant="default" className="absolute top-2 left-2 bg-primary/80 text-primary-foreground">
-                          {listing.price}
-                       </Badge>
-                       <Badge variant="secondary" className="absolute top-2 right-2 bg-secondary/80 text-secondary-foreground">
-                          {listing.category}
-                       </Badge>
-                    </div>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base sm:text-md text-primary hover:underline line-clamp-1">
-                        <Link href={`#`}>{listing.name}</Link>
-                      </CardTitle>
-                      {listing.description && <CardDescription className="line-clamp-2 text-xs">{listing.description}</CardDescription>}
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm flex-grow">
-                      <p><strong className="text-foreground">Quantity:</strong> {listing.quantity}</p>
-                       <div className="flex items-center text-muted-foreground">
-                        <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {listing.location}
-                      </div>
-                      <div className="flex items-center text-muted-foreground">
-                        <CalendarDays className="h-4 w-4 mr-1.5 text-primary" />
-                        Listed: {format(new Date(listing.listedDate), "MMM d, yyyy")}
-                      </div>
-                      <div className="flex items-center pt-2">
-                        <Avatar className="h-7 w-7 mr-2 border">
-                          <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.name || listing.seller.username} data-ai-hint="person farmer" />
-                          <AvatarFallback>{(listing.seller.name || listing.seller.username).charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                        <Link href={`/profile/${listing.seller.id}`} className="text-xs text-muted-foreground hover:text-primary hover:underline">
-                          Sold by: {listing.seller.name || `@${listing.seller.username}`}
-                        </Link>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="p-4 mt-auto">
-                      <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                        <ShoppingCart className="mr-2 h-4 w-4" /> View Details & Contact
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                  <MandiItemCard key={listing.id} listing={listing} />
                 ))}
               </div>
             ) : (
               <div className="text-center py-16">
                 <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-                <p className="text-xl font-semibold text-muted-foreground">No listings found matching your criteria.</p>
-                <p className="text-sm text-muted-foreground mt-2">Try adjusting your search or filters, or check back later!</p>
+                <p className="text-lg sm:text-xl font-semibold text-muted-foreground">No listings found matching your criteria.</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">Try adjusting your search or filters, or check back later!</p>
               </div>
             )}
           </section>
