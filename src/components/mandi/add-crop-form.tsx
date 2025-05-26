@@ -113,22 +113,21 @@ export function AddCropForm() {
 
   return (
     <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-xl">
-      <CardHeader className="relative flex items-center border-b pb-4 pt-4 pr-4 pl-2 sm:pl-4">
+      <CardHeader className="relative flex justify-center items-center border-b py-4 px-4 sm:px-6">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => router.back()}
-          className="h-9 w-9 mr-2"
+          className="absolute left-2 top-1/2 -translate-y-1/2 sm:left-4 h-9 w-9"
           aria-label="Go back"
         >
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <div className="flex flex-col items-center text-center flex-grow">
+        <div className="flex flex-col items-center text-center">
           <PackagePlus className="h-8 w-8 sm:h-10 sm:w-10 text-primary mb-1" />
           <CardTitle className="text-xl sm:text-2xl font-bold text-primary">List New Item in Mandi</CardTitle>
           <CardDescription className="text-xs sm:text-sm">Share details about your product or equipment to reach buyers.</CardDescription>
         </div>
-        <div className="h-9 w-9 ml-2 sm:w-9"></div> {/* Spacer for balance */}
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6 p-6">
