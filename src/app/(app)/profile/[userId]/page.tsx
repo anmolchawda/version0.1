@@ -6,15 +6,15 @@ import { notFound } from 'next/navigation';
 // Mock current user ID for demonstration
 const CURRENT_MOCK_USER_ID = '1'; 
 
-export default function UserProfilePage({ params }: { params: { userId: string } }) {
-  const user = getPlaceholderUser(params.userId);
+export default function UserProfilePage({ params: { userId } }: { params: { userId: string } }) { // Destructured userId
+  const user = getPlaceholderUser(userId);
   
   if (!user) {
     notFound();
   }
 
-  const userPosts = getPlaceholderPostsForUser(params.userId);
-  const isCurrentUser = params.userId === CURRENT_MOCK_USER_ID;
+  const userPosts = getPlaceholderPostsForUser(userId);
+  const isCurrentUser = userId === CURRENT_MOCK_USER_ID;
 
   return (
     <div className="space-y-8">

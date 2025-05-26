@@ -10,10 +10,10 @@ interface PostPageProps {
 }
 
 export async function generateMetadata(
-  { params }: PostPageProps,
+  { params: { postId } }: PostPageProps, // Destructured postId
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const post = getPlaceholderPostById(params.postId);
+  const post = getPlaceholderPostById(postId);
 
   if (!post) {
     return {
@@ -35,14 +35,14 @@ export async function generateMetadata(
 }
 
 
-export default async function PostPage({ params }: PostPageProps) {
-  const post = getPlaceholderPostById(params.postId);
+export default async function PostPage({ params: { postId } }: PostPageProps) { // Destructured postId
+  const post = getPlaceholderPostById(postId);
   
   if (!post) {
     notFound();
   }
 
-  const comments = getPlaceholderCommentsForPost(params.postId);
+  const comments = getPlaceholderCommentsForPost(postId);
 
   return (
     <div className="space-y-6">
