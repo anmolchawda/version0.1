@@ -46,7 +46,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Pineapple', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/pineapple.jpg', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
   { name: 'Watermelon', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/watermelon.jpg', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
   { name: 'Pomegranate', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/pomegranade.jpg', aiHint: 'pomegranate fruit', slug: 'pomegranate', unoptimized: true },
-  { name: 'Kiwi', imageUrl: 'https://images.unsplash.com/photo-1610917040803-1fccf9623064?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxraXdpfGVufDB8fHx8MTc0ODI0NzczNXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'kiwi fruit', slug: 'kiwi' },
+  { name: 'Kiwi', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/kiwi.jpg', aiHint: 'kiwi fruit', slug: 'kiwi', unoptimized: true },
 ];
 
 export default function CropSciencePage() {
@@ -94,10 +94,3 @@ export default function CropSciencePage() {
     </div>
   );
 }
-
-
-
-
-
-
-
