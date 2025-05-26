@@ -55,13 +55,13 @@ export default function CropSciencePage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {commonCrops.map((crop) => (
                 <Card key={crop.name} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-200 rounded-lg">
-                  <div className="aspect-square bg-card flex items-center justify-center p-2">
+                  <div className="aspect-square bg-card flex items-center justify-center p-1"> {/* Changed p-2 to p-1 */}
                     <Image
                       src={crop.imageUrl}
                       alt={crop.name}
                       width={150}
                       height={150}
-                      className="object-contain rounded-md"
+                      className="object-contain rounded-md max-h-full max-w-full" // Added max-h-full and max-w-full
                       data-ai-hint={crop.aiHint}
                     />
                   </div>
@@ -80,3 +80,4 @@ export default function CropSciencePage() {
   );
 }
 
+    
