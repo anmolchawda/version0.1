@@ -64,22 +64,15 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed top-16 left-0 bottom-0 transition-transform duration-300 ease-in-out z-40 shadow-lg", // top-16 to be below TopHeader
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-40 shadow-lg", // top-16 to be below TopHeader
+        "top-16", // Positioned below the TopHeader (h-16 or 4rem)
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Width is fixed, transform controls visibility
       )}
     >
-      {/* Sidebar Header - Close Button */}
+      {/* Sidebar Header - Logo and Close Button removed from here */}
       <div className="p-4 border-b flex items-center justify-end">
-        {/* AppLogo is now in TopHeader */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={closeSidebar} // Use closeSidebar from context
-          className="h-8 w-8"
-          aria-label="Close sidebar"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
+        {/* This space can be used for a header within the sidebar if needed in future, or removed if header is simple */}
+        {/* The AppLogo and toggle button are now managed by TopHeader */}
       </div>
 
       {/* Main Sidebar Content */}
