@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { HashtagSuggester } from './hashtag-suggester';
-import { ImageUp, Send, Tag, X, Loader2, Video } from 'lucide-react'; // Added Video icon
+import { ImageUp, Send, Tag, X, Loader2, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function CreatePostForm() {
@@ -32,14 +32,13 @@ export function CreatePostForm() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setMediaPreviewUrl(reader.result as string);
-        setMediaDataUri(reader.result as string); 
+        setMediaDataUri(reader.result as string);
       };
       reader.readAsDataURL(file);
       if (file.type.startsWith('image/')) {
         setMediaType('image');
       } else if (file.type.startsWith('video/')) {
         setMediaType('video');
-         // Basic video length check (client-side, should be validated server-side too)
         const videoElement = document.createElement('video');
         videoElement.preload = 'metadata';
         videoElement.onloadedmetadata = () => {
@@ -50,7 +49,7 @@ export function CreatePostForm() {
               description: "Please select a video that is 60 seconds or shorter.",
               variant: "destructive",
             });
-            removeMedia(); // Reset if video is too long
+            removeMedia();
           }
         }
         videoElement.src = URL.createObjectURL(file);
@@ -68,7 +67,7 @@ export function CreatePostForm() {
     setMediaDataUri(undefined);
     setMediaType(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Reset file input
+      fileInputRef.current.value = '';
     }
   };
 
@@ -78,7 +77,7 @@ export function CreatePostForm() {
       setHashtags([...hashtags, newTag]);
     }
   };
-  
+
   const handleCurrentHashtagInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCurrentHashtagInput(e.target.value);
   };
@@ -112,7 +111,6 @@ export function CreatePostForm() {
       return;
     }
     setIsSubmitting(true);
-    // Simulate API call
     console.log('Submitting post:', { caption, mediaFile, mediaType, hashtags, mediaDataUri });
     await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -120,8 +118,7 @@ export function CreatePostForm() {
       title: "Post Created!",
       description: "Your post has been successfully shared.",
     });
-    
-    // Reset form
+
     setCaption('');
     removeMedia();
     setHashtags([]);
@@ -132,12 +129,12 @@ export function CreatePostForm() {
   return (
     <Card className="w-full max-w-lg mx-auto shadow-xl rounded-xl">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center text-primary">Create New Post</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-center text-primary">Create New Post</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="caption" className="text-base">Caption</Label>
+            <Label htmlFor="caption" className="text-sm sm:text-base">Caption</Label>
             <Textarea
               id="caption"
               value={caption}
@@ -149,7 +146,7 @@ export function CreatePostForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mediaUpload" className="text-base">Image / Video (Optional)</Label>
+            <Label htmlFor="mediaUpload" className="text-sm sm:text-base">Image / Video (Optional)</Label>
             <Input
               id="mediaUpload"
               type="file"
@@ -196,7 +193,7 @@ export function CreatePostForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="hashtags" className="text-base">Hashtags</Label>
+            <Label htmlFor="hashtags" className="text-sm sm:text-base">Hashtags</Label>
             <div className="flex items-center gap-2">
               <Tag className="h-5 w-5 text-muted-foreground" />
               <Input
@@ -227,17 +224,17 @@ export function CreatePostForm() {
               </div>
             )}
           </div>
-          
+
           <HashtagSuggester
             postText={caption}
-            postImageDataUri={mediaType === 'image' ? mediaDataUri : undefined} // Only pass URI if it's an image
+            postImageDataUri={mediaType === 'image' ? mediaDataUri : undefined}
             onSuggestionClick={handleSuggestedHashtagClick}
             className="pt-2"
           />
 
         </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+        <CardFooter className="p-4 sm:p-6">
+          <Button type="submit" className="w-full text-base sm:text-lg py-3 sm:py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
             {isSubmitting ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
@@ -250,5 +247,3 @@ export function CreatePostForm() {
     </Card>
   );
 }
-
-    

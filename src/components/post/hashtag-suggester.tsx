@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -27,7 +28,7 @@ export function HashtagSuggester({
   const fetchSuggestions = useCallback(async () => {
     if (!postText && !postImageDataUri) {
       setSuggestions([]);
-      setHasFetched(false); // Reset if no input
+      setHasFetched(false);
       return;
     }
 
@@ -47,13 +48,10 @@ export function HashtagSuggester({
       setIsLoading(false);
     }
   }, [postText, postImageDataUri]);
-  
-  // Automatic suggestion (debounced) can be added here if desired
-  // For now, we use a manual trigger button
 
   if (isLoading) {
     return (
-      <div className={`flex items-center space-x-2 text-sm text-muted-foreground ${className}`}>
+      <div className={`flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground ${className}`}>
         <Loader2 className="h-4 w-4 animate-spin" />
         <span>Suggesting hashtags...</span>
       </div>
@@ -61,7 +59,7 @@ export function HashtagSuggester({
   }
 
   if (error) {
-    return <p className={`text-sm text-destructive ${className}`}>{error}</p>;
+    return <p className={`text-xs sm:text-sm text-destructive ${className}`}>{error}</p>;
   }
 
   if (hasFetched && suggestions.length === 0 && !isLoading) {
@@ -71,7 +69,7 @@ export function HashtagSuggester({
           <Sparkles className="mr-2 h-4 w-4" />
           Suggest Hashtags
         </Button>
-        <p className="text-sm text-muted-foreground">No suggestions found. Try different content or add manually.</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">No suggestions found. Try different content or add manually.</p>
       </div>
     );
   }
@@ -85,7 +83,7 @@ export function HashtagSuggester({
       </Button>
       {suggestions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">AI Suggested Hashtags:</p>
+          <p className="text-xs sm:text-sm font-medium text-foreground">AI Suggested Hashtags:</p>
           <div className="flex flex-wrap gap-2">
             {suggestions.map((tag) => (
               <Badge
