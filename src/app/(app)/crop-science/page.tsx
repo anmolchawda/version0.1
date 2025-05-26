@@ -1,3 +1,4 @@
+
 // src/app/(app)/crop-science/page.tsx
 'use client'; // Make it a client component
 
@@ -30,7 +31,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Mango', imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYW5nb3xlbnwwfHx8fDE3NDgyNDc2ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'mango fruit' },
   { name: 'Grapes', imageUrl: 'https://images.unsplash.com/photo-1596363505729-4190a9506133?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxncmFwZXN8ZW58MHx8fHwxNzQ4MjQ0NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'grapes fruit' },
   { name: 'Strawberry', imageUrl: 'https://images.unsplash.com/photo-1568966299181-bb7282cc84f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHJhd2JlcnJ5fGVufDB8fHx8MTc0ODI0NDc0Mnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'strawberry fruit' },
-  { name: 'Pineapple', imageUrl: 'https://images.unsplash.com/photo-1492831379069-0fe9d118b7c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGluZWFwcGxlJTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pineapple fruit' },
+  { name: 'Pineapple', imageUrl: 'https://images.unsplash.com/photo-1490885578174-acda8905c2c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaW5lYXBwbGV8ZW58MHx8fHwxNzQ4MjQ3NjcwfDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pineapple fruit' },
   { name: 'Watermelon', imageUrl: 'https://images.unsplash.com/photo-1453179592584-e2587867cfff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3YXRlcm1lbG9uJTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'watermelon fruit' },
   { name: 'Pomegranate', imageUrl: 'https://images.unsplash.com/photo-1580157508103-2a4e9fe8ed29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb21lZ3JhbmF0ZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pomegranate fruit' },
   { name: 'Kiwi', imageUrl: 'https://images.unsplash.com/photo-1572539280469-9c738c59964d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8a2l3aSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'kiwi fruit' },
@@ -78,3 +79,4 @@ export default function CropSciencePage() {
     </div>
   );
 }
+
