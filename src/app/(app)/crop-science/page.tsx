@@ -27,7 +27,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
-  { name: 'Beans', imageUrl: 'https://placehold.co/200x200.png?text=Beans', aiHint: 'beans vegetable', slug: 'beans' },
+  { name: 'Beans', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/Beans.jpeg', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
   { name: 'Bottle Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Bottle+Gourd', aiHint: 'bottle gourd', slug: 'bottle-gourd' },
   { name: 'Bitter Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Bitter+Gourd', aiHint: 'bitter gourd', slug: 'bitter-gourd' },
   { name: 'Cabbage', imageUrl: 'https://placehold.co/200x200.png?text=Cabbage', aiHint: 'cabbage vegetable', slug: 'cabbage' },
@@ -99,4 +99,3 @@ export default function CropSciencePage() {
     
 
     
-
