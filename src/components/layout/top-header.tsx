@@ -1,4 +1,3 @@
-
 // src/components/layout/top-header.tsx
 'use client';
 
@@ -26,7 +25,7 @@ export function TopHeader() {
 
       {/* Center: App Logo */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <AppLogo iconClassName="h-8 w-8" textClassName="text-xl" />
+        <AppLogo iconClassName="h-10 w-10" textClassName="text-xl" />
       </div>
 
       {/* Right: Messages Icon */}
