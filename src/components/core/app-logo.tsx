@@ -8,15 +8,14 @@ export function AppLogo({ className, textClassName, iconClassName }: { className
 
   return (
     <Link href="/" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
-      <div className={cn("relative h-8 w-8", iconClassName)}> {/* Container for the image */}
+      <div className={cn("relative", iconClassName)}> {/* This div receives h-12 w-12 */}
         <Image
           src={logoUrl}
           alt="KrishiX Logo"
-          fill // Use fill prop for responsive sizing within the container
-          sizes="(max-width: 768px) 32px, 32px" // Provide sizes prop when using fill
-          style={{ objectFit: "contain" }} // Use style prop for objectFit with fill
-          priority // Consider adding priority if it's LCP
-          unoptimized={true} // Added for diagnostic purposes
+          fill
+          sizes="(max-width: 768px) 48px, 48px" // For h-12 w-12
+          style={{ objectFit: "contain" }}
+          unoptimized={true} 
         />
       </div>
       <span className={cn(textClassName)}>KrishiX</span>
