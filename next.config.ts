@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'storage.cloud.google.com', // Ensure this is present
+        hostname: 'storage.cloud.google.com',
         port: '',
         pathname: '/**',
       },
