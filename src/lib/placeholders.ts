@@ -357,6 +357,7 @@ export const placeholderCategories = [
   { value: 'farm_equipment', label: 'Farm Equipment' },
   { value: 'pesticides', label: 'Pesticides' },
   { value: 'fungicides', label: 'Fungicides' },
+  { value: 'mulching', label: 'Mulching' },
 ];
 
 export const placeholderListings: MandiListing[] = [
@@ -369,7 +370,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹210/kg', // Example price in INR
     imageUrl: 'https://placehold.co/300x200.png?text=Tomatoes',
     aiHint: 'tomatoes vegetable',
-    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
     listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'Mumbai, MH'
   },
@@ -382,7 +383,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹1500/bag',
     imageUrl: 'https://placehold.co/300x200.png?text=Corn+Seeds',
     aiHint: 'corn seeds',
-    seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
     listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'New Delhi, DL'
   },
@@ -395,7 +396,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹3,50,000',
     imageUrl: 'https://placehold.co/300x200.png?text=Tractor',
     aiHint: 'tractor farm',
-    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
     listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     location: 'Pune, MH'
   },
@@ -408,7 +409,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹800/bag',
     imageUrl: 'https://placehold.co/300x200.png?text=Fertilizer',
     aiHint: 'fertilizer organic',
-    seller: { id: '3', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
+    seller: { id: '3', name: 'Mike Chen', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
     listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'South Delhi, DL'
   },
@@ -421,7 +422,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹45,000',
     imageUrl: 'https://placehold.co/300x200.png?text=Power+Tiller',
     aiHint: 'tiller equipment',
-    seller: { id: '2', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
     listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'Bengaluru, KA'
   },
@@ -434,7 +435,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹1200/can',
     imageUrl: 'https://placehold.co/300x200.png?text=Pesticide',
     aiHint: 'neem oil',
-    seller: { id: '1', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
     listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
     location: 'Ludhiana, PB'
   },
@@ -457,3 +458,5 @@ const placeholderChatMessages: Record<string, ChatMessage[]> = {
 export function getPlaceholderMessagesForChat(chatPartnerId: string): ChatMessage[] {
   return placeholderChatMessages[chatPartnerId] || [];
 }
+
+    

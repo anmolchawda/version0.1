@@ -34,6 +34,7 @@ const itemCategories = [
   { value: 'farm_equipment', label: 'Farm Equipment' },
   { value: 'pesticides', label: 'Pesticides' },
   { value: 'fungicides', label: 'Fungicides' },
+  { value: 'mulching', label: 'Mulching' },
 ];
 
 export function AddCropForm() {
@@ -270,3 +271,5 @@ export function AddCropForm() {
     </Card>
   );
 }
+
+    
