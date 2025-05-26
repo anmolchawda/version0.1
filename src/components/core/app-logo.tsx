@@ -1,32 +1,25 @@
 
 import Link from 'next/link';
-import { cn } from '@/lib/utils'; // Import cn for conditional classNames
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export function AppLogo({ className, textClassName, iconClassName }: { className?: string; textClassName?: string; iconClassName?: string }) {
-  // Base path for a single leaf, pointing upwards, height 15 units
-  const baseLeafPath = "M0,0 C3,-5 4,-12 0,-15 C-4,-12 -3,-5 0,0 Z";
-
   return (
     <Link href="/" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 100 100" // Using a 100x100 viewBox for easier path definition
-        className={cn("h-8 w-8", iconClassName)} // Allow overriding icon size
-        aria-hidden="true" // Decorative icon
-      >
-        {/* Main bubble shape, fill will be text-primary color */}
-        <path
-          fill="currentColor"
-          d="M70,10 H30 C18.954,10 10,18.954 10,30 V60 C10,71.046 18.954,80 30,80 H45 V82.5 C45,86.642 47.858,90 50,90 C52.142,90 55,86.642 55,82.5 V80 H70 C81.046,80 90,71.046 90,60 V30 C90,18.954 81.046,10 70,10 Z"
+      {/* 
+        Please place your logo image (e.g., logo.png, logo.svg) 
+        in the 'public' folder at the root of your project.
+        If your image is named differently or has a different extension, 
+        update the 'src' attribute below accordingly.
+      */}
+      <div className={cn("relative h-8 w-8", iconClassName)}> {/* Container for the image */}
+        <Image
+          src="/logo.png" // Assumes your logo is named logo.png and is in the /public folder
+          alt="KrishiX Logo"
+          layout="fill" // Fills the container div
+          objectFit="contain" // Ensures the whole logo is visible and maintains aspect ratio
         />
-        {/* Leaves - fill is white to contrast with the colored bubble */}
-        {/* Central Leaf: Positioned at center, scaled to be tallest */}
-        <path fill="white" d={baseLeafPath} transform="translate(50 58) scale(2.8 2.6)" />
-        {/* Left Leaf: Positioned to the left, smaller, rotated */}
-        <path fill="white" d={baseLeafPath} transform="translate(41 53) rotate(-35) scale(2.3 2.1)" />
-        {/* Right Leaf: Positioned to the right, smaller, rotated */}
-        <path fill="white" d={baseLeafPath} transform="translate(59 53) rotate(35) scale(2.3 2.1)" />
-      </svg>
+      </div>
       <span className={cn(textClassName)}>KrishiX</span>
     </Link>
   );
