@@ -27,7 +27,7 @@ export function AppLogo({ className, textClassName, iconClassName }: { className
         {/* Right Leaf: Positioned to the right, smaller, rotated */}
         <path fill="white" d={baseLeafPath} transform="translate(59 53) rotate(35) scale(2.3 2.1)" />
       </svg>
-      <span className={cn(textClassName)}>FARMDOCC</span>
+      <span className={cn(textClassName)}>KrishiX</span>
     </Link>
   );
 }
