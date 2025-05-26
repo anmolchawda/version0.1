@@ -25,7 +25,7 @@ export function TopHeader() {
 
       {/* Center: App Logo */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <AppLogo iconClassName="h-12 w-12" textClassName="text-xl" />
+        <AppLogo iconClassName="h-24 w-24" textClassName="hidden" />
       </div>
 
       {/* Right: Messages Icon */}
