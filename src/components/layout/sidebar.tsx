@@ -1,9 +1,10 @@
+
 // src/components/layout/sidebar.tsx
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useState, useEffect, type ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppLogo } from '@/components/core/app-logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,16 +12,10 @@ import { Separator } from '@/components/ui/separator';
 import type { NavLink, User } from '@/types';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import {
-  FlaskConical,
-  SprayCan,
-  Bug,
-  Code2,
-  Brain,
-  Settings as SettingsIcon,
-  ChevronLeft,
-  Menu, // Icon for opening sidebar
+  FlaskConical, SprayCan, Bug, Code2, Brain, Settings as SettingsIcon, ChevronLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 const MOCK_USER_ID = '1';
 
@@ -35,8 +30,8 @@ const getSecondaryNavLinks = (lang: string): NavLink[] => [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { isSidebarOpen, closeSidebar } = useSidebarContext();
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
-  const [isFullyCollapsed, setIsFullyCollapsed] = useState(true); // Start fully collapsed
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [secondaryLinks, setSecondaryLinks] = useState(() => getSecondaryNavLinks('en'));
@@ -66,94 +61,82 @@ export function Sidebar() {
   const userAvatarFallback = mockUser?.username ? mockUser.username.substring(0, 2).toUpperCase() : 'U';
   const userNameDisplay = mockUser?.name || mockUser?.username || 'FARMDOCC User';
 
-  const toggleSidebar = () => setIsFullyCollapsed(!isFullyCollapsed);
-
   return (
     <aside
       className={cn(
-        "bg-card text-card-foreground border-r flex flex-col h-screen", // Full height
-        "fixed top-0 left-0 transition-all duration-300 ease-in-out z-30",
-        isFullyCollapsed ? 'w-[72px]' : 'w-64 shadow-lg'
+        "bg-card text-card-foreground border-r flex flex-col h-full", // Full height, ensure it doesn't exceed viewport under pt-16 from layout
+        "fixed top-16 left-0 bottom-0 transition-transform duration-300 ease-in-out z-30 shadow-lg", // top-16 to be below TopHeader
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Width is fixed, transform controls visibility
       )}
     >
-      {/* Sidebar Header - Logo and Toggle Button */}
-      <div
-        className={cn(
-          "p-3 border-b",
-          isFullyCollapsed ? "flex flex-col items-center space-y-3" : "flex items-center justify-between"
-        )}
-      >
-        <AppLogo
-          iconClassName="h-8 w-8"
-          textClassName={isFullyCollapsed ? "hidden" : "text-xl"}
-        />
+      {/* Sidebar Header - Logo and Close Button */}
+      <div className="p-4 border-b flex items-center justify-between">
+        <AppLogo iconClassName="h-8 w-8" textClassName="text-xl" />
         <Button
           variant="ghost"
           size="icon"
-          onClick={toggleSidebar}
+          onClick={closeSidebar} // Use closeSidebar from context
           className="h-8 w-8"
-          aria-label={isFullyCollapsed ? "Open sidebar" : "Close sidebar"}
+          aria-label="Close sidebar"
         >
-          {isFullyCollapsed ? <Menu className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          <ChevronLeft className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Main Sidebar Content - Rendered only if not fully collapsed */}
-      {!isFullyCollapsed && (
-        <>
-          <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {secondaryLinks.map((link) => {
-              const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
-              return (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className={cn(
-                    'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  )}
-                >
-                  {link.icon}
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-auto p-2 space-y-2 border-t">
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3"
-              asChild
+      {/* Main Sidebar Content */}
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        {secondaryLinks.map((link) => {
+          const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
+          return (
+            <Link
+              key={link.label}
+              href={link.href}
+              className={cn(
+                'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+              onClick={closeSidebar} // Close sidebar on link click for mobile-like experience
             >
-              <Link href="/settings">
-                <SettingsIcon className="h-5 w-5" />
-                <span>{settingsLabel}</span>
-              </Link>
-            </Button>
+              {link.icon}
+              <span>{link.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-            <Separator />
+      <div className="mt-auto p-2 space-y-2 border-t">
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-3"
+          asChild
+        >
+          <Link href="/settings" onClick={closeSidebar}>
+            <SettingsIcon className="h-5 w-5" />
+            <span>{settingsLabel}</span>
+          </Link>
+        </Button>
 
-            {mockUser && (
-              <Link
-                href={`/profile/${mockUser.id}`}
-                className="flex items-center gap-3 group p-2 rounded-md hover:bg-muted"
-              >
-                <Avatar className="h-9 w-9 border">
-                  <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
-                  <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col overflow-hidden">
-                  <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
-                  <span className="text-xs text-muted-foreground truncate">@{mockUser.username}</span>
-                </div>
-              </Link>
-            )}
-          </div>
-        </>
-      )}
+        <Separator />
+
+        {mockUser && (
+          <Link
+            href={`/profile/${mockUser.id}`}
+            className="flex items-center gap-3 group p-2 rounded-md hover:bg-muted"
+            onClick={closeSidebar}
+          >
+            <Avatar className="h-9 w-9 border">
+              <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
+              <AvatarFallback>{userAvatarFallback}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
+              <span className="text-xs text-muted-foreground truncate">@{mockUser.username}</span>
+            </div>
+          </Link>
+        )}
+      </div>
     </aside>
   );
 }
