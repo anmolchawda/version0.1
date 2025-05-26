@@ -18,7 +18,7 @@ interface CropInfo {
 const commonCrops: CropInfo[] = [
   // Vegetables
   { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
-  { name: 'Potato', imageUrl: 'https://images.unsplash.com/photo-1578594640334-b71fbed2a406?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8cG90YXRvfGVufDB8fHx8MTc0ODIzOTAwNnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'potato vegetable', slug: 'potato' },
+  { name: 'Potato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/potato.jpg', aiHint: 'potato vegetable', slug: 'potato' },
   { name: 'Onion', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ONION.jpeg', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJyb3R8ZW58MHx8fHwxNzQ4MjM5Mzc2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable', slug: 'carrot' },
   { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1615485291234-9d694218aeb3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8YnJvY29sbGl8ZW58MHx8fHwxNzQ4MjM5NTU0fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable', slug: 'broccoli' },
@@ -67,7 +67,7 @@ export default function CropSciencePage() {
                         objectFit="contain"
                         className="rounded-md max-h-full max-w-full"
                         data-ai-hint={crop.aiHint}
-                        unoptimized={crop.unoptimized} // Apply unoptimized prop if true
+                        unoptimized={crop.unoptimized} 
                       />
                     </div>
                     <div className="p-3 text-center bg-muted/30 mt-auto">
