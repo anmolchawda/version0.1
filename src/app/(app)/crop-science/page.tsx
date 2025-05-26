@@ -61,7 +61,7 @@ export default function CropSciencePage() {
                     <div className="aspect-square bg-card flex items-center justify-center p-1 relative">
                       <Image
                         src={crop.imageUrl}
-                        alt={crop.name}
+                        alt={crop.name || 'Crop image'}
                         layout="fill"
                         objectFit="contain"
                         className="rounded-md max-h-full max-w-full"
