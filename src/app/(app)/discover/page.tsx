@@ -71,13 +71,13 @@ export default function DiscoverPage() {
       
       <Tabs defaultValue="farmers" className="w-full">
         <TabsList className="grid w-full grid-cols-3 md:grid-cols-3 mb-6"> {/* Updated to 3 columns */}
-          <TabsTrigger value="farmers" className="py-2.5 text-sm md:text-base">
+          <TabsTrigger value="farmers" className="py-2.5 text-sm">
             <Users className="mr-2 h-5 w-5" /> Farmers
           </TabsTrigger>
-          <TabsTrigger value="posts" className="py-2.5 text-sm md:text-base">
+          <TabsTrigger value="posts" className="py-2.5 text-sm">
             <ImageIcon className="mr-2 h-5 w-5" /> Posts
           </TabsTrigger>
-          <TabsTrigger value="mandi" className="py-2.5 text-sm md:text-base"> {/* New Mandi Tab */}
+          <TabsTrigger value="mandi" className="py-2.5 text-sm"> {/* New Mandi Tab */}
             <Store className="mr-2 h-5 w-5" /> Mandi
           </TabsTrigger>
         </TabsList>
