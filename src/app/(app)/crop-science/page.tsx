@@ -1,6 +1,6 @@
 
 // src/app/(app)/crop-science/page.tsx
-'use client'; 
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,6 +27,15 @@ const commonCrops: CropInfo[] = [
   { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
+  { name: 'Beans', imageUrl: 'https://placehold.co/200x200.png?text=Beans', aiHint: 'beans vegetable', slug: 'beans' },
+  { name: 'Bottle Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Bottle+Gourd', aiHint: 'bottle gourd', slug: 'bottle-gourd' },
+  { name: 'Bitter Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Bitter+Gourd', aiHint: 'bitter gourd', slug: 'bitter-gourd' },
+  { name: 'Cabbage', imageUrl: 'https://placehold.co/200x200.png?text=Cabbage', aiHint: 'cabbage vegetable', slug: 'cabbage' },
+  { name: 'Cauliflower', imageUrl: 'https://placehold.co/200x200.png?text=Cauliflower', aiHint: 'cauliflower vegetable', slug: 'cauliflower' },
+  { name: 'Radish', imageUrl: 'https://placehold.co/200x200.png?text=Radish', aiHint: 'radish vegetable', slug: 'radish' },
+  { name: 'Ridge Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Ridge+Gourd', aiHint: 'ridge gourd', slug: 'ridge-gourd' },
+  { name: 'Drumstick', imageUrl: 'https://placehold.co/200x200.png?text=Drumstick', aiHint: 'drumstick vegetable', slug: 'drumstick' },
+  { name: 'Okra', imageUrl: 'https://placehold.co/200x200.png?text=Okra', aiHint: 'okra vegetable', slug: 'okra' },
   // Fruits
   { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit', slug: 'apple' },
   { name: 'Banana', imageUrl: 'https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxN3x8YmFuYW5hfGVufDB8fHx8MTc0ODI0MDM3Nnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'banana fruit', slug: 'banana' },
@@ -90,3 +99,4 @@ export default function CropSciencePage() {
     
 
     
+
