@@ -83,16 +83,14 @@ export function Sidebar() {
   }, []);
 
 
-  // Define main navigation links
   const mainNavLinks = useMemo((): NavLink[] => [
     // { href: '/', label: currentLanguage === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> }, // Feed link removed
-    { href: '/discover', label: currentLanguage === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
+    // { href: '/discover', label: currentLanguage === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> }, // Discover link removed
     { href: '/post/create', label: currentLanguage === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
     { href: '/mandi', label: currentLanguage === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
     { href: `/profile/${MOCK_USER_ID}`, label: currentLanguage === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserProfileIcon className="h-5 w-5" /> },
   ], [currentLanguage]);
 
-  // Define secondary navigation links
   const secondaryNavLinks = useMemo((): NavLink[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
@@ -117,7 +115,7 @@ export function Sidebar() {
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides in and out
       )}
     >
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+      <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {mainNavLinks.map((link) => (
           <NavLinkItem
             key={link.href} 
@@ -137,7 +135,7 @@ export function Sidebar() {
             onClick={closeSidebar}
           />
         ))}
-      </nav>
+      </div>
 
       <div className="mt-auto p-2 space-y-2 border-t">
         <TooltipProvider delayDuration={0}>
