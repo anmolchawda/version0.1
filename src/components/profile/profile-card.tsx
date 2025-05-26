@@ -30,13 +30,13 @@ export function ProfileCard({ user }: ProfileCardProps) {
         {user.bio && <p className="text-muted-foreground line-clamp-2">{user.bio}</p>}
         {user.location && (
           <div className="flex items-center justify-center text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5 mr-1 text-primary" />
+            <MapPin className="h-4 w-4 mr-1.5 text-primary" />
             {user.location}
           </div>
         )}
         {user.produce && user.produce.length > 0 && (
           <div className="flex items-center justify-center text-muted-foreground">
-            <Leaf className="h-3.5 w-3.5 mr-1 text-primary" />
+            <Leaf className="h-4 w-4 mr-1.5 text-primary" />
             <span className="line-clamp-1">Grows: {user.produce.join(', ')}</span>
           </div>
         )}
