@@ -37,7 +37,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Drumstick', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/drumstick.jpeg', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/okra.jpeg', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
   // Fruits
-  { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit', slug: 'apple' },
+  { name: 'Apple', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/apple.jpg', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
   { name: 'Banana', imageUrl: 'https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxN3x8YmFuYW5hfGVufDB8fHx8MTc0ODI0MDM3Nnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'banana fruit', slug: 'banana' },
   { name: 'Orange', imageUrl: 'https://images.unsplash.com/photo-1609424572698-04d9d2e04954?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8b3JhbmdlfGVufDB8fHx8MTc0ODI0NDY5OHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'orange fruit', slug: 'orange' },
   { name: 'Mango', imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYW5nb3xlbnwwfHx8fDE3NDgyNDc2ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'mango fruit', slug: 'mango' },
