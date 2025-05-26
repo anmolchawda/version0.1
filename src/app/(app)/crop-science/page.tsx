@@ -24,7 +24,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Broccoli', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/BROCCOLI.jpg', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves', slug: 'spinach' },
   { name: 'Bell Pepper', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/red-yellow-capsicum.jpg', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
-  { name: 'Cucumber', imageUrl: 'https://images.unsplash.com/photo-1587411768638-ec71f8e33b78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjdWN1bWJlcnxlbnwwfHx8fDE3NDgyMzk4MDl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'cucumber vegetable', slug: 'cucumber' },
+  { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
   // Fruits
