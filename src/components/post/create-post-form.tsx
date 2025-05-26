@@ -132,7 +132,7 @@ export function CreatePostForm() {
         <CardTitle className="text-xl sm:text-2xl font-bold text-center text-primary">Create New Post</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6 p-4 sm:p-6">
+        <CardContent className="space-y-4 p-4 sm:p-6"> {/* Reduced space-y from 6 to 4 */}
           <div className="space-y-2">
             <Label htmlFor="caption" className="text-sm sm:text-base">Caption</Label>
             <Textarea
@@ -229,7 +229,7 @@ export function CreatePostForm() {
             postText={caption}
             postImageDataUri={mediaType === 'image' ? mediaDataUri : undefined}
             onSuggestionClick={handleSuggestedHashtagClick}
-            className="pt-2"
+            // Removed pt-2 from className here
           />
 
         </CardContent>
