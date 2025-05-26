@@ -30,7 +30,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Beans', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/Beans.jpeg', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
   { name: 'Bottle Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bottle%20gourd.jpeg', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
   { name: 'Bitter Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bitter%20gourd.jpeg', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
-  { name: 'Cabbage', imageUrl: 'https://placehold.co/200x200.png?text=Cabbage', aiHint: 'cabbage vegetable', slug: 'cabbage' },
+  { name: 'Cabbage', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cabbage.jpeg', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
   { name: 'Cauliflower', imageUrl: 'https://placehold.co/200x200.png?text=Cauliflower', aiHint: 'cauliflower vegetable', slug: 'cauliflower' },
   { name: 'Radish', imageUrl: 'https://placehold.co/200x200.png?text=Radish', aiHint: 'radish vegetable', slug: 'radish' },
   { name: 'Ridge Gourd', imageUrl: 'https://placehold.co/200x200.png?text=Ridge+Gourd', aiHint: 'ridge gourd', slug: 'ridge-gourd' },
@@ -99,6 +99,7 @@ export default function CropSciencePage() {
     
 
     
+
 
 
 
