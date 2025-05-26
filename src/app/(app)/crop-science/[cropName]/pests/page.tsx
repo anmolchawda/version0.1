@@ -30,7 +30,7 @@ const allPestsData: Pest[] = [
     name: 'Aphids',
     description: 'Small, pear-shaped insects that cluster on new growth and the undersides of leaves. They suck sap and can transmit diseases.',
     imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'aphids greenfly',
+    aiHint: 'aphids tomato',
   },
   {
     id: 't-pest3',
