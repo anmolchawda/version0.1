@@ -1,4 +1,3 @@
-
 // src/components/layout/sidebar.tsx
 'use client';
 
@@ -11,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import type { NavLink, User } from '@/types';
 import { getPlaceholderUser } from '@/lib/placeholders';
 import {
-  FlaskConical, SprayCan, Bug, Code2, Brain, Settings as SettingsIcon, ChevronLeft
+  FlaskConical, SprayCan, Bug, Code2, Brain, Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -64,16 +63,12 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-40 shadow-lg", // top-16 to be below TopHeader
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-40 shadow-lg",
         "top-16", // Positioned below the TopHeader (h-16 or 4rem)
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Width is fixed, transform controls visibility
       )}
     >
-      {/* Sidebar Header - Logo and Close Button removed from here */}
-      <div className="p-4 border-b flex items-center justify-end">
-        {/* This space can be used for a header within the sidebar if needed in future, or removed if header is simple */}
-        {/* The AppLogo and toggle button are now managed by TopHeader */}
-      </div>
+      {/* The empty div that was here (with p-4 border-b) has been removed */}
 
       {/* Main Sidebar Content */}
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
