@@ -16,6 +16,7 @@ export function AppLogo({ className, textClassName, iconClassName }: { className
           sizes="(max-width: 768px) 32px, 32px" // Provide sizes prop when using fill
           style={{ objectFit: "contain" }} // Use style prop for objectFit with fill
           priority // Consider adding priority if it's LCP
+          unoptimized={true} // Added for diagnostic purposes
         />
       </div>
       <span className={cn(textClassName)}>KrishiX</span>
