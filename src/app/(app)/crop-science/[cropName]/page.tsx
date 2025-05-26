@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Bug, Virus, Leaf, FlaskConical } from "lucide-react"; // Using Virus for Diseases
+import { ChevronLeft, Bug, ShieldAlert, Leaf, FlaskConical } from "lucide-react"; // Changed Virus to ShieldAlert
 
 interface ManagementOption {
   title: string;
@@ -33,13 +33,13 @@ export default function CropDetailPage() {
     {
       title: "Disease Control",
       description: `Identify and control common diseases that can impact your ${cropName} harvest.`,
-      icon: <Virus className="h-10 w-10 text-primary mb-3" />,
+      icon: <ShieldAlert className="h-10 w-10 text-primary mb-3" />, // Changed icon here
       linkPath: 'diseases',
     },
     {
       title: "Nutrient Deficiencies",
       description: `Diagnose and correct nutrient deficiencies to ensure healthy ${cropName} growth.`,
-      icon: <Leaf className="h-10 w-10 text-primary mb-3" />, // Or Droplets, ThermometerSnowflake
+      icon: <Leaf className="h-10 w-10 text-primary mb-3" />,
       linkPath: 'nutrient-deficiencies',
     },
   ];
@@ -80,5 +80,3 @@ export default function CropDetailPage() {
     </div>
   );
 }
-
-    
