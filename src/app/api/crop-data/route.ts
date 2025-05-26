@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     console.error('Error reading or parsing CSV file:', error);
 
     if (error.code === 'ENOENT') {
-      return NextResponse.json({ error: 'CSV file not found' }, { status: 404 });
+      return NextResponse.json({ error: 'CSV file not found. Please ensure `public/crop-data.csv` exists in your project.' }, { status: 404 });
     }
 
     return NextResponse.json({ error: 'Failed to read or parse CSV data', details: error.message }, { status: 500 });
