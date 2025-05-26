@@ -58,11 +58,13 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
         </div>
         <div className="flex items-center pt-1.5">
           <Avatar className="h-6 w-6 mr-1.5 border">
-            <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.username} data-ai-hint="person farmer" />
-            <AvatarFallback className="text-xs">{listing.seller.username.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.name || listing.seller.username} data-ai-hint="person farmer" />
+            <AvatarFallback className="text-xs">
+              {(listing.seller.name || listing.seller.username).charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <Link href={`/profile/${listing.seller.id}`} className="text-xs text-muted-foreground hover:text-primary hover:underline">
-            @{listing.seller.username}
+            {listing.seller.name || listing.seller.username}
           </Link>
         </div>
       </CardContent>
@@ -74,5 +76,3 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
     </Card>
   );
 }
-
-    
