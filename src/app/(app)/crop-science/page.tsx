@@ -17,7 +17,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Potato', imageUrl: 'https://images.unsplash.com/photo-1578594640334-b71fbed2a406?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8cG90YXRvfGVufDB8fHx8MTc0ODIzOTAwNnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'potato vegetable' },
   { name: 'Onion', imageUrl: 'https://images.unsplash.com/photo-1587049633312-d628ae50a8ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxvbmlvbnxlbnwwfHx8fDE3NDgyMzkzMzV8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'onion vegetable' },
   { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJyb3R8ZW58MHx8fHwxNzQ4MjM5Mzc2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable' },
-  { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1511410188607-eca3f2f341bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxicm9jY29saSUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable' },
+  { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1615485291234-9d694218aeb3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8YnJvY29sbGl8ZW58MHx8fHwxNzQ4MjM5NTU0fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable' },
   { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves' },
   { name: 'Bell Pepper', imageUrl: 'https://images.unsplash.com/photo-1525607551316-4a8e16d1f9ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiZWxsJTIwcGVwcGVyfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'bell pepper' },
   { name: 'Cucumber', imageUrl: 'https://images.unsplash.com/photo-1693933858151-2d01597907e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjdWN1bWJlciUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'cucumber vegetable' },
@@ -78,3 +78,4 @@ export default function CropSciencePage() {
     </div>
   );
 }
+
