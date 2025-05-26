@@ -154,10 +154,10 @@ export default function MandiPage() {
               </Button>
             </div>
             {filteredListings.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4"> {/* Updated grid layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> {/* Updated grid layout */}
                 {filteredListings.map((listing) => (
                   <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                    <div className="relative w-full aspect-square bg-muted"> {/* Changed h-52 to aspect-square */}
+                    <div className="relative w-full aspect-square bg-muted">
                       <Image
                         src={listing.imageUrl}
                         alt={listing.name}
@@ -173,10 +173,10 @@ export default function MandiPage() {
                        </Badge>
                     </div>
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-xl text-primary hover:underline">
+                      <CardTitle className="text-base sm:text-md text-primary hover:underline line-clamp-1">
                         <Link href={`#`}>{listing.name}</Link>
                       </CardTitle>
-                      {listing.description && <CardDescription className="line-clamp-2">{listing.description}</CardDescription>}
+                      {listing.description && <CardDescription className="line-clamp-2 text-xs">{listing.description}</CardDescription>}
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm flex-grow">
                       <p><strong className="text-foreground">Quantity:</strong> {listing.quantity}</p>
@@ -189,11 +189,11 @@ export default function MandiPage() {
                       </div>
                       <div className="flex items-center pt-2">
                         <Avatar className="h-7 w-7 mr-2 border">
-                          <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.username} data-ai-hint="person farmer" />
-                          <AvatarFallback>{listing.seller.username.charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarImage src={listing.seller.avatarUrl} alt={listing.seller.name || listing.seller.username} data-ai-hint="person farmer" />
+                          <AvatarFallback>{(listing.seller.name || listing.seller.username).charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <Link href={`/profile/${listing.seller.id}`} className="text-xs text-muted-foreground hover:text-primary hover:underline">
-                          Sold by: @{listing.seller.username}
+                          Sold by: {listing.seller.name || `@${listing.seller.username}`}
                         </Link>
                       </div>
                     </CardContent>
