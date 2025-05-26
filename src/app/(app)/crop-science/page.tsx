@@ -41,7 +41,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Banana', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/banana.jpg', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
   { name: 'Orange', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/orange.jpg', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/mango.jpg', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
-  { name: 'Grapes', imageUrl: 'https://images.unsplash.com/photo-1596363505729-4190a9506133?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxncmFwZXN8ZW58MHx8fHwxNzQ4MjQ0NzE2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'grapes fruit', slug: 'grapes' },
+  { name: 'Grapes', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/grapes.jpg', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
   { name: 'Strawberry', imageUrl: 'https://images.unsplash.com/photo-1568966299181-bb7282cc84f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzdHJhd2JlcnJ5fGVufDB8fHx8MTc0ODI0NDc0Mnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'strawberry fruit', slug: 'strawberry' },
   { name: 'Pineapple', imageUrl: 'https://images.unsplash.com/photo-1490885578174-acda8905c2c6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaW5lYXBwbGV8ZW58MHx8fHwxNzQ4MjQ3NjcwfDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pineapple fruit', slug: 'pineapple' },
   { name: 'Watermelon', imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3YXRlcm1lbG9ufGVufDB8fHx8MTc0ODI0NzY1Nnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'watermelon fruit', slug: 'watermelon' },
@@ -94,5 +94,6 @@ export default function CropSciencePage() {
     </div>
   );
 }
+
 
 
