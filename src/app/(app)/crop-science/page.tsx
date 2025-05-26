@@ -22,7 +22,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Onion', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ONION.jpeg', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/carrot.jpg', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
   { name: 'Broccoli', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/BROCCOLI.jpg', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
-  { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves', slug: 'spinach' },
+  { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
   { name: 'Bell Pepper', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/red-yellow-capsicum.jpg', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
   { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
@@ -99,4 +99,3 @@ export default function CropSciencePage() {
     
 
     
-
