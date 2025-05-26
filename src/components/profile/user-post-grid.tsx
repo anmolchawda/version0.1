@@ -18,9 +18,9 @@ export function UserPostGrid({ posts }: UserPostGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 pt-6">
+    <div className="grid grid-cols-3 gap-1 pt-2">
       {posts.map((post) => (
-        <Link href={`/post/${post.id}#comments`} key={post.id} className="group relative aspect-square block w-full overflow-hidden rounded-md shadow-sm hover:shadow-md transition-shadow">
+        <Link href={`/post/${post.id}#comments`} key={post.id} className="group relative aspect-square block w-full overflow-hidden rounded-sm shadow-sm hover:shadow-md transition-shadow">
           {post.imageUrl ? (
             <Image
               src={post.imageUrl}
@@ -48,3 +48,4 @@ export function UserPostGrid({ posts }: UserPostGridProps) {
     </div>
   );
 }
+
