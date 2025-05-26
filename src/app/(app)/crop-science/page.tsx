@@ -1,4 +1,3 @@
-
 // src/app/(app)/crop-science/page.tsx
 'use client';
 
@@ -34,7 +33,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Cauliflower', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cauliflower.jpeg', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
   { name: 'Radish', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/radish.jpeg', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ridge%20gourd.jpeg', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
-  { name: 'Drumstick', imageUrl: 'https://placehold.co/200x200.png?text=Drumstick', aiHint: 'drumstick vegetable', slug: 'drumstick' },
+  { name: 'Drumstick', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/drumstick.jpeg', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://placehold.co/200x200.png?text=Okra', aiHint: 'okra vegetable', slug: 'okra' },
   // Fruits
   { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit', slug: 'apple' },
@@ -94,15 +93,3 @@ export default function CropSciencePage() {
     </div>
   );
 }
-    
-
-    
-
-    
-
-
-
-
-
-
-
