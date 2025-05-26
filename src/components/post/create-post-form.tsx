@@ -55,6 +55,12 @@ export function CreatePostForm() {
         videoElement.src = URL.createObjectURL(file);
       } else {
         setMediaType(null);
+         toast({
+            title: "Unsupported File Type",
+            description: "Please select an image or video file.",
+            variant: "destructive",
+          });
+        removeMedia();
       }
     } else {
       removeMedia();
@@ -132,7 +138,7 @@ export function CreatePostForm() {
         <CardTitle className="text-xl sm:text-2xl font-bold text-center text-primary">Create New Post</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4 p-4 sm:p-6"> {/* Reduced space-y from 6 to 4 */}
+        <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
             <Label htmlFor="caption" className="text-sm sm:text-base">Caption</Label>
             <Textarea
@@ -146,16 +152,35 @@ export function CreatePostForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="mediaUpload" className="text-sm sm:text-base">Image / Video (Optional)</Label>
-            <Input
-              id="mediaUpload"
-              type="file"
-              accept="image/*, video/*"
-              onChange={handleMediaChange}
-              ref={fileInputRef}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-            />
-            <p className="text-xs text-muted-foreground">(Max 60 seconds for videos)</p>
+            <Label className="text-sm sm:text-base">Image / Video (Optional)</Label>
+            <div className={`
+              mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
+              rounded-md group hover:border-primary transition-colors border-input
+            `}>
+              <div className="space-y-1 text-center">
+                <ImageUp className="mx-auto h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors" />
+                <div className="flex text-xs sm:text-sm text-muted-foreground group-hover:text-primary transition-colors justify-center items-center">
+                  <Label
+                    htmlFor="mediaUploadField"
+                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 py-1 px-2"
+                  >
+                    <span>Upload a file</span>
+                    <Input
+                      id="mediaUploadField"
+                      name="mediaUploadField"
+                      type="file"
+                      accept="image/*,video/*"
+                      className="sr-only"
+                      onChange={handleMediaChange}
+                      ref={fileInputRef}
+                    />
+                  </Label>
+                  <p className="pl-1">or drag and drop</p>
+                </div>
+                <p className="text-xs text-muted-foreground">PNG, JPG, MP4, WEBM. Max 10MB.</p>
+              </div>
+            </div>
+             <p className="text-xs text-muted-foreground mt-1">(Max 60 seconds for videos)</p>
             {mediaPreviewUrl && (
               <div className="relative mt-2 group">
                 {mediaType === 'image' && (
@@ -229,12 +254,11 @@ export function CreatePostForm() {
             postText={caption}
             postImageDataUri={mediaType === 'image' ? mediaDataUri : undefined}
             onSuggestionClick={handleSuggestedHashtagClick}
-            // Removed pt-2 from className here
           />
 
         </CardContent>
         <CardFooter className="p-4 sm:p-6">
-          <Button type="submit" className="w-full text-base sm:text-lg py-3 sm:py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
+          <Button type="submit" className="w-full text-base sm:text-lg py-3 sm:py-3 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isSubmitting}>
             {isSubmitting ? (
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             ) : (
