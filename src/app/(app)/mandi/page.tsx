@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, CalendarDays, Building2, ListChecks, ShoppingCart, PlusCircle, Filter, Store } from 'lucide-react';
+import { Search, MapPin, CalendarDays, ListChecks, ShoppingCart, PlusCircle, Store } from 'lucide-react';
 import { format } from 'date-fns';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
 
@@ -104,7 +104,7 @@ export default function MandiPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end"> {/* Changed to md:grid-cols-3 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-full py-3 text-base rounded-lg">
                   <SelectValue placeholder="Filter by Category" />
@@ -135,7 +135,6 @@ export default function MandiPage() {
                   )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed/select state"}</SelectItem>}
                 </SelectContent>
               </Select>
-              {/* Apply button is now removed from here to match 3-column layout without it needing to span */}
             </div>
           </div>
 
@@ -155,10 +154,10 @@ export default function MandiPage() {
               </Button>
             </div>
             {filteredListings.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4"> {/* Updated grid layout */}
                 {filteredListings.map((listing) => (
                   <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                    <div className="relative w-full h-52 bg-muted">
+                    <div className="relative w-full aspect-square bg-muted"> {/* Changed h-52 to aspect-square */}
                       <Image
                         src={listing.imageUrl}
                         alt={listing.name}
@@ -219,5 +218,3 @@ export default function MandiPage() {
     </div>
   );
 }
-
-    
