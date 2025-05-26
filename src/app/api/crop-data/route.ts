@@ -7,22 +7,23 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const csvFilePath = path.join(process.cwd(), 'public', 'crop-data.csv');
-  // Log the path the API is trying to access
   console.log('[API /api/crop-data] Attempting to read CSV from path:', csvFilePath);
 
   try {
-    // Check if the file exists and is accessible
-    await fsPromises.access(csvFilePath);
+    await fsPromises.access(csvFilePath); // Check if file exists and is accessible
     console.log('[API /api/crop-data] CSV file access check successful.');
 
     const results: any[] = [];
-    // Use a promise to handle the stream events for parsing
+    
     await new Promise<void>((resolve, reject) => {
+      console.log('[API /api/crop-data] Starting CSV stream parsing...');
       fs.createReadStream(csvFilePath)
-        .pipe(parse({ headers: true }))
-        .on('data', (data) => results.push(data))
+        .pipe(parse({ headers: true })) // Ensure headers: true to use header names as keys
+        .on('data', (data) => {
+          results.push(data);
+        })
         .on('end', () => {
-          console.log('[API /api/crop-data] CSV parsing completed. Rows found:', results.length);
+          console.log(`[API /api/crop-data] CSV parsing completed. ${results.length} rows found.`);
           if (results.length === 0) {
             console.warn('[API /api/crop-data] CSV file might be empty or only contain headers.');
           }
@@ -30,16 +31,16 @@ export async function GET(req: NextRequest) {
         })
         .on('error', (streamError) => {
           console.error('[API /api/crop-data] Error during CSV stream parsing:', streamError);
-          reject(streamError); 
+          reject(new Error(`Error parsing CSV stream: ${streamError.message}`)); 
         });
     });
 
     return NextResponse.json(results);
 
   } catch (error: any) {
+    // Log the full error object for more details
     console.error('[API /api/crop-data] Error in GET handler:', error.message);
     console.error('[API /api/crop-data] Full error object:', error);
-
 
     if (error.code === 'ENOENT') {
       return NextResponse.json({ error: `CSV file not found. Expected at: ${csvFilePath}. Please ensure 'public/crop-data.csv' exists and is correctly named in your project's public directory.` }, { status: 404 });
