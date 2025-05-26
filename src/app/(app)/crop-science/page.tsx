@@ -31,11 +31,11 @@ export default function CropSciencePage() {
         if (!response.ok) {
           let errorDetails = `Failed to fetch data: ${response.statusText} (status: ${response.status})`;
           try {
-            // Try to parse as JSON, it might contain a specific error message
+            // Try to parse as JSON, it might contain a specific error message from our API
             const errorData = await response.json();
             errorDetails = errorData.error || errorData.details || JSON.stringify(errorData);
           } catch (jsonError) {
-            // If response is not JSON (e.g., HTML error page), use the text content
+            // If response is not JSON (e.g., HTML error page from server framework), use the text content
             const textError = await response.text();
             // Limit the length of HTML error to keep the message manageable
             errorDetails = `Server responded with an error. Response: ${textError.substring(0, 500)}...`;
@@ -116,7 +116,7 @@ export default function CropSciencePage() {
                 </div>
               ) : (
                  <p className="text-sm text-muted-foreground mt-4 text-center">
-                  No crop science data found in the CSV file or the file is empty.
+                  No crop science data found. This could be because the CSV file is empty, does not contain data rows, or there was an issue loading it.
                 </p>
               )}
             </>
