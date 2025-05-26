@@ -5,7 +5,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { AppLogo } from '@/components/core/app-logo';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -64,14 +63,14 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "bg-card text-card-foreground border-r flex flex-col h-full", // Full height, ensure it doesn't exceed viewport under pt-16 from layout
-        "fixed top-16 left-0 bottom-0 transition-transform duration-300 ease-in-out z-30 shadow-lg", // top-16 to be below TopHeader
+        "bg-card text-card-foreground border-r flex flex-col",
+        "fixed top-16 left-0 bottom-0 transition-transform duration-300 ease-in-out z-40 shadow-lg", // top-16 to be below TopHeader
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Width is fixed, transform controls visibility
       )}
     >
-      {/* Sidebar Header - Logo and Close Button */}
-      <div className="p-4 border-b flex items-center justify-between">
-        <AppLogo iconClassName="h-8 w-8" textClassName="text-xl" />
+      {/* Sidebar Header - Close Button */}
+      <div className="p-4 border-b flex items-center justify-end">
+        {/* AppLogo is now in TopHeader */}
         <Button
           variant="ghost"
           size="icon"
@@ -89,7 +88,7 @@ export function Sidebar() {
           const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1);
           return (
             <Link
-              key={link.label}
+              key={link.label} // Use label as key since it changes with language
               href={link.href}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
