@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   username: string;
@@ -48,7 +49,7 @@ export interface MandiListing {
   price: string; // e.g., '₹275/kg', '$5000'
   imageUrl: string;
   aiHint: string;
-  seller: { id: string; username: string; avatarUrl: string };
+  seller: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   listedDate: string; // ISO date string
   location: string; // City, State
 }
@@ -58,4 +59,7 @@ export interface ChatMessage {
   senderId: string; // ID of the user who sent this message (e.g., MOCK_USER_ID or chatPartnerId)
   text: string;
   timestamp: string; // ISO date string
+  mediaUrl?: string; // URL of the uploaded media
+  mediaType?: 'image' | 'video'; // Type of the media
 }
+

@@ -2,7 +2,7 @@
 // src/app/(app)/messages/[userId]/page.tsx
 'use client';
 
-import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent, type ChangeEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { ChevronLeft, Send, MoreVertical, Phone, Video, Trash2, ShieldAlert, UserX } from 'lucide-react';
+import { ChevronLeft, Send, MoreVertical, Phone, Video, Trash2, ShieldAlert, UserX, Paperclip, X as XIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,12 +38,17 @@ export default function ChatPage() {
   const router = useRouter();
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const userId = params.userId as string;
   const [chatPartner, setChatPartner] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (userId) {
@@ -64,18 +69,90 @@ export default function ChatPage() {
     }
   }, [messages]);
 
+  const handleMediaFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('video/')) {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+          window.URL.revokeObjectURL(video.src);
+          if (video.duration > 30) {
+            toast({
+              title: 'Video Too Long',
+              description: 'Please select a video that is 30 seconds or shorter.',
+              variant: 'destructive',
+            });
+            setSelectedFile(null);
+            setSelectedFileName(null);
+            if (mediaInputRef.current) {
+              mediaInputRef.current.value = ''; // Reset file input
+            }
+            return;
+          }
+          setSelectedFile(file);
+          setSelectedFileName(file.name);
+        };
+        video.onerror = () => {
+          toast({
+            title: 'Error Reading Video',
+            description: 'Could not determine video duration.',
+            variant: 'destructive',
+          });
+          setSelectedFile(null);
+          setSelectedFileName(null);
+           if (mediaInputRef.current) {
+              mediaInputRef.current.value = '';
+            }
+        }
+        video.src = URL.createObjectURL(file);
+      } else if (file.type.startsWith('image/')) {
+        setSelectedFile(file);
+        setSelectedFileName(file.name);
+      } else {
+        toast({
+          title: 'Unsupported File Type',
+          description: 'Please select an image or video file.',
+          variant: 'destructive',
+        });
+         if (mediaInputRef.current) {
+            mediaInputRef.current.value = '';
+          }
+      }
+    }
+  };
+
+  const clearSelectedMedia = () => {
+    setSelectedFile(null);
+    setSelectedFileName(null);
+    if (mediaInputRef.current) {
+      mediaInputRef.current.value = ''; // Reset file input
+    }
+  };
 
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !chatPartner) return;
+    if (!newMessage.trim() && !selectedFile) return;
+
     const newMsgObject: ChatMessage = {
       id: `msg${Date.now()}`,
       senderId: MOCK_USER_ID,
       text: newMessage.trim(),
       timestamp: new Date().toISOString(),
+      // In a real app, you'd upload the file and include its URL here
+      mediaUrl: selectedFile ? `mock-media-url-for-${selectedFile.name}` : undefined,
+      mediaType: selectedFile?.type.startsWith('image/') ? 'image' : selectedFile?.type.startsWith('video/') ? 'video' : undefined,
     };
+    
+    console.log("Sending message:", newMsgObject);
+    if (selectedFile) {
+      console.log("Attached file:", selectedFile.name, selectedFile.type, selectedFile.size);
+      // Here you would typically start an upload process for selectedFile
+    }
+
     setMessages(prev => [...prev, newMsgObject]);
     setNewMessage('');
+    clearSelectedMedia();
   };
 
   if (!chatPartner) {
@@ -180,6 +257,13 @@ export default function ChatPage() {
                     )}
                   >
                     <p className="text-sm">{msg.text}</p>
+                     {/* Basic media display placeholder - improve in future */}
+                    {msg.mediaUrl && msg.mediaType === 'image' && (
+                      <img src={msg.mediaUrl} alt="Sent media" className="mt-2 rounded-md max-w-xs max-h-48" data-ai-hint="chat media" />
+                    )}
+                    {msg.mediaUrl && msg.mediaType === 'video' && (
+                      <video src={msg.mediaUrl} controls className="mt-2 rounded-md max-w-xs max-h-48" data-ai-hint="chat media video" />
+                    )}
                     <p className={cn("text-xs mt-1", isCurrentUserSender ? "text-primary-foreground/70" : "text-muted-foreground/70", isCurrentUserSender ? "text-right" : "text-left")}>
                       {formatTimeAgo(msg.timestamp)}
                     </p>
@@ -194,6 +278,16 @@ export default function ChatPage() {
             )}
           </ScrollArea>
 
+          {/* Selected Media Preview Area */}
+          {selectedFileName && (
+            <div className="p-3 border-t text-sm text-muted-foreground flex justify-between items-center bg-card">
+              <span>Attached: {selectedFileName}</span>
+              <Button variant="ghost" size="icon" onClick={clearSelectedMedia} className="h-7 w-7">
+                <XIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
           {/* Message Input Area */}
           <CardFooter className="p-3 border-t sticky bottom-0 bg-card">
             <form onSubmit={handleSendMessage} className="flex w-full items-center space-x-2">
@@ -205,8 +299,31 @@ export default function ChatPage() {
                 className="flex-grow rounded-full py-2.5 px-4 h-auto text-sm"
                 autoComplete="off"
               />
-              <Button type="submit" size="icon" className="rounded-full h-10 w-10 bg-accent hover:bg-accent/80" disabled={!newMessage.trim()}>
+              <input
+                type="file"
+                ref={mediaInputRef}
+                onChange={handleMediaFileChange}
+                className="hidden"
+                accept="image/*,video/*"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10"
+                onClick={() => mediaInputRef.current?.click()}
+              >
+                <Paperclip className="h-5 w-5" />
+                <span className="sr-only">Attach file</span>
+              </Button>
+              <Button 
+                type="submit" 
+                size="icon" 
+                className="rounded-full h-10 w-10 bg-accent hover:bg-accent/80" 
+                disabled={!newMessage.trim() && !selectedFile}
+              >
                 <Send className="h-5 w-5" />
+                <span className="sr-only">Send message</span>
               </Button>
             </form>
           </CardFooter>
