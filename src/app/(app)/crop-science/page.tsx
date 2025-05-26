@@ -20,7 +20,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
   { name: 'Potato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/potato.jpg', aiHint: 'potato vegetable', slug: 'potato', unoptimized: true },
   { name: 'Onion', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ONION.jpeg', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
-  { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1576181256399-834e3b3a49bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjYXJyb3R8ZW58MHx8fHwxNzQ4MjM5Mzc2fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable', slug: 'carrot' },
+  { name: 'Carrot', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/carrot.jpg', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
   { name: 'Broccoli', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/BROCCOLI.jpg', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves', slug: 'spinach' },
   { name: 'Bell Pepper', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/red-yellow-capsicum.jpg', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
@@ -99,3 +99,4 @@ export default function CropSciencePage() {
     
 
     
+
