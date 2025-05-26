@@ -27,7 +27,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit' },
   { name: 'Banana', imageUrl: 'https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxN3x8YmFuYW5hfGVufDB8fHx8MTc0ODI0MDM3Nnww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'banana fruit' },
   { name: 'Orange', imageUrl: 'https://images.unsplash.com/photo-1609424572698-04d9d2e04954?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8b3JhbmdlfGVufDB8fHx8MTc0ODI0NDY5OHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'orange fruit' },
-  { name: 'Mango', imageUrl: 'https://images.unsplash.com/photo-1580928986783-bd8256003f29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtYW5nbyUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'mango fruit' },
+  { name: 'Mango', imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYW5nb3xlbnwwfHx8fDE3NDgyNDc2ODJ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'mango fruit' },
   { name: 'Grapes', imageUrl: 'https://images.unsplash.com/photo-1695304285211-8734c7f418e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxncmFwZXMlMjBmcnVpdHxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'grapes fruit' },
   { name: 'Strawberry', imageUrl: 'https://images.unsplash.com/photo-1668888500730-19727996caee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzdHJhd2JlcnJ5JTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'strawberry fruit' },
   { name: 'Pineapple', imageUrl: 'https://images.unsplash.com/photo-1492831379069-0fe9d118b7c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGluZWFwcGxlJTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pineapple fruit' },
@@ -78,4 +78,3 @@ export default function CropSciencePage() {
     </div>
   );
 }
-
