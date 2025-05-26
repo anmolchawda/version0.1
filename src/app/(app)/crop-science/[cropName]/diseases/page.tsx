@@ -3,20 +3,18 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ShieldAlert } from "lucide-react";
+import { ChevronLeft, ShieldAlert, Leaf } from "lucide-react"; // Leaf can be a generic icon for the items
 
 interface Disease {
   id: string;
   name: string;
-  description: string;
+  description: string; // Keep for potential detail view later
   imageUrl: string;
   aiHint: string;
-  // Add other relevant fields like symptoms, treatment, etc.
 }
 
-// Mock data - in a real app, this would come from a database or CMS
 const allDiseasesData: Disease[] = [
   {
     id: 't-disease1',
@@ -53,17 +51,12 @@ const allDiseasesData: Disease[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     aiHint: 'powdery mildew',
   },
-  // Add more diseases for tomatoes or other crops
 ];
 
-// Function to get diseases for a specific crop (slug)
 const getDiseasesForCrop = (cropSlug: string): Disease[] => {
-  // For now, we'll assume all diseases in allDiseasesData are for 'tomato'
-  // In a real app, you'd filter based on cropSlug or have a mapping
   if (cropSlug === 'tomato') {
-    return allDiseasesData.filter(disease => disease.id.startsWith('t-')); // Example: tomato diseases start with 't-'
+    return allDiseasesData.filter(disease => disease.id.startsWith('t-'));
   }
-  // Return a generic list or empty if no specific diseases for that crop
   return [
     { 
       id: 'gen-disease1', 
@@ -74,7 +67,6 @@ const getDiseasesForCrop = (cropSlug: string): Disease[] => {
     }
   ];
 };
-
 
 export default function DiseasesPage() {
   const params = useParams();
@@ -102,32 +94,34 @@ export default function DiseasesPage() {
         <CardHeader>
           <CardTitle>Common Diseases</CardTitle>
           <CardDescription>
-            Learn about common diseases affecting {cropDisplayName} and how to identify them.
+            Learn about common diseases affecting {cropDisplayName}.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {diseases.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-3"> {/* Changed from grid to space-y for list view */}
               {diseases.map((disease) => (
-                <Card key={disease.id} className="overflow-hidden shadow-md hover:shadow-lg transition-shadow rounded-lg flex flex-col">
-                  <div className="relative w-full h-48 bg-muted">
-                    <Image
-                      src={disease.imageUrl}
-                      alt={disease.name}
-                      layout="fill"
-                      objectFit="cover"
-                      data-ai-hint={disease.aiHint}
-                    />
+                <Card 
+                  key={disease.id} 
+                  className="overflow-hidden shadow-sm hover:shadow-md transition-shadow rounded-lg p-3 cursor-pointer"
+                  onClick={() => { /* Placeholder for navigation to detail page if needed later */ }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-md overflow-hidden shrink-0">
+                      <Image
+                        src={disease.imageUrl}
+                        alt={disease.name}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint={disease.aiHint}
+                      />
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="text-md sm:text-lg font-semibold text-primary">{disease.name}</h3>
+                      {/* Description removed from list view */}
+                    </div>
+                    {/* "Learn More" button removed from list view */}
                   </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">{disease.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground line-clamp-4">{disease.description}</p>
-                  </CardContent>
-                  <CardFooter className="p-4 mt-auto">
-                    <Button variant="outline" className="w-full">Learn More</Button>
-                  </CardFooter>
                 </Card>
               ))}
             </div>
