@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { FlaskConical } from "lucide-react"; // Leaf import removed as it's not used
+import { FlaskConical } from "lucide-react";
 
 interface CropInfo {
   name: string;
@@ -13,27 +13,27 @@ interface CropInfo {
 
 const commonCrops: CropInfo[] = [
   // Vegetables
-  { name: 'Tomato', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Tomato', aiHint: 'tomato vegetable' },
-  { name: 'Potato', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Potato', aiHint: 'potato vegetable' },
-  { name: 'Onion', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Onion', aiHint: 'onion vegetable' },
-  { name: 'Carrot', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Carrot', aiHint: 'carrot vegetable' },
-  { name: 'Broccoli', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Broccoli', aiHint: 'broccoli vegetable' },
-  { name: 'Spinach', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Spinach', aiHint: 'spinach leaves' },
-  { name: 'Bell Pepper', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Bell+Pepper', aiHint: 'bell pepper' },
-  { name: 'Cucumber', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Cucumber', aiHint: 'cucumber vegetable' },
-  { name: 'Lettuce', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Lettuce', aiHint: 'lettuce leaves' },
-  { name: 'Eggplant', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Eggplant', aiHint: 'eggplant vegetable' },
+  { name: 'Tomato', imageUrl: 'https://images.unsplash.com/photo-1471194402529-8e0f5a675de6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0b21hdG8lMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'tomato vegetable' },
+  { name: 'Potato', imageUrl: 'https://images.unsplash.com/photo-1505576633757-0ac1084af824?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwb3RhdG8lMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'potato vegetable' },
+  { name: 'Onion', imageUrl: 'https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8b25pb24lMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'onion vegetable' },
+  { name: 'Carrot', imageUrl: 'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjYXJyb3QlMjB2ZWdldGFibGV8ZW58MHx8fHwxNzQ4MjM4NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'carrot vegetable' },
+  { name: 'Broccoli', imageUrl: 'https://images.unsplash.com/photo-1511410188607-eca3f2f341bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxicm9jY29saSUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'broccoli vegetable' },
+  { name: 'Spinach', imageUrl: 'https://images.unsplash.com/photo-1580910365203-91ea9115a319?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzcGluYWNoJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'spinach leaves' },
+  { name: 'Bell Pepper', imageUrl: 'https://images.unsplash.com/photo-1525607551316-4a8e16d1f9ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiZWxsJTIwcGVwcGVyfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'bell pepper' },
+  { name: 'Cucumber', imageUrl: 'https://images.unsplash.com/photo-1693933858151-2d01597907e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjdWN1bWJlciUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'cucumber vegetable' },
+  { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsZXR0dWNlJTIwbGVhdmVzfGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves' },
+  { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1526049332082-27f8e41d5e8a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlZ2dwbGFudCUyMHZlZ2V0YWJsZXxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable' },
   // Fruits
-  { name: 'Apple', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Apple', aiHint: 'apple fruit' },
-  { name: 'Banana', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Banana', aiHint: 'banana fruit' },
-  { name: 'Orange', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Orange', aiHint: 'orange fruit' },
-  { name: 'Mango', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Mango', aiHint: 'mango fruit' },
-  { name: 'Grapes', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Grapes', aiHint: 'grapes fruit' },
-  { name: 'Strawberry', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Strawberry', aiHint: 'strawberry fruit' },
-  { name: 'Pineapple', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Pineapple', aiHint: 'pineapple fruit' },
-  { name: 'Watermelon', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Watermelon', aiHint: 'watermelon fruit' },
-  { name: 'Pomegranate', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Pomegranate', aiHint: 'pomegranate fruit' },
-  { name: 'Kiwi', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Kiwi', aiHint: 'kiwi fruit' },
+  { name: 'Apple', imageUrl: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHBsZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOHww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'apple fruit' },
+  { name: 'Banana', imageUrl: 'https://images.unsplash.com/photo-1666287536047-fe01c391671a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxiYW5hbmElMjBmcnVpdHxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'banana fruit' },
+  { name: 'Orange', imageUrl: 'https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxvcmFuZ2UlMjBmcnVpdHxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'orange fruit' },
+  { name: 'Mango', imageUrl: 'https://images.unsplash.com/photo-1580928986783-bd8256003f29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtYW5nbyUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'mango fruit' },
+  { name: 'Grapes', imageUrl: 'https://images.unsplash.com/photo-1695304285211-8734c7f418e6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxncmFwZXMlMjBmcnVpdHxlbnwwfHx8fDE3NDgyMzg3Mjl8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'grapes fruit' },
+  { name: 'Strawberry', imageUrl: 'https://images.unsplash.com/photo-1668888500730-19727996caee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzdHJhd2JlcnJ5JTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'strawberry fruit' },
+  { name: 'Pineapple', imageUrl: 'https://images.unsplash.com/photo-1492831379069-0fe9d118b7c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGluZWFwcGxlJTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pineapple fruit' },
+  { name: 'Watermelon', imageUrl: 'https://images.unsplash.com/photo-1453179592584-e2587867cfff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3YXRlcm1lbG9uJTIwZnJ1aXR8ZW58MHx8fHwxNzQ4MjM4NzI5fDA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'watermelon fruit' },
+  { name: 'Pomegranate', imageUrl: 'https://images.unsplash.com/photo-1580157508103-2a4e9fe8ed29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb21lZ3JhbmF0ZSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'pomegranate fruit' },
+  { name: 'Kiwi', imageUrl: 'https://images.unsplash.com/photo-1572539280469-9c738c59964d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8a2l3aSUyMGZydWl0fGVufDB8fHx8MTc0ODIzODcyOXww&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'kiwi fruit' },
 ];
 
 export default function CropSciencePage() {
