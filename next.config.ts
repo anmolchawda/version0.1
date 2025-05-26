@@ -25,13 +25,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'storage.cloud.google.com',
+        hostname: 'storage.cloud.google.com', // Ensure this is present
         port: '',
         pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'storage.googleapis.com', // Added new domain
+        hostname: 'storage.googleapis.com',
         port: '',
         pathname: '/**',
       },
