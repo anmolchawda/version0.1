@@ -29,8 +29,18 @@ export default function CropSciencePage() {
       try {
         const response = await fetch('/api/crop-data');
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Failed to fetch data: ${response.statusText}`);
+          let errorDetails = `Failed to fetch data: ${response.statusText} (status: ${response.status})`;
+          try {
+            // Try to parse as JSON, it might contain a specific error message
+            const errorData = await response.json();
+            errorDetails = errorData.error || errorData.details || JSON.stringify(errorData);
+          } catch (jsonError) {
+            // If response is not JSON (e.g., HTML error page), use the text content
+            const textError = await response.text();
+            // Limit the length of HTML error to keep the message manageable
+            errorDetails = `Server responded with an error. Response: ${textError.substring(0, 500)}...`;
+          }
+          throw new Error(errorDetails);
         }
         const data: CropDataItem[] = await response.json();
         setCropData(data);
