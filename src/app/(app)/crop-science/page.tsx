@@ -1,17 +1,49 @@
 // src/app/(app)/crop-science/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FlaskConical } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FlaskConical, ListChecks, Loader2, AlertTriangle } from "lucide-react";
 
-// Sample data structure for what might come from a Google Sheet
-const mockCropData = [
-  { id: '1', name: 'Tomato Blight', type: 'Fungal Disease', impact: 'High', controlMeasure: 'Fungicides, Crop Rotation' },
-  { id: '2', name: 'Aphids', type: 'Insect Pest', impact: 'Medium', controlMeasure: 'Neem Oil, Ladybugs' },
-  { id: '3', name: 'Nitrogen Deficiency', type: 'Nutrient Imbalance', impact: 'Medium', controlMeasure: 'Nitrogen-rich fertilizer' },
-  { id: '4', name: 'Powdery Mildew', type: 'Fungal Disease', impact: 'Medium', controlMeasure: 'Sulfur dust, Improve air circulation' },
-];
+interface CropDataItem {
+  id: string;
+  name: string;
+  type: string;
+  impact: string;
+  controlMeasure: string;
+  // Add other potential fields from your CSV here
+  [key: string]: string; // To accommodate any other columns
+}
 
 export default function CropSciencePage() {
+  const [cropData, setCropData] = useState<CropDataItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch('/api/crop-data');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to fetch data: ${response.statusText}`);
+        }
+        const data: CropDataItem[] = await response.json();
+        setCropData(data);
+      } catch (e: any) {
+        console.error("Error fetching crop data:", e);
+        setError(e.message || "An unexpected error occurred.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
   return (
     <div className="space-y-6">
       <Card className="shadow-xl rounded-xl">
@@ -21,40 +53,63 @@ export default function CropSciencePage() {
             Crop Science Hub
           </CardTitle>
           <CardDescription>
-            Explore data and insights related to crop science, agronomy, and best farming practices. The table below is a placeholder for data that could be sourced from a Google Sheet.
+            Explore data related to crop science, agronomy, and best farming practices, sourced from our data file.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
-            <strong>Note:</strong> The data below is sample data. Integrating live data from a Google Sheet would typically involve setting up API access or publishing the sheet as a CSV and fetching it.
-          </p>
-          <h3 className="text-xl font-semibold mb-4 text-primary">Crop Issues & Management (Sample Data)</h3>
-          <div className="border rounded-lg overflow-hidden shadow-sm">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[200px]">Issue Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Impact Level</TableHead>
-                  <TableHead>Control Measures</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockCropData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.type}</TableCell>
-                    <TableCell>{item.impact}</TableCell>
-                    <TableCell>{item.controlMeasure}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          {mockCropData.length === 0 && (
-            <p className="text-sm text-muted-foreground mt-4 text-center">
-              No crop science data to display currently.
-            </p>
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-10">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-lg text-muted-foreground">Loading crop data...</p>
+            </div>
+          )}
+
+          {error && !isLoading && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Error Loading Data</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {!isLoading && !error && (
+            <>
+              <p className="mb-4 text-sm text-muted-foreground">
+                The data below is dynamically loaded from the <code>public/crop-data.csv</code> file via an API.
+              </p>
+              <h3 className="text-xl font-semibold mb-4 text-primary flex items-center">
+                <ListChecks className="mr-2 h-6 w-6" />
+                Crop Issues & Management
+              </h3>
+              {cropData.length > 0 ? (
+                <div className="border rounded-lg overflow-hidden shadow-sm">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">Issue Name</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Impact Level</TableHead>
+                        <TableHead>Control Measures</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cropData.map((item) => (
+                        <TableRow key={item.id || item.name}> {/* Use name as fallback key if id is missing */}
+                          <TableCell className="font-medium">{item.name || 'N/A'}</TableCell>
+                          <TableCell>{item.type || 'N/A'}</TableCell>
+                          <TableCell>{item.impact || 'N/A'}</TableCell>
+                          <TableCell>{item.controlMeasure || 'N/A'}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                 <p className="text-sm text-muted-foreground mt-4 text-center">
+                  No crop science data found in the CSV file or the file is empty.
+                </p>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
