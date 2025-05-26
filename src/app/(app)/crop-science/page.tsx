@@ -1,15 +1,14 @@
-
 // src/app/(app)/crop-science/page.tsx
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FlaskConical, AlertTriangle } from "lucide-react";
+import { FlaskConical } from "lucide-react";
 
-// Mock data structure for demonstration
+// Sample data structure for what might come from a Google Sheet
 const mockCropData = [
-  { id: '1', name: 'Wheat Disease A', type: 'Fungus', impact: 'High', controlMeasure: 'Fungicide X, Crop Rotation' },
-  { id: '2', name: 'Corn Nutrient Deficiency (Nitrogen)', type: 'Nutrient', impact: 'Medium', controlMeasure: 'Apply Nitrogen Fertilizer' },
-  { id: '3', name: 'Rice Pest Y', type: 'Insect', impact: 'High', controlMeasure: 'Integrated Pest Management, Insecticide Z' },
-  { id: '4', name: 'Soybean Virus B', type: 'Virus', impact: 'Medium', controlMeasure: 'Resistant Varieties, Vector Control' },
+  { id: '1', name: 'Tomato Blight', type: 'Fungal Disease', impact: 'High', controlMeasure: 'Fungicides, Crop Rotation' },
+  { id: '2', name: 'Aphids', type: 'Insect Pest', impact: 'Medium', controlMeasure: 'Neem Oil, Ladybugs' },
+  { id: '3', name: 'Nitrogen Deficiency', type: 'Nutrient Imbalance', impact: 'Medium', controlMeasure: 'Nitrogen-rich fertilizer' },
+  { id: '4', name: 'Powdery Mildew', type: 'Fungal Disease', impact: 'Medium', controlMeasure: 'Sulfur dust, Improve air circulation' },
 ];
 
 export default function CropSciencePage() {
@@ -26,24 +25,9 @@ export default function CropSciencePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-4 mb-6 border-l-4 border-primary bg-primary/10 rounded-md">
-            <div className="flex items-center">
-              <AlertTriangle className="h-6 w-6 mr-3 text-primary" />
-              <div>
-                <h3 className="font-semibold text-primary">Developer Note: Google Sheets Integration</h3>
-                <p className="text-sm text-muted-foreground">
-                  To display live data from a Google Sheet, you would need to:
-                </p>
-                <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1 mt-1">
-                  <li>Publish your Google Sheet to the web (e.g., as a CSV).</li>
-                  <li>Create a Next.js API route or Server Action to fetch and parse this data.</li>
-                  <li>Update this page to fetch from your backend and display the live data.</li>
-                  <li>For private sheets, use the Google Sheets API with appropriate authentication (e.g., Service Account).</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
+          <p className="mb-4 text-sm text-muted-foreground">
+            <strong>Note:</strong> The data below is sample data. Integrating live data from a Google Sheet would typically involve setting up API access or publishing the sheet as a CSV and fetching it.
+          </p>
           <h3 className="text-xl font-semibold mb-4 text-primary">Crop Issues & Management (Sample Data)</h3>
           <div className="border rounded-lg overflow-hidden shadow-sm">
             <Table>
