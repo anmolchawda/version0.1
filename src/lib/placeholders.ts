@@ -354,7 +354,7 @@ export const placeholderCategories = [
   { value: 'seeds', label: 'Seeds' },
   { value: 'fertilizers', label: 'Fertilizers' },
   { value: 'tractors', label: 'Tractors' },
-  { value: 'farm_equipment', label: 'Farm Equipment' },
+  { value: 'equipments', label: 'Equipments' },
   { value: 'pesticides', label: 'Pesticides' },
   { value: 'fungicides', label: 'Fungicides' },
   { value: 'mulching', label: 'Mulching' },
@@ -416,7 +416,7 @@ export const placeholderListings: MandiListing[] = [
   {
     id: 'item5',
     name: 'Power Tiller',
-    category: 'Farm Equipment',
+    category: 'Equipments', // Updated category
     description: 'Brand Y, 8 HP, Petrol Engine. Good for small to medium farms.',
     quantity: '1 unit',
     price: '₹45,000',

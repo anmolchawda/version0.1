@@ -31,7 +31,7 @@ const itemCategories = [
   { value: 'seeds', label: 'Seeds' },
   { value: 'fertilizers', label: 'Fertilizers' },
   { value: 'tractors', label: 'Tractors' },
-  { value: 'farm_equipment', label: 'Farm Equipment' },
+  { value: 'equipments', label: 'Equipments' },
   { value: 'pesticides', label: 'Pesticides' },
   { value: 'fungicides', label: 'Fungicides' },
   { value: 'mulching', label: 'Mulching' },
