@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 
@@ -49,21 +48,22 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     <>
       <TopHeader />
       <div className="flex min-h-screen pt-16"> {/* pt-16 for TopHeader height */}
-        <Sidebar /> {/* Sidebar is fixed and will overlay */}
+        <Sidebar />
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20"
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20 md:hidden" // Only show overlay on mobile
             onClick={closeSidebar}
             aria-hidden="true"
           />
         )}
         <main
           className={cn(
-            `flex-1 py-6 overflow-y-auto mb-16` // Removed dynamic margin and related transition
-            // The main content itself doesn't need a z-index if the overlay covers it.
+            `flex-1 py-6 overflow-y-auto mb-16` 
+            // Removed dynamic margin, sidebar will overlap
           )}
         >
-          <div className="max-w-xl mx-auto px-4">
+          {/* Changed max-w-xl to max-w-2xl for slightly wider content area */}
+          <div className="max-w-2xl mx-auto px-4">
            {children}
           </div>
         </main>
