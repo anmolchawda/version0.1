@@ -34,12 +34,14 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
           objectFit="cover"
           data-ai-hint={listing.aiHint}
         />
-        <Badge variant="default" className="absolute top-2 left-2 bg-primary/80 text-primary-foreground text-xs px-1.5 py-0.5">
-          {listing.price}
-        </Badge>
-        <Badge variant="secondary" className="absolute top-2 right-2 bg-secondary/80 text-secondary-foreground text-xs px-1.5 py-0.5">
-          {listing.category}
-        </Badge>
+        <div className="absolute top-2 left-2 right-2 flex justify-between items-center space-x-1">
+          <Badge variant="default" className="bg-primary/80 text-primary-foreground text-xs px-1.5 py-0.5 truncate">
+            {listing.price}
+          </Badge>
+          <Badge variant="secondary" className="bg-secondary/80 text-secondary-foreground text-xs px-1.5 py-0.5 truncate text-right">
+            {listing.category}
+          </Badge>
+        </div>
       </div>
       <CardHeader className="pb-2 pt-3 px-3">
         <CardTitle className="text-sm sm:text-base font-semibold text-primary hover:underline line-clamp-1">
@@ -76,3 +78,4 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
     </Card>
   );
 }
+
