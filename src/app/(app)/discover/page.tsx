@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ProfileCard } from '@/components/profile/profile-card';
 import { placeholderUsers, placeholderPosts, placeholderListings, type MandiListing } from '@/lib/placeholders';
 import { PostCard } from '@/components/feed/post-card';
-import { MandiItemCard } from '@/components/mandi/mandi-item-card'; // New component
+import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { Search, Users, Image as ImageIcon, Store, ListChecks } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { User, Post } from '@/types';
@@ -18,7 +18,7 @@ export default function DiscoverPage() {
   const searchLower = searchTerm.toLowerCase();
 
   const filteredUsers = useMemo(() => {
-    if (!searchLower) return placeholderUsers.slice(0, 6); // Show some initial suggestions or all if not searching
+    if (!searchLower) return placeholderUsers.slice(0, 6);
     return placeholderUsers.filter(user =>
       user.username.toLowerCase().includes(searchLower) ||
       (user.name && user.name.toLowerCase().includes(searchLower)) ||
@@ -29,7 +29,7 @@ export default function DiscoverPage() {
   }, [searchLower]);
 
   const filteredPosts = useMemo(() => {
-    if (!searchLower) return placeholderPosts.slice(0, 4); // Show some initial suggestions
+    if (!searchLower) return placeholderPosts.slice(0, 4);
     return placeholderPosts.filter(post =>
       post.caption.toLowerCase().includes(searchLower) ||
       post.user.username.toLowerCase().includes(searchLower) ||
@@ -38,7 +38,7 @@ export default function DiscoverPage() {
   }, [searchLower]);
 
   const filteredMandiListings = useMemo(() => {
-    if (!searchLower) return placeholderListings.slice(0, 6); // Show some initial suggestions
+    if (!searchLower) return placeholderListings.slice(0, 6);
     return placeholderListings.filter(listing =>
       listing.name.toLowerCase().includes(searchLower) ||
       listing.category.toLowerCase().includes(searchLower) ||
@@ -62,23 +62,23 @@ export default function DiscoverPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search FARMDOCC (farmers, posts, mandi...)"
-          className="w-full pl-10 py-3 text-base rounded-lg shadow-sm"
+          placeholder="Search KrishiX..."
+          className="w-full pl-10 py-3 text-sm sm:text-base rounded-lg shadow-sm"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       
       <Tabs defaultValue="farmers" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-3 mb-6"> {/* Updated to 3 columns */}
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="farmers" className="py-2.5 text-sm">
-            <Users className="mr-2 h-5 w-5" /> Farmers
+            <Users className="mr-2 h-5 w-5 shrink-0" /> Farmers
           </TabsTrigger>
           <TabsTrigger value="posts" className="py-2.5 text-sm">
-            <ImageIcon className="mr-2 h-5 w-5" /> Posts
+            <ImageIcon className="mr-2 h-5 w-5 shrink-0" /> Posts
           </TabsTrigger>
-          <TabsTrigger value="mandi" className="py-2.5 text-sm"> {/* New Mandi Tab */}
-            <Store className="mr-2 h-5 w-5" /> Mandi
+          <TabsTrigger value="mandi" className="py-2.5 text-sm">
+            <Store className="mr-2 h-5 w-5 shrink-0" /> Mandi
           </TabsTrigger>
         </TabsList>
 
@@ -116,13 +116,13 @@ export default function DiscoverPage() {
           </section>
         </TabsContent>
 
-        <TabsContent value="mandi"> {/* New Mandi Tab Content */}
+        <TabsContent value="mandi">
            <section>
             <h2 className="text-2xl font-semibold mb-6 text-primary">
               {searchTerm ? `Mandi items matching "${searchTerm}"` : "Marketplace Listings"}
             </h2>
             {filteredMandiListings.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Using 3 columns for Mandi items */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredMandiListings.map((listing) => (
                   <MandiItemCard key={listing.id} listing={listing} />
                 ))}
@@ -136,5 +136,3 @@ export default function DiscoverPage() {
     </div>
   );
 }
-
-    
