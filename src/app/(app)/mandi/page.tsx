@@ -88,7 +88,7 @@ export default function MandiPage() {
             <div>
               <CardTitle className="text-2xl sm:text-3xl font-bold">Mandi (Marketplace)</CardTitle>
               <CardDescription className="text-sm sm:text-md text-muted-foreground">
-                Discover and trade agriculture products from here
+                Discover and trade agriculture products
               </CardDescription>
             </div>
           </div>
