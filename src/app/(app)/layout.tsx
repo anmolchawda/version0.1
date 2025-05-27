@@ -3,7 +3,7 @@
 'use client';
 
 import { Sidebar } from '@/components/layout/sidebar';
-import { TopHeader } from '@/components/layout/top-header'; 
+import { TopHeader } from '@/components/layout/top-header';
 import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
@@ -49,7 +49,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     <>
       <TopHeader />
       <div className="flex min-h-screen pt-16"> {/* pt-16 for TopHeader height */}
-        <Sidebar />
+        <Sidebar /> {/* Sidebar is fixed and will overlay */}
         {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20"
@@ -57,11 +57,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
             aria-hidden="true"
           />
         )}
-        <main 
+        <main
           className={cn(
-            `flex-1 py-6 overflow-y-auto mb-16 
-            transition-all duration-300 ease-in-out`,
-            isSidebarOpen ? 'ml-64' : 'ml-0' 
+            `flex-1 py-6 overflow-y-auto mb-16` // Removed dynamic margin and related transition
             // The main content itself doesn't need a z-index if the overlay covers it.
           )}
         >
