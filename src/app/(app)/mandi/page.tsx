@@ -76,9 +76,9 @@ export default function MandiPage() {
 
 
   return (
-    <div className="space-y-8">
-      <Card className="shadow-xl rounded-xl overflow-hidden flex flex-col max-h-[calc(100vh-11rem)]">
-        <CardHeader className="bg-gradient-to-r from-primary/10 via-background to-accent/10 p-6">
+    <div className="h-full flex flex-col"> {/* Ensures the root div can provide height to its children */}
+      <Card className="shadow-xl rounded-xl overflow-hidden flex flex-col flex-grow">
+        <CardHeader className="bg-gradient-to-r from-primary/10 via-background to-accent/10 p-4 sm:p-6">
           <div className="flex items-center space-x-4 text-primary">
             <Store className="h-10 w-10" />
             <div>
@@ -89,13 +89,13 @@ export default function MandiPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-6 space-y-8 overflow-y-auto flex-1">
+        <CardContent className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1 scrollbar-none">
           <div className="space-y-4 p-4 border rounded-lg shadow-sm bg-card">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search products, categories, sellers, locations..."
+                placeholder="Search products, categories, sellers..."
                 className="w-full pl-12 py-3 rounded-lg text-sm sm:text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
