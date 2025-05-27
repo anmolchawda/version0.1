@@ -9,12 +9,13 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
+import { cn } from '@/lib/utils';
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const { isSidebarOpen } = useSidebarContext();
+  const { isSidebarOpen, closeSidebar } = useSidebarContext();
 
   useEffect(() => {
     const loggedIn = localStorage.getItem('isMockAuthenticated') === 'true';
@@ -49,12 +50,20 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       <TopHeader />
       <div className="flex min-h-screen pt-16"> {/* pt-16 for TopHeader height */}
         <Sidebar />
+        {isSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20"
+            onClick={closeSidebar}
+            aria-hidden="true"
+          />
+        )}
         <main 
-          className={`
-            flex-1 py-6 overflow-y-auto mb-16 
-            transition-all duration-300 ease-in-out
-            ${isSidebarOpen ? 'ml-64' : 'ml-0'}
-          `}
+          className={cn(
+            `flex-1 py-6 overflow-y-auto mb-16 
+            transition-all duration-300 ease-in-out`,
+            isSidebarOpen ? 'ml-64' : 'ml-0' 
+            // The main content itself doesn't need a z-index if the overlay covers it.
+          )}
         >
           <div className="max-w-xl mx-auto px-4">
            {children}
@@ -77,4 +86,3 @@ export default function AppPagesLayout({
     </SidebarProvider>
   );
 }
-
