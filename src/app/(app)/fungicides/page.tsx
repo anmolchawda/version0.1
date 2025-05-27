@@ -19,7 +19,7 @@ interface FungicideItem {
   [key: string]: any; // Allow for other potential keys
 }
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8NYr35qrJfrHGgWWQWZIGIOssHLZtW1ukcoGWFXcI/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5fW9-cuZpEhXsiz2riv4CwVUr78-hREC5wINice9F2I0UVgHQDEzE_RHmnh_YfQw_GA/exec";
 
 export default function FungicidesPage() {
   const [fungicidesData, setFungicidesData] = useState<FungicideItem[]>([]);
