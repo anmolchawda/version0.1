@@ -2,34 +2,56 @@
 'use client';
 
 import { useState, type FormEvent, useEffect, type ChangeEvent } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getPlaceholderUser } from '@/lib/placeholders';
+import { getPlaceholderUser, placeholderStates, placeholderCities } from '@/lib/placeholders';
 import type { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Camera } from 'lucide-react'; // Added Camera icon
+import { cn } from '@/lib/utils';
 
 // Mock current user for initial form data
 const MOCK_CURRENT_USER_ID = '1';
-const initialUser = getPlaceholderUser(MOCK_CURRENT_USER_ID) || ({} as User);
 
 export function ProfileEditForm() {
-  const [username, setUsername] = useState(initialUser.username || '');
-  const [name, setName] = useState(initialUser.name || '');
-  const [bio, setBio] = useState(initialUser.bio || '');
-  const [location, setLocation] = useState(initialUser.location || ''); // Reverted to single location input
-  const [produceInput, setProduceInput] = useState((initialUser.produce || []).join(', '));
+  const [initialUser, setInitialUser] = useState<User | null>(null);
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [bio, setBio] = useState('');
+  const [location, setLocation] = useState('');
+  const [produceInput, setProduceInput] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(initialUser.avatarUrl || '');
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const user = getPlaceholderUser(MOCK_CURRENT_USER_ID);
+    if (user) {
+      setInitialUser(user);
+      setUsername(user.username || '');
+      setName(user.name || '');
+      setBio(user.bio || '');
+      setLocation(user.location || '');
+      setProduceInput((user.produce || []).join(', '));
+      setAvatarPreviewUrl(user.avatarUrl || '');
+    }
+  }, []);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast({
+          title: "Image Too Large",
+          description: "Please select an image smaller than 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
       setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -47,10 +69,10 @@ export function ProfileEditForm() {
       username,
       name,
       bio,
-      location: location.trim(), // Use the single location state
+      location: location.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
-      avatarUrl: avatarPreviewUrl,
-      avatarFile: avatarFile,
+      avatarUrl: avatarPreviewUrl, // In a real app, this would be the URL after upload
+      avatarFile: avatarFile, // This would be sent to the backend
     };
 
     console.log('Updating profile:', updatedProfile);
@@ -64,24 +86,42 @@ export function ProfileEditForm() {
     setIsSubmitting(false);
   };
 
+  if (!initialUser) {
+    return <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  }
+  
+  const avatarInitialDisplay = (name || username || 'U').charAt(0).toUpperCase();
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-            <Label htmlFor="avatarUpload" className="text-base font-medium">Profile Photo</Label>
+            <Label className="text-base font-medium">Profile Photo</Label>
             <div className="flex items-center space-x-4">
-                <Avatar className="h-24 w-24 border-2 border-primary">
-                <AvatarImage src={avatarPreviewUrl || `https://placehold.co/96x96.png?text=${username.charAt(0) || 'U'}`} alt={username} data-ai-hint="person farmer" />
-                <AvatarFallback className="text-3xl">{username.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
+                <Label 
+                  htmlFor="avatarUpload" 
+                  className="relative group rounded-full cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                >
+                    <Avatar className="h-24 w-24 border-2 border-primary group-hover:opacity-80 transition-opacity">
+                        <AvatarImage src={avatarPreviewUrl || `https://placehold.co/96x96.png?text=${avatarInitialDisplay}`} alt={name || username} data-ai-hint="person farmer" />
+                        <AvatarFallback className="text-3xl">{avatarInitialDisplay}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Camera className="h-8 w-8 text-white" />
+                    </div>
+                </Label>
+                <div className="flex flex-col">
                     <Input
                         id="avatarUpload"
                         type="file"
                         accept="image/*"
                         onChange={handleAvatarChange}
-                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                        className="hidden"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF up to 2MB.</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Click photo to change.
+                        <br />
+                        PNG, JPG, GIF up to 2MB.
+                    </p>
                 </div>
             </div>
         </div>
@@ -99,7 +139,7 @@ export function ProfileEditForm() {
 
         <div className="space-y-2">
         <Label htmlFor="bio" className="text-base font-medium">Bio</Label>
-        <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell us about yourself and your farm" rows={4} className="resize-none" />
+        <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell us about yourself and your farm" rows={3} className="resize-none" />
         </div>
 
         <div className="space-y-2">
@@ -108,10 +148,10 @@ export function ProfileEditForm() {
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Type your City, State (e.g., Raipur, Chhattisgarh)"
+                placeholder="e.g., Raipur, Chhattisgarh"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              This field is a direct text input. Dynamic suggestions are not available for this field.
+              Provide your city and state. Dynamic suggestions are not available for this field.
             </p>
         </div>
 
