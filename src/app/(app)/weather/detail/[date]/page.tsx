@@ -1,11 +1,20 @@
+
 // src/app/(app)/weather/detail/[date]/page.tsx
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, CloudSun, Thermometer, Wind, Droplets } from "lucide-react";
+import { ChevronLeft, CloudSun, Thermometer, Wind, Droplets, Sun, CloudRain, Cloud } from "lucide-react"; // Added Cloud for more icon options
 import { format, parseISO } from 'date-fns';
+import React from 'react'; // Ensure React is imported for JSX
+
+// Note: This page currently uses MOCK data.
+// To integrate with the API, this page would need to either:
+// 1. Receive the specific day's detailed forecast data from the main WeatherPage (e.g., via router state or context).
+// 2. Re-fetch the OpenWeatherMap API using lat/lon (passed from previous page or re-fetched) and filter for the specific date.
+// For this prototype, option 1 is more efficient but complex to implement across client-side navigation without a state manager.
+// Option 2 is simpler for now but less efficient. We'll stick to mock data for this page in this iteration.
 
 export default function WeatherDetailPage() {
   const params = useParams();
@@ -18,21 +27,20 @@ export default function WeatherDetailPage() {
       formattedDate = format(parseISO(dateParam), "EEEE, MMMM d, yyyy");
     } catch (error) {
       console.error("Error parsing date:", dateParam, error);
-      // Keep formattedDate as "N/A" or set to a fallback
     }
   }
   
-  // Placeholder data for the detailed view
+  // Placeholder data for the detailed view - needs to be updated if API is integrated here
   const mockDetailedWeatherData = {
     condition: "Partly Cloudy",
-    temp: "30°C",
-    feelsLike: "32°C",
-    humidity: "60%",
-    wind: "15 km/h NE",
-    pressure: "1012 hPa",
-    uvIndex: "High",
-    precipitationChance: "10%",
-    hourlyForecast: [
+    temp: "30°C", // This would ideally be temp.day for the specific day
+    feelsLike: "32°C", // from API day.feels_like.day
+    humidity: "60%", // from API day.humidity
+    wind: "15 km/h NE", // from API day.wind_speed + day.wind_deg
+    pressure: "1012 hPa", // from API day.pressure
+    uvIndex: "High", // from API day.uvi
+    precipitationChance: "10%", // from API day.pop * 100
+    hourlyForecast: [ // This would come from the 'hourly' part of API, if requested for the specific day
       { time: "10:00 AM", temp: "28°C", icon: <CloudSun className="h-5 w-5 text-sky-500"/> },
       { time: "01:00 PM", temp: "30°C", icon: <Sun className="h-5 w-5 text-yellow-500"/> },
       { time: "04:00 PM", temp: "29°C", icon: <CloudSun className="h-5 w-5 text-sky-500"/> },
@@ -59,7 +67,7 @@ export default function WeatherDetailPage() {
         <CardContent className="pt-6 space-y-4">
           <div className="text-center mb-6">
             <p className="text-5xl font-bold text-foreground">{mockDetailedWeatherData.temp}</p>
-            <p className="text-lg text-muted-foreground">{mockDetailedWeatherData.condition}</p>
+            <p className="text-lg text-muted-foreground capitalize">{mockDetailedWeatherData.condition}</p>
             <p className="text-sm text-muted-foreground">Feels like: {mockDetailedWeatherData.feelsLike}</p>
           </div>
 
@@ -115,10 +123,11 @@ export default function WeatherDetailPage() {
           </div>
 
           <p className="text-xs text-center text-muted-foreground pt-4">
-            Detailed weather information is illustrative. This is a placeholder.
+            Detailed weather information is illustrative and uses mock data.
           </p>
         </CardContent>
       </Card>
     </div>
   );
 }
+
