@@ -38,7 +38,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Drumstick', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/drumstick.jpeg', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/okra.jpeg', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
   // Fruits
-  { name: 'Apple', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/apple.jpg', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
+  { name: 'Apple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fapple.jpg?alt=media&token=c5f86e8e-c19f-4aba-8289-7f4bed2c5332', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
   { name: 'Banana', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/banana.jpg', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
   { name: 'Orange', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/orange.jpg', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/mango.jpg', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
@@ -95,5 +95,4 @@ export default function CropSciencePage() {
     </div>
   );
 }
-
-// Added comment to ensure change is picked up.
+// Updated image for Apple
