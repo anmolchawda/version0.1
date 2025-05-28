@@ -11,11 +11,11 @@ interface FungicideItem {
   "TRADE NAME ": string;
   "COMPANY": string;
   "TECHNICAL NAME": string;
-  "FRAC GROUP": string;
+  "FRAC GROUP": string; // Changed from FRAC CODE
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
-  "TARGET ": string;
+  "TARGET ": string; // Note the trailing space
   "DOSE": string;
   [key: string]: any; 
 }
@@ -51,11 +51,13 @@ export default function FungicidesPage() {
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            // Attempt to find a top-level property that is an array
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
                 console.log(`Found data in nested key: ${dataArrayKey}`);
                 setFungicidesData(data[dataArrayKey]);
             } else {
+                // Fallback: if the object's values are all objects (like a list from Firebase Realtime DB)
                 console.warn("Fetched data is an object but no array found. Trying Object.values if it's a flat object used as a list.", data);
                 if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
                   setFungicidesData(Object.values(data) as FungicideItem[]);
@@ -85,15 +87,15 @@ export default function FungicidesPage() {
     const lowerSearchTerm = searchTerm.toLowerCase();
     return fungicidesData.filter(item => {
       return (
-        (item["TRADE NAME "] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["COMPANY"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["TECHNICAL NAME"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["FRAC GROUP"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["CLASS/FAMILY CONTROL"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["S/C"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["TL/OVI"] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["TARGET "] || '').toLowerCase().includes(lowerSearchTerm) ||
-        (item["DOSE"] || '').toLowerCase().includes(lowerSearchTerm)
+        String(item["TRADE NAME "] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["COMPANY"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["TECHNICAL NAME"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["FRAC GROUP"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["CLASS/FAMILY CONTROL"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["S/C"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["TL/OVI"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["TARGET "] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["DOSE"] || '').toLowerCase().includes(lowerSearchTerm)
       );
     });
   }, [searchTerm, fungicidesData]);
@@ -154,6 +156,7 @@ export default function FungicidesPage() {
           {!isLoading && !error && filteredFungicides.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredFungicides.map((item, index) => {
+                // console.log(`Rendering item ${index}: TRADENAME - '${item["TRADE NAME "]}', FRAC GROUP - '${item["FRAC GROUP"]}' (type: ${typeof item["FRAC GROUP"]})`);
                 return (
                   <Card key={item["TRADE NAME "] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3 bg-muted/30">
@@ -179,3 +182,4 @@ export default function FungicidesPage() {
     </div>
   );
 }
+
