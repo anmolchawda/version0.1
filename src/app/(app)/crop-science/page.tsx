@@ -21,7 +21,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
   { name: 'Potato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/potato.jpg', aiHint: 'potato vegetable', slug: 'potato', unoptimized: true },
   { name: 'Onion', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FONION.jpeg?alt=media&token=110b1e81-e150-4353-ad3f-ccdb45efb616', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
-  { name: 'Carrot', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/carrot.jpg', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
+  { name: 'Carrot', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcarrot.jpg?alt=media&token=570b5735-ea6b-45fb-91db-5fa6c95ec198', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
   { name: 'Broccoli', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBROCCOLI.jpg?alt=media&token=1ea3e09d-cbbc-44be-885f-d7a1a60c7281', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
   { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
@@ -119,3 +119,4 @@ export default function CropSciencePage() {
 // Updated image for Kiwi
 // Removed placeholder image from GCS
 // Updated image for Bell Pepper with Firebase Storage URL
+// Updated image for Carrot with Firebase Storage URL
