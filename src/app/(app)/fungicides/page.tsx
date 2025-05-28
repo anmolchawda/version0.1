@@ -2,21 +2,21 @@
 // src/app/(app)/fungicides/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { SprayCan, Loader2, AlertTriangle } from "lucide-react";
+import { Input } from '@/components/ui/input';
+import { SprayCan, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react";
 
 interface FungicideItem {
-  "TRADE NAME ": string; // Note the trailing space
+  "TRADE NAME ": string;
   "COMPANY": string;
   "TECHNICAL NAME": string;
   "FRAC GROUP": string;
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
-  "TARGET ": string; // Note the trailing space
+  "TARGET ": string;
   "DOSE": string;
-  // Allow for other potential keys from the sheet
   [key: string]: any; 
 }
 
@@ -26,6 +26,7 @@ export default function FungicidesPage() {
   const [fungicidesData, setFungicidesData] = useState<FungicideItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,27 +38,25 @@ export default function FungicidesPage() {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
             const body = await response.text(); 
-            errorText += `\nResponse body: ${body.substring(0, 500)}`; // Log part of the response body if it's not JSON
+            errorText += `\nResponse body: ${body.substring(0, 500)}`; 
           } catch (e) {
-            // Ignore error reading body if it fails
+            // Ignore error reading body
           }
           throw new Error(errorText);
         }
         
         const data = await response.json();
-        console.log("Fetched data from Apps Script:", data); // Log the raw data structure
+        console.log("Fetched raw data from Apps Script:", data); 
 
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-            // Attempt to find a top-level key that holds the array
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
                 console.log(`Found data in nested key: ${dataArrayKey}`);
                 setFungicidesData(data[dataArrayKey]);
             } else {
-                console.warn("Fetched data is an object but no array found within its properties. Assuming top-level keys are the items if it's a flat object used as a list (uncommon).", data);
-                // Fallback: if data is like { "0": {...}, "1": {...} }
+                console.warn("Fetched data is an object but no array found. Trying Object.values if it's a flat object used as a list.", data);
                 if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
                   setFungicidesData(Object.values(data) as FungicideItem[]);
                 } else {
@@ -79,6 +78,26 @@ export default function FungicidesPage() {
     fetchData();
   }, []);
 
+  const filteredFungicides = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return fungicidesData;
+    }
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return fungicidesData.filter(item => {
+      return (
+        (item["TRADE NAME "] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["COMPANY"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["TECHNICAL NAME"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["FRAC GROUP"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["CLASS/FAMILY CONTROL"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["S/C"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["TL/OVI"] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["TARGET "] || '').toLowerCase().includes(lowerSearchTerm) ||
+        (item["DOSE"] || '').toLowerCase().includes(lowerSearchTerm)
+      );
+    });
+  }, [searchTerm, fungicidesData]);
+
   return (
     <div className="space-y-6">
       <Card className="shadow-lg rounded-xl">
@@ -88,8 +107,18 @@ export default function FungicidesPage() {
             Fungicides Information
           </CardTitle>
           <CardDescription>
-            Browse fungicide details fetched from our database.
+            Browse and search fungicide details fetched from our database.
           </CardDescription>
+          <div className="relative mt-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search by Trade Name, Company, Target, etc..."
+              className="w-full pl-10 py-2 rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading && (
@@ -108,16 +137,23 @@ export default function FungicidesPage() {
               </p>
             </div>
           )}
-          {!isLoading && !error && fungicidesData.length === 0 && (
+          {!isLoading && !error && fungicidesData.length > 0 && filteredFungicides.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
+              <ListChecks className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+              <p className="text-lg">No fungicides found matching "{searchTerm}".</p>
+              <p className="text-sm">Try a different search term.</p>
+            </div>
+          )}
+          {!isLoading && !error && fungicidesData.length === 0 && (
+             <div className="text-center py-10 text-muted-foreground">
+              <ListChecks className="mx-auto h-12 w-12 mb-4 text-gray-400" />
               <p className="text-lg">No fungicide data available at the moment.</p>
               <p className="text-sm">This could be because the source is empty or not providing data in the expected format. Check console logs for the fetched data structure.</p>
             </div>
           )}
-          {!isLoading && !error && fungicidesData.length > 0 && (
+          {!isLoading && !error && filteredFungicides.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {fungicidesData.map((item, index) => {
-                // console.log(`Rendering item ${index}: Trade Name: '${item["TRADE NAME "]}', Target: '${item["TARGET "]}'`); 
+              {filteredFungicides.map((item, index) => {
                 return (
                   <Card key={item["TRADE NAME "] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3 bg-muted/30">
