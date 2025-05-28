@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getPlaceholderUser } from '@/lib/placeholders'; 
+import { getPlaceholderUser } from '@/lib/placeholders';
 import type { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save } from 'lucide-react';
@@ -20,7 +20,7 @@ export function ProfileEditForm() {
   const [username, setUsername] = useState(initialUser.username || '');
   const [name, setName] = useState(initialUser.name || '');
   const [bio, setBio] = useState(initialUser.bio || '');
-  const [location, setLocation] = useState(initialUser.location || ''); // New state for single location input
+  const [location, setLocation] = useState(initialUser.location || ''); // Reverted to single location input
   const [produceInput, setProduceInput] = useState((initialUser.produce || []).join(', '));
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(initialUser.avatarUrl || '');
@@ -42,21 +42,21 @@ export function ProfileEditForm() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
-    
+
     const updatedProfile = {
       username,
       name,
       bio,
-      location: location.trim(), // Use the new location state
+      location: location.trim(), // Use the single location state
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
-      avatarUrl: avatarPreviewUrl, 
-      avatarFile: avatarFile, 
+      avatarUrl: avatarPreviewUrl,
+      avatarFile: avatarFile,
     };
-    
+
     console.log('Updating profile:', updatedProfile);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     toast({
       title: 'Profile Updated',
       description: 'Your profile information has been saved.',
@@ -74,8 +74,8 @@ export function ProfileEditForm() {
                 <AvatarFallback className="text-3xl">{username.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                    <Input 
-                        id="avatarUpload" 
+                    <Input
+                        id="avatarUpload"
                         type="file"
                         accept="image/*"
                         onChange={handleAvatarChange}
@@ -104,19 +104,22 @@ export function ProfileEditForm() {
 
         <div className="space-y-2">
             <Label htmlFor="location" className="text-base font-medium">Location (City, State)</Label>
-            <Input 
-                id="location" 
-                value={location} 
-                onChange={(e) => setLocation(e.target.value)} 
-                placeholder="e.g., Raipur, Chhattisgarh" 
+            <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Type your City, State (e.g., Raipur, Chhattisgarh)"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              This field is a direct text input. Dynamic suggestions are not available for this field.
+            </p>
         </div>
-        
+
         <div className="space-y-2">
             <Label htmlFor="produce" className="text-base font-medium">Main Produce (comma-separated)</Label>
             <Input id="produce" value={produceInput} onChange={(e) => setProduceInput(e.target.value)} placeholder="e.g., Tomatoes, Corn, Apples" />
         </div>
-        
+
         <div className="flex justify-end pt-4">
             <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 text-base" disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
@@ -126,3 +129,4 @@ export function ProfileEditForm() {
     </form>
   );
 }
+    
