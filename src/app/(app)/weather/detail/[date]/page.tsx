@@ -5,7 +5,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, CloudSun, Thermometer, Wind, Droplets, Sun, CloudRain, Cloud, Sunrise, Sunset } from "lucide-react";
+import { ChevronLeft, CloudSun, Thermometer, Wind, Droplets, Sun, CloudRain, Cloud, Sunrise, Sunset, Moon } from "lucide-react";
 import { format, parseISO } from 'date-fns';
 import React from 'react';
 
