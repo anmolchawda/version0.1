@@ -36,6 +36,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Ridge Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ridge%20gourd.jpeg', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/drumstick.jpeg', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/okra.jpeg', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
+  { name: 'Chilli', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Chilli', aiHint: 'chilli pepper', slug: 'chilli', unoptimized: true },
   // Fruits
   { name: 'Apple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fapple.jpg?alt=media&token=c5f86e8e-c19f-4aba-8289-7f4bed2c5332', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
   { name: 'Banana', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbanana.jpg?alt=media&token=6228109c-9358-4c7c-bffd-51be0c5bc914', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
@@ -120,3 +121,4 @@ export default function CropSciencePage() {
 // Updated image for Bell Pepper with Firebase Storage URL
 // Updated image for Carrot with Firebase Storage URL
 // Updated image for Cauliflower with Firebase Storage URL
+// Added Chilli to the crop list
