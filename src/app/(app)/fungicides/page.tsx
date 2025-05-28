@@ -3,19 +3,21 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { SprayCan, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react";
 
 interface FungicideItem {
   "TRADE NAME ": string;
   "COMPANY": string;
   "TECHNICAL NAME": string;
-  "FRAC GROUP": string; // Changed from FRAC CODE
+  "FRAC GROUP": string;
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
-  "TARGET ": string; // Note the trailing space
+  "TARGET ": string;
   "DOSE": string;
   [key: string]: any; 
 }
@@ -46,19 +48,17 @@ export default function FungicidesPage() {
         }
         
         const data = await response.json();
-        console.log("Fetched raw data from Apps Script:", data); 
+        // console.log("Fetched raw data from Apps Script:", data); 
 
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-            // Attempt to find a top-level property that is an array
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-                console.log(`Found data in nested key: ${dataArrayKey}`);
+                // console.log(`Found data in nested key: ${dataArrayKey}`);
                 setFungicidesData(data[dataArrayKey]);
             } else {
-                // Fallback: if the object's values are all objects (like a list from Firebase Realtime DB)
-                console.warn("Fetched data is an object but no array found. Trying Object.values if it's a flat object used as a list.", data);
+                // console.warn("Fetched data is an object but no array found. Trying Object.values if it's a flat object used as a list.", data);
                 if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
                   setFungicidesData(Object.values(data) as FungicideItem[]);
                 } else {
@@ -66,11 +66,11 @@ export default function FungicidesPage() {
                 }
             }
         } else {
-          console.warn("Fetched data is not an array or a recognizable object. Please check Apps Script output.", data);
+          // console.warn("Fetched data is not an array or a recognizable object. Please check Apps Script output.", data);
           throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
       } catch (err) {
-        console.error("Fetch error in FungicidesPage:", err);
+        // console.error("Fetch error in FungicidesPage:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
       } finally {
         setIsLoading(false);
@@ -109,7 +109,7 @@ export default function FungicidesPage() {
             Fungicides Information
           </CardTitle>
           <CardDescription>
-            Browse and search fungicide details fetched from our database.
+            Browse and search fungicide details. Click on an item for more details.
           </CardDescription>
           <div className="relative mt-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -150,31 +150,26 @@ export default function FungicidesPage() {
              <div className="text-center py-10 text-muted-foreground">
               <ListChecks className="mx-auto h-12 w-12 mb-4 text-gray-400" />
               <p className="text-lg">No fungicide data available at the moment.</p>
-              <p className="text-sm">This could be because the source is empty or not providing data in the expected format. Check console logs for the fetched data structure.</p>
+              <p className="text-sm">This could be because the source is empty or not providing data in the expected format.</p>
             </div>
           )}
           {!isLoading && !error && filteredFungicides.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredFungicides.map((item, index) => {
-                // console.log(`Rendering item ${index}: TRADENAME - '${item["TRADE NAME "]}', FRAC GROUP - '${item["FRAC GROUP"]}' (type: ${typeof item["FRAC GROUP"]})`);
-                return (
-                  <Card key={item["TRADE NAME "] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3 bg-muted/30">
-                      <CardTitle className="text-lg text-primary">{item["TRADE NAME "] || "N/A"}</CardTitle>
-                      <CardDescription>{item["COMPANY"] || "N/A"}</CardDescription>
+              {filteredFungicides.map((item, index) => (
+                <Link
+                  href={`/fungicides/detail/${encodeURIComponent(String(item["TRADE NAME "] || `item-${index}`))}`}
+                  key={String(item["TRADE NAME "] || `item-${index}`)}
+                  passHref
+                >
+                  <Card className="shadow-md rounded-lg hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
+                    <CardHeader className="pb-4 pt-4 bg-muted/20">
+                      <CardTitle className="text-lg text-primary">{String(item["TRADE NAME "] || "N/A")}</CardTitle>
+                      <CardDescription>{String(item["COMPANY"] || "N/A")}</CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-4 text-sm space-y-1.5">
-                      <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
-                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p>
-                      <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
-                      <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
-                      <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
-                      <p><strong>Target:</strong> {item["TARGET "] || "N/A"}</p>
-                      <p><strong>Dose:</strong> {item["DOSE"] || "N/A"}</p>
-                    </CardContent>
+                    {/* Content for other details removed from this list view */}
                   </Card>
-                );
-              })}
+                </Link>
+              ))}
             </div>
           )}
         </CardContent>
@@ -182,4 +177,3 @@ export default function FungicidesPage() {
     </div>
   );
 }
-
