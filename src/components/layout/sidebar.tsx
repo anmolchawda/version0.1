@@ -16,7 +16,8 @@ import {
   Code2,
   Cpu,
   Settings as SettingsIcon,
-  ScrollText, // Added for Yojna
+  ScrollText,
+  CloudSun, // Added for Weather
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -32,11 +33,7 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
     if (onClick) {
       onClick();
     }
-    // Only close sidebar on mobile/tablet when it's an overlay
-    // For desktop, it's fine for it to remain open after navigation
-    // This behavior might need adjustment based on exact requirements for overlay vs. push
-    // For now, assume we always close it if it's open via the context's sidebar state management.
-    if (contextCloseSidebar) { // Check if closeSidebar is defined
+    if (contextCloseSidebar) {
         contextCloseSidebar();
     }
   };
@@ -72,7 +69,7 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen } = useSidebarContext(); // Use context state
+  const { isSidebarOpen } = useSidebarContext();
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -96,7 +93,8 @@ export function Sidebar() {
 
   const secondaryNavLinks = useMemo((): NavLink[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
-    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText className="h-5 w-5" /> }, // Added Yojna
+    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText className="h-5 w-5" /> },
+    { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun className="h-5 w-5" /> }, // Added Weather
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
     { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 className="h-5 w-5" /> },
@@ -113,12 +111,11 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg", // z-index ensures it's above overlay
-        "top-16", // Positioned below the TopHeader
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides in and out
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
+        "top-16",
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
       )}
     >
-      {/* Removed internal header with AppLogo and toggle, as it's handled by TopHeader */}
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
@@ -142,7 +139,7 @@ export function Sidebar() {
                 )}
                 asChild
                 onClick={() => {
-                  const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically if needed for some reason
+                  const { closeSidebar } = useSidebarContext.getState(); 
                   if (closeSidebar) closeSidebar();
                 }}
               >
@@ -172,7 +169,7 @@ export function Sidebar() {
                     "flex items-center gap-3 group p-2 rounded-md hover:bg-muted"
                   )}
                   onClick={() => {
-                    const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically
+                    const { closeSidebar } = useSidebarContext.getState();
                     if (closeSidebar) closeSidebar();
                   }}
                 >
@@ -196,7 +193,7 @@ export function Sidebar() {
                     <TooltipTrigger asChild>
                          <Link href={`/profile/${mockUser.id}`} 
                            onClick={() => {
-                              const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically
+                              const { closeSidebar } = useSidebarContext.getState();
                               if (closeSidebar) closeSidebar();
                             }}
                          >
