@@ -1,3 +1,4 @@
+
 // src/app/(app)/fungicides/page.tsx
 'use client';
 
@@ -6,14 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { SprayCan, Loader2, AlertTriangle } from "lucide-react";
 
 interface FungicideItem {
-  "TRADE NAME": string;
+  "TRADE NAME ": string; // Note the trailing space
   "COMPANY": string;
   "TECHNICAL NAME": string;
-  "FRAC GROUP": string; // Changed from FRAC CODE
+  "FRAC GROUP": string;
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
-  "TARGET": string;
+  "TARGET ": string; // Note the trailing space
   "DOSE": string;
   // Allow for other potential keys from the sheet
   [key: string]: any; 
@@ -36,9 +37,9 @@ export default function FungicidesPage() {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
             const body = await response.text(); 
-            errorText += `\nResponse body: ${body.substring(0, 500)}`;
+            errorText += `\nResponse body: ${body.substring(0, 500)}`; // Log part of the response body if it's not JSON
           } catch (e) {
-            // Ignore error reading body
+            // Ignore error reading body if it fails
           }
           throw new Error(errorText);
         }
@@ -49,9 +50,10 @@ export default function FungicidesPage() {
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            // Attempt to find a top-level key that holds the array
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-                 console.log(`Found data in nested key: ${dataArrayKey}`);
+                console.log(`Found data in nested key: ${dataArrayKey}`);
                 setFungicidesData(data[dataArrayKey]);
             } else {
                 console.warn("Fetched data is an object but no array found within its properties. Assuming top-level keys are the items if it's a flat object used as a list (uncommon).", data);
@@ -109,27 +111,26 @@ export default function FungicidesPage() {
           {!isLoading && !error && fungicidesData.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
               <p className="text-lg">No fungicide data available at the moment.</p>
-              <p className="text-sm">This could be because the source is empty or not providing data in the expected format.</p>
+              <p className="text-sm">This could be because the source is empty or not providing data in the expected format. Check console logs for the fetched data structure.</p>
             </div>
           )}
           {!isLoading && !error && fungicidesData.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {fungicidesData.map((item, index) => {
-                // This console.log helps verify the exact structure of each item
-                // console.log(`Rendering item ${index}:`, item); 
+                // console.log(`Rendering item ${index}: Trade Name: '${item["TRADE NAME "]}', Target: '${item["TARGET "]}'`); 
                 return (
-                  <Card key={item["TRADE NAME"] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
+                  <Card key={item["TRADE NAME "] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3 bg-muted/30">
-                      <CardTitle className="text-lg text-primary">{item["TRADE NAME"] || "N/A"}</CardTitle>
+                      <CardTitle className="text-lg text-primary">{item["TRADE NAME "] || "N/A"}</CardTitle>
                       <CardDescription>{item["COMPANY"] || "N/A"}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-4 text-sm space-y-1.5">
                       <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
-                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p> {/* Corrected from FRAC CODE */}
+                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p>
                       <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
                       <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
                       <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
-                      <p><strong>Target:</strong> {item["TARGET"] || "N/A"}</p>
+                      <p><strong>Target:</strong> {item["TARGET "] || "N/A"}</p>
                       <p><strong>Dose:</strong> {item["DOSE"] || "N/A"}</p>
                     </CardContent>
                   </Card>
