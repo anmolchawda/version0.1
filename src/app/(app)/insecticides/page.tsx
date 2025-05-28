@@ -1,15 +1,16 @@
+
 // src/app/(app)/insecticides/page.tsx
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Bug, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react";
 
 interface InsecticideItem {
-  "TRADE NAME ": string;
+  "TRADE NAME": string; // No trailing space
   "COMPANY": string;
   "TECHNICAL NAME": string;
   "IRAC GROUP": string;
@@ -46,6 +47,7 @@ export default function InsecticidesPage() {
         }
         
         const data = await response.json();
+        // console.log("Fetched raw insecticide data from Apps Script:", data);
         
         let rawItems: any[] = [];
         if (Array.isArray(data)) {
@@ -53,32 +55,22 @@ export default function InsecticidesPage() {
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
+                // console.log(`Found data in nested key: ${dataArrayKey}`);
                 rawItems = data[dataArrayKey];
             } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
+                // console.warn("Fetched data is an object but no array found. Trying Object.values.", data);
                 rawItems = Object.values(data);
             } else {
                throw new Error("Fetched data format is not a recognized array or object containing an array.");
             }
         } else {
-          throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
-        }
-
-        // Filter out any potential header row if it's an object with matching keys to the first data row
-        if (rawItems.length > 1) {
-          const firstItemKeys = Object.keys(rawItems[0]);
-          const secondItemKeys = Object.keys(rawItems[1]);
-          if (firstItemKeys.length === secondItemKeys.length && firstItemKeys.every((key, index) => key === Object.values(rawItems[0])[index])) {
-            // Likely the first row is a header that got parsed as data
-            // This is a heuristic and might need adjustment based on actual data
-            // console.warn("Potential header row detected and skipped:", rawItems[0]);
-            // rawItems.shift(); 
-            // Decided against auto-skipping as it's too heuristic. Data should be clean from source.
-          }
+          // console.warn("Fetched data is not an array or a recognizable object.", data);
+          throw new Error("Fetched data format is not as expected.");
         }
         setInsecticidesData(rawItems as InsecticideItem[]);
 
       } catch (err) {
-        console.error("Fetch error in InsecticidesPage:", err);
+        // console.error("Fetch error in InsecticidesPage:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
       } finally {
         setIsLoading(false);
@@ -95,7 +87,7 @@ export default function InsecticidesPage() {
     const lowerSearchTerm = searchTerm.toLowerCase();
     return insecticidesData.filter(item => {
       return (
-        String(item["TRADE NAME "] || '').toLowerCase().includes(lowerSearchTerm) ||
+        String(item["TRADE NAME"] || '').toLowerCase().includes(lowerSearchTerm) ||
         String(item["COMPANY"] || '').toLowerCase().includes(lowerSearchTerm) ||
         String(item["TECHNICAL NAME"] || '').toLowerCase().includes(lowerSearchTerm) ||
         String(item["IRAC GROUP"] || '').toLowerCase().includes(lowerSearchTerm) ||
@@ -164,19 +156,23 @@ export default function InsecticidesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredInsecticides.map((item, index) => (
                 <Link
-                  // TODO: Create and link to /insecticides/detail/[tradeName]
+                  // TODO: Create and link to /insecticides/detail/[tradeName] page
                   href={`#`} // Placeholder, update when detail page exists
-                  key={String(item["TRADE NAME "] || `item-${index}`)}
+                  key={String(item["TRADE NAME"] || `item-${index}`)}
                   passHref
                 >
                   <Card className="shadow-md rounded-lg hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
                     <CardHeader className="pb-3 pt-4 bg-muted/20">
-                      <CardTitle className="text-lg text-primary">{String(item["TRADE NAME "] || "N/A")}</CardTitle>
+                      <CardTitle className="text-lg text-primary">{String(item["TRADE NAME"] || "N/A")}</CardTitle>
                       <CardDescription>{String(item["COMPANY"] || "N/A")}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-3 pb-4 text-sm space-y-1 flex-grow">
                        <p><strong>Technical:</strong> {String(item["TECHNICAL NAME"] || "N/A")}</p>
+                       <p><strong>IRAC Group:</strong> {String(item["IRAC GROUP"] || "N/A")}</p>
                        <p><strong>Target:</strong> {String(item["TARGET PEST"] || "N/A")}</p>
+                       <p><strong>S/C:</strong> {String(item["S/C"] || "N/A")}</p>
+                       <p><strong>TL/OVI:</strong> {String(item["TL/OVI"] || "N/A")}</p>
+                       <p><strong>Dose:</strong> {String(item["DOSE"] || "N/A")}</p>
                     </CardContent>
                      <CardFooter className="p-3 mt-auto">
                         <Button variant="outline" size="sm" className="w-full">View Details</Button>
@@ -191,3 +187,4 @@ export default function InsecticidesPage() {
     </div>
   );
 }
+
