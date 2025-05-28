@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 export function AppLogo({ className, textClassName, iconClassName }: { className?: string; textClassName?: string; iconClassName?: string }) {
-  const logoUrl = "https://storage.cloud.google.com/imagesoffarmdocc/KrishiX/KrishiX%20PNG%20Logo.png";
+  const logoUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/KrishiX%20logo%2FKrishiX%20PNG%20Logo.png?alt=media&token=f1b5520f-83f5-4665-81d8-45c8d2fb4d72";
 
   return (
     <Link href="/" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
@@ -15,8 +15,7 @@ export function AppLogo({ className, textClassName, iconClassName }: { className
           fill
           sizes="(max-width: 768px) 48px, (max-width: 1200px) 48px, 48px" // Adjust sizes as needed based on iconClassName
           style={{ objectFit: "contain" }}
-          unoptimized={true} // Keep unoptimized for GCS URLs if optimization causes issues
-          priority={false} // Removed priority as a diagnostic step
+          unoptimized={true} // Keep unoptimized for GCS/Firebase URLs if optimization causes issues
         />
       </div>
       <span className={cn(textClassName)}>KrishiX</span>
