@@ -16,18 +16,11 @@ import {
   Code2,
   Cpu,
   Settings as SettingsIcon,
-  Home,
-  Search,
-  PlusSquare,
-  Store,
-  User as UserProfileIcon,
-  ChevronLeft,
-  Menu,
+  ScrollText, // Added for Yojna
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AppLogo } from '@/components/core/app-logo';
 
 const MOCK_USER_ID = '1';
 
@@ -39,7 +32,13 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
     if (onClick) {
       onClick();
     }
-    contextCloseSidebar();
+    // Only close sidebar on mobile/tablet when it's an overlay
+    // For desktop, it's fine for it to remain open after navigation
+    // This behavior might need adjustment based on exact requirements for overlay vs. push
+    // For now, assume we always close it if it's open via the context's sidebar state management.
+    if (contextCloseSidebar) { // Check if closeSidebar is defined
+        contextCloseSidebar();
+    }
   };
 
   return (
@@ -73,7 +72,7 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext();
+  const { isSidebarOpen } = useSidebarContext(); // Use context state
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -97,6 +96,7 @@ export function Sidebar() {
 
   const secondaryNavLinks = useMemo((): NavLink[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
+    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText className="h-5 w-5" /> }, // Added Yojna
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
     { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 className="h-5 w-5" /> },
@@ -113,21 +113,18 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
-        "top-16",
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides completely off-screen
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg", // z-index ensures it's above overlay
+        "top-16", // Positioned below the TopHeader
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides in and out
       )}
     >
-      {/* This div is removed to allow content to move up */}
-      {/* <div className="flex items-center justify-between p-4 border-b h-16">
-        {isSidebarOpen && <AppLogo iconClassName="h-8 w-8" textClassName="text-xl" />}
-      </div> */}
+      {/* Removed internal header with AppLogo and toggle, as it's handled by TopHeader */}
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
             link={link}
-            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href.length > 1 && link.href !== '/')}
+            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
             isSidebarOpen={isSidebarOpen}
           />
         ))}
@@ -144,7 +141,10 @@ export function Sidebar() {
                   !isSidebarOpen && "justify-center"
                 )}
                 asChild
-                onClick={closeSidebar}
+                onClick={() => {
+                  const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically if needed for some reason
+                  if (closeSidebar) closeSidebar();
+                }}
               >
                 <Link href="/settings">
                   <SettingsIcon className="h-5 w-5" />
@@ -171,7 +171,10 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 group p-2 rounded-md hover:bg-muted"
                   )}
-                  onClick={closeSidebar}
+                  onClick={() => {
+                    const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically
+                    if (closeSidebar) closeSidebar();
+                  }}
                 >
                   <Avatar className="h-9 w-9 border">
                     <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
@@ -183,7 +186,6 @@ export function Sidebar() {
                   </div>
                 </Link>
               </TooltipTrigger>
-               {/* Tooltip for expanded state user profile might be redundant as text is visible */}
             </Tooltip>
           </TooltipProvider>
         )}
@@ -192,7 +194,12 @@ export function Sidebar() {
              <TooltipProvider delayDuration={0}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                         <Link href={`/profile/${mockUser.id}`} onClick={closeSidebar}>
+                         <Link href={`/profile/${mockUser.id}`} 
+                           onClick={() => {
+                              const { closeSidebar } = useSidebarContext.getState(); // Get context dynamically
+                              if (closeSidebar) closeSidebar();
+                            }}
+                         >
                             <Avatar className="h-9 w-9 border">
                                 <AvatarImage src={mockUser.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
                                 <AvatarFallback>{userAvatarFallback}</AvatarFallback>
