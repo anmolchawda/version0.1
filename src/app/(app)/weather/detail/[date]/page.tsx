@@ -5,64 +5,98 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, CloudSun, Thermometer, Wind, Droplets, Sun, CloudRain, Cloud, Sunrise, Sunset, Moon } from "lucide-react";
-import { format, parseISO } from 'date-fns';
-import React from 'react';
+import { 
+  ChevronLeft, CloudSun, Thermometer, Wind, Droplets, Sun, CloudRain, Cloud, 
+  Sunrise, Sunset, Moon, CloudMoon, CloudDrizzle, CloudLightning, CloudSnow, CloudFog,
+  Loader2, AlertTriangle, MapPin
+} from "lucide-react";
+import { format, parseISO, fromUnixTime, isSameDay } from 'date-fns';
+import React, { useState, useEffect, useCallback } from 'react';
 
-// This page will continue to use MOCK data.
-// Integrating live 3-hourly data for a specific day from the forecast API
-// would require passing significant data or re-fetching strategies.
+const OPENWEATHERMAP_API_KEY = "f771ba6953523ed0706f829f70e2d063";
+const DEFAULT_LATITUDE = 21.2514; // Raipur Latitude
+const DEFAULT_LONGITUDE = 81.6296; // Raipur Longitude
 
-interface MockHourlyForecast {
+interface WeatherLocation {
+  latitude: number;
+  longitude: number;
+}
+
+interface HourlyForecastItem {
+  dt: number;
+  main: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+    pressure: number;
+  };
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
+  clouds: {
+    all: number;
+  };
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  visibility: number;
+  pop: number; // Probability of precipitation
+  dt_txt: string;
+}
+
+interface TransformedHourlyForecast {
   time: string;
   temp: string;
   condition: string;
   icon: JSX.Element;
-}
-
-interface MockDetailedDayData {
-  condition: string;
-  temp: string; // Could be average, or just a representative temp
   feelsLike: string;
   humidity: string;
   wind: string;
-  pressure: string;
-  uvIndex: string;
-  precipitationChance: string;
-  sunrise: string;
-  sunset: string;
-  hourlyForecast: MockHourlyForecast[];
+  pop: string;
 }
 
-const getMockDetailedDataForDate = (dateStr: string): MockDetailedDayData => {
-  // Simple mock, doesn't actually use the date to vary data much.
-  const isWeekend = ['Sat', 'Sun'].includes(format(parseISO(dateStr), 'EEE'));
-  return {
-    condition: isWeekend ? "Sunny" : "Partly Cloudy",
-    temp: isWeekend ? "32°C" : "30°C",
-    feelsLike: isWeekend ? "33°C" : "32°C",
-    humidity: `${50 + Math.floor(Math.random() * 20)}%`,
-    wind: `${10 + Math.floor(Math.random() * 10)} km/h ${['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)]}`,
-    pressure: `${1005 + Math.floor(Math.random() * 10)} hPa`,
-    uvIndex: ["Low", "Moderate", "High", "Very High"][Math.floor(Math.random() * 4)],
-    precipitationChance: `${Math.floor(Math.random() * 5) * 10}%`, // 0-40%
-    sunrise: "6:08 AM",
-    sunset: "6:50 PM",
-    hourlyForecast: [
-      { time: "07:00 AM", temp: "26°C", condition: "Clear", icon: <Sun className="h-5 w-5 text-yellow-400"/> },
-      { time: "10:00 AM", temp: "29°C", condition: "Partly Cloudy", icon: <CloudSun className="h-5 w-5 text-sky-500"/> },
-      { time: "01:00 PM", temp: "31°C", condition: "Sunny", icon: <Sun className="h-5 w-5 text-yellow-500"/> },
-      { time: "04:00 PM", temp: "30°C", condition: "Clouds Gathering", icon: <Cloud className="h-5 w-5 text-gray-500"/> },
-      { time: "07:00 PM", temp: "27°C", condition: "Clear Night", icon: <Moon className="h-5 w-5 text-blue-300"/> },
-    ]
-  };
-};
+interface DayDetails {
+  locationName: string;
+  country: string;
+  sunrise: string;
+  sunset: string;
+  // We might add aggregated daily min/max temp here if needed
+}
 
+const getWeatherIcon = (iconCode: string, sizeClass = "h-5 w-5"): JSX.Element => {
+  switch (iconCode) {
+    case "01d": return <Sun className={`${sizeClass} text-yellow-400`} />;
+    case "01n": return <Moon className={`${sizeClass} text-blue-300`} />;
+    case "02d": return <CloudSun className={`${sizeClass} text-sky-500`} />;
+    case "02n": return <CloudMoon className={`${sizeClass} text-sky-400`} />;
+    case "03d": case "03n": return <Cloud className={`${sizeClass} text-gray-400`} />;
+    case "04d": case "04n": return <Cloud className={`${sizeClass} text-gray-500`} />;
+    case "09d": case "09n": return <CloudDrizzle className={`${sizeClass} text-blue-400`} />;
+    case "10d": return <CloudRain className={`${sizeClass} text-blue-500`} />;
+    case "10n": return <CloudRain className={`${sizeClass} text-blue-400`} />;
+    case "11d": case "11n": return <CloudLightning className={`${sizeClass} text-yellow-500`} />;
+    case "13d": case "13n": return <CloudSnow className={`${sizeClass} text-blue-300`} />;
+    case "50d": case "50n": return <CloudFog className={`${sizeClass} text-gray-400`} />;
+    default: return <CloudSun className={`${sizeClass} text-sky-500`} />;
+  }
+};
 
 export default function WeatherDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dateParam = params.date as string; 
+
+  const [hourlyForecasts, setHourlyForecasts] = useState<TransformedHourlyForecast[]>([]);
+  const [dayDetails, setDayDetails] = useState<DayDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<WeatherLocation | null>(null);
+   const [usedDefaultLocation, setUsedDefaultLocation] = useState(false);
+
 
   let formattedDate = "N/A";
   let pageTitleDate = "Weather Details";
@@ -76,106 +110,201 @@ export default function WeatherDetailPage() {
     }
   }
   
-  const mockDetailedWeatherData = getMockDetailedDataForDate(dateParam || new Date().toISOString().split('T')[0]);
+  const fetchWeatherDataForDate = useCallback(async (latitude: number, longitude: number, targetDateStr: string) => {
+    setIsLoading(true);
+    setError(null);
+    setHourlyForecasts([]);
+    setDayDetails(null);
+
+    try {
+      const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to fetch weather: ${response.status} ${errorData.message || response.statusText}`);
+      }
+      const data = await response.json();
+
+      if (!data.list || !data.city) {
+        throw new Error("Weather data from API is incomplete or in an unexpected format.");
+      }
+      
+      const targetDate = parseISO(targetDateStr);
+
+      const relevantHourlyData = data.list.filter((item: HourlyForecastItem) => 
+        isSameDay(fromUnixTime(item.dt), targetDate)
+      );
+
+      const transformedHourly: TransformedHourlyForecast[] = relevantHourlyData.map((item: HourlyForecastItem) => ({
+        time: format(fromUnixTime(item.dt), "h:mm a"),
+        temp: `${Math.round(item.main.temp)}°C`,
+        condition: item.weather[0].description,
+        icon: getWeatherIcon(item.weather[0].icon),
+        feelsLike: `${Math.round(item.main.feels_like)}°C`,
+        humidity: `${item.main.humidity}%`,
+        wind: `${Math.round(item.wind.speed * 3.6)} km/h`, // m/s to km/h
+        pop: `${Math.round(item.pop * 100)}%`,
+      }));
+      setHourlyForecasts(transformedHourly);
+
+      setDayDetails({
+        locationName: data.city.name,
+        country: data.city.country,
+        sunrise: format(fromUnixTime(data.city.sunrise), "h:mm a"),
+        sunset: format(fromUnixTime(data.city.sunset), "h:mm a"),
+      });
+
+    } catch (err) {
+      console.error("Error fetching detailed weather data:", err);
+      setError(err instanceof Error ? err.message : "An unknown error occurred while fetching detailed weather.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (!dateParam) {
+      setError("Date parameter is missing.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported. Showing default location weather (Raipur).");
+      setUsedDefaultLocation(true);
+      fetchWeatherDataForDate(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, dateParam);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCurrentLocation({ latitude, longitude });
+        setUsedDefaultLocation(false);
+        fetchWeatherDataForDate(latitude, longitude, dateParam);
+      },
+      (geoError) => {
+        let errorMsg = "Unable to retrieve your location. ";
+        switch (geoError.code) {
+          case geoError.PERMISSION_DENIED: errorMsg += "Permission denied."; break;
+          case geoError.POSITION_UNAVAILABLE: errorMsg += "Information unavailable."; break;
+          case geoError.TIMEOUT: errorMsg += "Request timed out."; break;
+          default: errorMsg += "Unknown error."; break;
+        }
+        setError(errorMsg + " Showing default location weather (Raipur).");
+        setUsedDefaultLocation(true);
+        setCurrentLocation({ latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE });
+        fetchWeatherDataForDate(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, dateParam);
+      }
+    );
+  }, [dateParam, fetchWeatherDataForDate]);
+
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+          <p className="text-lg">Loading detailed weather...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center py-10 text-destructive">
+          <AlertTriangle className="h-12 w-12 mb-4" />
+          <p className="text-lg font-semibold text-center">Error Loading Details</p>
+          <p className="text-sm text-center whitespace-pre-wrap">{error}</p>
+        </div>
+      );
+    }
+
+    if (!dayDetails || hourlyForecasts.length === 0) {
+      return (
+        <div className="text-center py-10 text-muted-foreground">
+          <p>No detailed forecast available for this date.</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <CardDescription className="text-center text-sm text-muted-foreground -mt-2 mb-4 capitalize flex items-center justify-center">
+           <MapPin className="h-4 w-4 mr-1 text-primary" /> 
+           {usedDefaultLocation ? "Raipur, Chhattisgarh" : `${dayDetails.locationName}, ${dayDetails.country}`}
+        </CardDescription>
+        {usedDefaultLocation && error && !error.includes("Date parameter is missing.") && (
+            <Card className="bg-yellow-50 border-yellow-300 text-yellow-700 p-3 mb-4">
+                <div className="flex items-center">
+                <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
+                <p className="text-xs">{error.replace(" Showing default location weather (Raipur).", "")}</p>
+                </div>
+            </Card>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+            <div className="flex items-center p-3 bg-muted/50 rounded-lg">
+            <Sunrise className="h-6 w-6 mr-3 text-orange-400" />
+            <div>
+                <p className="text-muted-foreground">Sunrise</p>
+                <p className="font-semibold text-base">{dayDetails.sunrise}</p>
+            </div>
+            </div>
+            <div className="flex items-center p-3 bg-muted/50 rounded-lg">
+            <Sunset className="h-6 w-6 mr-3 text-orange-600" />
+            <div>
+                <p className="text-muted-foreground">Sunset</p>
+                <p className="font-semibold text-base">{dayDetails.sunset}</p>
+            </div>
+            </div>
+        </div>
+        
+        <div>
+            <h3 className="text-lg font-semibold mb-3 text-primary">Hourly Forecast for {pageTitleDate}</h3>
+            {hourlyForecasts.length > 0 ? (
+            <div className="flex overflow-x-auto space-x-3 pb-3 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent -mx-1 px-1">
+                {hourlyForecasts.map((hour, index) => (
+                <Card key={index} className="p-3 shadow-sm rounded-lg min-w-[120px] flex-shrink-0 text-center bg-card hover:bg-muted/50">
+                    <p className="text-sm font-medium">{hour.time}</p>
+                    <div className="my-1.5 flex justify-center">{React.cloneElement(hour.icon, { className: "h-7 w-7" })}</div>
+                    <p className="text-lg font-semibold">{hour.temp}</p>
+                    <p className="text-xs text-muted-foreground capitalize truncate" title={hour.condition}>{hour.condition}</p>
+                    <p className="text-xs text-muted-foreground">Feels: {hour.feelsLike}</p>
+                    <p className="text-xs text-blue-500"><Droplets className="inline h-3 w-3 mr-0.5" />{hour.pop}</p>
+                </Card>
+                ))}
+            </div>
+            ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">No hourly data for this day.</p>
+            )}
+        </div>
+        <p className="text-xs text-center text-muted-foreground pt-6">
+            Weather data provided by OpenWeatherMap.
+        </p>
+      </>
+    );
+  };
 
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-2 inline-flex items-center text-primary hover:text-primary/80">
+      <Button variant="ghost" onClick={() => router.back()} className="mb-0 inline-flex items-center text-primary hover:text-primary/80">
         <ChevronLeft className="mr-2 h-5 w-5" /> Back to Forecast
       </Button>
       <Card className="shadow-xl rounded-xl">
         <CardHeader className="bg-primary/10">
           <CardTitle className="flex items-center text-xl sm:text-2xl font-bold text-primary">
             <CloudSun className="mr-3 h-6 sm:h-7 w-6 sm:w-7" />
-            Weather Details
+            Detailed Forecast
           </CardTitle>
           <CardDescription className="text-sm sm:text-md">
-            Forecast for: {formattedDate}
+            3-Hourly breakdown for: {formattedDate}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
-          <div className="text-center mb-6">
-            <p className="text-5xl font-bold text-foreground">{mockDetailedWeatherData.temp}</p>
-            <p className="text-lg text-muted-foreground capitalize">{mockDetailedWeatherData.condition}</p>
-            <p className="text-sm text-muted-foreground">Feels like: {mockDetailedWeatherData.feelsLike}</p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-            <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-              <Droplets className="h-5 w-5 mr-2 text-primary" />
-              <div>
-                <p className="text-muted-foreground">Humidity</p>
-                <p className="font-semibold">{mockDetailedWeatherData.humidity}</p>
-              </div>
-            </div>
-            <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-              <Wind className="h-5 w-5 mr-2 text-primary" />
-              <div>
-                <p className="text-muted-foreground">Wind</p>
-                <p className="font-semibold">{mockDetailedWeatherData.wind}</p>
-              </div>
-            </div>
-            <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-              <Thermometer className="h-5 w-5 mr-2 text-primary" />
-              <div>
-                <p className="text-muted-foreground">Pressure</p>
-                <p className="font-semibold">{mockDetailedWeatherData.pressure}</p>
-              </div>
-            </div>
-             <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-              <Sun className="h-5 w-5 mr-2 text-yellow-500" />
-              <div>
-                <p className="text-muted-foreground">UV Index</p>
-                <p className="font-semibold">{mockDetailedWeatherData.uvIndex}</p>
-              </div>
-            </div>
-             <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-              <CloudRain className="h-5 w-5 mr-2 text-blue-500" />
-              <div>
-                <p className="text-muted-foreground">Precipitation</p>
-                <p className="font-semibold">{mockDetailedWeatherData.precipitationChance}</p>
-              </div>
-            </div>
-            <div className="flex items-center p-3 bg-muted/50 rounded-lg sm:col-span-1"> {/* Adjusted for 3 col layout */}
-               {/* Placeholder for another detail or empty */}
-            </div>
-          </div>
-
-           <div className="grid grid-cols-2 gap-4 text-sm pt-2">
-             <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-                <Sunrise className="h-5 w-5 mr-2 text-orange-400" />
-                <div>
-                  <p className="text-muted-foreground">Sunrise</p>
-                  <p className="font-semibold">{mockDetailedWeatherData.sunrise}</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 bg-muted/50 rounded-lg">
-                <Sunset className="h-5 w-5 mr-2 text-orange-600" />
-                <div>
-                  <p className="text-muted-foreground">Sunset</p>
-                  <p className="font-semibold">{mockDetailedWeatherData.sunset}</p>
-                </div>
-              </div>
-          </div>
-          
-          <div>
-            <h3 className="text-md font-semibold my-4 text-primary">Hourly Overview for {pageTitleDate} (Mock)</h3>
-            <div className="flex overflow-x-auto space-x-3 pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-              {mockDetailedWeatherData.hourlyForecast.map((hour, index) => (
-                <Card key={index} className="p-3 shadow-sm rounded-lg min-w-[100px] flex-shrink-0 text-center">
-                  <p className="text-xs font-medium">{hour.time}</p>
-                  <div className="my-1 flex justify-center">{hour.icon}</div>
-                  <p className="text-sm font-semibold">{hour.temp}</p>
-                  <p className="text-xs text-muted-foreground capitalize truncate">{hour.condition}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <p className="text-xs text-center text-muted-foreground pt-4">
-            Detailed weather information is illustrative and uses mock data.
-          </p>
+          {renderContent()}
         </CardContent>
       </Card>
     </div>
