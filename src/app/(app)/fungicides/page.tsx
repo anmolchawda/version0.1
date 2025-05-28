@@ -33,27 +33,32 @@ export default function FungicidesPage() {
       try {
         const response = await fetch(APPS_SCRIPT_URL);
         if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+          let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
+          try {
+            const body = await response.text();
+            errorText += `\nResponse body: ${body.substring(0, 500)}`; // Log part of the body if it's not JSON
+          } catch (e) {
+            // Ignore error reading body if it fails
+          }
+          throw new Error(errorText);
         }
         const data = await response.json();
-        console.log("Fetched data:", data); // Added console log as per your script
+        console.log("Fetched data from Apps Script:", data); // This is the crucial log
 
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else {
-          // If your Apps Script returns an object with a specific key for the data array, adjust here.
-          // For example, if it returns { "data": [...] }, you might use data.data
           console.warn("Fetched data is not an array. Please check Apps Script output.", data);
           // Attempt to find an array within the data if it's structured differently
           const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
-          if (dataArrayKey) {
+          if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
             setFungicidesData(data[dataArrayKey]);
           } else {
-            throw new Error("Fetched data format is not as expected (expected an array).");
+            throw new Error("Fetched data format is not as expected (expected an array or an object with an array property).");
           }
         }
       } catch (err) {
-        console.error("Fetch error:", err); // Matches your script's error log
+        console.error("Fetch error:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
       } finally {
         setIsLoading(false);
@@ -86,9 +91,9 @@ export default function FungicidesPage() {
             <div className="flex flex-col items-center justify-center py-10 text-destructive">
               <AlertTriangle className="h-12 w-12 mb-4" />
               <p className="text-lg font-semibold">Error Loading Data</p>
-              <p className="text-sm text-center">{error}</p>
+              <p className="text-sm text-center whitespace-pre-wrap">{error}</p>
               <p className="text-xs text-muted-foreground mt-2">
-                Please ensure the data source is correctly configured and accessible.
+                Please ensure the data source is correctly configured, publicly accessible, and returns data in the expected format.
               </p>
             </div>
           )}
@@ -99,23 +104,27 @@ export default function FungicidesPage() {
           )}
           {!isLoading && !error && fungicidesData.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {fungicidesData.map((item, index) => (
-                <Card key={item.TRADENAME || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
-                  <CardHeader className="pb-3 bg-muted/30">
-                    <CardTitle className="text-lg text-primary">{item.TRADENAME || "N/A"}</CardTitle>
-                    <CardDescription>{item.COMPANY || "N/A"}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-4 text-sm space-y-1.5">
-                    <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
-                    <p><strong>FRAC Code:</strong> {item["FRAC CODE"] || "N/A"}</p>
-                    <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
-                    <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
-                    <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
-                    <p><strong>Target:</strong> {item.TARGET || "N/A"}</p>
-                    <p><strong>Dose:</strong> {item.DOSE || "N/A"}</p>
-                  </CardContent>
-                </Card>
-              ))}
+              {fungicidesData.map((item, index) => {
+                // Added log to inspect each item, especially TRADENAME
+                console.log(`Rendering item ${index}: TRADENAME is '${item.TRADENAME}', Full item:`, item);
+                return (
+                  <Card key={item.TRADENAME || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-3 bg-muted/30">
+                      <CardTitle className="text-lg text-primary">{item.TRADENAME || "N/A"}</CardTitle>
+                      <CardDescription>{item.COMPANY || "N/A"}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-4 text-sm space-y-1.5">
+                      <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
+                      <p><strong>FRAC Code:</strong> {item["FRAC CODE"] || "N/A"}</p>
+                      <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
+                      <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
+                      <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
+                      <p><strong>Target:</strong> {item.TARGET || "N/A"}</p>
+                      <p><strong>Dose:</strong> {item.DOSE || "N/A"}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </CardContent>
