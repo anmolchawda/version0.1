@@ -2,11 +2,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle, MapPin, CloudSun, Sun, Cloud, CloudRain, Wind, Thermometer, Droplets } from "lucide-react";
-import { format } from 'date-fns';
-import { addDays } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
 interface WeatherData {
   locationName: string;
@@ -22,7 +22,8 @@ interface WeatherData {
 
 interface ForecastDay {
   day: string;
-  date: string;
+  date: string; // Display date, e.g., "MMM d"
+  isoDate: string; // URL-friendly date, e.g., "yyyy-MM-dd"
   icon: JSX.Element;
   tempHigh: string;
   tempLow: string;
@@ -44,8 +45,9 @@ const getMockWeatherData = (lat: number, lon: number): WeatherData => {
     const forecastDate = addDays(today, i);
     const dayCondition = randomCondition();
     forecastDays.push({
-      day: i === 1 ? "Tomorrow" : i === 2 ? "Day After" : `Day +${i-1}`,
-      date: format(forecastDate, "MMM d"),
+      day: format(forecastDate, "EEE"), // e.g., Mon, Tue
+      date: format(forecastDate, "MMM d"), // e.g., May 29
+      isoDate: format(forecastDate, "yyyy-MM-dd"),
       icon: React.cloneElement(dayCondition.icon, {className: "h-7 w-7"}),
       tempHigh: `${28 + Math.floor(Math.random() * 8)}°C`,
       tempLow: `${20 + Math.floor(Math.random() * 7)}°C`,
@@ -117,7 +119,7 @@ export default function WeatherPage() {
   useEffect(() => {
     fetchLocationAndWeather();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
+  }, []); 
 
   const renderWeatherContent = () => {
     if (isLoading) {
@@ -188,16 +190,20 @@ export default function WeatherPage() {
         <div>
           <h3 className="text-lg font-semibold mb-3 text-primary">10-Day Forecast</h3>
           <div className="flex overflow-x-auto space-x-3 pb-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-            {weatherData.forecast.map((day, index) => (
-              <Card key={index} className="p-3 shadow-md rounded-lg min-w-[140px] sm:min-w-[160px] flex-shrink-0">
-                <CardTitle className="text-sm font-medium mb-1">{day.day}</CardTitle>
-                <p className="text-xs text-muted-foreground mb-1.5">{day.date}</p>
-                <div className="flex items-center justify-center mb-1">
-                   {day.icon}
-                </div>
-                <p className="text-base font-semibold text-center">{day.tempHigh} / <span className="text-muted-foreground">{day.tempLow}</span></p>
-                <p className="text-xs text-muted-foreground mt-0.5 text-center truncate">{day.condition}</p>
-              </Card>
+            {weatherData.forecast.map((day) => (
+              <Link key={day.isoDate} href={`/weather/detail/${day.isoDate}`} passHref>
+                <Card 
+                  className="p-3 shadow-md rounded-lg min-w-[140px] sm:min-w-[160px] flex-shrink-0 cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all"
+                >
+                  <CardTitle className="text-sm font-medium mb-1">{day.day}</CardTitle>
+                  <p className="text-xs text-muted-foreground mb-1.5">{day.date}</p>
+                  <div className="flex items-center justify-center mb-1">
+                     {day.icon}
+                  </div>
+                  <p className="text-base font-semibold text-center">{day.tempHigh} / <span className="text-muted-foreground">{day.tempLow}</span></p>
+                  <p className="text-xs text-muted-foreground mt-0.5 text-center truncate">{day.condition}</p>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
