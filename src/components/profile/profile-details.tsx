@@ -105,7 +105,6 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
 
           <div className="pt-4 flex justify-center gap-3">
             {isCurrentUser ? (
-              // This button is now part of the card flow, not the absolute positioned one
               <Button asChild variant="outline"> 
                 <Link href="/settings/account">
                   <Settings className="mr-2 h-4 w-4" /> Edit Profile
@@ -126,20 +125,7 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
           </div>
         </CardContent>
 
-         {isCurrentUser && (
-          <Link href="/settings/account" passHref legacyBehavior>
-            <a 
-              className={cn(
-                "absolute bottom-3 right-3 h-9 w-9 bg-card/80 hover:bg-card text-muted-foreground hover:text-primary",
-                "rounded-full shadow-md backdrop-blur-sm flex items-center justify-center transition-colors",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
-              )}
-              aria-label="Edit profile"
-            >
-              <Edit3 className="h-5 w-5" />
-            </a>
-          </Link>
-        )}
+         {/* The Edit3 (PenLine-like) icon button that was here has been removed */}
       </Card>
     </>
   );
