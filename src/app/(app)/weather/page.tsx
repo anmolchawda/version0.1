@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle, MapPin, CloudSun, Sun, Cloud, CloudRain, Wind, Thermometer, Droplets } from "lucide-react";
+import { format } from 'date-fns';
+import { addDays } from 'date-fns';
 
 interface WeatherData {
   locationName: string;
@@ -20,6 +22,7 @@ interface WeatherData {
 
 interface ForecastDay {
   day: string;
+  date: string;
   icon: JSX.Element;
   tempHigh: string;
   tempLow: string;
@@ -27,30 +30,40 @@ interface ForecastDay {
 }
 
 const getMockWeatherData = (lat: number, lon: number): WeatherData => {
-  // In a real app, you'd call a weather API with lat/lon here.
-  // For India, you might adjust mock data based on typical regional weather.
   const conditions = [
     { name: "Sunny", icon: <Sun className="h-10 w-10 text-yellow-500" /> },
     { name: "Partly Cloudy", icon: <CloudSun className="h-10 w-10 text-sky-500" /> },
     { name: "Cloudy", icon: <Cloud className="h-10 w-10 text-gray-500" /> },
     { name: "Rainy", icon: <CloudRain className="h-10 w-10 text-blue-500" /> },
   ];
-  const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+  const randomCondition = () => conditions[Math.floor(Math.random() * conditions.length)];
+
+  const forecastDays: ForecastDay[] = [];
+  const today = new Date();
+  for (let i = 1; i <= 10; i++) {
+    const forecastDate = addDays(today, i);
+    const dayCondition = randomCondition();
+    forecastDays.push({
+      day: i === 1 ? "Tomorrow" : i === 2 ? "Day After" : `Day +${i-1}`,
+      date: format(forecastDate, "MMM d"),
+      icon: React.cloneElement(dayCondition.icon, {className: "h-7 w-7"}),
+      tempHigh: `${28 + Math.floor(Math.random() * 8)}°C`,
+      tempLow: `${20 + Math.floor(Math.random() * 7)}°C`,
+      condition: dayCondition.name,
+    });
+  }
+  const currentCondition = randomCondition();
 
   return {
     locationName: `Weather for Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)} (Mock Data - India Focus)`,
     temperature: `${25 + Math.floor(Math.random() * 10)}°C`,
-    condition: randomCondition.name,
-    conditionIcon: randomCondition.icon,
+    condition: currentCondition.name,
+    conditionIcon: currentCondition.icon,
     humidity: `${50 + Math.floor(Math.random() * 30)}%`,
     wind: `${5 + Math.floor(Math.random() * 15)} km/h`,
     sunrise: "6:05 AM",
     sunset: "6:45 PM",
-    forecast: [
-      { day: "Tomorrow", icon: conditions[Math.floor(Math.random() * conditions.length)].icon, tempHigh: "32°C", tempLow: "24°C", condition: conditions[Math.floor(Math.random() * conditions.length)].name },
-      { day: "Day After", icon: conditions[Math.floor(Math.random() * conditions.length)].icon, tempHigh: "33°C", tempLow: "25°C", condition: conditions[Math.floor(Math.random() * conditions.length)].name },
-      { day: "Next Day +2", icon: conditions[Math.floor(Math.random() * conditions.length)].icon, tempHigh: "31°C", tempLow: "23°C", condition: conditions[Math.floor(Math.random() * conditions.length)].name },
-    ],
+    forecast: forecastDays,
   };
 };
 
@@ -75,8 +88,6 @@ export default function WeatherPage() {
       (position) => {
         const { latitude, longitude } = position.coords;
         setLocation({ latitude, longitude });
-        // Simulate fetching weather data
-        // In a real app, call a weather API here with latitude and longitude
         const mockData = getMockWeatherData(latitude, longitude);
         setWeatherData(mockData);
         setIsLoading(false);
@@ -175,17 +186,17 @@ export default function WeatherPage() {
 
         {/* Forecast */}
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-primary">3-Day Forecast</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h3 className="text-lg font-semibold mb-3 text-primary">10-Day Forecast</h3>
+          <div className="flex overflow-x-auto space-x-3 pb-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
             {weatherData.forecast.map((day, index) => (
-              <Card key={index} className="p-4 shadow-md rounded-lg">
-                <CardTitle className="text-md font-medium mb-2">{day.day}</CardTitle>
-                <div className="flex items-center justify-between mb-1">
-                   {React.cloneElement(day.icon, { className: "h-7 w-7" })}
-                  <p className="text-lg font-semibold">{day.tempHigh}</p>
+              <Card key={index} className="p-3 shadow-md rounded-lg min-w-[140px] sm:min-w-[160px] flex-shrink-0">
+                <CardTitle className="text-sm font-medium mb-1">{day.day}</CardTitle>
+                <p className="text-xs text-muted-foreground mb-1.5">{day.date}</p>
+                <div className="flex items-center justify-center mb-1">
+                   {day.icon}
                 </div>
-                 <p className="text-xs text-muted-foreground text-right -mt-1">Low: {day.tempLow}</p>
-                <p className="text-sm text-muted-foreground mt-1">{day.condition}</p>
+                <p className="text-base font-semibold text-center">{day.tempHigh} / <span className="text-muted-foreground">{day.tempLow}</span></p>
+                <p className="text-xs text-muted-foreground mt-0.5 text-center truncate">{day.condition}</p>
               </Card>
             ))}
           </div>
