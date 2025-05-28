@@ -7,13 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import type { User } from '@/types';
-import { MapPin, Leaf, UserPlus, MessageSquare, Settings, Edit3 } from 'lucide-react';
+import { MapPin, Leaf, UserPlus, MessageSquare, Settings } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
   DialogOverlay,
   DialogTrigger,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 
@@ -46,10 +48,13 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
                 </Avatar>
               </button>
             </DialogTrigger>
-            {user.avatarUrl && (
-            <DialogOverlay className="bg-black/70 backdrop-blur-sm fixed inset-0 z-50" />
-            )}
+            {user.avatarUrl ? (
+              <DialogOverlay className="bg-black/70 backdrop-blur-sm fixed inset-0 z-50" />
+            ) : null}
             <DialogContent className="p-0 max-w-md w-auto bg-transparent border-none shadow-none flex items-center justify-center z-[51]">
+              <DialogHeader className="sr-only"> {/* Visually hidden header for accessibility */}
+                <DialogTitle>Enlarged Profile Picture of {user.name || user.username}</DialogTitle>
+              </DialogHeader>
               {user.avatarUrl ? (
                 <Image
                   src={user.avatarUrl}
@@ -124,8 +129,6 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
             )}
           </div>
         </CardContent>
-
-         {/* The Edit3 (PenLine-like) icon button that was here has been removed */}
       </Card>
     </>
   );
