@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type FormEvent, useEffect } from 'react';
+import { useState, type FormEvent, useEffect, type ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,62 +23,70 @@ import {
 const MOCK_CURRENT_USER_ID = '1';
 const initialUser = getPlaceholderUser(MOCK_CURRENT_USER_ID) || ({} as User);
 
+const NO_STATE_VALUE = "--no-state--";
+const NO_CITY_VALUE = "--no-city--";
+
 export function ProfileEditForm() {
   const [username, setUsername] = useState(initialUser.username || '');
   const [name, setName] = useState(initialUser.name || '');
   const [bio, setBio] = useState(initialUser.bio || '');
-  // const [location, setLocation] = useState(initialUser.location || ''); // Replaced by dropdowns
   const [produceInput, setProduceInput] = useState((initialUser.produce || []).join(', '));
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(initialUser.avatarUrl || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const [selectedStateCode, setSelectedStateCode] = useState<string>('');
-  const [selectedCityValue, setSelectedCityValue] = useState<string>('');
+  const [selectedStateCode, setSelectedStateCode] = useState<string>(''); // Can be '' for placeholder, or a valid state code, or NO_STATE_VALUE
+  const [selectedCityValue, setSelectedCityValue] = useState<string>('');  // Can be '' for placeholder, or a valid city code, or NO_CITY_VALUE
   const [availableCities, setAvailableCities] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
-    // Attempt to pre-fill state and city if initialUser.location exists and is parsable
-    // This is a simplified parsing, might need to be more robust for real-world variations
+    let prefillStateCode = ''; 
+    let prefillCityValue = ''; 
+
     if (initialUser.location) {
       const parts = initialUser.location.split(',').map(p => p.trim());
-      if (parts.length === 2) {
-        const cityName = parts[0];
-        const stateIdentifier = parts[1]; // Could be code or full name
+      if (parts.length >= 1) { 
+        const stateIdentifier = parts.length === 1 ? parts[0] : parts[1]; 
+        const cityName = parts.length === 2 ? parts[0] : undefined;
 
         const foundState = placeholderStates.find(
           s => s.value.toLowerCase() === stateIdentifier.toLowerCase() || s.label.toLowerCase() === stateIdentifier.toLowerCase()
         );
 
         if (foundState) {
-          setSelectedStateCode(foundState.value);
+          prefillStateCode = foundState.value;
           const citiesForState = placeholderCities[foundState.value as keyof typeof placeholderCities] || [];
-          setAvailableCities(citiesForState);
+          // Intentionally set availableCities here so it's ready if prefillStateCode is valid
+          setAvailableCities(citiesForState); 
           
-          const foundCity = citiesForState.find(
-            c => c.label.toLowerCase() === cityName.toLowerCase() || c.value.toLowerCase() === cityName.toLowerCase()
-          );
-          if (foundCity) {
-            setSelectedCityValue(foundCity.value);
+          if (cityName) {
+            const foundCity = citiesForState.find(
+              c => c.label.toLowerCase() === cityName.toLowerCase() || c.value.toLowerCase() === cityName.toLowerCase()
+            );
+            if (foundCity) {
+              prefillCityValue = foundCity.value;
+            }
           }
         }
       }
     }
+    setSelectedStateCode(prefillStateCode);
+    setSelectedCityValue(prefillCityValue);
   }, []);
 
 
   useEffect(() => {
-    if (selectedStateCode) {
+    if (selectedStateCode && selectedStateCode !== NO_STATE_VALUE) {
       setAvailableCities(placeholderCities[selectedStateCode as keyof typeof placeholderCities] || []);
     } else {
       setAvailableCities([]);
     }
-    setSelectedCityValue(''); // Reset city when state changes
+    // City value is reset when state changes (handled in state Select's onValueChange)
   }, [selectedStateCode]);
 
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setAvatarFile(file);
@@ -94,29 +102,26 @@ export function ProfileEditForm() {
     event.preventDefault();
     setIsSubmitting(true);
     
-    let locationString = initialUser.location || ''; // Default to original if not changed
-    if (selectedStateCode && selectedCityValue) {
-      const stateLabel = placeholderStates.find(s => s.value === selectedStateCode)?.label;
-      const cityLabel = (placeholderCities[selectedStateCode as keyof typeof placeholderCities] || []).find(c => c.value === selectedCityValue)?.label;
-      if (cityLabel && stateLabel) {
-        locationString = `${cityLabel}, ${stateLabel}`;
-      } else if (stateLabel) { // Only state selected
-        locationString = stateLabel;
-      } else {
-        locationString = ''; // If selections are invalid or cleared
-      }
-    } else if (selectedStateCode) { // Only state selected
-        const stateLabel = placeholderStates.find(s => s.value === selectedStateCode)?.label;
-        locationString = stateLabel || '';
-    } else {
-      // If no new selection, retain original or set to empty if it was never set
-      // For this simulation, if no selection, we can imply user wants to clear it or keep original
-      // If we want to explicitly clear if untouched, set locationString = '';
-      // For now, it will default to initialUser.location unless changed.
-      // If we want to set to empty if dropdowns were interacted with then cleared:
-      // locationString = ''; // if selectedStateCode and selectedCityValue are empty after interaction
-    }
+    let locationString = ''; 
+    
+    const finalSelectedStateCode = selectedStateCode === NO_STATE_VALUE ? '' : selectedStateCode;
+    const finalSelectedCityValue = selectedCityValue === NO_CITY_VALUE ? '' : selectedCityValue;
 
+    if (finalSelectedStateCode) {
+      const stateLabel = placeholderStates.find(s => s.value === finalSelectedStateCode)?.label;
+      if (stateLabel) {
+        if (finalSelectedCityValue) {
+          const cityLabel = (placeholderCities[finalSelectedStateCode as keyof typeof placeholderCities] || []).find(c => c.value === finalSelectedCityValue)?.label;
+          if (cityLabel) {
+            locationString = `${cityLabel}, ${stateLabel}`;
+          } else {
+            locationString = stateLabel; 
+          }
+        } else {
+          locationString = stateLabel; 
+        }
+      }
+    }
 
     const updatedProfile = {
       username,
@@ -129,6 +134,7 @@ export function ProfileEditForm() {
     };
     
     console.log('Updating profile:', updatedProfile);
+    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
     toast({
@@ -155,7 +161,7 @@ export function ProfileEditForm() {
                         onChange={handleAvatarChange}
                         className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF up to 2MB. Click to upload.</p>
+                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, GIF up to 2MB.</p>
                 </div>
             </div>
         </div>
@@ -179,12 +185,18 @@ export function ProfileEditForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
                 <Label htmlFor="state" className="text-base font-medium">State</Label>
-                <Select value={selectedStateCode} onValueChange={setSelectedStateCode}>
+                <Select 
+                  value={selectedStateCode} 
+                  onValueChange={(value) => {
+                    setSelectedStateCode(value);
+                    setSelectedCityValue(''); // Reset city when state changes
+                  }}
+                >
                     <SelectTrigger id="state">
                         <SelectValue placeholder="Select State" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value={NO_STATE_VALUE}>None</SelectItem>
                         {placeholderStates.map(state => (
                             <SelectItem key={state.value} value={state.value}>{state.label}</SelectItem>
                         ))}
@@ -193,16 +205,20 @@ export function ProfileEditForm() {
             </div>
             <div className="space-y-2">
                 <Label htmlFor="city" className="text-base font-medium">City</Label>
-                <Select value={selectedCityValue} onValueChange={setSelectedCityValue} disabled={!selectedStateCode || availableCities.length === 0}>
+                <Select 
+                  value={selectedCityValue} 
+                  onValueChange={setSelectedCityValue} 
+                  disabled={!selectedStateCode || selectedStateCode === NO_STATE_VALUE || availableCities.length === 0}
+                >
                     <SelectTrigger id="city">
                         <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                     <SelectContent>
-                         <SelectItem value="">None</SelectItem>
+                         <SelectItem value={NO_CITY_VALUE}>None</SelectItem>
                         {availableCities.map(city => (
                             <SelectItem key={city.value} value={city.value}>{city.label}</SelectItem>
                         ))}
-                         {availableCities.length === 0 && selectedStateCode && <SelectItem value="no-cities" disabled>No cities listed for this state</SelectItem>}
+                         {availableCities.length === 0 && selectedStateCode && selectedStateCode !== NO_STATE_VALUE && <SelectItem value="no-cities" disabled>No cities listed for this state</SelectItem>}
                     </SelectContent>
                 </Select>
             </div>
