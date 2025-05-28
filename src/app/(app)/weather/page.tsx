@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   Loader2, AlertTriangle, CloudSun, Sun, Cloud, CloudRain, Wind, Droplets,
-  Moon, CloudMoon, CloudDrizzle, CloudLightning, CloudSnow, CloudFog, Sunrise, Sunset, MapPin
+  Moon, CloudMoon, CloudDrizzle, CloudLightning, CloudSnow, CloudFog, Sunrise, Sunset, MapPin, Thermometer
 } from "lucide-react";
-import { format, fromUnixTime } from 'date-fns';
+import { format, fromUnixTime, parseISO, startOfTomorrow, isSameDay } from 'date-fns';
+import Link from 'next/link';
 
 interface WeatherData {
   locationName: string;
+  country: string;
   temperature: string;
   condition: string;
   conditionIcon: JSX.Element;
@@ -22,15 +24,54 @@ interface WeatherData {
   sunset: string;
   feelsLike: string;
   pressure: string;
-  visibility: string;
+  visibility?: string; // Visibility might not be in the forecast API directly for current
 }
 
-const OPENWEATHERMAP_API_KEY = "f771ba6953523ed0706f829f70e2d063"; 
+interface ForecastListItem {
+  dt: number;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+  };
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
+  clouds: {
+    all: number;
+  };
+  wind: {
+    speed: number;
+    deg: number;
+    gust?: number;
+  };
+  visibility: number;
+  pop: number;
+  dt_txt: string;
+}
+
+interface DailyForecast {
+  isoDate: string;
+  dayName: string;
+  dateStr: string;
+  tempMin: string;
+  tempMax: string;
+  condition: string;
+  conditionIcon: JSX.Element;
+}
+
+const OPENWEATHERMAP_API_KEY = "f771ba6953523ed0706f829f70e2d063";
 const DEFAULT_LATITUDE = 21.2514; // Raipur Latitude
 const DEFAULT_LONGITUDE = 81.6296; // Raipur Longitude
 const DEFAULT_LOCATION_NAME = "Raipur, Chhattisgarh";
 
-const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element => {
+const getWeatherIcon = (iconCode: string, sizeClass = "h-6 w-6"): JSX.Element => {
   switch (iconCode) {
     case "01d": return <Sun className={`${sizeClass} text-yellow-500`} />;
     case "01n": return <Moon className={`${sizeClass} text-blue-300`} />;
@@ -39,8 +80,8 @@ const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element 
     case "03d": case "03n": return <Cloud className={`${sizeClass} text-gray-500`} />;
     case "04d": case "04n": return <Cloud className={`${sizeClass} text-gray-600`} />;
     case "09d": case "09n": return <CloudDrizzle className={`${sizeClass} text-blue-500`} />;
-    case "10d": return <CloudRain className={`${sizeClass} text-blue-600`} />;
-    case "10n": return <CloudRain className={`${sizeClass} text-blue-500`} />;
+    case "10d": return <CloudRain className={`${sizeClass} text-blue-600`} />; // Day rain
+    case "10n": return <CloudRain className={`${sizeClass} text-blue-500`} />; // Night rain
     case "11d": case "11n": return <CloudLightning className={`${sizeClass} text-yellow-400`} />;
     case "13d": case "13n": return <CloudSnow className={`${sizeClass} text-blue-300`} />;
     case "50d": case "50n": return <CloudFog className={`${sizeClass} text-gray-400`} />;
@@ -50,15 +91,55 @@ const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element 
 
 export default function WeatherPage() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [dailyForecast, setDailyForecast] = useState<DailyForecast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [usedDefaultLocation, setUsedDefaultLocation] = useState(false);
 
+  const processForecastData = (forecastList: ForecastListItem[]): DailyForecast[] => {
+    const dailyData: { [date: string]: { temps: number[], icons: string[], conditions: string[] } } = {};
+
+    forecastList.forEach(item => {
+      const date = format(fromUnixTime(item.dt), "yyyy-MM-dd");
+      if (!dailyData[date]) {
+        dailyData[date] = { temps: [], icons: [], conditions: [] };
+      }
+      dailyData[date].temps.push(item.main.temp);
+      dailyData[date].icons.push(item.weather[0].icon);
+      dailyData[date].conditions.push(item.weather[0].description);
+    });
+    
+    const processedForecast: DailyForecast[] = [];
+    Object.keys(dailyData).slice(0, 5).forEach(date => { // Limit to 5 days
+      const dayInfo = dailyData[date];
+      const tempMin = Math.round(Math.min(...dayInfo.temps));
+      const tempMax = Math.round(Math.max(...dayInfo.temps));
+      // For simplicity, pick the icon and condition from the midday forecast or first available
+      // A more complex approach would be to find the most representative one
+      const representativeIcon = dayInfo.icons[Math.floor(dayInfo.icons.length / 2)] || dayInfo.icons[0];
+      const representativeCondition = dayInfo.conditions[Math.floor(dayInfo.conditions.length / 2)] || dayInfo.conditions[0];
+      
+      processedForecast.push({
+        isoDate: date,
+        dayName: format(parseISO(date), "EEE"),
+        dateStr: format(parseISO(date), "MMM d"),
+        tempMin: `${tempMin}°C`,
+        tempMax: `${tempMax}°C`,
+        condition: representativeCondition,
+        conditionIcon: getWeatherIcon(representativeIcon, "h-5 w-5"),
+      });
+    });
+    return processedForecast;
+  };
+
   const fetchWeather = useCallback(async (latitude: number, longitude: number) => {
     setIsLoading(true);
     setError(null);
+    setWeatherData(null);
+    setDailyForecast([]);
+
     try {
-      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
+      const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
       const response = await fetch(apiUrl);
       
       if (!response.ok) {
@@ -67,49 +148,51 @@ export default function WeatherPage() {
       }
       const data = await response.json();
 
-      if (!data.weather || !data.main || !data.wind || !data.sys) {
-        throw new Error("Weather data from API is incomplete.");
+      if (!data.list || data.list.length === 0 || !data.city) {
+        throw new Error("Weather data from API is incomplete or in an unexpected format.");
       }
 
-      const transformedData: WeatherData = {
-        locationName: data.name || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`,
-        temperature: `${Math.round(data.main.temp)}°C`,
-        condition: data.weather[0].description,
-        conditionIcon: getWeatherIcon(data.weather[0].icon),
-        humidity: `${data.main.humidity}%`,
-        wind: `${Math.round(data.wind.speed * 3.6)} km/h`, // m/s to km/h
-        sunrise: format(fromUnixTime(data.sys.sunrise), "h:mm a"),
-        sunset: format(fromUnixTime(data.sys.sunset), "h:mm a"),
-        feelsLike: `${Math.round(data.main.feels_like)}°C`,
-        pressure: `${data.main.pressure} hPa`,
-        visibility: `${(data.visibility / 1000).toFixed(1)} km`,
+      const firstForecast = data.list[0];
+      const transformedCurrentData: WeatherData = {
+        locationName: data.city.name || `${latitude.toFixed(2)}, ${longitude.toFixed(2)}`,
+        country: data.city.country || '',
+        temperature: `${Math.round(firstForecast.main.temp)}°C`,
+        condition: firstForecast.weather[0].description,
+        conditionIcon: getWeatherIcon(firstForecast.weather[0].icon, "h-10 w-10"),
+        humidity: `${firstForecast.main.humidity}%`,
+        wind: `${Math.round(firstForecast.wind.speed * 3.6)} km/h`, // m/s to km/h
+        sunrise: format(fromUnixTime(data.city.sunrise), "h:mm a"),
+        sunset: format(fromUnixTime(data.city.sunset), "h:mm a"),
+        feelsLike: `${Math.round(firstForecast.main.feels_like)}°C`,
+        pressure: `${firstForecast.main.pressure} hPa`,
+        visibility: `${(firstForecast.visibility / 1000).toFixed(1)} km`,
       };
-      setWeatherData(transformedData);
+      setWeatherData(transformedCurrentData);
+      setDailyForecast(processForecastData(data.list));
+
     } catch (err) {
       console.error("Error fetching weather data:", err);
       setError(err instanceof Error ? err.message : "An unknown error occurred while fetching weather.");
-      // Fallback to default location if API call fails for any reason
-      if (!usedDefaultLocation) { // Avoid infinite loop if default location also fails
-        console.log("API fetch failed, attempting default location: Raipur");
-        setUsedDefaultLocation(true); // Mark that we've tried the default
+      if (!usedDefaultLocation) {
+        setUsedDefaultLocation(true);
         fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
       }
     } finally {
       setIsLoading(false);
     }
-  }, [usedDefaultLocation]); // Add usedDefaultLocation to dependency array
+  }, [usedDefaultLocation]);
   
   const fetchLocationAndWeather = useCallback(() => {
     setIsLoading(true);
     setError(null);
     setWeatherData(null);
-    setUsedDefaultLocation(false); // Reset default location flag
+    setDailyForecast([]);
+    setUsedDefaultLocation(false);
 
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser. Showing weather for Raipur.");
       setUsedDefaultLocation(true);
       fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-      setIsLoading(false); // Already handled by fetchWeather
       return;
     }
 
@@ -121,23 +204,14 @@ export default function WeatherPage() {
       (err) => {
         let errorMsg = "Unable to retrieve your location. ";
         switch (err.code) {
-          case err.PERMISSION_DENIED:
-            errorMsg += "Location permission denied.";
-            break;
-          case err.POSITION_UNAVAILABLE:
-            errorMsg += "Location information is unavailable.";
-            break;
-          case err.TIMEOUT:
-            errorMsg += "The request to get user location timed out.";
-            break;
-          default:
-            errorMsg += "An unknown error occurred.";
-            break;
+          case err.PERMISSION_DENIED: errorMsg += "Location permission denied."; break;
+          case err.POSITION_UNAVAILABLE: errorMsg += "Location information is unavailable."; break;
+          case err.TIMEOUT: errorMsg += "The request to get user location timed out."; break;
+          default: errorMsg += "An unknown error occurred."; break;
         }
         setError(errorMsg + " Showing weather for Raipur.");
         setUsedDefaultLocation(true);
         fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
-        // setIsLoading(false) will be handled by fetchWeather
       }
     );
   }, [fetchWeather]);
@@ -156,12 +230,12 @@ export default function WeatherPage() {
       );
     }
 
-    if (error && !weatherData) { // Show error only if no weather data is available (e.g. initial load with error)
+    if (error && !weatherData) {
       return (
         <div className="flex flex-col items-center justify-center py-10 text-destructive">
           <AlertTriangle className="h-12 w-12 mb-4" />
           <p className="text-lg font-semibold text-center">Error Fetching Weather</p>
-          <p className="text-sm text-center mt-2">{error}</p>
+          <p className="text-sm text-center mt-2 whitespace-pre-wrap">{error}</p>
           <Button onClick={fetchLocationAndWeather} className="mt-6">Try Again</Button>
         </div>
       );
@@ -179,15 +253,16 @@ export default function WeatherPage() {
     return (
       <div className="space-y-4">
         <CardDescription className="text-center text-sm text-muted-foreground -mt-2 capitalize flex items-center justify-center">
-           <MapPin className="h-4 w-4 mr-1 text-primary" /> {usedDefaultLocation ? DEFAULT_LOCATION_NAME : weatherData.locationName}
+           <MapPin className="h-4 w-4 mr-1 text-primary" /> 
+           {usedDefaultLocation ? DEFAULT_LOCATION_NAME : `${weatherData.locationName}, ${weatherData.country}`}
         </CardDescription>
-         {error && usedDefaultLocation && ( // Show specific error message if default location was used due to an error
-          <Alert variant="default" className="bg-yellow-50 border-yellow-300 text-yellow-700">
-            <AlertTriangle className="h-4 w-4 !text-yellow-600" />
-            <AlertDescription className="text-xs">
-              {error}
-            </AlertDescription>
-          </Alert>
+        {error && usedDefaultLocation && (
+          <Card className="bg-yellow-50 border-yellow-300 text-yellow-700 p-3">
+            <div className="flex items-center">
+              <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
+              <p className="text-xs">{error}</p>
+            </div>
+          </Card>
         )}
 
         <Card className="shadow-lg rounded-xl bg-gradient-to-br from-primary/20 via-card to-accent/10">
@@ -217,18 +292,39 @@ export default function WeatherPage() {
                 <span>Sunset: {weatherData.sunset}</span>
               </div>
                <div className="flex items-center justify-start space-x-1.5">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-gauge-circle text-primary"><path d="M15.8 2.9A10 10 0 0 0 8.2 2.9"/><path d="M12 12c-1.94 0-3.5-1.56-3.5-3.5S10.06 5 12 5s3.5 1.56 3.5 3.5S13.94 12 12 12z"/><path d="M12 12a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM7 12a5 5 0 0 1 5-5"/><path d="M12 22a5 5 0 0 0 5-5"/></svg>
+                <Thermometer className="h-4 w-4 text-primary" /> {/* Using Thermometer for Pressure */}
                 <span>Pressure: {weatherData.pressure}</span>
               </div>
-              <div className="flex items-center justify-start space-x-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye text-primary"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span>Visibility: {weatherData.visibility}</span>
-              </div>
+              {weatherData.visibility && (
+                <div className="flex items-center justify-start space-x-1.5">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye text-primary"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <span>Visibility: {weatherData.visibility}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
+        
+        {dailyForecast.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3 text-primary">5-Day Forecast</h3>
+            <div className="flex overflow-x-auto space-x-3 pb-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+              {dailyForecast.map((day) => (
+                <Link key={day.isoDate} href={`/weather/detail/${day.isoDate}`} passHref>
+                  <Card className="p-3 shadow-sm rounded-lg min-w-[120px] sm:min-w-[140px] flex-shrink-0 text-center cursor-pointer hover:shadow-md transition-shadow bg-card hover:bg-muted/50">
+                    <p className="text-xs font-semibold">{day.dayName}</p>
+                    <p className="text-xs text-muted-foreground">{day.dateStr}</p>
+                    <div className="my-1.5 flex justify-center">{day.conditionIcon}</div>
+                    <p className="text-sm font-semibold">{day.tempMax} / {day.tempMin}</p>
+                    <p className="text-xs text-muted-foreground capitalize truncate">{day.condition}</p>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
         <p className="text-xs text-center text-muted-foreground pt-2">
-          Current weather data provided by OpenWeatherMap.
+          Weather data provided by OpenWeatherMap.
         </p>
       </div>
     );
@@ -250,4 +346,3 @@ export default function WeatherPage() {
     </div>
   );
 }
-
