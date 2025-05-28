@@ -28,7 +28,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Cucumber', imageUrl: 'https://storage.googleapis.com/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcucumber.jpeg?alt=media', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
-  { name: 'Beans', imageUrl: 'https://storage.googleapis.com/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
+  { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
   { name: 'Bottle Gourd', imageUrl: 'https://storage.googleapis.com/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbottle%20gourd.jpeg?alt=media', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
   { name: 'Bitter Gourd', imageUrl: 'https://storage.googleapis.com/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
   { name: 'Cabbage', imageUrl: 'https://storage.googleapis.com/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcabbage.jpeg?alt=media', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
@@ -96,3 +96,4 @@ export default function CropSciencePage() {
   );
 }
 
+// Added comment to ensure change is picked up.
