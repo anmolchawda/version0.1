@@ -14,7 +14,7 @@ import {
   SprayCan,
   Bug,
   Code2,
-  Cpu, // Changed from Brain
+  Cpu,
   Settings as SettingsIcon,
   Home,
   Search,
@@ -37,7 +37,9 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
     if (onClick) {
       onClick();
     }
-    if (window.innerWidth < 768) { 
+    // For mobile, always close sidebar on link click.
+    // For desktop, only close if it's set to overlap (which is current behavior with overlay).
+    if (window.innerWidth < 768 || isSidebarOpen) { // Simplified: close if open or on mobile
         contextCloseSidebar();
     }
   };
@@ -100,7 +102,7 @@ export function Sidebar() {
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
     { href: '/irac-frac-codes', label: currentLanguage === 'hi' ? 'IRAC/FRAC कोड' : 'IRAC/FRAC Code', icon: <Code2 className="h-5 w-5" /> },
-    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Cpu className="h-5 w-5" /> }, // Changed Brain to Cpu
+    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu className="h-5 w-5" /> },
   ], [currentLanguage]);
 
   const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
@@ -112,19 +114,18 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg", // Adjusted z-index to 30
         "top-16", 
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Ensure it slides out completely
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
       )}
     >
-      {/* Removed the empty div that was here to bring content up */}
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
             link={link}
             isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
-            onClick={closeSidebar} 
+            // onClick prop will be handled by NavLinkItem itself if needed for mobile
           />
         ))}
       </div>
@@ -140,8 +141,9 @@ export function Sidebar() {
                   !isSidebarOpen && "justify-center"
                 )}
                 asChild
+                onClick={isSidebarOpen ? closeSidebar : undefined} 
               >
-                <Link href="/settings" onClick={closeSidebar}>
+                <Link href="/settings">
                   <SettingsIcon className="h-5 w-5" />
                   {isSidebarOpen && <span>{settingsLabel}</span>}
                 </Link>
@@ -178,7 +180,7 @@ export function Sidebar() {
                   </div>
                 </Link>
               </TooltipTrigger>
-              {!isSidebarOpen && (
+              {!isSidebarOpen && ( // This condition should not be met if we hide the element itself
                  <TooltipContent side="right" className="bg-background text-foreground border">
                   <p>{userNameDisplay}</p>
                   <p className="text-xs text-muted-foreground">@{mockUser.username}</p>
@@ -187,7 +189,7 @@ export function Sidebar() {
             </Tooltip>
           </TooltipProvider>
         )}
-        {mockUser && !isSidebarOpen && (
+        {mockUser && !isSidebarOpen && ( // This is the icon-only view for the user profile when collapsed
            <div className="flex justify-center p-2">
              <TooltipProvider delayDuration={0}>
                 <Tooltip>
@@ -211,4 +213,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
