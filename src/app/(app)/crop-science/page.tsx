@@ -18,13 +18,13 @@ interface CropInfo {
 // Ensure public HTTP(S) URLs are used for images. gs:// URIs are not web-accessible.
 const commonCrops: CropInfo[] = [
   // Vegetables
-  { name: 'Tomato', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
+  { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
   { name: 'Potato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/potato.jpg', aiHint: 'potato vegetable', slug: 'potato', unoptimized: true },
   { name: 'Onion', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FONION.jpeg?alt=media&token=110b1e81-e150-4353-ad3f-ccdb45efb616', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/carrot.jpg', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
   { name: 'Broccoli', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBROCCOLI.jpg?alt=media&token=1ea3e09d-cbbc-44be-885f-d7a1a60c7281', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
-  { name: 'Bell Pepper', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/red-yellow-capsicum.jpg', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
+  { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
   { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
@@ -118,5 +118,4 @@ export default function CropSciencePage() {
 // Updated image for Pomegranate
 // Updated image for Kiwi
 // Removed placeholder image from GCS
-
-
+// Updated image for Bell Pepper with Firebase Storage URL
