@@ -9,14 +9,14 @@ interface FungicideItem {
   "TRADE NAME": string;
   "COMPANY": string;
   "TECHNICAL NAME": string;
-  "FRAC GROUP": string; // Changed from FRAC CODE to FRAC GROUP as per user script
+  "FRAC GROUP": string; // Changed from FRAC CODE
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
   "TARGET": string;
   "DOSE": string;
-  // Add any other properties that might come from your sheet
-  [key: string]: any; // Allow for other potential keys
+  // Allow for other potential keys from the sheet
+  [key: string]: any; 
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5fW9-cuZpEhXsiz2riv4CwVUr78-hREC5wINice9F2I0UVgHQDEzE_RHmnh_YfQw_GA/exec";
@@ -35,7 +35,7 @@ export default function FungicidesPage() {
         if (!response.ok) {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
-            const body = await response.text(); // Attempt to get more info if not JSON
+            const body = await response.text(); 
             errorText += `\nResponse body: ${body.substring(0, 500)}`;
           } catch (e) {
             // Ignore error reading body
@@ -49,21 +49,25 @@ export default function FungicidesPage() {
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-            // Attempt to find an array within the data if it's structured differently e.g. { "data": [...] } or similar
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
                  console.log(`Found data in nested key: ${dataArrayKey}`);
                 setFungicidesData(data[dataArrayKey]);
             } else {
-                console.warn("Fetched data is an object but no array found within its properties.", data);
-                throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
+                console.warn("Fetched data is an object but no array found within its properties. Assuming top-level keys are the items if it's a flat object used as a list (uncommon).", data);
+                // Fallback: if data is like { "0": {...}, "1": {...} }
+                if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
+                  setFungicidesData(Object.values(data) as FungicideItem[]);
+                } else {
+                   throw new Error("Fetched data format is not a recognized array or object containing an array.");
+                }
             }
         } else {
           console.warn("Fetched data is not an array or a recognizable object. Please check Apps Script output.", data);
-          throw new Error("Fetched data format is not as expected (expected an array).");
+          throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Fetch error in FungicidesPage:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
       } finally {
         setIsLoading(false);
@@ -111,8 +115,8 @@ export default function FungicidesPage() {
           {!isLoading && !error && fungicidesData.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {fungicidesData.map((item, index) => {
-                // Added log to inspect each item, especially TRADENAME
-                // console.log(`Rendering item ${index}: TRADE NAME is '${item["TRADE NAME"]}', Full item:`, item);
+                // This console.log helps verify the exact structure of each item
+                // console.log(`Rendering item ${index}:`, item); 
                 return (
                   <Card key={item["TRADE NAME"] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3 bg-muted/30">
@@ -121,7 +125,7 @@ export default function FungicidesPage() {
                     </CardHeader>
                     <CardContent className="pt-4 text-sm space-y-1.5">
                       <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
-                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p>
+                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p> {/* Corrected from FRAC CODE */}
                       <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
                       <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
                       <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
