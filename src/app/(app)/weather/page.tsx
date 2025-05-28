@@ -1,7 +1,7 @@
 // src/app/(app)/weather/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle, MapPin, CloudSun, Sun, Cloud, CloudRain, Wind, Thermometer, Droplets } from "lucide-react";
