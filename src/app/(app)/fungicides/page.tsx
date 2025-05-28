@@ -6,15 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { SprayCan, Loader2, AlertTriangle } from "lucide-react";
 
 interface FungicideItem {
-  TRADENAME: string;
-  COMPANY: string;
+  "TRADE NAME": string;
+  "COMPANY": string;
   "TECHNICAL NAME": string;
-  "FRAC CODE": string;
+  "FRAC GROUP": string; // Changed from FRAC CODE to FRAC GROUP as per user script
   "CLASS/FAMILY CONTROL": string;
   "S/C": string;
   "TL/OVI": string;
-  TARGET: string;
-  DOSE: string;
+  "TARGET": string;
+  "DOSE": string;
   // Add any other properties that might come from your sheet
   [key: string]: any; // Allow for other potential keys
 }
@@ -35,27 +35,32 @@ export default function FungicidesPage() {
         if (!response.ok) {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
-            const body = await response.text();
-            errorText += `\nResponse body: ${body.substring(0, 500)}`; // Log part of the body if it's not JSON
+            const body = await response.text(); // Attempt to get more info if not JSON
+            errorText += `\nResponse body: ${body.substring(0, 500)}`;
           } catch (e) {
-            // Ignore error reading body if it fails
+            // Ignore error reading body
           }
           throw new Error(errorText);
         }
+        
         const data = await response.json();
-        console.log("Fetched data from Apps Script:", data); // This is the crucial log
+        console.log("Fetched data from Apps Script:", data); // Log the raw data structure
 
         if (Array.isArray(data)) {
           setFungicidesData(data);
+        } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            // Attempt to find an array within the data if it's structured differently e.g. { "data": [...] } or similar
+            const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
+            if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
+                 console.log(`Found data in nested key: ${dataArrayKey}`);
+                setFungicidesData(data[dataArrayKey]);
+            } else {
+                console.warn("Fetched data is an object but no array found within its properties.", data);
+                throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
+            }
         } else {
-          console.warn("Fetched data is not an array. Please check Apps Script output.", data);
-          // Attempt to find an array within the data if it's structured differently
-          const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
-          if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-            setFungicidesData(data[dataArrayKey]);
-          } else {
-            throw new Error("Fetched data format is not as expected (expected an array or an object with an array property).");
-          }
+          console.warn("Fetched data is not an array or a recognizable object. Please check Apps Script output.", data);
+          throw new Error("Fetched data format is not as expected (expected an array).");
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -93,34 +98,35 @@ export default function FungicidesPage() {
               <p className="text-lg font-semibold">Error Loading Data</p>
               <p className="text-sm text-center whitespace-pre-wrap">{error}</p>
               <p className="text-xs text-muted-foreground mt-2">
-                Please ensure the data source is correctly configured, publicly accessible, and returns data in the expected format.
+                Please ensure the Google Apps Script URL is correct, deployed, and returns data in the expected JSON array format. Check the browser console for more details.
               </p>
             </div>
           )}
           {!isLoading && !error && fungicidesData.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
               <p className="text-lg">No fungicide data available at the moment.</p>
+              <p className="text-sm">This could be because the source is empty or not providing data in the expected format.</p>
             </div>
           )}
           {!isLoading && !error && fungicidesData.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {fungicidesData.map((item, index) => {
                 // Added log to inspect each item, especially TRADENAME
-                console.log(`Rendering item ${index}: TRADENAME is '${item.TRADENAME}', Full item:`, item);
+                // console.log(`Rendering item ${index}: TRADE NAME is '${item["TRADE NAME"]}', Full item:`, item);
                 return (
-                  <Card key={item.TRADENAME || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
+                  <Card key={item["TRADE NAME"] || index} className="shadow-md rounded-lg hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3 bg-muted/30">
-                      <CardTitle className="text-lg text-primary">{item.TRADENAME || "N/A"}</CardTitle>
-                      <CardDescription>{item.COMPANY || "N/A"}</CardDescription>
+                      <CardTitle className="text-lg text-primary">{item["TRADE NAME"] || "N/A"}</CardTitle>
+                      <CardDescription>{item["COMPANY"] || "N/A"}</CardDescription>
                     </CardHeader>
                     <CardContent className="pt-4 text-sm space-y-1.5">
                       <p><strong>Technical Name:</strong> {item["TECHNICAL NAME"] || "N/A"}</p>
-                      <p><strong>FRAC Code:</strong> {item["FRAC CODE"] || "N/A"}</p>
+                      <p><strong>FRAC Group:</strong> {item["FRAC GROUP"] || "N/A"}</p>
                       <p><strong>Class/Family:</strong> {item["CLASS/FAMILY CONTROL"] || "N/A"}</p>
                       <p><strong>S/C:</strong> {item["S/C"] || "N/A"}</p>
                       <p><strong>TL/OVI:</strong> {item["TL/OVI"] || "N/A"}</p>
-                      <p><strong>Target:</strong> {item.TARGET || "N/A"}</p>
-                      <p><strong>Dose:</strong> {item.DOSE || "N/A"}</p>
+                      <p><strong>Target:</strong> {item["TARGET"] || "N/A"}</p>
+                      <p><strong>Dose:</strong> {item["DOSE"] || "N/A"}</p>
                     </CardContent>
                   </Card>
                 );
