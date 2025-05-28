@@ -14,13 +14,14 @@ import {
   SprayCan,
   Bug,
   Code2,
-  Brain,
+  Cpu, // Changed from Brain
   Settings as SettingsIcon,
   Home,
   Search,
   PlusSquare,
   Store,
   User as UserProfileIcon,
+  ChevronLeft,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -99,7 +100,7 @@ export function Sidebar() {
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
     { href: '/irac-frac-codes', label: currentLanguage === 'hi' ? 'IRAC/FRAC कोड' : 'IRAC/FRAC Code', icon: <Code2 className="h-5 w-5" /> },
-    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Brain className="h-5 w-5" /> },
+    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Cpu className="h-5 w-5" /> }, // Changed Brain to Cpu
   ], [currentLanguage]);
 
   const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
@@ -113,10 +114,10 @@ export function Sidebar() {
         "bg-card text-card-foreground border-r flex flex-col",
         "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
         "top-16", 
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Ensure it slides out completely
       )}
     >
-      
+      {/* Removed the empty div that was here to bring content up */}
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
@@ -136,6 +137,7 @@ export function Sidebar() {
                 variant="outline"
                 className={cn(
                   "w-full justify-start gap-3",
+                  !isSidebarOpen && "justify-center"
                 )}
                 asChild
               >
@@ -209,3 +211,4 @@ export function Sidebar() {
     </aside>
   );
 }
+
