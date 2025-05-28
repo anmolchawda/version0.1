@@ -15,6 +15,7 @@ interface CropInfo {
   unoptimized?: boolean; // Optional flag for diagnostics
 }
 
+// Ensure public HTTP(S) URLs are used for images. gs:// URIs are not web-accessible.
 const commonCrops: CropInfo[] = [
   // Vegetables
   { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
