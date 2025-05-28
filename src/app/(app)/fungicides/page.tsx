@@ -36,6 +36,8 @@ export default function FungicidesPage() {
           throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
         }
         const data = await response.json();
+        console.log("Fetched data:", data); // Added console log as per your script
+
         if (Array.isArray(data)) {
           setFungicidesData(data);
         } else {
@@ -51,7 +53,7 @@ export default function FungicidesPage() {
           }
         }
       } catch (err) {
-        console.error("Error fetching fungicide data:", err);
+        console.error("Fetch error:", err); // Matches your script's error log
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
       } finally {
         setIsLoading(false);
