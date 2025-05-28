@@ -21,7 +21,6 @@ import {
   PlusSquare,
   Store,
   User as UserProfileIcon,
-  ChevronLeft, // Keep for internal close if re-enabled
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -37,11 +36,7 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
     if (onClick) {
       onClick();
     }
-    // Close sidebar if it's open (primarily for mobile/smaller screens where it might overlay content)
-    // For desktop, it might be preferable to keep it open, but this ensures consistency.
-    // Check if it is a mobile screen, then close, otherwise let it be.
-    // This logic might need to be adapted based on final UX preference for desktop.
-    if (window.innerWidth < 768) { // Example breakpoint for mobile
+    if (window.innerWidth < 768) { 
         contextCloseSidebar();
     }
   };
@@ -57,7 +52,6 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
               isActive
                 ? 'bg-primary/10 text-primary'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              // Removed: !isSidebarOpen && "justify-center" as the sidebar is hidden when !isSidebarOpen
             )}
             onClick={handleClick}
           >
@@ -65,7 +59,6 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
             {isSidebarOpen && <span>{link.label}</span>}
           </Link>
         </TooltipTrigger>
-        {/* Tooltip currently won't show if sidebar is fully hidden. Kept for potential future states (e.g., icon-only collapsed sidebar) */}
         {!isSidebarOpen && link.label && (
           <TooltipContent side="right" className="bg-background text-foreground border">
             <p>{link.label}</p>
@@ -79,7 +72,7 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext(); // Use context
+  const { isSidebarOpen, closeSidebar } = useSidebarContext(); 
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -105,8 +98,7 @@ export function Sidebar() {
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
-    { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC code', icon: <Code2 className="h-5 w-5" /> },
-    { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC code', icon: <Code2 className="h-5 w-5" /> },
+    { href: '/irac-frac-codes', label: currentLanguage === 'hi' ? 'IRAC/FRAC कोड' : 'IRAC/FRAC Code', icon: <Code2 className="h-5 w-5" /> },
     { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI सुविधाएँ' : 'AI Features', icon: <Brain className="h-5 w-5" /> },
   ], [currentLanguage]);
 
@@ -120,21 +112,18 @@ export function Sidebar() {
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
         "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
-        "top-16", // Positioned below the TopHeader
+        "top-16", 
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
       )}
     >
-      {/* Removed internal header with AppLogo and toggle button, as it's now in TopHeader */}
       
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {/* Main navigation links (Feed, Discover, etc.) are now in BottomNavBar */}
-        {/* Secondary navigation links */}
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
             link={link}
             isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
-            onClick={closeSidebar} // Close sidebar on link click, especially for mobile
+            onClick={closeSidebar} 
           />
         ))}
       </div>
@@ -147,7 +136,6 @@ export function Sidebar() {
                 variant="outline"
                 className={cn(
                   "w-full justify-start gap-3",
-                  !isSidebarOpen && "justify-center px-0" // Still needed if we ever have icon-only mode
                 )}
                 asChild
               >
@@ -157,7 +145,7 @@ export function Sidebar() {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {!isSidebarOpen && ( // This tooltip will only show if sidebar is partially collapsed (icon-only), not fully hidden
+            {!isSidebarOpen && ( 
               <TooltipContent side="right" className="bg-background text-foreground border">
                 <p>{settingsLabel}</p>
               </TooltipContent>
@@ -167,7 +155,7 @@ export function Sidebar() {
 
         <Separator />
 
-        {mockUser && isSidebarOpen && ( // Only show user details if sidebar is open
+        {mockUser && isSidebarOpen && ( 
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -188,7 +176,6 @@ export function Sidebar() {
                   </div>
                 </Link>
               </TooltipTrigger>
-               {/* Tooltip for collapsed state - currently not used as user info is hidden when fully collapsed */}
               {!isSidebarOpen && (
                  <TooltipContent side="right" className="bg-background text-foreground border">
                   <p>{userNameDisplay}</p>
@@ -198,7 +185,6 @@ export function Sidebar() {
             </Tooltip>
           </TooltipProvider>
         )}
-         {/* Simplified Avatar for when sidebar is not fully open (icon-only mode, if re-enabled) */}
         {mockUser && !isSidebarOpen && (
            <div className="flex justify-center p-2">
              <TooltipProvider delayDuration={0}>
