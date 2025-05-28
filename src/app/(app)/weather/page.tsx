@@ -3,14 +3,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
+// import Link from 'next/link'; // No longer needed as forecast detail links are removed
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  Loader2, AlertTriangle, MapPin, CloudSun, Sun, Cloud, CloudRain, Wind, Thermometer, Droplets,
+  Loader2, AlertTriangle, CloudSun, Sun, Cloud, CloudRain, Wind, Droplets,
   Moon, CloudMoon, CloudDrizzle, CloudLightning, CloudSnow, CloudFog, Sunrise, Sunset
 } from "lucide-react";
-import { format, fromUnixTime, addDays } from 'date-fns';
+import { format, fromUnixTime } from 'date-fns';
 
 interface WeatherData {
   locationName: string;
@@ -21,20 +21,11 @@ interface WeatherData {
   wind: string;
   sunrise: string;
   sunset: string;
-  forecast: ForecastDay[];
+  // Forecast property is removed as the new API doesn't provide it
 }
 
-interface ForecastDay {
-  day: string; // e.g., Mon
-  date: string; // e.g., May 29
-  isoDate: string; // e.g., "2023-05-29"
-  icon: JSX.Element;
-  tempHigh: string;
-  tempLow: string;
-  condition: string;
-}
-
-const OPENWEATHERMAP_API_KEY = "1084327516741"; // WARNING: API Key exposed client-side. For production, move to backend.
+// API Key - WARNING: For production, move to backend/environment variables.
+const OPENWEATHERMAP_API_KEY = "1084327516741"; 
 
 const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element => {
   switch (iconCode) {
@@ -43,14 +34,14 @@ const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element 
     case "02d": return <CloudSun className={`${sizeClass} text-sky-500`} />;
     case "02n": return <CloudMoon className={`${sizeClass} text-sky-400`} />;
     case "03d": case "03n": return <Cloud className={`${sizeClass} text-gray-500`} />;
-    case "04d": case "04n": return <Cloud className={`${sizeClass} text-gray-600`} />; // Using Cloud for broken clouds
+    case "04d": case "04n": return <Cloud className={`${sizeClass} text-gray-600`} />;
     case "09d": case "09n": return <CloudDrizzle className={`${sizeClass} text-blue-500`} />;
     case "10d": return <CloudRain className={`${sizeClass} text-blue-600`} />;
     case "10n": return <CloudRain className={`${sizeClass} text-blue-500`} />;
     case "11d": case "11n": return <CloudLightning className={`${sizeClass} text-yellow-400`} />;
     case "13d": case "13n": return <CloudSnow className={`${sizeClass} text-blue-300`} />;
     case "50d": case "50n": return <CloudFog className={`${sizeClass} text-gray-400`} />;
-    default: return <CloudSun className={`${sizeClass} text-sky-500`} />; // Default icon
+    default: return <CloudSun className={`${sizeClass} text-sky-500`} />;
   }
 };
 
@@ -64,32 +55,29 @@ export default function WeatherPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const apiUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=minutely,hourly,alerts&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
+      // Using the /data/2.5/weather endpoint for current weather
+      const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
       const response = await fetch(apiUrl);
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to fetch weather: ${response.status} ${errorData.message || response.statusText}`);
       }
       const data = await response.json();
 
+      if (!data.weather || !data.main || !data.wind || !data.sys) {
+        throw new Error("Weather data from API is incomplete.");
+      }
+
       const transformedData: WeatherData = {
-        locationName: data.timezone || `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`,
-        temperature: `${Math.round(data.current.temp)}°C`,
-        condition: data.current.weather[0].description,
-        conditionIcon: getWeatherIcon(data.current.weather[0].icon),
-        humidity: `${data.current.humidity}%`,
-        wind: `${Math.round(data.current.wind_speed * 3.6)} km/h`, // m/s to km/h
-        sunrise: format(fromUnixTime(data.current.sunrise), "h:mm a"),
-        sunset: format(fromUnixTime(data.current.sunset), "h:mm a"),
-        forecast: data.daily.slice(0, 8).map((dayData: any, index: number) => ({ // API provides 8 days
-          day: format(fromUnixTime(dayData.dt), "EEE"),
-          date: format(fromUnixTime(dayData.dt), "MMM d"),
-          isoDate: format(fromUnixTime(dayData.dt), "yyyy-MM-dd"),
-          icon: getWeatherIcon(dayData.weather[0].icon, "h-7 w-7"),
-          tempHigh: `${Math.round(dayData.temp.max)}°C`,
-          tempLow: `${Math.round(dayData.temp.min)}°C`,
-          condition: dayData.weather[0].description,
-        })),
+        locationName: data.name || data.timezone || `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`,
+        temperature: `${Math.round(data.main.temp)}°C`,
+        condition: data.weather[0].description,
+        conditionIcon: getWeatherIcon(data.weather[0].icon),
+        humidity: `${data.main.humidity}%`,
+        wind: `${Math.round(data.wind.speed * 3.6)} km/h`, // m/s to km/h
+        sunrise: format(fromUnixTime(data.sys.sunrise), "h:mm a"),
+        sunset: format(fromUnixTime(data.sys.sunset), "h:mm a"),
       };
       setWeatherData(transformedData);
     } catch (err) {
@@ -207,28 +195,9 @@ export default function WeatherPage() {
           </CardContent>
         </Card>
 
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-primary">8-Day Forecast</h3>
-          <div className="flex overflow-x-auto space-x-3 pb-4 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-            {weatherData.forecast.map((day) => (
-              <Link key={day.isoDate} href={`/weather/detail/${day.isoDate}`} passHref>
-                <Card 
-                  className="p-3 shadow-md rounded-lg min-w-[120px] sm:min-w-[140px] flex-shrink-0 cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all text-center"
-                >
-                  <CardTitle className="text-sm font-medium mb-1">{day.day}</CardTitle>
-                  <p className="text-xs text-muted-foreground mb-1.5">{day.date}</p>
-                  <div className="flex items-center justify-center my-1.5">
-                     {day.icon}
-                  </div>
-                  <p className="text-base font-semibold">{day.tempHigh} / <span className="text-muted-foreground">{day.tempLow}</span></p>
-                  <p className="text-xs text-muted-foreground mt-0.5 capitalize truncate">{day.condition}</p>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* Forecast section removed as new API doesn't provide it */}
          <p className="text-xs text-center text-muted-foreground pt-4">
-            Weather data provided by OpenWeatherMap. For precise details, please consult official weather services.
+            Current weather data provided by OpenWeatherMap. Forecast feature is not available with this API.
          </p>
       </div>
     );
@@ -250,4 +219,3 @@ export default function WeatherPage() {
     </div>
   );
 }
-
