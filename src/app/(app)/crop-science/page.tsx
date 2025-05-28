@@ -30,7 +30,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
   { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
   { name: 'Bottle Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bottle%20gourd.jpeg', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
-  { name: 'Bitter Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bitter%20gourd.jpeg', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
+  { name: 'Bitter Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media&token=6b10f15d-2e24-4218-ade6-3c3b62ef1360', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
   { name: 'Cabbage', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cabbage.jpeg', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
   { name: 'Cauliflower', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cauliflower.jpeg', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
   { name: 'Radish', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/radish.jpeg', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
@@ -118,3 +118,4 @@ export default function CropSciencePage() {
 // Updated image for Pomegranate
 // Updated image for Kiwi
 // Removed placeholder image from GCS
+
