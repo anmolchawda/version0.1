@@ -3,7 +3,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-// import Link from 'next/link'; // No longer needed as forecast detail links are removed
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -21,11 +20,10 @@ interface WeatherData {
   wind: string;
   sunrise: string;
   sunset: string;
-  // Forecast property is removed as the new API doesn't provide it
 }
 
 // API Key - WARNING: For production, move to backend/environment variables.
-const OPENWEATHERMAP_API_KEY = "1084327516741"; 
+const OPENWEATHERMAP_API_KEY = "f771ba6953523ed0706f829f70e2d063"; 
 
 const getWeatherIcon = (iconCode: string, sizeClass = "h-10 w-10"): JSX.Element => {
   switch (iconCode) {
@@ -194,10 +192,8 @@ export default function WeatherPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Forecast section removed as new API doesn't provide it */}
          <p className="text-xs text-center text-muted-foreground pt-4">
-            Current weather data provided by OpenWeatherMap. Forecast feature is not available with this API.
+            Current weather data provided by OpenWeatherMap.
          </p>
       </div>
     );
