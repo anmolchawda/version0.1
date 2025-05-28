@@ -32,7 +32,7 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
       <div className="bg-card text-card-foreground rounded-xl shadow-lg overflow-hidden relative">
         {isCurrentUser && (
           <Link href="/settings/account" className="absolute top-3 right-3 z-10">
-            <Button variant="ghost" size="icon" aria-label="Edit Profile" className="h-8 w-8">
+            <Button variant="ghost" size="icon" aria-label="Edit Profile" className="h-10 w-10">
               <Settings className="h-5 w-5" />
             </Button>
           </Link>
@@ -56,11 +56,11 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
                 </button>
               </DialogTrigger>
               {user.avatarUrl ? (
-                <DialogOverlay className="bg-black/70 backdrop-blur-sm fixed inset-0 z-[51]" />
+                <DialogOverlay className="bg-black/50 backdrop-blur-sm fixed inset-0 z-[51]" />
               ) : null}
               <DialogContent className="p-0 max-w-md w-auto bg-transparent border-none shadow-none flex items-center justify-center z-[52]">
                 <DialogHeader className="sr-only">
-                  <DialogTitle className="sr-only">Enlarged Profile Picture of {user.name || user.username}</DialogTitle>
+                  <DialogTitle>Enlarged Profile Picture of {user.name || user.username}</DialogTitle>
                 </DialogHeader>
                 {user.avatarUrl ? (
                   <Image
@@ -97,7 +97,7 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
           </div>
 
           {/* Info Section */}
-          <div className="text-left space-y-1">
+          <div className="text-left space-y-1 mt-2">
             <h1 className="text-lg font-semibold text-foreground">{user.name || user.username}</h1>
             <p className="text-sm text-muted-foreground">@{user.username}</p>
             
@@ -118,11 +118,10 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
               )}
             </div>
           </div>
-        </div>
         
         {/* Action Buttons Section */}
         {!isCurrentUser && (
-          <div className="p-4 sm:p-6 border-t">
+          <div className="pt-4 mt-4 border-t">
             <div className="flex gap-2">
                 <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground flex-1">
                     <UserPlus className="mr-1.5 h-4 w-4" /> Follow
@@ -135,6 +134,7 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
             </div>
           </div>
         )}
+        </div>
       </div>
     </>
   );
