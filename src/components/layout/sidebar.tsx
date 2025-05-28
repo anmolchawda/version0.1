@@ -22,26 +22,24 @@ import {
   Store,
   User as UserProfileIcon,
   ChevronLeft,
+  Menu,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AppLogo } from '@/components/core/app-logo';
 
 const MOCK_USER_ID = '1';
 
 // Helper function to generate NavLink items with tooltips
-const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => void }> = ({ link, isActive, onClick }) => {
-  const { isSidebarOpen, closeSidebar: contextCloseSidebar } = useSidebarContext();
+const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => void; isSidebarOpen: boolean }> = ({ link, isActive, onClick, isSidebarOpen }) => {
+  const { closeSidebar: contextCloseSidebar } = useSidebarContext();
 
   const handleClick = () => {
     if (onClick) {
       onClick();
     }
-    // For mobile, always close sidebar on link click.
-    // For desktop, only close if it's set to overlap (which is current behavior with overlay).
-    if (window.innerWidth < 768 || isSidebarOpen) { // Simplified: close if open or on mobile
-        contextCloseSidebar();
-    }
+    contextCloseSidebar();
   };
 
   return (
@@ -75,11 +73,11 @@ const NavLinkItem: React.FC<{ link: NavLink; isActive: boolean; onClick?: () => 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext(); 
+  const { isSidebarOpen, closeSidebar } = useSidebarContext();
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  
+
   useEffect(() => {
     const storedLanguage = localStorage.getItem('selectedAppLanguage');
     if (storedLanguage) {
@@ -101,7 +99,8 @@ export function Sidebar() {
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
-    { href: '/irac-frac-codes', label: currentLanguage === 'hi' ? 'IRAC/FRAC कोड' : 'IRAC/FRAC Code', icon: <Code2 className="h-5 w-5" /> },
+    { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 className="h-5 w-5" /> },
+    { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC Code', icon: <Code2 className="h-5 w-5" /> },
     { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu className="h-5 w-5" /> },
   ], [currentLanguage]);
 
@@ -114,18 +113,22 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg", // Adjusted z-index to 30
-        "top-16", 
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
+        "fixed left-0 h-[calc(100vh-4rem)] transition-transform duration-300 ease-in-out z-30 shadow-lg",
+        "top-16",
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64' // Slides completely off-screen
       )}
     >
+      {/* This div is removed to allow content to move up */}
+      {/* <div className="flex items-center justify-between p-4 border-b h-16">
+        {isSidebarOpen && <AppLogo iconClassName="h-8 w-8" textClassName="text-xl" />}
+      </div> */}
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
             link={link}
-            isActive={pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1)}
-            // onClick prop will be handled by NavLinkItem itself if needed for mobile
+            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href.length > 1 && link.href !== '/')}
+            isSidebarOpen={isSidebarOpen}
           />
         ))}
       </div>
@@ -141,7 +144,7 @@ export function Sidebar() {
                   !isSidebarOpen && "justify-center"
                 )}
                 asChild
-                onClick={isSidebarOpen ? closeSidebar : undefined} 
+                onClick={closeSidebar}
               >
                 <Link href="/settings">
                   <SettingsIcon className="h-5 w-5" />
@@ -149,7 +152,7 @@ export function Sidebar() {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {!isSidebarOpen && ( 
+            {!isSidebarOpen && (
               <TooltipContent side="right" className="bg-background text-foreground border">
                 <p>{settingsLabel}</p>
               </TooltipContent>
@@ -159,7 +162,7 @@ export function Sidebar() {
 
         <Separator />
 
-        {mockUser && isSidebarOpen && ( 
+        {mockUser && isSidebarOpen && (
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -180,16 +183,11 @@ export function Sidebar() {
                   </div>
                 </Link>
               </TooltipTrigger>
-              {!isSidebarOpen && ( // This condition should not be met if we hide the element itself
-                 <TooltipContent side="right" className="bg-background text-foreground border">
-                  <p>{userNameDisplay}</p>
-                  <p className="text-xs text-muted-foreground">@{mockUser.username}</p>
-                </TooltipContent>
-              )}
+               {/* Tooltip for expanded state user profile might be redundant as text is visible */}
             </Tooltip>
           </TooltipProvider>
         )}
-        {mockUser && !isSidebarOpen && ( // This is the icon-only view for the user profile when collapsed
+        {mockUser && !isSidebarOpen && (
            <div className="flex justify-center p-2">
              <TooltipProvider delayDuration={0}>
                 <Tooltip>

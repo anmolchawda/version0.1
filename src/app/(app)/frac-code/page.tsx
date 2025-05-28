@@ -1,5 +1,29 @@
-// This page is no longer directly linked and is replaced by /irac-frac-codes
-// You can remove this file if it's no longer needed.
-export default function OldFracCodePage() {
-  return null;
+// src/app/(app)/frac-code/page.tsx
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Code2 } from "lucide-react";
+
+export default function FracCodePage() {
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center text-2xl">
+            <Code2 className="mr-3 h-6 w-6 text-primary" />
+            FRAC Codes
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Learn about Fungicide Resistance Action Committee (FRAC) codes.
+          </p>
+          <div className="mt-8 p-6 border-2 border-dashed border-muted-foreground/50 rounded-lg text-center">
+            <p className="text-lg font-semibold">Content Coming Soon</p>
+            <p className="text-sm text-muted-foreground">
+              Detailed information on FRAC codes will be provided here.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
