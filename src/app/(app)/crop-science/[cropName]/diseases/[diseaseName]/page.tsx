@@ -105,23 +105,6 @@ export default function DiseaseDetailPage() {
     }
   }, [cropNameParam, diseaseNameParam, cropDisplayName]);
   
-  // Diagnostic logs
-  if (diseaseDetails) {
-    console.log("DiseaseDetailPage - diseaseDetails from state:", diseaseDetails);
-    const derivedName = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-    console.log("DiseaseDetailPage - Derived name for conditional check:", derivedName);
-    const isTomato = cropNameParam === 'tomato';
-    console.log("DiseaseDetailPage - Is it a tomato page?", isTomato);
-    const nameMatchesEarlyBlight = derivedName === "Early Blight (Alternaria solani)";
-    console.log("DiseaseDetailPage - Does name match 'Early Blight (Alternaria solani)'?", nameMatchesEarlyBlight);
-    if(isTomato && nameMatchesEarlyBlight) {
-        console.log("DiseaseDetailPage - Override condition for Early Blight MET!");
-    } else {
-        console.log("DiseaseDetailPage - Override condition for Early Blight NOT MET.");
-    }
-  }
-
-
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
@@ -158,21 +141,28 @@ export default function DiseaseDetailPage() {
   }
   
   const name = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
+  console.log("DiseaseDetailPage - Derived name for conditional check:", name);
   
   let imageUrl = diseaseDetails.IMAGE_URL;
-  let aiHint = diseaseDetails.AI_HINT || 'plant disease';
+  let aiHint = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
   const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
 
-  // Override for specific tomato disease if name matches
   if (isTomatoDisease && name === "Early Blight (Alternaria solani)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
-    aiHint = 'tomato blight';
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+    aiHint = 'tomato early blight';
+    console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
+  } else if (isTomatoDisease && name === "Late Blight (Phytophthora infestans)") {
+    // Use the specific URL for Late Blight as requested
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+    aiHint = 'tomato late blight';
+    console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
   }
+
 
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
   }
-   console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl);
+  console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl);
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -269,5 +259,5 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
-
       
+    
