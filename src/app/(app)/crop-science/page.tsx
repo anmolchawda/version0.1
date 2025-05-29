@@ -43,7 +43,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Banana', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbanana.jpg?alt=media&token=6228109c-9358-4c7c-bffd-51be0c5bc914', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
   { name: 'Orange', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/orange.jpg', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/mango.jpg', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
-  { name: 'Grapes', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/grapes.jpg', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
+  { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
   { name: 'Strawberry', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/strawberry%20(1).jpg', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
   { name: 'Pineapple', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/pineapple.jpg', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
   { name: 'Watermelon', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/watermelon.jpg', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
@@ -125,3 +125,4 @@ export default function CropSciencePage() {
 // Added Chilli to the crop list
 // Updated image for Cucumber with Firebase Storage URL
 // Updated image for Drumstick with new Firebase Storage URL
+// Updated image for Grapes with new Firebase Storage URL
