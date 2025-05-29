@@ -169,6 +169,11 @@ export default function DiseaseDetailPage() {
       aiHint = 'tomato yellow_leaf_curl';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Tomato Yellow Leaf Curl Virus (TYLCV) applied. ImageURL:", imageUrl);
+    } else if (name === "Fusarium Wilt (Fusarium oxysporum)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FFusarium%20Wilt.jpeg?alt=media&token=7b64a066-3f48-49b2-8f60-15f6d9c69c45";
+      aiHint = 'tomato fusarium_wilt';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Fusarium Wilt (Fusarium oxysporum) applied. ImageURL:", imageUrl);
     }
   }
 
@@ -277,3 +282,4 @@ export default function DiseaseDetailPage() {
   );
 }
     
+
