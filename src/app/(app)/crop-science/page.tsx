@@ -37,7 +37,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Ridge Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fridge%20gourd.jpeg?alt=media&token=8f73c6e4-35f7-412f-87de-1d2ff5458af7', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fokra.jpeg?alt=media&token=cbaf3db6-17e4-4d44-9375-a360f85a5953', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
-  { name: 'Chilli', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Chilli', aiHint: 'chilli pepper', slug: 'chilli', unoptimized: true },
+  { name: 'Chilli', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fchilli.jpeg?alt=media&token=9033d81e-2ff3-40fd-ba5f-b41e392009c1', aiHint: 'chilli pepper', slug: 'chilli', unoptimized: true },
   // Fruits
   { name: 'Apple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fapple.jpg?alt=media&token=c5f86e8e-c19f-4aba-8289-7f4bed2c5332', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
   { name: 'Banana', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbanana.jpg?alt=media&token=6228109c-9358-4c7c-bffd-51be0c5bc914', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
