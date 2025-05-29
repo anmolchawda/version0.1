@@ -23,16 +23,16 @@ const commonCrops: CropInfo[] = [
   { name: 'Onion', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FONION.jpeg?alt=media&token=110b1e81-e150-4353-ad3f-ccdb45efb616', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcarrot.jpg?alt=media&token=570b5735-ea6b-45fb-91db-5fa6c95ec198', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
   { name: 'Broccoli', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBROCCOLI.jpg?alt=media&token=1ea3e09d-cbbc-44be-885f-d7a1a60c7281', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
-  { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
+  { name: 'Spinach', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fspinach.jpg?alt=media&token=52fb4f22-f1fd-48c3-ac07-4f428f6465c5', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
   { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
   { name: 'Cucumber', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcucumber.jpeg?alt=media&token=54866db4-6209-46c1-89cd-829464f11a1f', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Flettuce.jpg?alt=media&token=985c9c4d-b70e-481b-b895-3813af119730', aiHint: 'lettuce leaves', slug: 'lettuce', unoptimized: true },
   { name: 'Eggplant', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbrinjal.jpg?alt=media&token=e295fae9-efde-4729-af3c-d45eefa0e02d', aiHint: 'eggplant vegetable', slug: 'eggplant', unoptimized: true },
   { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
-  { name: 'Bottle Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bottle%20gourd.jpeg', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
-  { name: 'Bitter Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bitter%20gourd.jpeg', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
-  { name: 'Cabbage', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cabbage.jpeg', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
-  { name: 'Cauliflower', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cauliflower.jpeg', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
+  { name: 'Bottle Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbottle%20gourd.jpeg?alt=media&token=64b61099-5ddc-4078-9beb-72072fb519f2', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
+  { name: 'Bitter Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media&token=6b10f15d-2e24-4218-ade6-3c3b62ef1360', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
+  { name: 'Cabbage', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcabbage.jpeg?alt=media&token=2b30d09d-0c37-4ae7-b93e-fc0039797af8', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
+  { name: 'Cauliflower', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcauliflower.jpeg?alt=media&token=0d5f65bf-1b70-4f91-b481-d1d908a43d57', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
   { name: 'Radish', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fradish.jpeg?alt=media&token=13b67f66-6f4f-4728-abc2-cfff0791b615', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fridge%20gourd.jpeg?alt=media&token=8f73c6e4-35f7-412f-87de-1d2ff5458af7', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
@@ -44,9 +44,9 @@ const commonCrops: CropInfo[] = [
   { name: 'Orange', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Forange.jpg?alt=media&token=6be8b4b0-12d8-4813-b0a8-62eb64d75429', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fmango.jpg?alt=media&token=afec0169-ee02-434c-b22b-0c0993f38464', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
   { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
-  { name: 'Strawberry', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/strawberry%20(1).jpg', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
+  { name: 'Strawberry', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fstrawberry%20(1).jpg?alt=media&token=b8d6c225-0416-4688-b039-3800e99c0a54', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
   { name: 'Pineapple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpineapple.jpg?alt=media&token=e6323018-a82a-477b-a31f-c4979146baed', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
-  { name: 'Watermelon', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/watermelon.jpg', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
+  { name: 'Watermelon', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fwatermelon.jpg?alt=media&token=99f36179-3084-4a4e-a134-f36179ba475e', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
   { name: 'Pomegranate', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpomegranade.jpg?alt=media&token=b64e3d98-71e9-4299-a579-100ec8d66d90', aiHint: 'pomegranate fruit', slug: 'pomegranate', unoptimized: true },
   { name: 'Kiwi', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fkiwi.jpg?alt=media&token=5c9a822d-ec0f-4dee-86b1-99eb4a109bd5', aiHint: 'kiwi fruit', slug: 'kiwi', unoptimized: true },
 ];
@@ -96,49 +96,3 @@ export default function CropSciencePage() {
     </div>
   );
 }
-// Updated image for Tomato
-// Updated image for Potato
-// Updated image for Onion
-// Updated image for Broccoli
-// Updated image for Bell Pepper
-// Updated image for Cucumber
-// Updated image for Beans
-// Updated image for Carrot
-// Updated image for Spinach
-// Updated image for Bottle Gourd
-// Updated image for Bitter Gourd
-// Updated image for Cabbage
-// Updated image for Cauliflower
-// Updated image for Radish
-// Updated image for Ridge Gourd
-// Updated image for Drumstick
-// Updated image for Okra
-// Updated image for Apple
-// Updated image for Banana
-// Updated image for Orange
-// Updated image for Mango
-// Updated image for Grapes
-// Updated image for Strawberry
-// Updated image for Pineapple
-// Updated image for Watermelon
-// Updated image for Pomegranate
-// Updated image for Kiwi
-// Removed placeholder image from GCS
-// Updated image for Bell Pepper with Firebase Storage URL
-// Updated image for Carrot with Firebase Storage URL
-// Updated image for Cauliflower with Firebase Storage URL
-// Added Chilli to the crop list
-// Updated image for Cucumber with Firebase Storage URL
-// Updated image for Drumstick with new Firebase Storage URL
-// Updated image for Grapes with new Firebase Storage URL
-// Updated image for Kiwi with new Firebase URL
-// Updated image for Mango with new Firebase Storage URL
-// Updated image for Okra with new Firebase Storage URL
-// Updated image for Orange with new Firebase Storage URL
-// Updated image for Pineapple with new Firebase Storage URL
-// Updated Pomegranate image URL
-// Updated Potato image URL with Firebase Storage link
-// Updated Radish image URL with Firebase Storage link
-// Updated Ridge Gourd image URL
-// Updated Eggplant/Brinjal image URL
-// Updated Lettuce image URL
