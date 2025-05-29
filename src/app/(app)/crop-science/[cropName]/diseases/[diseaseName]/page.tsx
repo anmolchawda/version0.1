@@ -100,9 +100,27 @@ export default function DiseaseDetailPage() {
     };
 
     if (cropNameParam && diseaseNameParam) {
+        console.log("DiseaseDetailPage - Params:", { cropNameParam, diseaseNameParam });
         fetchDiseaseDetails();
     }
   }, [cropNameParam, diseaseNameParam, cropDisplayName]);
+  
+  // Diagnostic logs
+  if (diseaseDetails) {
+    console.log("DiseaseDetailPage - diseaseDetails from state:", diseaseDetails);
+    const derivedName = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
+    console.log("DiseaseDetailPage - Derived name for conditional check:", derivedName);
+    const isTomato = cropNameParam === 'tomato';
+    console.log("DiseaseDetailPage - Is it a tomato page?", isTomato);
+    const nameMatchesEarlyBlight = derivedName === "Early Blight (Alternaria solani)";
+    console.log("DiseaseDetailPage - Does name match 'Early Blight (Alternaria solani)'?", nameMatchesEarlyBlight);
+    if(isTomato && nameMatchesEarlyBlight) {
+        console.log("DiseaseDetailPage - Override condition for Early Blight MET!");
+    } else {
+        console.log("DiseaseDetailPage - Override condition for Early Blight NOT MET.");
+    }
+  }
+
 
   if (isLoading) {
     return (
@@ -154,6 +172,7 @@ export default function DiseaseDetailPage() {
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
   }
+   console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl);
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -250,3 +269,5 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
+
+      
