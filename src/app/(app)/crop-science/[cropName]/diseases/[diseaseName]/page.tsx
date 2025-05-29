@@ -167,11 +167,12 @@ export default function DiseaseDetailPage() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative w-full sm:w-1/2 aspect-video bg-muted rounded-md overflow-hidden">
                     <Image
-                        src={`https://placehold.co/400x300.png?text=Symptom+1`}
-                        alt={`${name || 'Disease'} symptom 1`}
+                        src="https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab"
+                        alt={`${name || 'Disease'} symptom - E&L Blight`}
                         layout="fill"
                         objectFit="cover"
-                        data-ai-hint="disease symptom"
+                        data-ai-hint="tomato blight"
+                        unoptimized={true}
                     />
                   </div>
                   <div className="relative w-full sm:w-1/2 aspect-video bg-muted rounded-md overflow-hidden">
