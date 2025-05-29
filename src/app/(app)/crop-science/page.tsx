@@ -35,7 +35,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Cauliflower', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcauliflower.jpeg?alt=media&token=0d5f65bf-1b70-4f91-b481-d1d908a43d57', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
   { name: 'Radish', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/radish.jpeg', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ridge%20gourd.jpeg', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
-  { name: 'Drumstick', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/drumstick.jpeg', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
+  { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/okra.jpeg', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
   { name: 'Chilli', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Chilli', aiHint: 'chilli pepper', slug: 'chilli', unoptimized: true },
   // Fruits
@@ -124,3 +124,4 @@ export default function CropSciencePage() {
 // Updated image for Cauliflower with Firebase Storage URL
 // Added Chilli to the crop list
 // Updated image for Cucumber with Firebase Storage URL
+// Updated image for Drumstick with new Firebase Storage URL
