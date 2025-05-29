@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ShieldAlert, Loader2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Loader2, AlertTriangle } from "lucide-react";
 import Image from 'next/image';
 import {
   Dialog,
@@ -164,6 +164,11 @@ export default function DiseaseDetailPage() {
       aiHint = 'tomato mosaic virus';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Tomato Mosaic Virus applied. ImageURL:", imageUrl);
+    } else if (name === "Tomato Yellow Leaf Curl Virus (TYLCV)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
+      aiHint = 'tomato yellow_leaf_curl';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Tomato Yellow Leaf Curl Virus (TYLCV) applied. ImageURL:", imageUrl);
     }
   }
 
