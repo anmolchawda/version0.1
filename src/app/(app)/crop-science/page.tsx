@@ -27,7 +27,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
   { name: 'Cucumber', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcucumber.jpeg?alt=media&token=54866db4-6209-46c1-89cd-829464f11a1f', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
-  { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
+  { name: 'Eggplant', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbrinjal.jpg?alt=media&token=e295fae9-efde-4729-af3c-d45eefa0e02d', aiHint: 'eggplant vegetable', slug: 'eggplant', unoptimized: true },
   { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
   { name: 'Bottle Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbottle%20gourd.jpeg?alt=media&token=64b61099-5ddc-4078-9beb-72072fb519f2', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
   { name: 'Bitter Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media&token=6b10f15d-2e24-4218-ade6-3c3b62ef1360', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
@@ -96,9 +96,12 @@ export default function CropSciencePage() {
     </div>
   );
 }
-// Updated image for Apple and Banana
+// Updated image for Tomato
+// Updated image for Potato
 // Updated image for Onion
 // Updated image for Broccoli
+// Updated image for Bell Pepper
+// Updated image for Cucumber
 // Updated image for Beans
 // Updated image for Carrot
 // Updated image for Spinach
@@ -110,6 +113,8 @@ export default function CropSciencePage() {
 // Updated image for Ridge Gourd
 // Updated image for Drumstick
 // Updated image for Okra
+// Updated image for Apple
+// Updated image for Banana
 // Updated image for Orange
 // Updated image for Mango
 // Updated image for Grapes
@@ -135,3 +140,4 @@ export default function CropSciencePage() {
 // Updated Potato image URL with Firebase Storage link
 // Updated Radish image URL with Firebase Storage link
 // Updated Ridge Gourd image URL
+// Updated Eggplant/Brinjal image URL
