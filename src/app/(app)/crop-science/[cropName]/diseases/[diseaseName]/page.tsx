@@ -12,8 +12,8 @@ import {
   Dialog,
   DialogContent,
   DialogOverlay,
-  DialogHeader, // Added DialogHeader for accessibility
-  DialogTitle as RadixDialogTitle, // Added DialogTitle as RadixDialogTitle
+  DialogHeader, 
+  DialogTitle as RadixDialogTitle, 
 } from "@/components/ui/dialog";
 
 interface DiseaseDataItem {
@@ -157,7 +157,7 @@ export default function DiseaseDetailPage() {
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
-    const paragraphs = String(value).split(/\n{2,}/); // Split by two or more newlines for paragraphs
+    const paragraphs = String(value).split(/\n{2,}/); 
     return (
       <div className="mb-4">
         <h4 className="font-semibold text-md text-primary mb-1">{label}:</h4>
@@ -192,7 +192,7 @@ export default function DiseaseDetailPage() {
             <button
               type="button"
               onClick={() => openImageInModal(imageUrl!)}
-              className="relative w-full aspect-[4/3] bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+              className="relative w-full aspect-video bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
               aria-label={`View image for ${name || 'Disease'}`}
             >
                 <Image
