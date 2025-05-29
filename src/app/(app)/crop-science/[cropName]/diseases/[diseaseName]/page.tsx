@@ -165,7 +165,7 @@ export default function DiseaseDetailPage() {
               </div>
               <div className="mt-4 pt-4 border-t">
                 <h5 className="font-semibold text-md text-primary mb-2">More Images of Symptoms/Effects:</h5>
-                <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden">
+                <div className="relative w-2/3 mx-auto aspect-video bg-muted rounded-md overflow-hidden">
                   <Image
                       src="https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab"
                       alt={`${name || 'Disease'} symptom - E&L Blight`}
