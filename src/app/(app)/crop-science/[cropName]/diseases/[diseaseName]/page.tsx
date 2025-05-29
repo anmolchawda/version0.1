@@ -174,6 +174,11 @@ export default function DiseaseDetailPage() {
       aiHint = 'tomato fusarium_wilt';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Fusarium Wilt (Fusarium oxysporum) applied. ImageURL:", imageUrl);
+    } else if (name === "Verticillium Wilt (Verticillium dahliae)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FVerticillium%20Wilt.jpeg?alt=media&token=ce09fcd6-e8cd-4cfc-8855-d429fe1498eb";
+      aiHint = 'tomato verticillium_wilt';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Verticillium Wilt (Verticillium dahliae) applied. ImageURL:", imageUrl);
     }
   }
 
