@@ -26,6 +26,7 @@ interface DiseaseDataItem {
   [key: string]: any; // To accommodate other potential fields
 }
 
+// Ensured this is the correct URL as per user request
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrbyhJ85nt_dMLSnTt3JHC-WJ3Ll9C3HiQ8N-Eo7fyYuBPek6lAX2L75fFj30KOrsww/exec";
 
 export default function DiseasesPage() {
@@ -56,19 +57,19 @@ export default function DiseasesPage() {
         }
         
         const data = await response.json();
+        console.log("[DiseasesPage] Fetched raw data:", data);
         
         let processedData: DiseaseDataItem[] = [];
 
         if (Array.isArray(data)) {
           processedData = data; 
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-            // Attempt to find an array within the object's properties
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
+                console.log("[DiseasesPage] Data found in nested key:", dataArrayKey);
                 processedData = data[dataArrayKey];
             } else if (Object.values(data).every(val => typeof val === 'object' && val !== null && Object.keys(val).length > 0)) {
-                // Handles case where data is an object of objects, e.g. { "item1": {...}, "item2": {...} }
-                // This might occur if Apps Script returns data indexed by row number or some other key.
+                console.log("[DiseasesPage] Data is an object of objects, converting to array.");
                 processedData = Object.values(data) as DiseaseDataItem[];
             } else {
                throw new Error("Fetched data format is not a recognized array or object containing an array of items.");
@@ -84,13 +85,13 @@ export default function DiseasesPage() {
         );
 
         if (processedData.length === 0 && ((Array.isArray(data) && data.length > 0) || (typeof data === 'object' && Object.keys(data).length > 0))) {
-            console.warn("Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or 'TOMATO PEST AND DISEASES' for tomatoes) exist and are non-empty strings in your Apps Script output items. Current cropSlug:", cropSlug);
+            console.warn("[DiseasesPage] Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or 'TOMATO PEST AND DISEASES' for tomatoes) exist and are non-empty strings in your Apps Script output items. Current cropSlug:", cropSlug);
         }
         
         setDiseasesData(processedData);
 
       } catch (err) {
-        console.error("Fetch error in DiseasesPage:", err);
+        console.error("[DiseasesPage] Fetch error:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
         setDiseasesData([]); 
       } finally {
@@ -164,7 +165,7 @@ export default function DiseasesPage() {
                           layout="fill"
                           objectFit="cover"
                           data-ai-hint={aiHint}
-                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
+                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com') || imageUrl.startsWith('https://placehold.co')}
                         />
                       </div>
                       <div className="flex flex-col">
