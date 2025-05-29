@@ -150,6 +150,7 @@ export default function DiseaseDetailPage() {
                       layout="fill"
                       objectFit="cover"
                       data-ai-hint={aiHint}
+                      unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
                   />
               </div>
               <p><strong>Causing Agent:</strong> {diseaseDetails["CAUSING AGENT"] || "N/A"}</p>
@@ -196,6 +197,7 @@ export default function DiseaseDetailPage() {
                         layout="fill"
                         objectFit="cover"
                         data-ai-hint={aiHint}
+                        unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
                     />
                 </div>
                 <p>{diseaseDetails.description || "No further details available."}</p>
