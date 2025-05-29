@@ -45,7 +45,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Mango', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fmango.jpg?alt=media&token=afec0169-ee02-434c-b22b-0c0993f38464', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
   { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
   { name: 'Strawberry', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/strawberry%20(1).jpg', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
-  { name: 'Pineapple', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/pineapple.jpg', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
+  { name: 'Pineapple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpineapple.jpg?alt=media&token=e6323018-a82a-477b-a31f-c4979146baed', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
   { name: 'Watermelon', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/watermelon.jpg', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
   { name: 'Pomegranate', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/pomegranade.jpg', aiHint: 'pomegranate fruit', slug: 'pomegranate', unoptimized: true },
   { name: 'Kiwi', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fkiwi.jpg?alt=media&token=5c9a822d-ec0f-4dee-86b1-99eb4a109bd5', aiHint: 'kiwi fruit', slug: 'kiwi', unoptimized: true },
@@ -130,3 +130,4 @@ export default function CropSciencePage() {
 // Updated image for Mango with new Firebase Storage URL
 // Updated image for Okra with new Firebase Storage URL
 // Updated image for Orange with new Firebase Storage URL
+// Updated image for Pineapple with new Firebase Storage URL
