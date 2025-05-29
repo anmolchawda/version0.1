@@ -179,6 +179,11 @@ export default function DiseaseDetailPage() {
       aiHint = 'tomato verticillium_wilt';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Verticillium Wilt (Verticillium dahliae) applied. ImageURL:", imageUrl);
+    } else if (name === "Bacterial Speck and Bacterial Spot (Pseudomonas syringae)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FBacterial%20Spot.JPG?alt=media&token=6bcdc7c2-88bd-4610-bd65-ca47f66b19a5";
+      aiHint = 'tomato bacterial spot';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Bacterial Speck and Spot applied. ImageURL:", imageUrl);
     }
   }
 
@@ -287,4 +292,3 @@ export default function DiseaseDetailPage() {
   );
 }
     
-
