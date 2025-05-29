@@ -18,7 +18,7 @@ interface CropInfo {
 // Ensure public HTTP(S) URLs are used for images. gs:// URIs are not web-accessible.
 const commonCrops: CropInfo[] = [
   // Vegetables
-  { name: 'Tomato', imageUrl: 'https://storage.googleapis.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
+  { name: 'Tomato', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/tomato%201.jpeg', aiHint: 'tomato white-background', slug: 'tomato', unoptimized: true },
   { name: 'Potato', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpotato.jpg?alt=media&token=f973faf2-6976-4d9a-9e2e-3c4c7e2bbc3b', aiHint: 'potato vegetable', slug: 'potato', unoptimized: true },
   { name: 'Onion', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FONION.jpeg?alt=media&token=110b1e81-e150-4353-ad3f-ccdb45efb616', aiHint: 'onion vegetable', slug: 'onion', unoptimized: true },
   { name: 'Carrot', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcarrot.jpg?alt=media&token=570b5735-ea6b-45fb-91db-5fa6c95ec198', aiHint: 'carrot vegetable', slug: 'carrot', unoptimized: true },
@@ -26,13 +26,13 @@ const commonCrops: CropInfo[] = [
   { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
   { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
   { name: 'Cucumber', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcucumber.jpeg?alt=media&token=54866db4-6209-46c1-89cd-829464f11a1f', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
-  { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
+  { name: 'Lettuce', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Flettuce.jpg?alt=media&token=985c9c4d-b70e-481b-b895-3813af119730', aiHint: 'lettuce leaves', slug: 'lettuce', unoptimized: true },
   { name: 'Eggplant', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbrinjal.jpg?alt=media&token=e295fae9-efde-4729-af3c-d45eefa0e02d', aiHint: 'eggplant vegetable', slug: 'eggplant', unoptimized: true },
   { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
-  { name: 'Bottle Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbottle%20gourd.jpeg?alt=media&token=64b61099-5ddc-4078-9beb-72072fb519f2', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
-  { name: 'Bitter Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media&token=6b10f15d-2e24-4218-ade6-3c3b62ef1360', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
-  { name: 'Cabbage', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcabbage.jpeg?alt=media&token=2b30d09d-0c37-4ae7-b93e-fc0039797af8', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
-  { name: 'Cauliflower', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcauliflower.jpeg?alt=media&token=0d5f65bf-1b70-4f91-b481-d1d908a43d57', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
+  { name: 'Bottle Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bottle%20gourd.jpeg', aiHint: 'bottle gourd', slug: 'bottle-gourd', unoptimized: true },
+  { name: 'Bitter Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/bitter%20gourd.jpeg', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
+  { name: 'Cabbage', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cabbage.jpeg', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
+  { name: 'Cauliflower', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cauliflower.jpeg', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
   { name: 'Radish', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fradish.jpeg?alt=media&token=13b67f66-6f4f-4728-abc2-cfff0791b615', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fridge%20gourd.jpeg?alt=media&token=8f73c6e4-35f7-412f-87de-1d2ff5458af7', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
@@ -141,3 +141,4 @@ export default function CropSciencePage() {
 // Updated Radish image URL with Firebase Storage link
 // Updated Ridge Gourd image URL
 // Updated Eggplant/Brinjal image URL
+// Updated Lettuce image URL
