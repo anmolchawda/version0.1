@@ -44,7 +44,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Orange', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Forange.jpg?alt=media&token=6be8b4b0-12d8-4813-b0a8-62eb64d75429', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fmango.jpg?alt=media&token=afec0169-ee02-434c-b22b-0c0993f38464', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
   { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
-  { name: 'Strawberry', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fstrawberry%20(1).jpg?alt=media&token=b8d6c225-0416-4688-b039-3800e99c0a54', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
+  { name: 'Strawberry', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fstrawberry.jpg?alt=media&token=f4ac25be-1ef3-4020-804a-fa4563471c67', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
   { name: 'Pineapple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpineapple.jpg?alt=media&token=e6323018-a82a-477b-a31f-c4979146baed', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
   { name: 'Watermelon', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fwatermelon.jpg?alt=media&token=99f36179-3084-4a4e-a134-f36179ba475e', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
   { name: 'Pomegranate', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpomegranade.jpg?alt=media&token=b64e3d98-71e9-4299-a579-100ec8d66d90', aiHint: 'pomegranate fruit', slug: 'pomegranate', unoptimized: true },
@@ -96,3 +96,4 @@ export default function CropSciencePage() {
     </div>
   );
 }
+
