@@ -36,7 +36,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Radish', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/radish.jpeg', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ridge%20gourd.jpeg', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
-  { name: 'Okra', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/okra.jpeg', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
+  { name: 'Okra', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fokra.jpeg?alt=media&token=cbaf3db6-17e4-4d44-9375-a360f85a5953', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
   { name: 'Chilli', imageUrl: 'https://placehold.co/200x200/FFFFFF/4A4A4A.png?text=Chilli', aiHint: 'chilli pepper', slug: 'chilli', unoptimized: true },
   // Fruits
   { name: 'Apple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fapple.jpg?alt=media&token=c5f86e8e-c19f-4aba-8289-7f4bed2c5332', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
@@ -128,3 +128,4 @@ export default function CropSciencePage() {
 // Updated image for Grapes with new Firebase Storage URL
 // Updated image for Kiwi with new Firebase URL
 // Updated image for Mango with new Firebase Storage URL
+// Updated image for Okra with new Firebase Storage URL
