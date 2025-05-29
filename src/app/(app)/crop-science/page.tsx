@@ -1,3 +1,4 @@
+
 // src/app/(app)/crop-science/page.tsx
 'use client';
 
@@ -24,7 +25,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Broccoli', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBROCCOLI.jpg?alt=media&token=1ea3e09d-cbbc-44be-885f-d7a1a60c7281', aiHint: 'broccoli vegetable', slug: 'broccoli', unoptimized: true },
   { name: 'Spinach', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/spinach.jpg', aiHint: 'spinach leaves', slug: 'spinach', unoptimized: true },
   { name: 'Bell Pepper', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fred-yellow-capsicum.jpg?alt=media&token=3b9abff7-8775-4667-b07c-395730736ca9', aiHint: 'bell pepper', slug: 'bell-pepper', unoptimized: true },
-  { name: 'Cucumber', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/cucumber.jpeg', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
+  { name: 'Cucumber', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcucumber.jpeg?alt=media&token=54866db4-6209-46c1-89cd-829464f11a1f', aiHint: 'cucumber vegetable', slug: 'cucumber', unoptimized: true },
   { name: 'Lettuce', imageUrl: 'https://images.unsplash.com/photo-1622943495354-f49d2964094c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bGV0dHVjZXxlbnwwfHx8fDE3NDgyMzk5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'lettuce leaves', slug: 'lettuce' },
   { name: 'Eggplant', imageUrl: 'https://images.unsplash.com/photo-1615484477201-9f4953340fab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxlZ2dwbGFudHxlbnwwfHx8fDE3NDgyNDAwNDZ8MA&ixlib=rb-4.1.0&q=80&w=1080', aiHint: 'eggplant vegetable', slug: 'eggplant' },
   { name: 'Beans', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2FBeans.jpeg?alt=media&token=07738d31-ae7b-4c9d-9a7e-9c5795dba540', aiHint: 'beans vegetable', slug: 'beans', unoptimized: true },
@@ -122,3 +123,4 @@ export default function CropSciencePage() {
 // Updated image for Carrot with Firebase Storage URL
 // Updated image for Cauliflower with Firebase Storage URL
 // Added Chilli to the crop list
+// Updated image for Cucumber with Firebase Storage URL
