@@ -146,22 +146,35 @@ export default function DiseaseDetailPage() {
   let imageUrl = diseaseDetails.IMAGE_URL;
   let aiHint = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
   const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
+  let unoptimizedImage = false;
 
-  if (isTomatoDisease && name === "Early Blight (Alternaria solani)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-    aiHint = 'tomato early blight';
-    console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
-  } else if (isTomatoDisease && name === "Late Blight (Phytophthora infestans)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-    aiHint = 'tomato late blight';
-    console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
+  if (isTomatoDisease) {
+    if (name === "Early Blight (Alternaria solani)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+      aiHint = 'tomato early blight';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
+    } else if (name === "Late Blight (Phytophthora infestans)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+      aiHint = 'tomato late blight';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
+    } else if (name === "Tomato Mosaic Virus") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
+      aiHint = 'tomato mosaic virus';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Tomato Mosaic Virus applied. ImageURL:", imageUrl);
+    }
   }
 
 
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
+    unoptimizedImage = true;
+  } else if (imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')) {
+    unoptimizedImage = true;
   }
-  console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl);
+  console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl, "Unoptimized:", unoptimizedImage);
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -211,7 +224,7 @@ export default function DiseaseDetailPage() {
                       layout="fill"
                       objectFit="cover"
                       data-ai-hint={aiHint}
-                      unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com') || imageUrl.startsWith('https://placehold.co')}
+                      unoptimized={unoptimizedImage}
                       className="transition-transform duration-300 group-hover:scale-105"
                   />
                 )}
@@ -258,7 +271,4 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
-      
-    
-
     
