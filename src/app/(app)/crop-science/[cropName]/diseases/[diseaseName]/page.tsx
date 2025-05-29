@@ -12,6 +12,8 @@ import {
   Dialog,
   DialogContent,
   DialogOverlay,
+  DialogHeader, // Added DialogHeader for accessibility
+  DialogTitle as RadixDialogTitle, // Added DialogTitle as RadixDialogTitle
 } from "@/components/ui/dialog";
 
 interface DiseaseDataItem {
@@ -138,19 +140,41 @@ export default function DiseaseDetailPage() {
   }
   
   const name = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  const imageUrl = diseaseDetails.IMAGE_URL || `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
-  const aiHint = diseaseDetails.AI_HINT || 'plant disease';
+  
+  let imageUrl = diseaseDetails.IMAGE_URL;
+  let aiHint = diseaseDetails.AI_HINT || 'plant disease';
   const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
 
+  // Override for specific tomato disease if name matches
+  if (isTomatoDisease && name === "Early Blight (Alternaria solani)") {
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
+    aiHint = 'tomato blight';
+  }
+
+  if (!imageUrl) {
+    imageUrl = `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
+  }
+  
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
+    const paragraphs = String(value).split(/\n{2,}/); // Split by two or more newlines for paragraphs
     return (
-      <div className="mb-3">
-        <h4 className="font-semibold text-md text-primary">{label}:</h4>
-        <p className="whitespace-pre-wrap text-muted-foreground text-sm">{value}</p>
+      <div className="mb-4">
+        <h4 className="font-semibold text-md text-primary mb-1">{label}:</h4>
+        {paragraphs.map((paragraph, index) => (
+          <p key={index} className="whitespace-pre-wrap text-muted-foreground text-sm mb-1.5 last:mb-0">
+            {paragraph.split('\n').map((line, lineIndex) => (
+              <React.Fragment key={lineIndex}>
+                {line}
+                {lineIndex < paragraph.split('\n').length - 1 && <br />}
+              </React.Fragment>
+            ))}
+          </p>
+        ))}
       </div>
     );
   };
+
 
   return (
     <>
@@ -167,16 +191,17 @@ export default function DiseaseDetailPage() {
           <CardContent className="p-0">
             <button
               type="button"
-              onClick={() => openImageInModal(imageUrl)}
+              onClick={() => openImageInModal(imageUrl!)}
               className="relative w-full aspect-[4/3] bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+              aria-label={`View image for ${name || 'Disease'}`}
             >
                 <Image
-                    src={imageUrl}
+                    src={imageUrl!}
                     alt={name || 'Disease image'}
                     layout="fill"
                     objectFit="cover"
                     data-ai-hint={aiHint}
-                    unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
+                    unoptimized={imageUrl!.startsWith('https://firebasestorage.googleapis.com') || imageUrl!.startsWith('https://storage.googleapis.com') || imageUrl!.startsWith('https://placehold.co')}
                     className="transition-transform duration-300 group-hover:scale-105"
                 />
             </button>
@@ -201,13 +226,16 @@ export default function DiseaseDetailPage() {
         <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
           <DialogOverlay className="bg-black/60 backdrop-blur-sm fixed inset-0 z-[51]" />
           <DialogContent className="p-2 max-w-3xl w-auto bg-transparent border-none shadow-none flex items-center justify-center z-[52] outline-none">
+            <DialogHeader className="sr-only">
+                <RadixDialogTitle>Enlarged image for {name || 'disease'}</RadixDialogTitle>
+            </DialogHeader>
             <div className="relative aspect-auto max-h-[85vh] max-w-[85vw]">
               <Image
                 src={modalImageUrl}
-                alt="Enlarged disease image"
+                alt={`Enlarged image for ${name || 'disease'}`}
                 layout="intrinsic"
-                width={1200} // Provide a large base width
-                height={800} // Provide a large base height
+                width={1200} 
+                height={800} 
                 objectFit="contain"
                 className="rounded-lg"
                 unoptimized={modalImageUrl.startsWith('https://firebasestorage.googleapis.com') || modalImageUrl.startsWith('https://storage.googleapis.com') || modalImageUrl.startsWith('https://placehold.co')}
@@ -219,3 +247,4 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
+
