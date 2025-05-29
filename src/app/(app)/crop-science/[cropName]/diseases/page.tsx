@@ -62,10 +62,13 @@ export default function DiseasesPage() {
         if (Array.isArray(data)) {
           processedData = data; 
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            // Attempt to find an array within the object's properties
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
                 processedData = data[dataArrayKey];
-            } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
+            } else if (Object.values(data).every(val => typeof val === 'object' && val !== null && Object.keys(val).length > 0)) {
+                // Handles case where data is an object of objects, e.g. { "item1": {...}, "item2": {...} }
+                // This might occur if Apps Script returns data indexed by row number or some other key.
                 processedData = Object.values(data) as DiseaseDataItem[];
             } else {
                throw new Error("Fetched data format is not a recognized array or object containing an array of items.");
@@ -81,7 +84,7 @@ export default function DiseasesPage() {
         );
 
         if (processedData.length === 0 && ((Array.isArray(data) && data.length > 0) || (typeof data === 'object' && Object.keys(data).length > 0))) {
-            console.warn("Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or TOMATO PEST AND DISEASES for tomatoes) exist and are non-empty strings in your Apps Script output items.");
+            console.warn("Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or 'TOMATO PEST AND DISEASES' for tomatoes) exist and are non-empty strings in your Apps Script output items. Current cropSlug:", cropSlug);
         }
         
         setDiseasesData(processedData);
@@ -95,7 +98,12 @@ export default function DiseasesPage() {
       }
     };
 
-    fetchData();
+    if (cropSlug) {
+        fetchData();
+    } else {
+        setError("Crop name not specified in URL.");
+        setIsLoading(false);
+    }
   }, [cropSlug]);
 
   return (
