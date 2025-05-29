@@ -191,19 +191,22 @@ export default function DiseaseDetailPage() {
           <CardContent className="p-0">
             <button
               type="button"
-              onClick={() => openImageInModal(imageUrl!)}
+              onClick={() => imageUrl && openImageInModal(imageUrl)}
               className="relative w-full aspect-video bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
               aria-label={`View image for ${name || 'Disease'}`}
+              disabled={!imageUrl}
             >
-                <Image
-                    src={imageUrl!}
-                    alt={name || 'Disease image'}
-                    layout="fill"
-                    objectFit="cover"
-                    data-ai-hint={aiHint}
-                    unoptimized={imageUrl!.startsWith('https://firebasestorage.googleapis.com') || imageUrl!.startsWith('https://storage.googleapis.com') || imageUrl!.startsWith('https://placehold.co')}
-                    className="transition-transform duration-300 group-hover:scale-105"
-                />
+                {imageUrl && (
+                  <Image
+                      src={imageUrl}
+                      alt={name || 'Disease image'}
+                      layout="fill"
+                      objectFit="cover"
+                      data-ai-hint={aiHint}
+                      unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com') || imageUrl.startsWith('https://placehold.co')}
+                      className="transition-transform duration-300 group-hover:scale-105"
+                  />
+                )}
             </button>
             
             <div className="p-4 space-y-3">
@@ -247,4 +250,3 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
-
