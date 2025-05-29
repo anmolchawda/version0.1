@@ -41,31 +41,47 @@ export default function DiseasesPage() {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
             const body = await response.text(); 
-            errorText += `\nResponse body: ${body.substring(0, 500)}`; 
+            errorText += `\nResponse body (first 500 chars): ${body.substring(0, 500)}`; 
           } catch (e) { /* Ignore error reading body */ }
           throw new Error(errorText);
         }
         
         const data = await response.json();
+        console.log("Fetched raw data from Apps Script for diseases:", JSON.stringify(data, null, 2));
         
+        let processedData: DiseaseDataItem[] = [];
+
         if (Array.isArray(data)) {
-          setDiseasesData(data.filter(item => item.NAME)); // Filter out items without a name
+          processedData = data.filter(item => item && typeof item.NAME === 'string' && item.NAME.trim() !== '');
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-                setDiseasesData(data[dataArrayKey].filter((item: DiseaseDataItem) => item.NAME));
+                console.log(`Data found in nested key: ${dataArrayKey}`);
+                processedData = data[dataArrayKey].filter((item: any) => item && typeof item.NAME === 'string' && item.NAME.trim() !== '');
             } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
-                setDiseasesData(Object.values(data).filter((item: DiseaseDataItem) => item.NAME) as DiseaseDataItem[]);
+                console.log("Data seems to be an object of objects. Processing values.");
+                processedData = Object.values(data).filter((item: any) => item && typeof item.NAME === 'string' && item.NAME.trim() !== '') as DiseaseDataItem[];
             } else {
-               throw new Error("Fetched data format is not a recognized array or object containing an array.");
+               console.error("Unrecognized data structure:", data);
+               throw new Error("Fetched data format is not a recognized array or object containing an array of items with a valid NAME property.");
             }
         } else {
-          throw new Error("Fetched data format is not as expected.");
+          console.error("Data is not an array or suitable object:", data);
+          throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
+        
+        if (processedData.length === 0 && Array.isArray(data) && data.length > 0) {
+            console.warn("Data was an array, but all items were filtered out. Check if 'NAME' property exists and is a non-empty string in your Apps Script output items.");
+        } else if (processedData.length === 0 && typeof data === 'object' && Object.keys(data).length > 0) {
+            console.warn("Data was an object, but processing resulted in an empty list. Check data structure and 'NAME' property.");
+        }
+        
+        setDiseasesData(processedData);
+
       } catch (err) {
         console.error("Fetch error in DiseasesPage:", err);
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
-        setDiseasesData([]); // Clear data on error
+        setDiseasesData([]); 
       } finally {
         setIsLoading(false);
       }
@@ -116,7 +132,7 @@ export default function DiseasesPage() {
             <div className="space-y-3">
               {diseasesData.map((disease, index) => (
                 <Card 
-                  key={disease.id || `disease-${index}`} 
+                  key={disease.NAME || `disease-${index}`} // Use NAME as key if unique, otherwise index
                   className="overflow-hidden shadow-sm hover:shadow-md transition-shadow rounded-lg p-3 cursor-pointer"
                   // onClick={() => { /* Placeholder for navigation to detail page if needed later */ }}
                 >
