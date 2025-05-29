@@ -157,8 +157,18 @@ export default function DiseasesPage() {
                 const diseaseName = cropSlug === 'tomato' ? disease["TOMATO PEST AND DISEASES"] : disease.NAME;
                 if (!diseaseName) return null; // Skip rendering if no valid name
 
-                const imageUrl = disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${diseaseName.charAt(0)}`;
-                const aiHint = disease.AI_HINT || (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
+                let imageUrl = disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${diseaseName.charAt(0)}`;
+                let aiHint = disease.AI_HINT || (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
+                let unoptimizedImage = imageUrl.startsWith('https://placehold.co');
+
+                if (cropSlug === 'tomato' && diseaseName === "Early Blight (Alternaria solani)") {
+                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
+                  aiHint = 'tomato blight';
+                  unoptimizedImage = true; 
+                } else if (imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')) {
+                  unoptimizedImage = true;
+                }
+
 
                 return (
                   <Link
@@ -173,7 +183,7 @@ export default function DiseasesPage() {
                           layout="fill"
                           objectFit="cover"
                           data-ai-hint={aiHint}
-                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com') || imageUrl.startsWith('https://placehold.co')}
+                          unoptimized={unoptimizedImage}
                         />
                       </div>
                       <div className="flex flex-col">
@@ -193,4 +203,6 @@ export default function DiseasesPage() {
     </div>
   );
 }
+    
+
     
