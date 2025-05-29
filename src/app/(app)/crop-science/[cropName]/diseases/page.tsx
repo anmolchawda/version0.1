@@ -15,6 +15,7 @@ interface DiseaseDataItem {
   NAME?: string;
   IMAGE_URL?: string;
   AI_HINT?: string;
+  PHOTOS?: string; // New field for tomato disease photos
 
   // Tomato-specific fields
   "TOMATO PEST AND DISEASES"?: string;
@@ -26,7 +27,6 @@ interface DiseaseDataItem {
   [key: string]: any; // To accommodate other potential fields
 }
 
-// Ensured this is the correct URL as per user request
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrbyhJ85nt_dMLSnTt3JHC-WJ3Ll9C3HiQ8N-Eo7fyYuBPek6lAX2L75fFj30KOrsww/exec";
 
 export default function DiseasesPage() {
@@ -83,9 +83,8 @@ export default function DiseasesPage() {
           throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
         
-        // Filter out items that don't have a valid name field for the current crop type
         processedData = processedData.filter(item => 
-          item && // Ensure item itself is not null or undefined
+          item && 
           (
             (cropSlug === 'tomato' && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '') ||
             (cropSlug !== 'tomato' && typeof item.NAME === 'string' && item.NAME.trim() !== '')
@@ -155,20 +154,29 @@ export default function DiseasesPage() {
             <div className="space-y-3">
               {diseasesData.map((disease, index) => {
                 const diseaseName = cropSlug === 'tomato' ? disease["TOMATO PEST AND DISEASES"] : disease.NAME;
-                if (!diseaseName) return null; // Skip rendering if no valid name
+                if (!diseaseName) return null; 
 
-                let imageUrl = disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${diseaseName.charAt(0)}`;
-                let aiHint = disease.AI_HINT || (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
-                let unoptimizedImage = imageUrl.startsWith('https://placehold.co');
+                let imageUrl: string;
+                let aiHint: string;
+                let unoptimizedImage = false;
 
                 if (cropSlug === 'tomato' && diseaseName === "Early Blight (Alternaria solani)") {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
                   aiHint = 'tomato blight';
                   unoptimizedImage = true; 
-                } else if (imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')) {
+                } else if (cropSlug === 'tomato' && disease["PHOTOS"]) {
+                  imageUrl = disease["PHOTOS"];
+                  aiHint = disease.AI_HINT || 'tomato disease';
+                  unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
+                } else if (disease.IMAGE_URL) {
+                  imageUrl = disease.IMAGE_URL;
+                  aiHint = disease.AI_HINT || (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
+                  unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
+                } else {
+                  imageUrl = `https://placehold.co/100x100.png?text=${diseaseName.charAt(0)}`;
+                  aiHint = (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
                   unoptimizedImage = true;
                 }
-
 
                 return (
                   <Link
@@ -203,6 +211,4 @@ export default function DiseasesPage() {
     </div>
   );
 }
-    
-
     
