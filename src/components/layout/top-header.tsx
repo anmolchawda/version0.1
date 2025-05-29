@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/core/app-logo';
-import { Menu, MessageSquare } from 'lucide-react';
+import { Menu, MessageSquare, Search } from 'lucide-react'; // Added Search
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
 export function TopHeader() {
@@ -15,19 +15,13 @@ export function TopHeader() {
   const [unreadCount, setUnreadCount] = useState(3); // Mock unread count
 
   useEffect(() => {
-    // Simulate clearing unread messages when user navigates to messages section
     if (pathname === '/messages' || pathname.startsWith('/messages/')) {
       setUnreadCount(0);
     }
-    // In a real app, you might want to re-fetch or subscribe to unread counts
-    // if the user navigates away and back, or based on real-time events.
-    // For this simulation, we'll keep it simple. If you want it to reappear
-    // for demo purposes when navigating away, you could add more complex logic here or
-    // re-initialize it based on some other trigger. For now, it just clears.
   }, [pathname]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-4 z-50 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-50 shadow-sm">
       {/* Left: Sidebar Toggle */}
       <Button
         variant="ghost"
@@ -44,18 +38,24 @@ export function TopHeader() {
         <AppLogo iconClassName="h-12 w-12" textClassName="hidden" />
       </div>
 
-      {/* Right: Messages Icon */}
-      <Link href="/messages" passHref>
-        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative">
-          <MessageSquare className="h-5 w-5 text-primary" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
-              {unreadCount}
-            </span>
-          )}
-          <span className="sr-only">Messages</span>
-        </Button>
-      </Link>
+      {/* Right: Search and Messages Icons */}
+      <div className="flex items-center space-x-1 sm:space-x-2">
+        <Link href="/discover" passHref>
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" aria-label="Search">
+            <Search className="h-5 w-5 text-primary" />
+          </Button>
+        </Link>
+        <Link href="/messages" passHref>
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Messages">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </Button>
+        </Link>
+      </div>
     </header>
   );
 }
