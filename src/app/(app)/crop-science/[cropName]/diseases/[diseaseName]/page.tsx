@@ -152,7 +152,6 @@ export default function DiseaseDetailPage() {
     aiHint = 'tomato early blight';
     console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
   } else if (isTomatoDisease && name === "Late Blight (Phytophthora infestans)") {
-    // Use the specific URL for Late Blight as requested
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
     aiHint = 'tomato late blight';
     console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
@@ -260,4 +259,6 @@ export default function DiseaseDetailPage() {
   );
 }
       
+    
+
     
