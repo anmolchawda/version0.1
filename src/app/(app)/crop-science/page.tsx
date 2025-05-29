@@ -33,7 +33,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Bitter Gourd', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbitter%20gourd.jpeg?alt=media&token=6b10f15d-2e24-4218-ade6-3c3b62ef1360', aiHint: 'bitter gourd', slug: 'bitter-gourd', unoptimized: true },
   { name: 'Cabbage', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcabbage.jpeg?alt=media&token=2b30d09d-0c37-4ae7-b93e-fc0039797af8', aiHint: 'cabbage vegetable', slug: 'cabbage', unoptimized: true },
   { name: 'Cauliflower', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fcauliflower.jpeg?alt=media&token=0d5f65bf-1b70-4f91-b481-d1d908a43d57', aiHint: 'cauliflower vegetable', slug: 'cauliflower', unoptimized: true },
-  { name: 'Radish', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/radish.jpeg', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
+  { name: 'Radish', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fradish.jpeg?alt=media&token=13b67f66-6f4f-4728-abc2-cfff0791b615', aiHint: 'radish vegetable', slug: 'radish', unoptimized: true },
   { name: 'Ridge Gourd', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/ridge%20gourd.jpeg', aiHint: 'ridge gourd', slug: 'ridge-gourd', unoptimized: true },
   { name: 'Drumstick', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fdrumstick.jpeg?alt=media&token=52131ddc-5d08-4b78-9ce1-0b7e4c5bcb5b', aiHint: 'drumstick vegetable', slug: 'drumstick', unoptimized: true },
   { name: 'Okra', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fokra.jpeg?alt=media&token=cbaf3db6-17e4-4d44-9375-a360f85a5953', aiHint: 'okra vegetable', slug: 'okra', unoptimized: true },
@@ -133,3 +133,4 @@ export default function CropSciencePage() {
 // Updated image for Pineapple with new Firebase Storage URL
 // Updated Pomegranate image URL
 // Updated Potato image URL with Firebase Storage link
+// Updated Radish image URL with Firebase Storage link
