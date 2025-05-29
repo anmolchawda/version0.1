@@ -1,15 +1,14 @@
 // src/app/(app)/events/page.tsx
 'use client';
 
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CalendarDays, MapPin, Dot } from "lucide-react";
-import { format, isSameDay, addDays, startOfMonth } from 'date-fns';
+import { CalendarDays, MapPin } from "lucide-react";
+import { format, isSameDay, addDays, startOfMonth, startOfDay } from 'date-fns';
 
 // Helper components for icons if not already globally available
-// Moved these definitions to the top, before mockEventsData
 const Leaf = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M11 20A7 7 0 0 1 4 13H2a10 10 0 0 0 10 10zM4 13c0-3.9 2.6-7.3 6-8.7A4.9 4.9 0 0 1 12 4a5 5 0 0 1 5 5v0H4z" />
@@ -113,6 +112,14 @@ export default function EventsPage() {
     }
   }, [selectedDate]);
 
+  const eventDays = useMemo(() => {
+    const dates = mockEventsData.map(event => startOfDay(event.date));
+    // Return unique dates
+    return dates.filter((date, index, self) =>
+      index === self.findIndex((d) => isSameDay(d, date))
+    );
+  }, []);
+
   return (
     <div className="space-y-6">
       <Card className="shadow-lg rounded-xl">
@@ -135,6 +142,13 @@ export default function EventsPage() {
               initialFocus
               month={selectedDate}
               onMonthChange={setSelectedDate} // Allows month navigation to update selected date context
+              modifiers={{ hasEvent: eventDays }}
+              modifiersStyles={{ 
+                hasEvent: { 
+                  color: 'hsl(var(--primary))', 
+                  fontWeight: 'bold' 
+                } 
+              }}
             />
           </div>
           <div className="flex-1 space-y-4">
