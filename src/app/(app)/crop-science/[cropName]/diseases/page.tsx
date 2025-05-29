@@ -1,72 +1,23 @@
 // src/app/(app)/crop-science/[cropName]/diseases/page.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ShieldAlert, Leaf } from "lucide-react"; // Leaf can be a generic icon for the items
+import { ChevronLeft, ShieldAlert, Leaf, Loader2, AlertTriangle } from "lucide-react";
 
-interface Disease {
-  id: string;
-  name: string;
-  description: string; // Keep for potential detail view later
-  imageUrl: string;
-  aiHint: string;
+interface DiseaseDataItem {
+  NAME: string; // Assuming the Apps Script returns a 'NAME' field
+  DESCRIPTION?: string; // Optional description
+  IMAGE_URL?: string; // Optional image URL from script
+  AI_HINT?: string; // Optional AI hint for image
+  // Add other fields as returned by your Apps Script
+  [key: string]: any; // To accommodate other potential fields
 }
 
-const allDiseasesData: Disease[] = [
-  {
-    id: 't-disease1',
-    name: 'Early Blight',
-    description: 'Caused by the fungus Alternaria solani. Appears as dark, concentric lesions on lower leaves. Can defoliate plants and reduce yield.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'tomato early blight',
-  },
-  {
-    id: 't-disease2',
-    name: 'Late Blight',
-    description: 'Caused by Phytophthora infestans. Rapidly destroys leaves, stems, and fruit. Thrives in cool, moist conditions.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'tomato late blight',
-  },
-  {
-    id: 't-disease3',
-    name: 'Septoria Leaf Spot',
-    description: 'Caused by Septoria lycopersici. Small, circular spots with dark borders and lighter centers on leaves. Leads to yellowing and leaf drop.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'leaf spot',
-  },
-  {
-    id: 't-disease4',
-    name: 'Fusarium Wilt',
-    description: 'Fungal disease that causes yellowing and wilting, often on one side of the plant. Vascular tissues become discolored.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'plant wilt disease',
-  },
-  {
-    id: 't-disease5',
-    name: 'Powdery Mildew',
-    description: 'Fungal disease appearing as white, powdery spots on leaves and stems. Can reduce photosynthesis and plant vigor.',
-    imageUrl: 'https://placehold.co/600x400.png',
-    aiHint: 'powdery mildew',
-  },
-];
-
-const getDiseasesForCrop = (cropSlug: string): Disease[] => {
-  if (cropSlug === 'tomato') {
-    return allDiseasesData.filter(disease => disease.id.startsWith('t-'));
-  }
-  return [
-    { 
-      id: 'gen-disease1', 
-      name: 'General Disease Info', 
-      description: `Detailed disease information for ${cropSlug.replace('-', ' ')} is being updated. Check common issues like blights and wilts.`, 
-      imageUrl: 'https://placehold.co/600x400.png',
-      aiHint: 'plant disease'
-    }
-  ];
-};
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrbyhJ85nt_dMLSnTt3JHC-WJ3Ll9C3HiQ8N-Eo7fyYuBPek6lAX2L75fFj30KOrsww/exec";
 
 export default function DiseasesPage() {
   const params = useParams();
@@ -76,7 +27,54 @@ export default function DiseasesPage() {
   const cropSlug = typeof cropNameParam === 'string' ? cropNameParam : '';
   const cropDisplayName = cropSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-  const diseases = getDiseasesForCrop(cropSlug);
+  const [diseasesData, setDiseasesData] = useState<DiseaseDataItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        if (!response.ok) {
+          let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
+          try {
+            const body = await response.text(); 
+            errorText += `\nResponse body: ${body.substring(0, 500)}`; 
+          } catch (e) { /* Ignore error reading body */ }
+          throw new Error(errorText);
+        }
+        
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+          setDiseasesData(data.filter(item => item.NAME)); // Filter out items without a name
+        } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+            const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
+            if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
+                setDiseasesData(data[dataArrayKey].filter((item: DiseaseDataItem) => item.NAME));
+            } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
+                setDiseasesData(Object.values(data).filter((item: DiseaseDataItem) => item.NAME) as DiseaseDataItem[]);
+            } else {
+               throw new Error("Fetched data format is not a recognized array or object containing an array.");
+            }
+        } else {
+          throw new Error("Fetched data format is not as expected.");
+        }
+      } catch (err) {
+        console.error("Fetch error in DiseasesPage:", err);
+        setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
+        setDiseasesData([]); // Clear data on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // TODO: Consider passing cropSlug to Apps Script if it can filter by crop
+    // For now, it fetches all data and assumes it's relevant or user will filter if search is added.
+    fetchData();
+  }, [cropSlug]); // Re-fetch if cropSlug changes, though currently not used in API call
 
   return (
     <div className="space-y-6">
@@ -94,39 +92,53 @@ export default function DiseasesPage() {
         <CardHeader>
           <CardTitle>Common Diseases</CardTitle>
           <CardDescription>
-            Learn about common diseases affecting {cropDisplayName}.
+            Learn about common diseases affecting {cropDisplayName}. Data sourced live.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {diseases.length > 0 ? (
-            <div className="space-y-3"> {/* Changed from grid to space-y for list view */}
-              {diseases.map((disease) => (
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-lg">Loading disease data...</p>
+            </div>
+          )}
+          {error && !isLoading && (
+            <div className="flex flex-col items-center justify-center py-10 text-destructive">
+              <AlertTriangle className="h-12 w-12 mb-4" />
+              <p className="text-lg font-semibold">Error Loading Data</p>
+              <p className="text-sm text-center whitespace-pre-wrap">{error}</p>
+            </div>
+          )}
+          {!isLoading && !error && diseasesData.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">No specific disease information available for {cropDisplayName} at this time.</p>
+          )}
+          {!isLoading && !error && diseasesData.length > 0 && (
+            <div className="space-y-3">
+              {diseasesData.map((disease, index) => (
                 <Card 
-                  key={disease.id} 
+                  key={disease.id || `disease-${index}`} 
                   className="overflow-hidden shadow-sm hover:shadow-md transition-shadow rounded-lg p-3 cursor-pointer"
-                  onClick={() => { /* Placeholder for navigation to detail page if needed later */ }}
+                  // onClick={() => { /* Placeholder for navigation to detail page if needed later */ }}
                 >
                   <div className="flex items-center space-x-4">
                     <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-md overflow-hidden shrink-0">
                       <Image
-                        src={disease.imageUrl}
-                        alt={disease.name}
+                        src={disease.IMAGE_URL || `https://placehold.co/200x200.png?text=${disease.NAME ? disease.NAME.charAt(0) : 'D'}`}
+                        alt={disease.NAME || 'Disease image'}
                         layout="fill"
                         objectFit="cover"
-                        data-ai-hint={disease.aiHint}
+                        data-ai-hint={disease.AI_HINT || 'plant disease'}
                       />
                     </div>
                     <div className="flex-grow">
-                      <h3 className="text-md sm:text-lg font-semibold text-primary">{disease.name}</h3>
-                      {/* Description removed from list view */}
+                      <h3 className="text-md sm:text-lg font-semibold text-primary">{disease.NAME || "Unknown Disease"}</h3>
+                      {/* For now, description is not shown in this list view to keep it clean */}
+                      {/* disease.DESCRIPTION && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{disease.DESCRIPTION}</p> */}
                     </div>
-                    {/* "Learn More" button removed from list view */}
                   </div>
                 </Card>
               ))}
             </div>
-          ) : (
-            <p className="text-center text-muted-foreground py-8">No specific disease information available for {cropDisplayName} at this time.</p>
           )}
         </CardContent>
       </Card>
