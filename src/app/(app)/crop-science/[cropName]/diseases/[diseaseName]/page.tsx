@@ -140,88 +140,59 @@ export default function DiseaseDetailPage() {
   const name = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const imageUrl = diseaseDetails.IMAGE_URL || `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
   const aiHint = diseaseDetails.AI_HINT || 'plant disease';
-  const additionalImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
+  const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
+
+  const renderDetailItem = (label: string, value: string | undefined | null) => {
+    if (!value) return null;
+    return (
+      <div className="mb-3">
+        <h4 className="font-semibold text-md text-primary">{label}:</h4>
+        <p className="whitespace-pre-wrap text-muted-foreground text-sm">{value}</p>
+      </div>
+    );
+  };
 
   return (
     <>
-      <div className="space-y-6">
-        <Button variant="ghost" onClick={() => router.back()} className="mb-2 inline-flex items-center text-primary hover:text-primary/80">
-            <ChevronLeft className="mr-2 h-5 w-5" /> Back to Diseases List for {cropDisplayName}
-          </Button>
-        <Card className="shadow-lg rounded-xl">
-          <CardHeader className="bg-primary/10">
-            <CardTitle className="flex items-center text-xl sm:text-2xl font-bold text-primary">
-              <ShieldAlert className="mr-3 h-6 sm:h-7 w-6 sm:w-7" />
+      <div className="space-y-4">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-0 inline-flex items-center text-primary hover:text-primary/80 -ml-2">
+            <ChevronLeft className="mr-2 h-5 w-5" /> Back
+        </Button>
+        <Card className="shadow-lg rounded-xl overflow-hidden">
+          <CardHeader className="bg-card pt-4 pb-3 px-4">
+            <CardTitle className="text-lg sm:text-xl font-bold text-primary text-center">
               {name || "Disease Details"}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4 text-sm">
-            {cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"] ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => openImageInModal(imageUrl)}
-                  className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
-                >
-                    <Image
-                        src={imageUrl}
-                        alt={name || 'Disease image'}
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint={aiHint}
-                        unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
-                        className="transition-transform duration-300 group-hover:scale-105"
-                    />
-                </button>
-                <p><strong>Causing Agent:</strong> {diseaseDetails["CAUSING AGENT"] || "N/A"}</p>
-                <p><strong>Favourable Climate:</strong> {diseaseDetails["FAVOURABLE CLIMATE"] || "N/A"}</p>
-                <div className="space-y-1"> 
-                  <h4 className="font-semibold mt-2 mb-1 text-primary">Symptoms:</h4>
-                  <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["SYMPTOMS"] || "N/A"}</p>
-                </div>
-                <div className="space-y-1">
-                  <h4 className="font-semibold mt-2 mb-1 text-primary">Management:</h4>
-                  <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["MANAGEMENT"] || "N/A"}</p>
-                </div>
-                <div className="mt-4 pt-4 border-t">
-                  <h5 className="font-semibold text-md text-primary mb-2">More Images of Symptoms/Effects:</h5>
-                  <button
-                    type="button"
-                    onClick={() => openImageInModal(additionalImageUrl)}
-                    className="relative w-2/3 mx-auto aspect-video bg-muted rounded-md overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
-                  >
-                    <Image
-                        src={additionalImageUrl}
-                        alt={`${name || 'Disease'} symptom - E&L Blight`}
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint="tomato blight"
-                        unoptimized={true}
-                        className="transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </button>
-                </div>
-              </>
-            ) : (
-               <>
-                  <button
-                    type="button"
-                    onClick={() => openImageInModal(imageUrl)}
-                    className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
-                  >
-                      <Image
-                          src={imageUrl}
-                          alt={name || 'Disease image'}
-                          layout="fill"
-                          objectFit="cover"
-                          data-ai-hint={aiHint}
-                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
-                          className="transition-transform duration-300 group-hover:scale-105"
-                      />
-                  </button>
-                  <p>{diseaseDetails.description || "No further details available."}</p>
-              </>
-            )}
+          <CardContent className="p-0">
+            <button
+              type="button"
+              onClick={() => openImageInModal(imageUrl)}
+              className="relative w-full aspect-[4/3] bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+            >
+                <Image
+                    src={imageUrl}
+                    alt={name || 'Disease image'}
+                    layout="fill"
+                    objectFit="cover"
+                    data-ai-hint={aiHint}
+                    unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
+                    className="transition-transform duration-300 group-hover:scale-105"
+                />
+            </button>
+            
+            <div className="p-4 space-y-3">
+                {isTomatoDisease ? (
+                <>
+                    {renderDetailItem("Causing Agent", diseaseDetails["CAUSING AGENT"])}
+                    {renderDetailItem("Favourable Climate", diseaseDetails["FAVOURABLE CLIMATE"])}
+                    {renderDetailItem("Symptoms", diseaseDetails["SYMPTOMS"])}
+                    {renderDetailItem("Management", diseaseDetails["MANAGEMENT"])}
+                </>
+                ) : (
+                <p className="text-sm text-muted-foreground">{diseaseDetails.description || "No further details available."}</p>
+                )}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -248,4 +219,3 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
-
