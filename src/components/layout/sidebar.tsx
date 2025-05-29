@@ -84,7 +84,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext(); // Use closeSidebar from context
+  const { isSidebarOpen, closeSidebar } = useSidebarContext();
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -109,13 +109,13 @@ export function Sidebar() {
   const secondaryNavLinks = useMemo((): NavLink[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
     { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun /> },
+    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu /> },
     { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText /> },
     { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug /> },
     { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 /> },
     { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC Code', icon: <Code2 /> },
-    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu /> },
   ], [currentLanguage]);
 
   const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
@@ -129,7 +129,7 @@ export function Sidebar() {
         variant={isSidebarOpen ? "outline" : "ghost"}
         className={cn(
           "w-full justify-start gap-3",
-          !isSidebarOpen && "justify-center p-2 h-auto" 
+           !isSidebarOpen && "justify-center p-2 h-auto"
         )}
         onClick={closeSidebar}
         aria-label={!isSidebarOpen ? settingsLabel : undefined}
@@ -192,9 +192,11 @@ export function Sidebar() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>{settingsLinkElement}</TooltipTrigger>
-              <TooltipContent side="right" className="bg-background text-foreground border">
-                <p>{settingsLabel}</p>
-              </TooltipContent>
+              {settingsLabel && (
+                 <TooltipContent side="right" className="bg-background text-foreground border">
+                    <p>{settingsLabel}</p>
+                 </TooltipContent>
+              )}
             </Tooltip>
           </TooltipProvider>
         ) : (
@@ -207,10 +209,12 @@ export function Sidebar() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>{userProfileElement}</TooltipTrigger>
-              <TooltipContent side="right" className="bg-background text-foreground border">
-                <p>{userNameDisplay}</p>
-                <p className="text-xs text-muted-foreground">@{mockUser?.username}</p>
-              </TooltipContent>
+               {userNameDisplay && (
+                  <TooltipContent side="right" className="bg-background text-foreground border">
+                    <p>{userNameDisplay}</p>
+                    {mockUser?.username && <p className="text-xs text-muted-foreground">@{mockUser?.username}</p>}
+                  </TooltipContent>
+               )}
             </Tooltip>
           </TooltipProvider>
         ) : (
