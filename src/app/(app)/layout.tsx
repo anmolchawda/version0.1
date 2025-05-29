@@ -51,7 +51,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         <Sidebar />
         {isSidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20 md:hidden" // Only show overlay on mobile
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20" // Removed md:hidden
             onClick={closeSidebar}
             aria-hidden="true"
           />
@@ -59,11 +59,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         <main
           className={cn(
             `flex-1 py-6 overflow-y-auto mb-16` 
-            // Removed dynamic margin, sidebar will overlap
           )}
         >
-          {/* Changed max-w-xl to max-w-2xl for slightly wider content area */}
-          <div className="max-w-2xl mx-auto px-4">
+          <div className="max-w-2xl mx-auto px-4 h-full"> {/* Added h-full here for MandiPage card */}
            {children}
           </div>
         </main>
