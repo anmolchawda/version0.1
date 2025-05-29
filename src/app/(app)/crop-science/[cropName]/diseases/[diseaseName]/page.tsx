@@ -125,8 +125,7 @@ export default function DiseaseDetailPage() {
   }
   
   const name = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  // Using placeholder image for detail page as well, if IMAGE_URL is not present for tomato diseases.
-  const imageUrl = diseaseDetails.IMAGE_URL || `https://placehold.co/600x400.png?text=${name ? name.charAt(0) : 'D'}`;
+  const imageUrl = diseaseDetails.IMAGE_URL || `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
   const aiHint = diseaseDetails.AI_HINT || 'plant disease';
 
   return (
@@ -144,18 +143,15 @@ export default function DiseaseDetailPage() {
         <CardContent className="pt-6 space-y-4 text-sm">
           {cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"] ? (
             <>
-              {/* Optionally, display an image if available */}
-              {diseaseDetails.IMAGE_URL && (
-                 <div className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4">
-                    <Image
-                        src={diseaseDetails.IMAGE_URL}
-                        alt={name || 'Disease image'}
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint={diseaseDetails.AI_HINT || 'tomato disease detail'}
-                    />
-                </div>
-              )}
+              <div className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4">
+                  <Image
+                      src={imageUrl}
+                      alt={name || 'Disease image'}
+                      layout="fill"
+                      objectFit="cover"
+                      data-ai-hint={aiHint}
+                  />
+              </div>
               <p><strong>Causing Agent:</strong> {diseaseDetails["CAUSING AGENT"] || "N/A"}</p>
               <p><strong>Favourable Climate:</strong> {diseaseDetails["FAVOURABLE CLIMATE"] || "N/A"}</p>
               <div className="space-y-1"> 
@@ -165,6 +161,29 @@ export default function DiseaseDetailPage() {
               <div className="space-y-1">
                 <h4 className="font-semibold mt-2 mb-1 text-primary">Management:</h4>
                 <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["MANAGEMENT"] || "N/A"}</p>
+              </div>
+              <div className="mt-4 pt-4 border-t">
+                <h5 className="font-semibold text-md text-primary mb-2">More Images of Symptoms/Effects:</h5>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative w-full sm:w-1/2 aspect-video bg-muted rounded-md overflow-hidden">
+                    <Image
+                        src={`https://placehold.co/400x300.png?text=Symptom+1`}
+                        alt={`${name || 'Disease'} symptom 1`}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint="disease symptom"
+                    />
+                  </div>
+                  <div className="relative w-full sm:w-1/2 aspect-video bg-muted rounded-md overflow-hidden">
+                    <Image
+                        src={`https://placehold.co/400x300.png?text=Affected+Part`}
+                        alt={`${name || 'Disease'} affected plant part`}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint="affected plant"
+                    />
+                  </div>
+                </div>
               </div>
             </>
           ) : (
@@ -186,6 +205,3 @@ export default function DiseaseDetailPage() {
     </div>
   );
 }
-
-
-    
