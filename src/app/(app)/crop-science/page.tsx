@@ -41,7 +41,7 @@ const commonCrops: CropInfo[] = [
   // Fruits
   { name: 'Apple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fapple.jpg?alt=media&token=c5f86e8e-c19f-4aba-8289-7f4bed2c5332', aiHint: 'apple fruit', slug: 'apple', unoptimized: true },
   { name: 'Banana', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fbanana.jpg?alt=media&token=6228109c-9358-4c7c-bffd-51be0c5bc914', aiHint: 'banana fruit', slug: 'banana', unoptimized: true },
-  { name: 'Orange', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/orange.jpg', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
+  { name: 'Orange', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Forange.jpg?alt=media&token=6be8b4b0-12d8-4813-b0a8-62eb64d75429', aiHint: 'orange fruit', slug: 'orange', unoptimized: true },
   { name: 'Mango', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fmango.jpg?alt=media&token=afec0169-ee02-434c-b22b-0c0993f38464', aiHint: 'mango fruit', slug: 'mango', unoptimized: true },
   { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
   { name: 'Strawberry', imageUrl: 'https://storage.cloud.google.com/imagesoffarmdocc/crop%20images/strawberry%20(1).jpg', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
@@ -129,3 +129,4 @@ export default function CropSciencePage() {
 // Updated image for Kiwi with new Firebase URL
 // Updated image for Mango with new Firebase Storage URL
 // Updated image for Okra with new Firebase Storage URL
+// Updated image for Orange with new Firebase Storage URL
