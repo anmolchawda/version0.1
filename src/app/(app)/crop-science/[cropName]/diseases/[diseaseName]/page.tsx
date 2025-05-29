@@ -145,8 +145,8 @@ export default function DiseaseDetailPage() {
   
   let imageUrl = diseaseDetails.IMAGE_URL;
   let aiHint = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
-  const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
   let unoptimizedImage = false;
+  const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
 
   if (isTomatoDisease) {
     if (name === "Early Blight (Alternaria solani)") {
@@ -184,6 +184,11 @@ export default function DiseaseDetailPage() {
       aiHint = 'tomato bacterial spot';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Bacterial Speck and Spot applied. ImageURL:", imageUrl);
+    } else if (name === "Gray Mold (Botrytis cinerea)") {
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
+      aiHint = 'tomato gray_mold';
+      unoptimizedImage = true;
+      console.log("DiseaseDetailPage - Override for Gray Mold (Botrytis cinerea) applied. ImageURL:", imageUrl);
     }
   }
 
