@@ -1,4 +1,4 @@
-
+// src/components/layout/sidebar.tsx
 'use client';
 
 import Link from 'next/link';
@@ -53,12 +53,13 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+        !isSidebarOpen && "justify-center",
         itemClassName
       )}
       onClick={handleClick}
       aria-label={!isSidebarOpen ? ariaLabel || label : undefined}
     >
-      {icon}
+      {React.cloneElement(icon, { className: cn(icon.props.className, 'h-5 w-5') })}
       {isSidebarOpen && <span className="truncate">{label}</span>}
     </Link>
   );
@@ -83,7 +84,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext();
+  const { isSidebarOpen, closeSidebar } = useSidebarContext(); // Use closeSidebar from context
   const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -106,15 +107,15 @@ export function Sidebar() {
   }, []);
 
   const secondaryNavLinks = useMemo((): NavLink[] => [
-    { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
-    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText className="h-5 w-5" /> },
-    { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun className="h-5 w-5" /> },
-    { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays className="h-5 w-5" /> },
-    { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
-    { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
-    { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 className="h-5 w-5" /> },
-    { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC Code', icon: <Code2 className="h-5 w-5" /> },
-    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu className="h-5 w-5" /> },
+    { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
+    { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun /> },
+    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText /> },
+    { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays /> },
+    { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan /> },
+    { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug /> },
+    { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 /> },
+    { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC Code', icon: <Code2 /> },
+    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu /> },
   ], [currentLanguage]);
 
   const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
@@ -128,11 +129,12 @@ export function Sidebar() {
         variant={isSidebarOpen ? "outline" : "ghost"}
         className={cn(
           "w-full justify-start gap-3",
-          !isSidebarOpen && "justify-center p-2.5 h-auto aspect-square" 
+          !isSidebarOpen && "justify-center p-2 h-auto" 
         )}
         onClick={closeSidebar}
+        aria-label={!isSidebarOpen ? settingsLabel : undefined}
       >
-        <Link href="/settings" aria-label={!isSidebarOpen ? settingsLabel : undefined}>
+        <Link href="/settings">
           <SettingsIcon className="h-5 w-5" />
           {isSidebarOpen && <span>{settingsLabel}</span>}
         </Link>
@@ -180,7 +182,6 @@ export function Sidebar() {
             icon={link.icon}
             isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
             isSidebarOpen={isSidebarOpen}
-            itemClassName={!isSidebarOpen ? "justify-center" : ""}
             ariaLabel={link.label}
           />
         ))}
