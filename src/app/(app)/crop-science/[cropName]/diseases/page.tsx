@@ -43,6 +43,11 @@ export default function DiseasesPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!cropSlug) {
+        setError("Crop name not specified in URL.");
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
       setError(null);
       try {
@@ -80,8 +85,11 @@ export default function DiseasesPage() {
         
         // Filter out items that don't have a valid name field for the current crop type
         processedData = processedData.filter(item => 
-          (cropSlug === 'tomato' && item && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '') ||
-          (cropSlug !== 'tomato' && item && typeof item.NAME === 'string' && item.NAME.trim() !== '')
+          item && // Ensure item itself is not null or undefined
+          (
+            (cropSlug === 'tomato' && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '') ||
+            (cropSlug !== 'tomato' && typeof item.NAME === 'string' && item.NAME.trim() !== '')
+          )
         );
 
         if (processedData.length === 0 && ((Array.isArray(data) && data.length > 0) || (typeof data === 'object' && Object.keys(data).length > 0))) {
