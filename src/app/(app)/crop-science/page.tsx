@@ -46,7 +46,7 @@ const commonCrops: CropInfo[] = [
   { name: 'Grapes', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fgrapes.jpg?alt=media&token=51c9eda6-60f4-4955-a065-b60e70ed2858', aiHint: 'grapes fruit', slug: 'grapes', unoptimized: true },
   { name: 'Strawberry', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fstrawberry.jpg?alt=media&token=f4ac25be-1ef3-4020-804a-fa4563471c67', aiHint: 'strawberry fruit', slug: 'strawberry', unoptimized: true },
   { name: 'Pineapple', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpineapple.jpg?alt=media&token=e6323018-a82a-477b-a31f-c4979146baed', aiHint: 'pineapple fruit', slug: 'pineapple', unoptimized: true },
-  { name: 'Watermelon', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fwatermelon.jpg?alt=media&token=99f36179-3084-4a4e-a134-f36179ba475e', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
+  { name: 'Watermelon', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fwatermelon.jpg?alt=media&token=d4f5d05f-08b3-4127-a94d-4f7fd2670f73', aiHint: 'watermelon fruit', slug: 'watermelon', unoptimized: true },
   { name: 'Pomegranate', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fpomegranade.jpg?alt=media&token=b64e3d98-71e9-4299-a579-100ec8d66d90', aiHint: 'pomegranate fruit', slug: 'pomegranate', unoptimized: true },
   { name: 'Kiwi', imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Crop%20images%2Fkiwi.jpg?alt=media&token=5c9a822d-ec0f-4dee-86b1-99eb4a109bd5', aiHint: 'kiwi fruit', slug: 'kiwi', unoptimized: true },
 ];
@@ -97,3 +97,4 @@ export default function CropSciencePage() {
   );
 }
 
+// Added a comment to ensure file change is detected if content is identical.
