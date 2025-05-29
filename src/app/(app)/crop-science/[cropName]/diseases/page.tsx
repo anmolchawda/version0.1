@@ -74,9 +74,10 @@ export default function DiseasesPage() {
           throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
         
+        // Filter out items that don't have a valid name field for the current crop type
         processedData = processedData.filter(item => 
-          (item && typeof item.NAME === 'string' && item.NAME.trim() !== '') ||
-          (cropSlug === 'tomato' && item && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '')
+          (cropSlug === 'tomato' && item && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '') ||
+          (cropSlug !== 'tomato' && item && typeof item.NAME === 'string' && item.NAME.trim() !== '')
         );
 
         if (processedData.length === 0 && ((Array.isArray(data) && data.length > 0) || (typeof data === 'object' && Object.keys(data).length > 0))) {
@@ -135,49 +136,39 @@ export default function DiseasesPage() {
           )}
           {!isLoading && !error && diseasesData.length > 0 && (
             <div className="space-y-3">
-              {diseasesData.map((disease, index) => (
-                cropSlug === 'tomato' && disease["TOMATO PEST AND DISEASES"] ? (
+              {diseasesData.map((disease, index) => {
+                const diseaseName = cropSlug === 'tomato' ? disease["TOMATO PEST AND DISEASES"] : disease.NAME;
+                if (!diseaseName) return null; // Skip rendering if no valid name
+
+                const imageUrl = disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${diseaseName.charAt(0)}`;
+                const aiHint = disease.AI_HINT || (cropSlug === 'tomato' ? 'tomato disease' : 'plant disease');
+
+                return (
                   <Link
-                    href={`/crop-science/${cropSlug}/diseases/${encodeURIComponent(disease["TOMATO PEST AND DISEASES"]!)}`}
-                    key={disease["TOMATO PEST AND DISEASES"] || `tomato-disease-${index}`}
+                    href={`/crop-science/${cropSlug}/diseases/${encodeURIComponent(diseaseName)}`}
+                    key={diseaseName || `disease-${index}`}
                   >
                     <Card className="p-3 flex items-center space-x-4 hover:bg-muted/50 cursor-pointer rounded-lg shadow-sm transition-shadow">
                       <div className="relative w-16 h-16 bg-muted rounded-md overflow-hidden shrink-0">
                         <Image
-                          src={disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${disease["TOMATO PEST AND DISEASES"] ? disease["TOMATO PEST AND DISEASES"].charAt(0) : 'D'}`}
-                          alt={disease["TOMATO PEST AND DISEASES"] || 'Disease image'}
+                          src={imageUrl}
+                          alt={diseaseName}
                           layout="fill"
                           objectFit="cover"
-                          data-ai-hint={disease.AI_HINT || 'tomato disease'}
+                          data-ai-hint={aiHint}
+                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
                         />
                       </div>
-                      <CardTitle className="text-md text-primary">{disease["TOMATO PEST AND DISEASES"]}</CardTitle>
+                      <div className="flex flex-col">
+                        <CardTitle className="text-md text-primary">{diseaseName}</CardTitle>
+                        {cropSlug === 'tomato' && (
+                          <p className="text-xs text-muted-foreground uppercase mt-1">TOMATO</p>
+                        )}
+                      </div>
                     </Card>
                   </Link>
-                ) : disease.NAME ? (
-                  // Fallback for non-tomato crops or general disease listing
-                  <Card 
-                    key={disease.NAME || `disease-${index}`}
-                    className="overflow-hidden shadow-sm hover:shadow-md transition-shadow rounded-lg p-3 cursor-pointer"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-md overflow-hidden shrink-0">
-                        <Image
-                          src={disease.IMAGE_URL || `https://placehold.co/200x200.png?text=${disease.NAME ? disease.NAME.charAt(0) : 'D'}`}
-                          alt={disease.NAME || 'Disease image'}
-                          layout="fill"
-                          objectFit="cover"
-                          data-ai-hint={disease.AI_HINT || 'plant disease'}
-                        />
-                      </div>
-                      <div className="flex-grow">
-                        <h3 className="text-md sm:text-lg font-semibold text-primary">{disease.NAME}</h3>
-                        {/* Optionally, add a link to a generic detail page if needed */}
-                      </div>
-                    </div>
-                  </Card>
-                ) : null
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
@@ -185,5 +176,4 @@ export default function DiseasesPage() {
     </div>
   );
 }
-
     
