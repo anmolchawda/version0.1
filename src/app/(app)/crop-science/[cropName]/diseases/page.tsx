@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ShieldAlert, Leaf, Loader2, AlertTriangle } from "lucide-react";
@@ -15,7 +16,7 @@ interface DiseaseDataItem {
   IMAGE_URL?: string;
   AI_HINT?: string;
 
-  // Tomato-specific fields (as per user's new example)
+  // Tomato-specific fields
   "TOMATO PEST AND DISEASES"?: string;
   "CAUSING AGENT"?: string;
   "FAVOURABLE CLIMATE"?: string;
@@ -44,7 +45,7 @@ export default function DiseasesPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(APPS_SCRIPT_URL); // Using the same script URL
+        const response = await fetch(APPS_SCRIPT_URL); 
         if (!response.ok) {
           let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
           try {
@@ -55,30 +56,24 @@ export default function DiseasesPage() {
         }
         
         const data = await response.json();
-        // console.log("Fetched raw data from Apps Script for diseases:", JSON.stringify(data, null, 2));
         
         let processedData: DiseaseDataItem[] = [];
 
         if (Array.isArray(data)) {
-          processedData = data; // Assume direct array of items
+          processedData = data; 
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-                // console.log(`Data found in nested key: ${dataArrayKey}`);
                 processedData = data[dataArrayKey];
             } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
-                // console.log("Data seems to be an object of objects. Processing values.");
                 processedData = Object.values(data) as DiseaseDataItem[];
             } else {
-               // console.error("Unrecognized data structure:", data);
                throw new Error("Fetched data format is not a recognized array or object containing an array of items.");
             }
         } else {
-          // console.error("Data is not an array or suitable object:", data);
           throw new Error("Fetched data format is not as expected (expected an array or an object with a top-level array property).");
         }
         
-        // Filter out items that don't have either NAME (for general) or TOMATO PEST AND DISEASES (for tomato-specific)
         processedData = processedData.filter(item => 
           (item && typeof item.NAME === 'string' && item.NAME.trim() !== '') ||
           (cropSlug === 'tomato' && item && typeof item["TOMATO PEST AND DISEASES"] === 'string' && item["TOMATO PEST AND DISEASES"].trim() !== '')
@@ -142,18 +137,25 @@ export default function DiseasesPage() {
             <div className="space-y-3">
               {diseasesData.map((disease, index) => (
                 cropSlug === 'tomato' && disease["TOMATO PEST AND DISEASES"] ? (
-                  <Card key={disease["TOMATO PEST AND DISEASES"] || `tomato-disease-${index}`} className="shadow-md rounded-lg">
-                    <CardHeader>
-                      <CardTitle className="text-lg text-primary">{disease["TOMATO PEST AND DISEASES"]}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-1 text-sm text-muted-foreground">
-                      <p><strong>Causing Agent:</strong> {disease["CAUSING AGENT"] || "N/A"}</p>
-                      <p><strong>Favourable Climate:</strong> {disease["FAVOURABLE CLIMATE"] || "N/A"}</p>
-                      <p><strong>Symptoms:</strong> {disease["SYMPTOMS"] || "N/A"}</p>
-                      <p><strong>Management:</strong> {disease["MANAGEMENT"] || "N/A"}</p>
-                    </CardContent>
-                  </Card>
+                  <Link
+                    href={`/crop-science/${cropSlug}/diseases/${encodeURIComponent(disease["TOMATO PEST AND DISEASES"]!)}`}
+                    key={disease["TOMATO PEST AND DISEASES"] || `tomato-disease-${index}`}
+                  >
+                    <Card className="p-3 flex items-center space-x-4 hover:bg-muted/50 cursor-pointer rounded-lg shadow-sm transition-shadow">
+                      <div className="relative w-16 h-16 bg-muted rounded-md overflow-hidden shrink-0">
+                        <Image
+                          src={disease.IMAGE_URL || `https://placehold.co/100x100.png?text=${disease["TOMATO PEST AND DISEASES"] ? disease["TOMATO PEST AND DISEASES"].charAt(0) : 'D'}`}
+                          alt={disease["TOMATO PEST AND DISEASES"] || 'Disease image'}
+                          layout="fill"
+                          objectFit="cover"
+                          data-ai-hint={disease.AI_HINT || 'tomato disease'}
+                        />
+                      </div>
+                      <CardTitle className="text-md text-primary">{disease["TOMATO PEST AND DISEASES"]}</CardTitle>
+                    </Card>
+                  </Link>
                 ) : disease.NAME ? (
+                  // Fallback for non-tomato crops or general disease listing
                   <Card 
                     key={disease.NAME || `disease-${index}`}
                     className="overflow-hidden shadow-sm hover:shadow-md transition-shadow rounded-lg p-3 cursor-pointer"
@@ -170,10 +172,11 @@ export default function DiseasesPage() {
                       </div>
                       <div className="flex-grow">
                         <h3 className="text-md sm:text-lg font-semibold text-primary">{disease.NAME}</h3>
+                        {/* Optionally, add a link to a generic detail page if needed */}
                       </div>
                     </div>
                   </Card>
-                ) : null // In case an item has neither tomato specific key nor general NAME key
+                ) : null
               ))}
             </div>
           )}
