@@ -1,4 +1,4 @@
-// src/components/layout/sidebar.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -18,6 +18,7 @@ import {
   Settings as SettingsIcon,
   ScrollText,
   CloudSun,
+  CalendarDays,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -25,14 +26,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 const MOCK_USER_ID = '1';
 
-const NavLinkItem: React.FC<{
+interface NavLinkItemProps {
   href: string;
   label: string;
   icon: JSX.Element;
   isActive: boolean;
   isSidebarOpen: boolean;
   itemClassName?: string;
-}> = ({ href, label, icon, isActive, isSidebarOpen, itemClassName }) => {
+  ariaLabel?: string;
+}
+
+const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, isSidebarOpen, itemClassName, ariaLabel }) => {
   const { closeSidebar: contextCloseSidebar } = useSidebarContext();
 
   const handleClick = () => {
@@ -49,10 +53,10 @@ const NavLinkItem: React.FC<{
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        !isSidebarOpen && "justify-center", // Center icon when collapsed
         itemClassName
       )}
       onClick={handleClick}
+      aria-label={!isSidebarOpen ? ariaLabel || label : undefined}
     >
       {icon}
       {isSidebarOpen && <span className="truncate">{label}</span>}
@@ -64,7 +68,7 @@ const NavLinkItem: React.FC<{
       <TooltipProvider delayDuration={0}>
         <Tooltip>
           <TooltipTrigger asChild>{linkElement}</TooltipTrigger>
-          {label && ( // Ensure label exists before rendering TooltipContent
+          {label && (
             <TooltipContent side="right" className="bg-background text-foreground border">
               <p>{label}</p>
             </TooltipContent>
@@ -73,8 +77,7 @@ const NavLinkItem: React.FC<{
       </TooltipProvider>
     );
   }
-
-  return linkElement; // Render only the Link when sidebar is open
+  return linkElement;
 };
 
 
@@ -106,6 +109,7 @@ export function Sidebar() {
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
     { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText className="h-5 w-5" /> },
     { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun className="h-5 w-5" /> },
+    { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays className="h-5 w-5" /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan className="h-5 w-5" /> },
     { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug className="h-5 w-5" /> },
     { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 className="h-5 w-5" /> },
@@ -121,27 +125,50 @@ export function Sidebar() {
   const settingsLinkElement = (
       <Button
         asChild
-        variant="outline"
+        variant={isSidebarOpen ? "outline" : "ghost"}
         className={cn(
-          "w-full justify-start gap-3", // Base styles
-          !isSidebarOpen && "justify-center p-2.5 h-auto" // Styles for collapsed state (icon only)
+          "w-full justify-start gap-3",
+          !isSidebarOpen && "justify-center p-2.5 h-auto aspect-square" 
         )}
         onClick={closeSidebar}
       >
-        <Link href="/settings" aria-label={settingsLabel}>
+        <Link href="/settings" aria-label={!isSidebarOpen ? settingsLabel : undefined}>
           <SettingsIcon className="h-5 w-5" />
           {isSidebarOpen && <span>{settingsLabel}</span>}
         </Link>
       </Button>
   );
 
+  const userProfileElement = (
+    <Link
+      href={`/profile/${MOCK_USER_ID}`}
+      className={cn(
+        "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
+        !isSidebarOpen && "justify-center"
+      )}
+      onClick={closeSidebar}
+      aria-label={!isSidebarOpen ? `${userNameDisplay} Profile` : undefined}
+    >
+      <Avatar className="h-9 w-9 border">
+        <AvatarImage src={mockUser?.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
+        <AvatarFallback>{userAvatarFallback}</AvatarFallback>
+      </Avatar>
+      {isSidebarOpen && (
+        <div className="flex flex-col overflow-hidden">
+          <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
+          <span className="text-xs text-muted-foreground truncate">@{mockUser?.username}</span>
+        </div>
+      )}
+    </Link>
+  );
 
   return (
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 transition-transform duration-300 ease-in-out z-30 shadow-lg",
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        "fixed left-0 top-16 h-[calc(100vh-8rem)] shadow-lg", // 8rem = 4rem top + 4rem bottom
+        "transition-transform duration-300 ease-in-out z-30",
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
       )}
     >
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
@@ -153,6 +180,8 @@ export function Sidebar() {
             icon={link.icon}
             isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
             isSidebarOpen={isSidebarOpen}
+            itemClassName={!isSidebarOpen ? "justify-center" : ""}
+            ariaLabel={link.label}
           />
         ))}
       </div>
@@ -173,40 +202,18 @@ export function Sidebar() {
 
         <Separator />
 
-        {isSidebarOpen ? (
-           <Link
-            href={`/profile/${MOCK_USER_ID}`}
-            className={cn("flex items-center gap-3 group p-2 rounded-md hover:bg-muted")}
-            onClick={closeSidebar}
-          >
-            <Avatar className="h-9 w-9 border">
-              <AvatarImage src={mockUser?.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
-              <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
-              <span className="text-xs text-muted-foreground truncate">@{mockUser?.username}</span>
-            </div>
-          </Link>
+        {!isSidebarOpen ? (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>{userProfileElement}</TooltipTrigger>
+              <TooltipContent side="right" className="bg-background text-foreground border">
+                <p>{userNameDisplay}</p>
+                <p className="text-xs text-muted-foreground">@{mockUser?.username}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
-           <div className="flex justify-center p-2">
-             <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                         <Link href={`/profile/${MOCK_USER_ID}`} onClick={closeSidebar} aria-label={`${userNameDisplay} Profile`}>
-                            <Avatar className="h-9 w-9 border">
-                                <AvatarImage src={mockUser?.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
-                                <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-                            </Avatar>
-                         </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="bg-background text-foreground border">
-                        <p>{userNameDisplay}</p>
-                        <p className="text-xs text-muted-foreground">@{mockUser?.username}</p>
-                    </TooltipContent>
-                </Tooltip>
-             </TooltipProvider>
-           </div>
+          userProfileElement
         )}
       </div>
     </aside>
