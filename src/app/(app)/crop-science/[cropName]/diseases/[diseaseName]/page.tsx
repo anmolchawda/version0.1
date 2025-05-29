@@ -8,6 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ShieldAlert, Loader2, AlertTriangle } from "lucide-react";
 import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+} from "@/components/ui/dialog";
 
 interface DiseaseDataItem {
   NAME?: string;
@@ -34,6 +39,14 @@ export default function DiseaseDetailPage() {
   const [diseaseDetails, setDiseaseDetails] = useState<DiseaseDataItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
+
+  const openImageInModal = (url: string) => {
+    setModalImageUrl(url);
+    setIsImageModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchDiseaseDetails = async () => {
@@ -127,59 +140,29 @@ export default function DiseaseDetailPage() {
   const name = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const imageUrl = diseaseDetails.IMAGE_URL || `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
   const aiHint = diseaseDetails.AI_HINT || 'plant disease';
+  const additionalImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
 
   return (
-    <div className="space-y-6">
-       <Button variant="ghost" onClick={() => router.back()} className="mb-2 inline-flex items-center text-primary hover:text-primary/80">
-          <ChevronLeft className="mr-2 h-5 w-5" /> Back to Diseases List for {cropDisplayName}
-        </Button>
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader className="bg-primary/10">
-          <CardTitle className="flex items-center text-xl sm:text-2xl font-bold text-primary">
-            <ShieldAlert className="mr-3 h-6 sm:h-7 w-6 sm:w-7" />
-            {name || "Disease Details"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-6 space-y-4 text-sm">
-          {cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"] ? (
-            <>
-              <div className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4">
-                  <Image
-                      src={imageUrl}
-                      alt={name || 'Disease image'}
-                      layout="fill"
-                      objectFit="cover"
-                      data-ai-hint={aiHint}
-                      unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
-                  />
-              </div>
-              <p><strong>Causing Agent:</strong> {diseaseDetails["CAUSING AGENT"] || "N/A"}</p>
-              <p><strong>Favourable Climate:</strong> {diseaseDetails["FAVOURABLE CLIMATE"] || "N/A"}</p>
-              <div className="space-y-1"> 
-                <h4 className="font-semibold mt-2 mb-1 text-primary">Symptoms:</h4>
-                <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["SYMPTOMS"] || "N/A"}</p>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-semibold mt-2 mb-1 text-primary">Management:</h4>
-                <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["MANAGEMENT"] || "N/A"}</p>
-              </div>
-              <div className="mt-4 pt-4 border-t">
-                <h5 className="font-semibold text-md text-primary mb-2">More Images of Symptoms/Effects:</h5>
-                <div className="relative w-2/3 mx-auto aspect-video bg-muted rounded-md overflow-hidden">
-                  <Image
-                      src="https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab"
-                      alt={`${name || 'Disease'} symptom - E&L Blight`}
-                      layout="fill"
-                      objectFit="cover"
-                      data-ai-hint="tomato blight"
-                      unoptimized={true}
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-             <>
-                <div className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4">
+    <>
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-2 inline-flex items-center text-primary hover:text-primary/80">
+            <ChevronLeft className="mr-2 h-5 w-5" /> Back to Diseases List for {cropDisplayName}
+          </Button>
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader className="bg-primary/10">
+            <CardTitle className="flex items-center text-xl sm:text-2xl font-bold text-primary">
+              <ShieldAlert className="mr-3 h-6 sm:h-7 w-6 sm:w-7" />
+              {name || "Disease Details"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-4 text-sm">
+            {cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"] ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => openImageInModal(imageUrl)}
+                  className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+                >
                     <Image
                         src={imageUrl}
                         alt={name || 'Disease image'}
@@ -187,14 +170,82 @@ export default function DiseaseDetailPage() {
                         objectFit="cover"
                         data-ai-hint={aiHint}
                         unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
+                        className="transition-transform duration-300 group-hover:scale-105"
                     />
+                </button>
+                <p><strong>Causing Agent:</strong> {diseaseDetails["CAUSING AGENT"] || "N/A"}</p>
+                <p><strong>Favourable Climate:</strong> {diseaseDetails["FAVOURABLE CLIMATE"] || "N/A"}</p>
+                <div className="space-y-1"> 
+                  <h4 className="font-semibold mt-2 mb-1 text-primary">Symptoms:</h4>
+                  <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["SYMPTOMS"] || "N/A"}</p>
                 </div>
-                <p>{diseaseDetails.description || "No further details available."}</p>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                <div className="space-y-1">
+                  <h4 className="font-semibold mt-2 mb-1 text-primary">Management:</h4>
+                  <p className="whitespace-pre-wrap text-muted-foreground">{diseaseDetails["MANAGEMENT"] || "N/A"}</p>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <h5 className="font-semibold text-md text-primary mb-2">More Images of Symptoms/Effects:</h5>
+                  <button
+                    type="button"
+                    onClick={() => openImageInModal(additionalImageUrl)}
+                    className="relative w-2/3 mx-auto aspect-video bg-muted rounded-md overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+                  >
+                    <Image
+                        src={additionalImageUrl}
+                        alt={`${name || 'Disease'} symptom - E&L Blight`}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint="tomato blight"
+                        unoptimized={true}
+                        className="transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </button>
+                </div>
+              </>
+            ) : (
+               <>
+                  <button
+                    type="button"
+                    onClick={() => openImageInModal(imageUrl)}
+                    className="relative w-full h-60 bg-muted rounded-md overflow-hidden mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
+                  >
+                      <Image
+                          src={imageUrl}
+                          alt={name || 'Disease image'}
+                          layout="fill"
+                          objectFit="cover"
+                          data-ai-hint={aiHint}
+                          unoptimized={imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')}
+                          className="transition-transform duration-300 group-hover:scale-105"
+                      />
+                  </button>
+                  <p>{diseaseDetails.description || "No further details available."}</p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {modalImageUrl && (
+        <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+          <DialogOverlay className="bg-black/60 backdrop-blur-sm fixed inset-0 z-[51]" />
+          <DialogContent className="p-2 max-w-3xl w-auto bg-transparent border-none shadow-none flex items-center justify-center z-[52] outline-none">
+            <div className="relative aspect-auto max-h-[85vh] max-w-[85vw]">
+              <Image
+                src={modalImageUrl}
+                alt="Enlarged disease image"
+                layout="intrinsic"
+                width={1200} // Provide a large base width
+                height={800} // Provide a large base height
+                objectFit="contain"
+                className="rounded-lg"
+                unoptimized={modalImageUrl.startsWith('https://firebasestorage.googleapis.com') || modalImageUrl.startsWith('https://storage.googleapis.com') || modalImageUrl.startsWith('https://placehold.co')}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 
