@@ -24,7 +24,7 @@ export async function generateMetadata(
   const previousImages = (await parent).openGraph?.images || [];
 
   return {
-    title: `Post by @${post.user.username}: ${post.caption.substring(0, 30)}... | FARMDOCC`,
+    title: `Post by @${post.user.username}: ${post.caption.substring(0, 30)}... | KrishiX`,
     description: post.caption.substring(0, 150),
     openGraph: {
       title: `Post by @${post.user.username}`,
