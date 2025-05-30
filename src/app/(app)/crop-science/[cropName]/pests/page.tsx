@@ -29,7 +29,7 @@ const allPestsData: Pest[] = [
     id: 't-pest2',
     name: 'Aphids',
     description: 'Small, pear-shaped insects that cluster on new growth and the undersides of leaves. They suck sap and can transmit diseases.',
-    imageUrl: 'https://placehold.co/600x400.png',
+    imageUrl: 'https://images.unsplash.com/photo-1522325636832-5dbc1440f793?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhcGhpZHN8ZW58MHx8fHwxNzQ4NTgxNzY3fDA&ixlib=rb-4.1.0&q=80&w=1080',
     aiHint: 'aphids tomato',
   },
   {
