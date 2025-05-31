@@ -15,7 +15,7 @@ interface DiseaseDataItem {
   NAME?: string;
   IMAGE_URL?: string;
   AI_HINT?: string;
-  PHOTOS?: string; // New field for tomato disease photos
+  PHOTOS?: string;
 
   // Tomato-specific fields
   "TOMATO PEST AND DISEASES"?: string;
@@ -53,7 +53,7 @@ export default function DiseasesPage() {
       try {
         const response = await fetch(APPS_SCRIPT_URL); 
         if (!response.ok) {
-          let errorText = `Failed to fetch data: ${response.status} ${response.statusText}`;
+          let errorText = `Failed to fetch data from ${APPS_SCRIPT_URL}: ${response.status} ${response.statusText}`;
           try {
             const body = await response.text(); 
             errorText += `\nResponse body (first 500 chars): ${body.substring(0, 500)}`; 
@@ -98,8 +98,14 @@ export default function DiseasesPage() {
         setDiseasesData(processedData);
 
       } catch (err) {
-        console.error("[DiseasesPage] Fetch error:", err);
-        setError(err instanceof Error ? err.message : "An unknown error occurred while fetching data.");
+        let detailedErrorMessage = `An unknown error occurred while fetching data from the disease information service. URL: ${APPS_SCRIPT_URL}`;
+        if (err instanceof TypeError && err.message.toLowerCase().includes("failed to fetch")) {
+            detailedErrorMessage = `Network error: Failed to fetch data from ${APPS_SCRIPT_URL}. Please check your internet connection and ensure the service URL is correct and accessible.`;
+        } else if (err instanceof Error) {
+            detailedErrorMessage = `Error fetching data: ${err.message}. URL: ${APPS_SCRIPT_URL}`;
+        }
+        console.error("[DiseasesPage] Fetch error:", detailedErrorMessage, err);
+        setError(detailedErrorMessage);
         setDiseasesData([]); 
       } finally {
         setIsLoading(false);
@@ -160,9 +166,10 @@ export default function DiseasesPage() {
                 let aiHint: string;
                 let unoptimizedImage = false;
 
+                // Specific override for Early Blight on Tomato
                 if (cropSlug === 'tomato' && diseaseName === "Early Blight (Alternaria solani)") {
-                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
-                  aiHint = 'tomato blight';
+                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+                  aiHint = 'tomato blight'; // More specific hint
                   unoptimizedImage = true; 
                 } else if (cropSlug === 'tomato' && disease["PHOTOS"]) {
                   imageUrl = disease["PHOTOS"];
@@ -212,3 +219,4 @@ export default function DiseasesPage() {
   );
 }
     
+
