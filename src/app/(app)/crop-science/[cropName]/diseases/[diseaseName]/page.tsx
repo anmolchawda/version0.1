@@ -37,8 +37,7 @@ export default function DiseaseDetailPage() {
 
   const cropNameParam = params.cropName as string;
   const diseaseNameParam = decodeURIComponent(params.diseaseName as string);
-  const cropDisplayName = cropNameParam.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-
+  
   const [diseaseDetails, setDiseaseDetails] = useState<DiseaseDataItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +45,12 @@ export default function DiseaseDetailPage() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
 
+  // State for derived main image properties
+  const [mainImageUrl, setMainImageUrl] = useState<string | undefined>(undefined);
+  const [mainImageAiHint, setMainImageAiHint] = useState<string>('plant disease');
+  const [mainImageUnoptimized, setMainImageUnoptimized] = useState<boolean>(true);
+
+  // State for additional images
   const [additionalImagesData, setAdditionalImagesData] = useState<{url: string, hint: string, unoptimized: boolean}[]>([]);
 
   const openImageInModal = (url: string) => {
@@ -53,6 +58,7 @@ export default function DiseaseDetailPage() {
     setIsImageModalOpen(true);
   };
 
+  // Effect 1: Fetch disease details
   useEffect(() => {
     const fetchDiseaseDetails = async () => {
       if (!diseaseNameParam) {
@@ -85,6 +91,7 @@ export default function DiseaseDetailPage() {
           throw new Error("Fetched data format is not as expected.");
         }
         
+        const cropDisplayNameForError = cropNameParam.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         const foundDisease = allItems.find(item => 
           (cropNameParam === 'tomato' && String(item["TOMATO PEST AND DISEASES"])?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) || 
           (String(item.NAME)?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) 
@@ -93,7 +100,7 @@ export default function DiseaseDetailPage() {
         if (foundDisease) {
           setDiseaseDetails(foundDisease);
         } else {
-          setError(`Details for "${diseaseNameParam}" not found for ${cropDisplayName}.`);
+          setError(`Details for "${diseaseNameParam}" not found for ${cropDisplayNameForError}.`);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred while fetching details.");
@@ -105,8 +112,132 @@ export default function DiseaseDetailPage() {
     if (cropNameParam && diseaseNameParam) {
         fetchDiseaseDetails();
     }
-  }, [cropNameParam, diseaseNameParam, cropDisplayName]);
+  }, [cropNameParam, diseaseNameParam]);
   
+  // Effect 2: Determine main image URL and properties based on fetched details and params
+  useEffect(() => {
+    if (diseaseDetails) {
+      let determinedImageUrl: string | undefined;
+      let determinedAiHint: string = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
+      let determinedUnoptimized = false;
+
+      const isTomatoCrop = cropNameParam === 'tomato';
+      const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
+      const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
+      const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
+
+      if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
+        determinedAiHint = 'tomato anthracnose';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "tomato spotted wilt virus") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
+        determinedAiHint = 'tomato spotted_wilt_virus';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet.includes("damping off")) {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FDamping%20Off.png?alt=media&token=df712817-9522-448b-86d8-1eacd75f68f1";
+        determinedAiHint = 'tomato damping_off seedling';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "early blight (alternaria solani)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
+        determinedAiHint = 'tomato early_blight';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "late blight (phytophthora infestans)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+        determinedAiHint = 'tomato late_blight';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "tomato mosaic virus") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
+        determinedAiHint = 'tomato mosaic_virus';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "tomato yellow leaf curl virus (tylcv)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
+        determinedAiHint = 'tomato yellow_leaf_curl';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "fusarium wilt (fusarium oxysporum)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FFusarium%20Wilt.jpeg?alt=media&token=7b64a066-3f48-49b2-8f60-15f6d9c69c45";
+        determinedAiHint = 'tomato fusarium_wilt';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "verticillium wilt (verticillium dahliae)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FVerticillium%20Wilt.jpeg?alt=media&token=ce09fcd6-e8cd-4cfc-8855-d429fe1498eb";
+        determinedAiHint = 'tomato verticillium_wilt';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "bacterial speck and bacterial spot (pseudomonas syringae)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FBacterial%20Spot.JPG?alt=media&token=6bcdc7c2-88bd-4610-bd65-ca47f66b19a5";
+        determinedAiHint = 'tomato bacterial_spot';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet === "gray mold (botrytis cinerea)") {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
+        determinedAiHint = 'tomato gray_mold';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedNameFromSheet.includes("spotted wilt virus")) { 
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
+        determinedAiHint = 'tomato spotted_wilt_virus';
+        determinedUnoptimized = true;
+      }
+      else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
+        determinedImageUrl = diseaseDetails.IMAGE_URL;
+        determinedUnoptimized = determinedImageUrl.startsWith('https://firebasestorage.googleapis.com') || determinedImageUrl.startsWith('https://storage.googleapis.com');
+      }
+
+      if (!determinedImageUrl) {
+        determinedImageUrl = `https://placehold.co/600x400.png`;
+        determinedAiHint = diseaseDetails.AI_HINT || 'plant disease'; // diseaseDetails is checked, so this is safe
+        determinedUnoptimized = true;
+      }
+      setMainImageUrl(determinedImageUrl);
+      setMainImageAiHint(determinedAiHint);
+      setMainImageUnoptimized(determinedUnoptimized);
+    } else {
+      // If diseaseDetails is null (e.g., initial load, error), set defaults
+      setMainImageUrl(`https://placehold.co/600x400.png`);
+      setMainImageAiHint('plant disease');
+      setMainImageUnoptimized(true);
+    }
+  }, [diseaseDetails, cropNameParam, diseaseNameParam]);
+
+  // Effect 3: Determine additional images
+  useEffect(() => {
+    if (diseaseDetails && mainImageUrl) {
+      const tempAdditionalImages = [];
+      const photosUrl = diseaseDetails.PHOTOS;
+
+      if (photosUrl && typeof photosUrl === 'string' && photosUrl !== mainImageUrl) {
+        tempAdditionalImages.push({
+          url: photosUrl,
+          hint: diseaseDetails.AI_HINT || 'affected plant detail',
+          unoptimized: photosUrl.startsWith('https://firebasestorage.googleapis.com') || photosUrl.startsWith('https://storage.googleapis.com')
+        });
+      } else {
+        tempAdditionalImages.push({
+          url: 'https://placehold.co/200x150.png',
+          hint: 'affected leaf',
+          unoptimized: true
+        });
+      }
+
+      tempAdditionalImages.push({
+        url: 'https://placehold.co/200x150.png',
+        hint: 'affected plant overall',
+        unoptimized: true
+      });
+      tempAdditionalImages.push({
+        url: 'https://placehold.co/200x150.png',
+        hint: 'disease progress',
+        unoptimized: true
+      });
+      
+      setAdditionalImagesData(tempAdditionalImages.slice(0,3));
+    } else {
+         setAdditionalImagesData([
+            { url: 'https://placehold.co/200x150.png', hint: 'affected leaf', unoptimized: true },
+            { url: 'https://placehold.co/200x150.png', hint: 'affected plant overall', unoptimized: true },
+            { url: 'https://placehold.co/200x150.png', hint: 'disease progress', unoptimized: true },
+        ].slice(0,3));
+    }
+  }, [diseaseDetails, mainImageUrl]);
+  
+  // Conditional returns (MUST BE AFTER ALL HOOKS)
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
@@ -143,112 +274,7 @@ export default function DiseaseDetailPage() {
   }
   
   const nameForDisplay = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  
-  let imageUrl: string | undefined;
-  let aiHint: string = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
-  let unoptimizedImage = false;
-
-  const isTomatoCrop = cropNameParam === 'tomato';
-  const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
-  const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
-
-  if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
-    aiHint = 'tomato anthracnose';
-    unoptimizedImage = true;
-  } 
-  else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "tomato spotted wilt virus") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
-    aiHint = 'tomato spotted_wilt_virus';
-    unoptimizedImage = true;
-  }
-  else if (isTomatoCrop && normalizedNameFromSheet.includes("damping off")) {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FDamping%20Off.png?alt=media&token=df712817-9522-448b-86d8-1eacd75f68f1";
-    aiHint = 'tomato damping_off seedling';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "early blight (alternaria solani)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
-    aiHint = 'tomato early_blight';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "late blight (phytophthora infestans)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-    aiHint = 'tomato late_blight';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato mosaic virus") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
-    aiHint = 'tomato mosaic_virus';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato yellow leaf curl virus (tylcv)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
-    aiHint = 'tomato yellow_leaf_curl';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "fusarium wilt (fusarium oxysporum)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FFusarium%20Wilt.jpeg?alt=media&token=7b64a066-3f48-49b2-8f60-15f6d9c69c45";
-    aiHint = 'tomato fusarium_wilt';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "verticillium wilt (verticillium dahliae)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FVerticillium%20Wilt.jpeg?alt=media&token=ce09fcd6-e8cd-4cfc-8855-d429fe1498eb";
-    aiHint = 'tomato verticillium_wilt';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "bacterial speck and bacterial spot (pseudomonas syringae)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FBacterial%20Spot.JPG?alt=media&token=6bcdc7c2-88bd-4610-bd65-ca47f66b19a5";
-    aiHint = 'tomato bacterial_spot';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "gray mold (botrytis cinerea)") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
-    aiHint = 'tomato gray_mold';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet.includes("spotted wilt virus")) { 
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
-    aiHint = 'tomato spotted_wilt_virus';
-    unoptimizedImage = true;
-  }
-  else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
-    imageUrl = diseaseDetails.IMAGE_URL;
-    unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
-  }
-
-  if (!imageUrl) {
-    imageUrl = `https://placehold.co/600x400.png`;
-    aiHint = diseaseDetails.AI_HINT || 'plant disease'; // use existing hint or default
-    unoptimizedImage = true; 
-  }
-
-  useEffect(() => {
-    if (diseaseDetails && imageUrl) {
-      const tempAdditionalImages = [];
-      const photosUrl = diseaseDetails.PHOTOS;
-
-      if (photosUrl && typeof photosUrl === 'string' && photosUrl !== imageUrl) {
-        tempAdditionalImages.push({
-          url: photosUrl,
-          hint: diseaseDetails.AI_HINT || 'affected plant detail',
-          unoptimized: photosUrl.startsWith('https://firebasestorage.googleapis.com') || photosUrl.startsWith('https://storage.googleapis.com')
-        });
-      } else {
-        tempAdditionalImages.push({
-          url: 'https://placehold.co/200x150.png',
-          hint: 'affected leaf',
-          unoptimized: true
-        });
-      }
-
-      // Add remaining placeholders
-      tempAdditionalImages.push({
-        url: 'https://placehold.co/200x150.png',
-        hint: 'affected plant overall',
-        unoptimized: true
-      });
-      tempAdditionalImages.push({
-        url: 'https://placehold.co/200x150.png',
-        hint: 'disease progress',
-        unoptimized: true
-      });
-      
-      setAdditionalImagesData(tempAdditionalImages.slice(0,3)); // Ensure only 3 additional images
-    }
-  }, [diseaseDetails, imageUrl]);
+  const cropDisplayNameForTitle = cropNameParam.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -281,30 +307,33 @@ export default function DiseaseDetailPage() {
             <CardTitle className="text-lg sm:text-xl font-bold text-primary text-center">
               {nameForDisplay || "Disease Details"}
             </CardTitle>
+             <CardDescription className="text-center text-xs text-muted-foreground">
+              {cropDisplayNameForTitle}
+            </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <button
               type="button"
-              onClick={() => imageUrl && openImageInModal(imageUrl)}
+              onClick={() => mainImageUrl && openImageInModal(mainImageUrl)}
               className="relative w-full aspect-video bg-muted overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer block group"
               aria-label={`View image for ${nameForDisplay || 'Disease'}`}
-              disabled={!imageUrl}
+              disabled={!mainImageUrl}
             >
-                {imageUrl && (
+                {mainImageUrl && (
                   <Image
-                      src={imageUrl}
+                      src={mainImageUrl}
                       alt={nameForDisplay || 'Disease image'}
                       layout="fill"
                       objectFit="cover"
-                      data-ai-hint={aiHint}
-                      unoptimized={unoptimizedImage}
+                      data-ai-hint={mainImageAiHint}
+                      unoptimized={mainImageUnoptimized}
                       className="transition-transform duration-300 group-hover:scale-105"
                   />
                 )}
             </button>
             
             <div className="p-4 space-y-3">
-                {isTomatoCrop && diseaseDetails["TOMATO PEST AND DISEASES"] ? ( 
+                {cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"] ? ( 
                 <>
                     {renderDetailItem("Causing Agent", diseaseDetails["CAUSING AGENT"])}
                     {renderDetailItem("Favourable Climate", diseaseDetails["FAVOURABLE CLIMATE"])}
@@ -318,7 +347,7 @@ export default function DiseaseDetailPage() {
           </CardContent>
         </Card>
 
-        {diseaseDetails && additionalImagesData.length > 0 && (
+        {additionalImagesData.length > 0 && (
           <Card className="shadow-md rounded-xl">
             <CardHeader className="pt-4 pb-2 px-4">
               <CardTitle className="text-md font-semibold text-primary">
