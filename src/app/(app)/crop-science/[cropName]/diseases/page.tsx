@@ -156,13 +156,24 @@ export default function DiseasesPage() {
           {!isLoading && !error && diseasesData.length > 0 && (
             <div className="space-y-3">
               {diseasesData.map((disease, index) => {
+                // --- Start of Diagnostic Logging ---
+                // console.log("[DiseasesPage] Item data from sheet:", JSON.stringify(disease));
+                // --- End of Diagnostic Logging ---
+
                 const diseaseName = cropSlug === 'tomato' ? disease["TOMATO PEST AND DISEASES"] : disease.NAME;
-                if (!diseaseName) return null; 
+                if (!diseaseName) {
+                  // console.warn("[DiseasesPage] Item skipped due to missing disease name:", JSON.stringify(disease));
+                  return null;
+                }
+
+                const normalizedDiseaseName = String(diseaseName).trim().toLowerCase();
+                // --- Diagnostic Log ---
+                // console.log(`[DiseasesPage] Processing Disease: Original='${diseaseName}', Normalized='${normalizedDiseaseName}', CropSlug='${cropSlug}'`);
+                // ---
 
                 let imageUrl: string;
                 let aiHint: string;
                 let unoptimizedImage = false;
-                const normalizedDiseaseName = String(diseaseName).trim().toLowerCase();
 
 
                 if (cropSlug === 'tomato' && normalizedDiseaseName === "early blight (alternaria solani)") {
@@ -174,6 +185,9 @@ export default function DiseasesPage() {
                   aiHint = 'tomato anthracnose';
                   unoptimizedImage = true;
                 } else if (cropSlug === 'tomato' && normalizedDiseaseName === "tomato spotted wilt virus") {
+                  // --- Diagnostic Log ---
+                  // console.log("[DiseasesPage] SUCCESS: Matched 'tomato spotted wilt virus'. Applying specific image.");
+                  // ---
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
                   aiHint = 'tomato spotted_wilt_virus';
                   unoptimizedImage = true;
@@ -225,4 +239,5 @@ export default function DiseasesPage() {
   );
 }
     
+
 
