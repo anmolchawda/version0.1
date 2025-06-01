@@ -148,48 +148,49 @@ export default function DiseaseDetailPage() {
   let unoptimizedImage = false;
   const isTomatoDisease = cropNameParam === 'tomato' && diseaseDetails["TOMATO PEST AND DISEASES"];
 
-  if (isTomatoDisease) {
-    if (name === "Early Blight (Alternaria solani)") {
+  if (isTomatoDisease && name) {
+    const lowerCaseName = name.trim().toLowerCase();
+    if (lowerCaseName === "early blight (alternaria solani)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
       aiHint = 'tomato early blight';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
-    } else if (name === "Late Blight (Phytophthora infestans)") {
+    } else if (lowerCaseName === "late blight (phytophthora infestans)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
       aiHint = 'tomato late blight';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
-    } else if (name === "Anthracnose (Colletotrichum spp.)") {
+    } else if (lowerCaseName === "anthracnose (colletotrichum spp.)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
       aiHint = 'tomato anthracnose';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Anthracnose (Colletotrichum spp.) applied. ImageURL:", imageUrl);
-    } else if (name === "Tomato Mosaic Virus") {
+    } else if (lowerCaseName === "tomato mosaic virus") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
       aiHint = 'tomato mosaic virus';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Tomato Mosaic Virus applied. ImageURL:", imageUrl);
-    } else if (name === "Tomato Yellow Leaf Curl Virus (TYLCV)") {
+    } else if (lowerCaseName === "tomato yellow leaf curl virus (tylcv)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
       aiHint = 'tomato yellow_leaf_curl';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Tomato Yellow Leaf Curl Virus (TYLCV) applied. ImageURL:", imageUrl);
-    } else if (name === "Fusarium Wilt (Fusarium oxysporum)") {
+    } else if (lowerCaseName === "fusarium wilt (fusarium oxysporum)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FFusarium%20Wilt.jpeg?alt=media&token=7b64a066-3f48-49b2-8f60-15f6d9c69c45";
       aiHint = 'tomato fusarium_wilt';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Fusarium Wilt (Fusarium oxysporum) applied. ImageURL:", imageUrl);
-    } else if (name === "Verticillium Wilt (Verticillium dahliae)") {
+    } else if (lowerCaseName === "verticillium wilt (verticillium dahliae)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FVerticillium%20Wilt.jpeg?alt=media&token=ce09fcd6-e8cd-4cfc-8855-d429fe1498eb";
       aiHint = 'tomato verticillium_wilt';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Verticillium Wilt (Verticillium dahliae) applied. ImageURL:", imageUrl);
-    } else if (name === "Bacterial Speck and Bacterial Spot (Pseudomonas syringae)") {
+    } else if (lowerCaseName === "bacterial speck and bacterial spot (pseudomonas syringae)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FBacterial%20Spot.JPG?alt=media&token=6bcdc7c2-88bd-4610-bd65-ca47f66b19a5";
       aiHint = 'tomato bacterial spot';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Bacterial Speck and Spot applied. ImageURL:", imageUrl);
-    } else if (name === "Gray Mold (Botrytis cinerea)") {
+    } else if (lowerCaseName === "gray mold (botrytis cinerea)") {
       imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
       aiHint = 'tomato gray_mold';
       unoptimizedImage = true;
