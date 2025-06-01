@@ -162,14 +162,20 @@ export default function DiseasesPage() {
                 let imageUrl: string;
                 let aiHint: string;
                 let unoptimizedImage = false;
+                const normalizedDiseaseName = String(diseaseName).trim().toLowerCase();
 
-                if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "early blight (alternaria solani)") {
+
+                if (cropSlug === 'tomato' && normalizedDiseaseName === "early blight (alternaria solani)") {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
                   aiHint = 'tomato early blight';
                   unoptimizedImage = true; 
-                } else if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "anthracnose (colletotrichum spp.)") {
+                } else if (cropSlug === 'tomato' && normalizedDiseaseName === "anthracnose (colletotrichum spp.)") {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
                   aiHint = 'tomato anthracnose';
+                  unoptimizedImage = true;
+                } else if (cropSlug === 'tomato' && normalizedDiseaseName === "tomato spotted wilt virus") {
+                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
+                  aiHint = 'tomato spotted_wilt_virus';
                   unoptimizedImage = true;
                 } else if (cropSlug === 'tomato' && disease["PHOTOS"]) {
                   imageUrl = disease["PHOTOS"];
