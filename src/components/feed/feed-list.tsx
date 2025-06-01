@@ -17,12 +17,11 @@ export function FeedList() {
 
   const [pullStartY, setPullStartY] = useState<number | null>(null);
   const [pullDeltaY, setPullDeltaY] = useState(0);
-  // isEligibleToPull is true if the page is scrolled to the top
   const [isEligibleToPull, setIsEligibleToPull] = useState(false);
+  const [isDragging, setIsDragging] = useState(false); // To track mouse dragging specifically
 
   const feedContainerRef = useRef<HTMLDivElement>(null);
 
-  // Check scroll position to determine if pull-to-refresh can be initiated
   useEffect(() => {
     const checkScrollPosition = () => {
       const atTop = window.scrollY === 0;
@@ -30,18 +29,16 @@ export function FeedList() {
     };
 
     window.addEventListener('scroll', checkScrollPosition, { passive: true });
-    checkScrollPosition(); // Initial check
+    checkScrollPosition(); 
 
     return () => {
       window.removeEventListener('scroll', checkScrollPosition);
     };
   }, []);
 
-
   const handleRefresh = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const newPosts = [...posts].sort(() => Math.random() - 0.5);
@@ -53,42 +50,89 @@ export function FeedList() {
     setPosts(initialPosts);
   }, []);
 
+  // Touch Events
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isLoading || !isEligibleToPull) {
-      setPullStartY(null); // Ensure not to start a pull if not eligible or already loading
+    if (isLoading || !isEligibleToPull || e.touches.length === 0) {
+      setPullStartY(null);
       return;
     }
     setPullStartY(e.touches[0].clientY);
-    setPullDeltaY(0); // Reset delta on new touch start
+    setPullDeltaY(0);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (pullStartY === null || isLoading) return;
+    if (pullStartY === null || isLoading || e.touches.length === 0) return;
 
     const currentY = e.touches[0].clientY;
     let delta = currentY - pullStartY;
-
-    if (delta < 0) delta = 0; // Only allow pulling down
-
+    if (delta < 0) delta = 0; 
     setPullDeltaY(delta);
-
-    // Basic prevention of scrolling while actively pulling down beyond a small threshold.
-    // This is a sensitive area; aggressive preventDefault can break native scroll.
-    if (delta > 10 && isEligibleToPull) {
-      // e.preventDefault(); // Be cautious with this, might over-prevent. Test thoroughly.
-    }
   };
 
   const handleTouchEnd = () => {
     if (pullStartY === null || isLoading) return;
+    if (pullDeltaY > PULL_THRESHOLD) {
+      handleRefresh();
+    }
+    setPullStartY(null);
+    setPullDeltaY(0);
+  };
+
+  // Mouse Events
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isLoading || !isEligibleToPull || e.button !== 0) { // Only main (left) click
+      setIsDragging(false);
+      setPullStartY(null);
+      return;
+    }
+    setIsDragging(true);
+    setPullStartY(e.clientY);
+    setPullDeltaY(0);
+    
+    // Add window listeners for mouse move and up
+    window.addEventListener('mousemove', handleWindowMouseMove);
+    window.addEventListener('mouseup', handleWindowMouseUp);
+  };
+
+  const handleWindowMouseMove = (e: MouseEvent) => {
+    if (!isDragging || pullStartY === null || isLoading) return;
+
+    const currentY = e.clientY;
+    let delta = currentY - pullStartY;
+    if (delta < 0) delta = 0;
+    setPullDeltaY(delta);
+  };
+
+  const handleWindowMouseUp = () => {
+    if (!isDragging || pullStartY === null || isLoading) {
+      // Clean up just in case, though isDragging should cover it
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      setIsDragging(false);
+      setPullStartY(null);
+      return;
+    }
 
     if (pullDeltaY > PULL_THRESHOLD) {
       handleRefresh();
     }
     
+    setIsDragging(false);
     setPullStartY(null);
     setPullDeltaY(0);
+
+    // Clean up window listeners
+    window.removeEventListener('mousemove', handleWindowMouseMove);
+    window.removeEventListener('mouseup', handleWindowMouseUp);
   };
+  
+  // Cleanup effect for window listeners if component unmounts during a drag
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('mousemove', handleWindowMouseMove);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+    };
+  }, []); // Empty dependency array means this runs on mount and cleans up on unmount
 
   if (isLoading && posts.length === 0 && pullDeltaY === 0) {
      return (
@@ -105,40 +149,40 @@ export function FeedList() {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="relative" // Needed for positioning the pull indicator correctly if it's a child
+      onMouseDown={handleMouseDown}
+      className="relative" 
+      style={{ userSelect: isDragging ? 'none' : 'auto' }} // Prevent text selection during drag
     >
-      {/* Pull-to-refresh visual indicator */}
       <div
         className={cn(
           "fixed top-16 left-1/2 -translate-x-1/2 z-10 mt-3 p-2.5 rounded-full bg-card shadow-lg flex items-center justify-center transition-all duration-200 ease-out",
-          (pullDeltaY > 10 || (isLoading && pullStartY === null)) ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+          (pullDeltaY > 10 || (isLoading && (pullStartY === null || isDragging))) ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
         )}
         style={{
-          transform: `translateX(-50%) translateY(${Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px) scale(${ (pullDeltaY > 10 || (isLoading && pullStartY === null)) ? 1 : 0.75 })`,
+          transform: `translateX(-50%) translateY(${Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px) scale(${ (pullDeltaY > 10 || (isLoading && (pullStartY === null || isDragging))) ? 1 : 0.75 })`,
         }}
       >
-        {isLoading && pullStartY === null ? ( // Show loader when refreshing was triggered by pull (pullStartY is reset)
+        {isLoading && (pullStartY === null || isDragging) ? 
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
-        ) : pullDeltaY > PULL_THRESHOLD ? ( // Pulled enough to trigger
+         : pullDeltaY > PULL_THRESHOLD ? 
           <RefreshCw className="h-5 w-5 text-green-500" />
-        ) : pullDeltaY > 10 ? ( // Pulling in progress
+         : pullDeltaY > 10 ? 
           <RefreshCw 
             className="h-5 w-5 text-primary transition-transform duration-100" 
             style={{ transform: `rotate(${Math.min(pullDeltaY / PULL_THRESHOLD, 1) * 270}deg)`}}
           />
-        ) : null}
+         : null}
       </div>
       
       <div 
         className="space-y-6 max-w-xl mx-auto transition-transform duration-200 ease-out"
         style={{
-          // Push content down slightly when loading is active *after* a pull
-          transform: (isLoading && pullStartY === null) ? `translateY(40px)` : 'translateY(0px)',
-          paddingTop: '1px' // Ensures the touch area is available even if no posts
+          transform: (isLoading && (pullStartY === null || isDragging)) ? `translateY(40px)` : 'translateY(0px)',
+          paddingTop: '1px' 
         }}
       >
         {posts.length === 0 && !isLoading && (
-          <div className="text-center py-10 pt-20"> {/* Added padding top to avoid overlap with indicator */}
+          <div className="text-center py-10 pt-20">
             <p className="text-xl text-muted-foreground">No posts yet. Follow some farmers to see their updates!</p>
           </div>
         )}
