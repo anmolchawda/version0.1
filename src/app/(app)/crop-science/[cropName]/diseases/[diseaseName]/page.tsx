@@ -194,7 +194,7 @@ export default function DiseaseDetailPage() {
 
 
   if (!imageUrl) {
-    imageUrl = `https://placehold.co/600x400.png?text=${name ? name.replace(/\s+/g, '+').substring(0,10) : 'Disease'}`;
+    imageUrl = `https://placehold.co/600x400.png`;
     unoptimizedImage = true;
   } else if (imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com')) {
     unoptimizedImage = true;
@@ -220,6 +220,17 @@ export default function DiseaseDetailPage() {
       </div>
     );
   };
+
+  const placeholderImageUrls = [
+    `https://placehold.co/200x150.png`,
+    `https://placehold.co/200x150.png`,
+    `https://placehold.co/200x150.png`,
+  ];
+  const placeholderAiHints = [
+    "disease symptom",
+    "affected plant",
+    "disease progress",
+  ];
 
 
   return (
@@ -269,6 +280,37 @@ export default function DiseaseDetailPage() {
             </div>
           </CardContent>
         </Card>
+
+        {diseaseDetails && (
+          <Card className="shadow-md rounded-xl">
+            <CardHeader className="pt-4 pb-2 px-4">
+              <CardTitle className="text-md font-semibold text-primary">
+                Additional Images
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-3 gap-2 p-3">
+              {placeholderImageUrls.map((url, index) => (
+                <button
+                  key={`additional-img-${index}`}
+                  type="button"
+                  onClick={() => openImageInModal(url)}
+                  className="relative w-full aspect-[4/3] bg-muted rounded-md overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary group"
+                  aria-label={`View additional image ${index + 1}`}
+                >
+                  <Image
+                    src={url}
+                    alt={`Additional image ${index + 1} of ${name || 'disease'}`}
+                    layout="fill"
+                    objectFit="cover"
+                    data-ai-hint={placeholderAiHints[index]}
+                    unoptimized={true}
+                    className="transition-transform duration-300 group-hover:scale-105"
+                  />
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {modalImageUrl && (
