@@ -100,7 +100,6 @@ export default function DiseaseDetailPage() {
     };
 
     if (cropNameParam && diseaseNameParam) {
-        console.log("DiseaseDetailPage - Params:", { cropNameParam, diseaseNameParam });
         fetchDiseaseDetails();
     }
   }, [cropNameParam, diseaseNameParam, cropDisplayName]);
@@ -140,43 +139,35 @@ export default function DiseaseDetailPage() {
     );
   }
   
-  // This name is primarily for display (CardTitle, alt text)
   const nameForDisplay = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  console.log("DiseaseDetailPage - Name for display:", nameForDisplay);
   
-  let imageUrl = diseaseDetails.IMAGE_URL; // Default from sheet
+  let imageUrl = diseaseDetails.IMAGE_URL; 
   let aiHint = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
   let unoptimizedImage = false;
 
   const isTomatoCrop = cropNameParam === 'tomato';
-  // Use diseaseNameParam from URL for primary matching of specific diseases
   const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
-  // Use name derived from sheet for fallback matching and general display
   const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const normalizedNameFromSheet = nameFromSheet ? nameFromSheet.trim().toLowerCase() : "";
 
-
-  // Specific image overrides for tomato diseases
-  // Prioritize Anthracnose based on URL parameter if it's a tomato crop
+  // Priority for Anthracnose if URL parameter specifically matches
   if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
     aiHint = 'tomato anthracnose';
     unoptimizedImage = true;
-    console.log("DiseaseDetailPage - URL-PARAM BASED Override for Anthracnose image. ImageURL:", imageUrl);
   }
-  // Other specific tomato diseases (matched using name from sheet for robustness if URL param is slightly off but sheet data is good)
+  // Other specific tomato diseases (matched using name from sheet for robustness)
   else if (isTomatoCrop && normalizedNameFromSheet === "early blight (alternaria solani)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
-    aiHint = 'tomato early blight';
+    aiHint = 'tomato early_blight';
     unoptimizedImage = true;
-    console.log("DiseaseDetailPage - SHEET-NAME BASED Override for Early Blight. ImageURL:", imageUrl);
   } else if (isTomatoCrop && normalizedNameFromSheet === "late blight (phytophthora infestans)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-    aiHint = 'tomato late blight';
+    aiHint = 'tomato late_blight';
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato mosaic virus") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
-    aiHint = 'tomato mosaic virus';
+    aiHint = 'tomato mosaic_virus';
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato yellow leaf curl virus (tylcv)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
@@ -192,30 +183,29 @@ export default function DiseaseDetailPage() {
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "bacterial speck and bacterial spot (pseudomonas syringae)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FBacterial%20Spot.JPG?alt=media&token=6bcdc7c2-88bd-4610-bd65-ca47f66b19a5";
-    aiHint = 'tomato bacterial spot';
+    aiHint = 'tomato bacterial_spot';
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "gray mold (botrytis cinerea)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
     aiHint = 'tomato gray_mold';
     unoptimizedImage = true;
+  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato spotted wilt virus") {
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
+    aiHint = 'tomato spotted_wilt_virus';
+    unoptimizedImage = true;
   }
-  // Fallback to IMAGE_URL from sheet if it exists and no specific override was matched by the above
+  // Fallback to IMAGE_URL from sheet if it exists and no specific override was matched
   else if (diseaseDetails.IMAGE_URL) {
     imageUrl = diseaseDetails.IMAGE_URL;
-    // aiHint is already initialized with diseaseDetails.AI_HINT or a default
     unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
-     console.log("DiseaseDetailPage - Using IMAGE_URL from sheet. ImageURL:", imageUrl);
   }
 
 
   // Final fallback to placeholder if no image URL determined yet
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png`;
-    aiHint = aiHint || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease'); // Ensure aiHint has a fallback
     unoptimizedImage = true;
-    console.log("DiseaseDetailPage - Using placeholder image. ImageURL:", imageUrl);
   }
-  console.log("DiseaseDetailPage - Final imageUrl for <Image>:", imageUrl, "Unoptimized:", unoptimizedImage);
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -283,14 +273,14 @@ export default function DiseaseDetailPage() {
             </button>
             
             <div className="p-4 space-y-3">
-                {isTomatoCrop && diseaseDetails["TOMATO PEST AND DISEASES"] ? ( // Check if it's a tomato disease with specific fields
+                {isTomatoCrop && diseaseDetails["TOMATO PEST AND DISEASES"] ? ( 
                 <>
                     {renderDetailItem("Causing Agent", diseaseDetails["CAUSING AGENT"])}
                     {renderDetailItem("Favourable Climate", diseaseDetails["FAVOURABLE CLIMATE"])}
                     {renderDetailItem("Symptoms", diseaseDetails["SYMPTOMS"])}
                     {renderDetailItem("Management", diseaseDetails["MANAGEMENT"])}
                 </>
-                ) : ( // Fallback for non-tomato diseases or if tomato-specific fields are missing
+                ) : ( 
                 <p className="text-sm text-muted-foreground">{diseaseDetails.description || "No further details available."}</p>
                 )}
             </div>
@@ -319,7 +309,7 @@ export default function DiseaseDetailPage() {
                     layout="fill"
                     objectFit="cover"
                     data-ai-hint={placeholderAiHints[index]}
-                    unoptimized={true} // Placeholders are always unoptimized
+                    unoptimized={true} 
                     className="transition-transform duration-300 group-hover:scale-105"
                   />
                 </button>
@@ -355,5 +345,8 @@ export default function DiseaseDetailPage() {
   );
 }
     
+
+    
+
 
     
