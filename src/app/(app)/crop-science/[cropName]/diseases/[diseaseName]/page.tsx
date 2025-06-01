@@ -160,7 +160,7 @@ export default function DiseaseDetailPage() {
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Late Blight applied. ImageURL:", imageUrl);
     } else if (name === "Anthracnose (Colletotrichum spp.)") {
-      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%20high%20resol.jpg?alt=media&token=af34e460-5daf-4694-91fe-b1db024ac2d6";
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
       aiHint = 'tomato anthracnose';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Anthracnose (Colletotrichum spp.) applied. ImageURL:", imageUrl);
@@ -343,4 +343,6 @@ export default function DiseaseDetailPage() {
     </>
   );
 }
+    
+
     
