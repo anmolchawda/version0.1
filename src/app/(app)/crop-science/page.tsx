@@ -52,6 +52,14 @@ const commonCrops: CropInfo[] = [
 ];
 
 export default function CropSciencePage() {
+  const sizes = `
+    (max-width: 639px) calc(45vw - 16px), 
+    (max-width: 767px) calc(30vw - 16px), 
+    (max-width: 1023px) calc(22vw - 16px), 
+    (max-width: 1279px) calc(18vw - 16px), 
+    250px
+  `; // Adjusted to account for gap and padding
+
   return (
     <div className="space-y-6">
       <Card className="shadow-xl rounded-xl">
@@ -78,7 +86,14 @@ export default function CropSciencePage() {
                         objectFit="contain"
                         className="rounded-md max-h-full max-w-full"
                         data-ai-hint={crop.aiHint}
-                        unoptimized={crop.unoptimized} 
+                        unoptimized={crop.unoptimized}
+                        sizes={sizes}
+                        onError={(e) => {
+                          console.error(`Error loading image for ${crop.name}: ${crop.imageUrl}`, e.target);
+                          // Optionally, you could set a fallback image source here
+                          // e.currentTarget.srcset = "https://placehold.co/250x250.png?text=Error";
+                          // e.currentTarget.src = "https://placehold.co/250x250.png?text=Error";
+                        }}
                       />
                     </div>
                     <div className="p-3 text-center bg-muted/30 mt-auto">
@@ -98,3 +113,4 @@ export default function CropSciencePage() {
 }
 
 // Added a comment to ensure file change is detected if content is identical.
+
