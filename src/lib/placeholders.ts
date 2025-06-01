@@ -9,7 +9,7 @@ export const placeholderUsers: User[] = [
     id: '1',
     username: 'FarmerJohn',
     name: 'John Appleseed',
-    avatarUrl: 'https://placehold.co/100x100.png?a=1&text=FJ',
+    avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080',
     bio: 'Proud farmer growing organic apples and corn. Sharing my journey one post at a time!',
     location: 'Sunnyvale, CA',
     produce: ['Apples', 'Corn', 'Pumpkins'],
@@ -21,7 +21,7 @@ export const placeholderUsers: User[] = [
     id: '2',
     username: 'GreenThumbSarah',
     name: 'Sarah Green',
-    avatarUrl: 'https://placehold.co/100x100.png?a=2&text=GS',
+    avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080',
     bio: 'Sustainable farming advocate. Specializing in heirloom tomatoes and free-range poultry.',
     location: 'Green Valley, OR',
     produce: ['Heirloom Tomatoes', 'Free-Range Eggs', 'Leafy Greens'],
@@ -33,7 +33,7 @@ export const placeholderUsers: User[] = [
     id: '3',
     username: 'UrbanHarvester',
     name: 'Mike Chen',
-    avatarUrl: 'https://placehold.co/100x100.png?a=3&text=UC',
+    avatarUrl: 'https://images.unsplash.com/photo-1528693404014-b13ebe6e723e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080',
     bio: 'Bringing fresh produce to the city! Rooftop farming enthusiast.',
     location: 'Metro City, NY',
     produce: ['Microgreens', 'Herbs', 'Rooftop Vegetables'],
@@ -47,7 +47,7 @@ export const placeholderPosts: Post[] = [
   {
     id: 'p1',
     user: placeholderUsers[0],
-    imageUrl: 'https://placehold.co/600x400.png?a=p1&text=Corn+Sunrise',
+    imageUrl: 'https://images.unsplash.com/reserve/22gQ9dqRziaAoZeBpZVY_kornmark-01.png?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'Beautiful sunrise over the cornfields today! Feeling blessed. 🌽☀️ #farminglife #sunrise #cornfield',
     hashtags: ['#farminglife', '#sunrise', '#cornfield', '#organic'],
     likesCount: 152,
@@ -57,7 +57,7 @@ export const placeholderPosts: Post[] = [
   {
     id: 'p2',
     user: placeholderUsers[1],
-    imageUrl: 'https://placehold.co/600x500.png?a=p2&text=Tomatoes',
+    imageUrl: 'https://images.unsplash.com/photo-1465378295786-5cb1fca555ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'Harvesting our first batch of organic tomatoes. They are looking juicy! 🍅😋 #organic #harvest #tomatoes #farmtotable',
     hashtags: ['#organic', '#harvest', '#tomatoes', '#farmtotable', '#growyourown'],
     likesCount: 230,
@@ -76,7 +76,7 @@ export const placeholderPosts: Post[] = [
   {
     id: 'p4',
     user: placeholderUsers[2],
-    imageUrl: 'https://placehold.co/500x500.png?a=p4&text=Microgreens',
+    imageUrl: 'https://images.unsplash.com/photo-1422651973727-50f085c0b26f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'My rooftop microgreens are thriving! So much flavor in these tiny plants. 🌱 #urbanfarming #microgreens #rooftopgarden #cityfarmer',
     hashtags: ['#urbanfarming', '#microgreens', '#rooftopgarden', '#cityfarmer'],
     likesCount: 120,
@@ -370,7 +370,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹210/kg', // Example price in INR
     imageUrl: 'https://placehold.co/300x200.png?text=Tomatoes',
     aiHint: 'tomatoes vegetable',
-    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'Mumbai, MH'
   },
@@ -383,7 +383,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹1500/bag',
     imageUrl: 'https://placehold.co/300x200.png?text=Corn+Seeds',
     aiHint: 'corn seeds',
-    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'New Delhi, DL'
   },
@@ -396,7 +396,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹3,50,000',
     imageUrl: 'https://placehold.co/300x200.png?text=Tractor',
     aiHint: 'tractor farm',
-    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     location: 'Pune, MH'
   },
@@ -409,7 +409,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹800/bag',
     imageUrl: 'https://placehold.co/300x200.png?text=Fertilizer',
     aiHint: 'fertilizer organic',
-    seller: { id: '3', name: 'Mike Chen', username: 'UrbanHarvester', avatarUrl: 'https://placehold.co/40x40.png?text=UH&a=s3' },
+    seller: { id: '3', name: 'Mike Chen', username: 'UrbanHarvester', avatarUrl: 'https://images.unsplash.com/photo-1528693404014-b13ebe6e723e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'South Delhi, DL'
   },
@@ -422,7 +422,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹45,000',
     imageUrl: 'https://placehold.co/300x200.png?text=Power+Tiller',
     aiHint: 'tiller equipment',
-    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://placehold.co/40x40.png?text=GS&a=s2' },
+    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     location: 'Bengaluru, KA'
   },
@@ -435,7 +435,7 @@ export const placeholderListings: MandiListing[] = [
     price: '₹1200/can',
     imageUrl: 'https://placehold.co/300x200.png?text=Pesticide',
     aiHint: 'neem oil',
-    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://placehold.co/40x40.png?text=FJ&a=s1' },
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
     location: 'Ludhiana, PB'
   },
