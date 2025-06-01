@@ -164,8 +164,8 @@ export default function DiseasesPage() {
                 let unoptimizedImage = false;
 
                 if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "early blight (alternaria solani)") {
-                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-                  aiHint = 'tomato blight';
+                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
+                  aiHint = 'tomato early blight';
                   unoptimizedImage = true; 
                 } else if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "anthracnose (colletotrichum spp.)") {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
@@ -219,4 +219,3 @@ export default function DiseasesPage() {
   );
 }
     
-
