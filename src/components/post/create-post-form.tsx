@@ -3,6 +3,7 @@
 
 import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,7 @@ export function CreatePostForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter(); // Initialize router
 
   const handleMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -129,6 +131,7 @@ export function CreatePostForm() {
     removeMedia();
     setHashtags([]);
     setCurrentHashtagInput('');
+    router.push('/'); // Redirect to feed page
     setIsSubmitting(false);
   };
 
