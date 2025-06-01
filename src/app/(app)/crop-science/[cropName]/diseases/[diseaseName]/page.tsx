@@ -20,6 +20,7 @@ interface DiseaseDataItem {
   NAME?: string;
   IMAGE_URL?: string;
   AI_HINT?: string;
+  PHOTOS?: string; // For additional images
   "TOMATO PEST AND DISEASES"?: string;
   "CAUSING AGENT"?: string;
   "FAVOURABLE CLIMATE"?: string;
@@ -44,6 +45,8 @@ export default function DiseaseDetailPage() {
 
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
+
+  const [additionalImagesData, setAdditionalImagesData] = useState<{url: string, hint: string, unoptimized: boolean}[]>([]);
 
   const openImageInModal = (url: string) => {
     setModalImageUrl(url);
@@ -146,15 +149,10 @@ export default function DiseaseDetailPage() {
   let unoptimizedImage = false;
 
   const isTomatoCrop = cropNameParam === 'tomato';
-  // Normalize disease name from URL for robust comparison
   const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
-
-  // Normalize disease name from sheet data
   const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
 
-
-  // Priority for specific diseases if URL parameter specifically matches
   if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
     aiHint = 'tomato anthracnose';
@@ -165,8 +163,11 @@ export default function DiseaseDetailPage() {
     aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
   }
-  // Other specific tomato diseases (matched using name from sheet for robustness)
-  else if (isTomatoCrop && normalizedNameFromSheet === "early blight (alternaria solani)") {
+  else if (isTomatoCrop && normalizedNameFromSheet.includes("damping off")) {
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FDamping%20Off.png?alt=media&token=df712817-9522-448b-86d8-1eacd75f68f1";
+    aiHint = 'tomato damping_off seedling';
+    unoptimizedImage = true;
+  } else if (isTomatoCrop && normalizedNameFromSheet === "early blight (alternaria solani)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
     aiHint = 'tomato early_blight';
     unoptimizedImage = true;
@@ -177,10 +178,6 @@ export default function DiseaseDetailPage() {
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato mosaic virus") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
     aiHint = 'tomato mosaic_virus';
-    unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet.includes("damping off")) {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FDamping%20off%201.jpg?alt=media&token=82df5511-5396-4a18-9764-1d40c1437a7b";
-    aiHint = 'tomato damping_off';
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato yellow leaf curl virus (tylcv)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
@@ -202,23 +199,56 @@ export default function DiseaseDetailPage() {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
     aiHint = 'tomato gray_mold';
     unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato spotted wilt virus") { // This could be after the URL param check as a fallback
+  } else if (isTomatoCrop && normalizedNameFromSheet.includes("spotted wilt virus")) { 
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
     aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
   }
-  // Fallback to IMAGE_URL from sheet if it exists and no specific override was matched
   else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
     imageUrl = diseaseDetails.IMAGE_URL;
     unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
   }
 
-
-  // Final fallback to placeholder if no image URL determined yet
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png`;
-    unoptimizedImage = true; // Placeholders are generally unoptimized
+    aiHint = diseaseDetails.AI_HINT || 'plant disease'; // use existing hint or default
+    unoptimizedImage = true; 
   }
+
+  useEffect(() => {
+    if (diseaseDetails && imageUrl) {
+      const tempAdditionalImages = [];
+      const photosUrl = diseaseDetails.PHOTOS;
+
+      if (photosUrl && typeof photosUrl === 'string' && photosUrl !== imageUrl) {
+        tempAdditionalImages.push({
+          url: photosUrl,
+          hint: diseaseDetails.AI_HINT || 'affected plant detail',
+          unoptimized: photosUrl.startsWith('https://firebasestorage.googleapis.com') || photosUrl.startsWith('https://storage.googleapis.com')
+        });
+      } else {
+        tempAdditionalImages.push({
+          url: 'https://placehold.co/200x150.png',
+          hint: 'affected leaf',
+          unoptimized: true
+        });
+      }
+
+      // Add remaining placeholders
+      tempAdditionalImages.push({
+        url: 'https://placehold.co/200x150.png',
+        hint: 'affected plant overall',
+        unoptimized: true
+      });
+      tempAdditionalImages.push({
+        url: 'https://placehold.co/200x150.png',
+        hint: 'disease progress',
+        unoptimized: true
+      });
+      
+      setAdditionalImagesData(tempAdditionalImages.slice(0,3)); // Ensure only 3 additional images
+    }
+  }, [diseaseDetails, imageUrl]);
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
     if (!value) return null;
@@ -239,18 +269,6 @@ export default function DiseaseDetailPage() {
       </div>
     );
   };
-
-  const placeholderImageUrls = [
-    `https://placehold.co/200x150.png`,
-    `https://placehold.co/200x150.png`,
-    `https://placehold.co/200x150.png`,
-  ];
-  const placeholderAiHints = [
-    "affected leaf",
-    "affected plant",
-    "disease progress",
-  ];
-
 
   return (
     <>
@@ -300,7 +318,7 @@ export default function DiseaseDetailPage() {
           </CardContent>
         </Card>
 
-        {diseaseDetails && (
+        {diseaseDetails && additionalImagesData.length > 0 && (
           <Card className="shadow-md rounded-xl">
             <CardHeader className="pt-4 pb-2 px-4">
               <CardTitle className="text-md font-semibold text-primary">
@@ -308,21 +326,21 @@ export default function DiseaseDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-2 p-3">
-              {placeholderImageUrls.map((url, index) => (
+              {additionalImagesData.map((imgData, index) => (
                 <button
                   key={`additional-img-${index}`}
                   type="button"
-                  onClick={() => openImageInModal(url)}
+                  onClick={() => openImageInModal(imgData.url)}
                   className="relative w-full aspect-[4/3] bg-muted rounded-md overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary group"
                   aria-label={`View additional image ${index + 1}`}
                 >
                   <Image
-                    src={url}
+                    src={imgData.url}
                     alt={`Additional image ${index + 1} of ${nameForDisplay || 'disease'}`}
                     layout="fill"
                     objectFit="cover"
-                    data-ai-hint={placeholderAiHints[index]}
-                    unoptimized={true} 
+                    data-ai-hint={imgData.hint}
+                    unoptimized={imgData.unoptimized} 
                     className="transition-transform duration-300 group-hover:scale-105"
                   />
                 </button>
@@ -358,11 +376,3 @@ export default function DiseaseDetailPage() {
   );
 }
     
-
-    
-
-
-    
-
-
-
