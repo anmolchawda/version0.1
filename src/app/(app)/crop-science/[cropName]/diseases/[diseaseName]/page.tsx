@@ -150,7 +150,7 @@ export default function DiseaseDetailPage() {
 
   if (isTomatoDisease) {
     if (name === "Early Blight (Alternaria solani)") {
-      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
+      imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab";
       aiHint = 'tomato early blight';
       unoptimizedImage = true;
       console.log("DiseaseDetailPage - Override for Early Blight applied. ImageURL:", imageUrl);
