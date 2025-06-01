@@ -62,7 +62,6 @@ export default function DiseasesPage() {
         }
         
         const data = await response.json();
-        console.log("[DiseasesPage] Fetched raw data:", data);
         
         let processedData: DiseaseDataItem[] = [];
 
@@ -71,10 +70,8 @@ export default function DiseasesPage() {
         } else if (data && typeof data === 'object' && Object.keys(data).length > 0) {
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
-                console.log("[DiseasesPage] Data found in nested key:", dataArrayKey);
                 processedData = data[dataArrayKey];
             } else if (Object.values(data).every(val => typeof val === 'object' && val !== null && Object.keys(val).length > 0)) {
-                console.log("[DiseasesPage] Data is an object of objects, converting to array.");
                 processedData = Object.values(data) as DiseaseDataItem[];
             } else {
                throw new Error("Fetched data format is not a recognized array or object containing an array of items.");
@@ -166,11 +163,14 @@ export default function DiseasesPage() {
                 let aiHint: string;
                 let unoptimizedImage = false;
 
-                // Specific override for Early Blight on Tomato
-                if (cropSlug === 'tomato' && diseaseName === "Early Blight (Alternaria solani)") {
+                if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "early blight (alternaria solani)") {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f";
-                  aiHint = 'tomato blight'; // More specific hint
+                  aiHint = 'tomato blight';
                   unoptimizedImage = true; 
+                } else if (cropSlug === 'tomato' && diseaseName.trim().toLowerCase() === "anthracnose (colletotrichum spp.)") {
+                  imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
+                  aiHint = 'tomato anthracnose';
+                  unoptimizedImage = true;
                 } else if (cropSlug === 'tomato' && disease["PHOTOS"]) {
                   imageUrl = disease["PHOTOS"];
                   aiHint = disease.AI_HINT || 'tomato disease';
