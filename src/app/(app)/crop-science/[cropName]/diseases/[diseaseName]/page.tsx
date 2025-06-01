@@ -146,18 +146,21 @@ export default function DiseaseDetailPage() {
   let unoptimizedImage = false;
 
   const isTomatoCrop = cropNameParam === 'tomato';
-  // Normalize disease name from URL for direct matching
   const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
 
-  // Normalize disease name from sheet data for robust matching
   const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
 
 
-  // Priority for Anthracnose if URL parameter specifically matches
+  // Priority for specific diseases if URL parameter specifically matches
   if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
     aiHint = 'tomato anthracnose';
+    unoptimizedImage = true;
+  } 
+  else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "tomato spotted wilt virus") {
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
+    aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
   }
   // Other specific tomato diseases (matched using name from sheet for robustness)
@@ -354,3 +357,4 @@ export default function DiseaseDetailPage() {
 
 
     
+
