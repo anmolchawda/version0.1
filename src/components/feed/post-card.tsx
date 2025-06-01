@@ -31,13 +31,15 @@ export function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
 
+  // For SAVED posts, we'll continue to store just post.id
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
     return saved ? JSON.parse(saved) : [];
   };
 
-  const getLikedPostsFromStorage = (): string[] => {
+  // For LIKED posts, we'll store composite IDs: "userId_postId"
+  const getLikedItemsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
     const liked = localStorage.getItem(`farmdocc_liked_posts_${MOCK_USER_ID}`);
     return liked ? JSON.parse(liked) : [];
@@ -47,11 +49,15 @@ export function PostCard({ post }: PostCardProps) {
     if (typeof window !== 'undefined') {
       setPostFullUrl(`${window.location.origin}/post/${post.id}`);
       
+      // Saved posts check (uses postId)
       const savedPosts = getSavedPostsFromStorage();
       setIsSaved(savedPosts.includes(post.id));
 
-      const likedPosts = getLikedPostsFromStorage();
-      setIsLiked(likedPosts.includes(post.id));
+      // Liked posts check (uses "userId_postId")
+      const likedItems = getLikedItemsFromStorage();
+      const currentLikeId = `${MOCK_USER_ID}_${post.id}`;
+      setIsLiked(likedItems.includes(currentLikeId));
+      
       setLocalLikesCount(post.likesCount); // Initialize with server count
     }
   }, [post.id, post.likesCount]);
@@ -60,7 +66,7 @@ export function PostCard({ post }: PostCardProps) {
     const savedPosts = getSavedPostsFromStorage();
     let updatedSavedPosts: string[];
 
-    if (savedPosts.includes(post.id)) {
+    if (isSaved) { // isSaved means post.id was in savedPosts
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
       toast({ title: "Post Unsaved", description: "Removed from your favorites." });
     } else {
@@ -72,19 +78,20 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   const handleToggleLike = () => {
-    const likedPosts = getLikedPostsFromStorage();
-    let updatedLikedPosts: string[];
+    const likedItems = getLikedItemsFromStorage(); // Array of "userId_postId"
+    const currentLikeId = `${MOCK_USER_ID}_${post.id}`;
+    let updatedLikedItems: string[];
 
-    if (isLiked) {
-      updatedLikedPosts = likedPosts.filter(id => id !== post.id);
-      setLocalLikesCount(prev => prev - 1);
+    if (isLiked) { // isLiked means currentLikeId was in likedItems
+      updatedLikedItems = likedItems.filter(id => id !== currentLikeId);
+      setLocalLikesCount(prev => Math.max(0, prev - 1)); // Ensure likes don't go below 0
       toast({ title: "Post Unliked" });
     } else {
-      updatedLikedPosts = [...likedPosts, post.id];
+      updatedLikedItems = [...likedItems, currentLikeId];
       setLocalLikesCount(prev => prev + 1);
       toast({ title: "Post Liked!" });
     }
-    localStorage.setItem(`farmdocc_liked_posts_${MOCK_USER_ID}`, JSON.stringify(updatedLikedPosts));
+    localStorage.setItem(`farmdocc_liked_posts_${MOCK_USER_ID}`, JSON.stringify(updatedLikedItems));
     setIsLiked(!isLiked);
     // In a real app, you'd also update the backend here.
   };
@@ -180,4 +187,3 @@ export function PostCard({ post }: PostCardProps) {
     </>
   );
 }
-
