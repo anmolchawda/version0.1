@@ -83,8 +83,8 @@ export default function DiseaseDetailPage() {
         }
         
         const foundDisease = allItems.find(item => 
-          (cropNameParam === 'tomato' && item["TOMATO PEST AND DISEASES"]?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) || 
-          (item.NAME?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) 
+          (cropNameParam === 'tomato' && String(item["TOMATO PEST AND DISEASES"])?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) || 
+          (String(item.NAME)?.trim().toLowerCase() === diseaseNameParam.trim().toLowerCase()) 
         );
         
         if (foundDisease) {
@@ -141,14 +141,18 @@ export default function DiseaseDetailPage() {
   
   const nameForDisplay = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   
-  let imageUrl = diseaseDetails.IMAGE_URL; 
-  let aiHint = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
+  let imageUrl: string | undefined;
+  let aiHint: string = diseaseDetails.AI_HINT || (cropNameParam === 'tomato' ? 'tomato disease' : 'plant disease');
   let unoptimizedImage = false;
 
   const isTomatoCrop = cropNameParam === 'tomato';
+  // Normalize disease name from URL for direct matching
   const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
+
+  // Normalize disease name from sheet data for robust matching
   const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
-  const normalizedNameFromSheet = nameFromSheet ? nameFromSheet.trim().toLowerCase() : "";
+  const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
+
 
   // Priority for Anthracnose if URL parameter specifically matches
   if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
@@ -195,7 +199,7 @@ export default function DiseaseDetailPage() {
     unoptimizedImage = true;
   }
   // Fallback to IMAGE_URL from sheet if it exists and no specific override was matched
-  else if (diseaseDetails.IMAGE_URL) {
+  else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
     imageUrl = diseaseDetails.IMAGE_URL;
     unoptimizedImage = imageUrl.startsWith('https://firebasestorage.googleapis.com') || imageUrl.startsWith('https://storage.googleapis.com');
   }
@@ -204,7 +208,7 @@ export default function DiseaseDetailPage() {
   // Final fallback to placeholder if no image URL determined yet
   if (!imageUrl) {
     imageUrl = `https://placehold.co/600x400.png`;
-    unoptimizedImage = true;
+    unoptimizedImage = true; // Placeholders are generally unoptimized
   }
   
   const renderDetailItem = (label: string, value: string | undefined | null) => {
