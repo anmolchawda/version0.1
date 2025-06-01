@@ -89,7 +89,7 @@ export default function DiseasesPage() {
         );
 
         if (processedData.length === 0 && ((Array.isArray(data) && data.length > 0) || (typeof data === 'object' && Object.keys(data).length > 0))) {
-            console.warn("[DiseasesPage] Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or 'TOMATO PEST AND DISEASES' for tomatoes) exist and are non-empty strings in your Apps Script output items. Current cropSlug:", cropSlug);
+            // console.warn("[DiseasesPage] Data was fetched, but all items were filtered out. Check if relevant identifying properties (NAME or 'TOMATO PEST AND DISEASES' for tomatoes) exist and are non-empty strings in your Apps Script output items. Current cropSlug:", cropSlug);
         }
         
         setDiseasesData(processedData);
@@ -101,7 +101,7 @@ export default function DiseasesPage() {
         } else if (err instanceof Error) {
             detailedErrorMessage = `Error fetching data: ${err.message}. URL: ${APPS_SCRIPT_URL}`;
         }
-        console.error("[DiseasesPage] Fetch error:", detailedErrorMessage, err);
+        // console.error("[DiseasesPage] Fetch error:", detailedErrorMessage, err);
         setError(detailedErrorMessage);
         setDiseasesData([]); 
       } finally {
@@ -184,9 +184,9 @@ export default function DiseasesPage() {
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
                   aiHint = 'tomato anthracnose';
                   unoptimizedImage = true;
-                } else if (cropSlug === 'tomato' && normalizedDiseaseName === "tomato spotted wilt virus") {
+                } else if (cropSlug === 'tomato' && normalizedDiseaseName.includes("spotted wilt virus")) { // Changed to .includes for leniency
                   // --- Diagnostic Log ---
-                  // console.log("[DiseasesPage] SUCCESS: Matched 'tomato spotted wilt virus'. Applying specific image.");
+                  // console.log("[DiseasesPage] SUCCESS: Matched 'tomato spotted wilt virus' (using .includes). Applying specific image.");
                   // ---
                   imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
                   aiHint = 'tomato spotted_wilt_virus';
@@ -239,5 +239,3 @@ export default function DiseasesPage() {
   );
 }
     
-
-
