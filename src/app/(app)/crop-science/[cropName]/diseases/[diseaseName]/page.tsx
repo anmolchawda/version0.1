@@ -146,8 +146,10 @@ export default function DiseaseDetailPage() {
   let unoptimizedImage = false;
 
   const isTomatoCrop = cropNameParam === 'tomato';
+  // Normalize disease name from URL for robust comparison
   const normalizedDiseaseNameFromUrl = diseaseNameParam.trim().toLowerCase();
 
+  // Normalize disease name from sheet data
   const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
   const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
 
@@ -159,7 +161,7 @@ export default function DiseaseDetailPage() {
     unoptimizedImage = true;
   } 
   else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "tomato spotted wilt virus") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
     aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
   }
@@ -197,7 +199,7 @@ export default function DiseaseDetailPage() {
     aiHint = 'tomato gray_mold';
     unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato spotted wilt virus") {
-    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04";
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
     aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
   }
@@ -357,4 +359,5 @@ export default function DiseaseDetailPage() {
 
 
     
+
 
