@@ -178,6 +178,10 @@ export default function DiseaseDetailPage() {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FMosiac%20virus.png?alt=media&token=733cf2fb-fa72-40af-9aba-c9b65bd2018a";
     aiHint = 'tomato mosaic_virus';
     unoptimizedImage = true;
+  } else if (isTomatoCrop && normalizedNameFromSheet.includes("damping off")) {
+    imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FDamping%20off%201.jpg?alt=media&token=82df5511-5396-4a18-9764-1d40c1437a7b";
+    aiHint = 'tomato damping_off';
+    unoptimizedImage = true;
   } else if (isTomatoCrop && normalizedNameFromSheet === "tomato yellow leaf curl virus (tylcv)") {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FYellow%20Leaf%20curl%20virus%202.JPG?alt=media&token=3c81aa7f-565e-4a64-ae04-4533ba91aa10";
     aiHint = 'tomato yellow_leaf_curl';
@@ -198,7 +202,7 @@ export default function DiseaseDetailPage() {
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FGray%20Mold.jpeg?alt=media&token=e4594a8a-41f6-4252-af42-03281f3eb117";
     aiHint = 'tomato gray_mold';
     unoptimizedImage = true;
-  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato spotted wilt virus") {
+  } else if (isTomatoCrop && normalizedNameFromSheet === "tomato spotted wilt virus") { // This could be after the URL param check as a fallback
     imageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
     aiHint = 'tomato spotted_wilt_virus';
     unoptimizedImage = true;
@@ -359,5 +363,6 @@ export default function DiseaseDetailPage() {
 
 
     
+
 
 
