@@ -13,6 +13,7 @@ import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
 import { formatTimeAgo, getPlaceholderUser } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface PostCardProps {
   post: Post;
@@ -27,19 +28,33 @@ export function PostCard({ post }: PostCardProps) {
   const { toast } = useToast();
 
   const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
 
   const getSavedPostsFromStorage = (): string[] => {
+    if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
     return saved ? JSON.parse(saved) : [];
+  };
+
+  const getLikedPostsFromStorage = (): string[] => {
+    if (typeof window === 'undefined') return [];
+    const liked = localStorage.getItem(`farmdocc_liked_posts_${MOCK_USER_ID}`);
+    return liked ? JSON.parse(liked) : [];
   };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPostFullUrl(`${window.location.origin}/post/${post.id}`);
+      
       const savedPosts = getSavedPostsFromStorage();
       setIsSaved(savedPosts.includes(post.id));
+
+      const likedPosts = getLikedPostsFromStorage();
+      setIsLiked(likedPosts.includes(post.id));
+      setLocalLikesCount(post.likesCount); // Initialize with server count
     }
-  }, [post.id]);
+  }, [post.id, post.likesCount]);
 
   const handleToggleSave = () => {
     const savedPosts = getSavedPostsFromStorage();
@@ -55,6 +70,25 @@ export function PostCard({ post }: PostCardProps) {
     localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
   };
+
+  const handleToggleLike = () => {
+    const likedPosts = getLikedPostsFromStorage();
+    let updatedLikedPosts: string[];
+
+    if (isLiked) {
+      updatedLikedPosts = likedPosts.filter(id => id !== post.id);
+      setLocalLikesCount(prev => prev - 1);
+      toast({ title: "Post Unliked" });
+    } else {
+      updatedLikedPosts = [...likedPosts, post.id];
+      setLocalLikesCount(prev => prev + 1);
+      toast({ title: "Post Liked!" });
+    }
+    localStorage.setItem(`farmdocc_liked_posts_${MOCK_USER_ID}`, JSON.stringify(updatedLikedPosts));
+    setIsLiked(!isLiked);
+    // In a real app, you'd also update the backend here.
+  };
+
 
   return (
     <>
@@ -87,8 +121,8 @@ export function PostCard({ post }: PostCardProps) {
 
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Heart className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike}>
+              <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />
               <span className="sr-only">Like</span>
             </Button>
             <Link href={`/post/${post.id}#comments`}>
@@ -107,8 +141,8 @@ export function PostCard({ post }: PostCardProps) {
             </Button>
           </div>
           
-          {post.likesCount > 0 && (
-            <p className="text-sm font-semibold">{post.likesCount} likes</p>
+          {localLikesCount > 0 && (
+            <p className="text-sm font-semibold">{localLikesCount} {localLikesCount === 1 ? 'like' : 'likes'}</p>
           )}
 
           <p className="text-sm">
@@ -146,3 +180,4 @@ export function PostCard({ post }: PostCardProps) {
     </>
   );
 }
+
