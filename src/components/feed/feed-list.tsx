@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 const PULL_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const MAX_PULL_VISUAL_EFFECT_DISTANCE = 100; // Max distance for visual effect (e.g., icon movement)
+const WHEEL_PULL_ACTIVATION_THRESHOLD = 20; // Minimum deltaY magnitude for a wheel event to trigger refresh
 
 export function FeedList() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -39,12 +40,14 @@ export function FeedList() {
   const handleRefresh = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
+    
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const newPosts = [...posts].sort(() => Math.random() - 0.5);
+    const newPosts = [...initialPosts].sort(() => Math.random() - 0.5); // Refresh from initial set for demo
     setPosts(newPosts);
     setIsLoading(false);
-  }, [isLoading, posts]);
+    setPullDeltaY(0); // Reset pullDeltaY after loading is complete
+  }, [isLoading]); // Removed posts from dependency array as we re-fetch/re-shuffle from a base set or API
 
   useEffect(() => {
     setPosts(initialPosts);
@@ -66,16 +69,18 @@ export function FeedList() {
     const currentY = e.touches[0].clientY;
     let delta = currentY - pullStartY;
     if (delta < 0) delta = 0; 
-    setPullDeltaY(delta);
+    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50)); // Allow some overpull
   };
 
   const handleTouchEnd = () => {
     if (pullStartY === null || isLoading) return;
     if (pullDeltaY > PULL_THRESHOLD) {
       handleRefresh();
+    } else {
+      setPullDeltaY(0); // Reset if not pulled enough
     }
     setPullStartY(null);
-    setPullDeltaY(0);
+    // pullDeltaY is reset by handleRefresh or above else
   };
 
   // Mouse Events
@@ -89,7 +94,6 @@ export function FeedList() {
     setPullStartY(e.clientY);
     setPullDeltaY(0);
     
-    // Add window listeners for mouse move and up
     window.addEventListener('mousemove', handleWindowMouseMove);
     window.addEventListener('mouseup', handleWindowMouseUp);
   };
@@ -100,12 +104,11 @@ export function FeedList() {
     const currentY = e.clientY;
     let delta = currentY - pullStartY;
     if (delta < 0) delta = 0;
-    setPullDeltaY(delta);
+    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50)); // Allow some overpull
   };
 
   const handleWindowMouseUp = () => {
     if (!isDragging || pullStartY === null || isLoading) {
-      // Clean up just in case, though isDragging should cover it
       window.removeEventListener('mousemove', handleWindowMouseMove);
       window.removeEventListener('mouseup', handleWindowMouseUp);
       setIsDragging(false);
@@ -115,24 +118,42 @@ export function FeedList() {
 
     if (pullDeltaY > PULL_THRESHOLD) {
       handleRefresh();
+    } else {
+      setPullDeltaY(0); // Reset if not pulled enough
     }
     
     setIsDragging(false);
     setPullStartY(null);
-    setPullDeltaY(0);
+    // pullDeltaY is reset by handleRefresh or above else
 
-    // Clean up window listeners
     window.removeEventListener('mousemove', handleWindowMouseMove);
     window.removeEventListener('mouseup', handleWindowMouseUp);
   };
   
-  // Cleanup effect for window listeners if component unmounts during a drag
+  // Wheel Event for Trackpad/Mouse Wheel
+  const handleWheel = (e: React.WheelEvent) => {
+    if (isLoading || !isEligibleToPull || e.ctrlKey || e.metaKey) {
+      return;
+    }
+
+    // User is at the top and scrolls "up" (pulls down on trackpad, deltaY < 0)
+    if (e.deltaY < 0) {
+      const pullStrength = -e.deltaY;
+      if (pullStrength > WHEEL_PULL_ACTIVATION_THRESHOLD) {
+        // To show the loading spinner correctly via existing logic:
+        setPullDeltaY(PULL_THRESHOLD + 1); // Make it look like it was pulled enough to trigger refresh
+        handleRefresh();
+        // pullDeltaY will be reset by handleRefresh after loading.
+      }
+    }
+  };
+
   useEffect(() => {
     return () => {
       window.removeEventListener('mousemove', handleWindowMouseMove);
       window.removeEventListener('mouseup', handleWindowMouseUp);
     };
-  }, []); // Empty dependency array means this runs on mount and cleans up on unmount
+  }, []); 
 
   if (isLoading && posts.length === 0 && pullDeltaY === 0) {
      return (
@@ -150,19 +171,24 @@ export function FeedList() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
+      onWheel={handleWheel} // Added wheel event handler
       className="relative" 
-      style={{ userSelect: isDragging ? 'none' : 'auto' }} // Prevent text selection during drag
+      style={{ 
+        userSelect: isDragging ? 'none' : 'auto',
+        // If content is shorter than viewport, ensure it can still be "pulled"
+        // minHeight: 'calc(100vh + 1px)' // This might be too aggressive, ensure it doesn't break layout
+      }}
     >
       <div
         className={cn(
           "fixed top-16 left-1/2 -translate-x-1/2 z-10 mt-3 p-2.5 rounded-full bg-card shadow-lg flex items-center justify-center transition-all duration-200 ease-out",
-          (pullDeltaY > 10 || (isLoading && (pullStartY === null || isDragging))) ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+          (pullDeltaY > 10 || isLoading) ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
         )}
         style={{
-          transform: `translateX(-50%) translateY(${Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px) scale(${ (pullDeltaY > 10 || (isLoading && (pullStartY === null || isDragging))) ? 1 : 0.75 })`,
+          transform: `translateX(-50%) translateY(${isLoading ? 0 : Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px) scale(${ (pullDeltaY > 10 || isLoading) ? 1 : 0.75 })`,
         }}
       >
-        {isLoading && (pullStartY === null || isDragging) ? 
+        {isLoading ? 
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
          : pullDeltaY > PULL_THRESHOLD ? 
           <RefreshCw className="h-5 w-5 text-green-500" />
@@ -177,12 +203,16 @@ export function FeedList() {
       <div 
         className="space-y-6 max-w-xl mx-auto transition-transform duration-200 ease-out"
         style={{
-          transform: (isLoading && (pullStartY === null || isDragging)) ? `translateY(40px)` : 'translateY(0px)',
-          paddingTop: '1px' 
+          // Content push down effect
+          transform: `translateY(${isLoading ? Math.max(40, pullDeltaY * 0.3) : Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px)`,
+          paddingTop: '1px' // Helps with scroll detection at the very top
         }}
       >
         {posts.length === 0 && !isLoading && (
-          <div className="text-center py-10 pt-20">
+          <div 
+            className="text-center py-10"
+            style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(2.5, pullDeltaY * 0.3 / 16)}rem` : '2.5rem' }} // Adjust pt if pulling
+          >
             <p className="text-xl text-muted-foreground">No posts yet. Follow some farmers to see their updates!</p>
           </div>
         )}
