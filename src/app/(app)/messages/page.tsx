@@ -1,46 +1,94 @@
+
 // src/app/(app)/messages/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageSquareText, Search, Edit3, Users } from 'lucide-react';
-import { placeholderUsers } from '@/lib/placeholders';
-import type { User } from '@/types';
-import { MOCK_USER_ID } from '@/lib/placeholders';
-import { NewMessageModal } from '@/components/message/new-message-modal'; // Import the new modal
-
-interface MockConversation {
-  id: string;
-  user: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
-  lastMessage: string;
-  lastMessageTime: string;
-  unread?: boolean;
-}
-
-const mockConversations: MockConversation[] = placeholderUsers
-  .filter(user => user.id !== MOCK_USER_ID)
-  .slice(0, 3)
-  .map((user, index) => ({
-  id: `conv_${user.id}`,
-  user: {
-    id: user.id,
-    username: user.username,
-    name: user.name || user.username,
-    avatarUrl: user.avatarUrl,
-  },
-  lastMessage: index === 0 ? "Hey, how are you doing?" : (index === 1 ? "Sure, sounds good! See you then." : "Can you send me the details? Thanks!"),
-  lastMessageTime: index === 0 ? "2h ago" : (index === 1 ? "Yesterday" : "10:30 AM"),
-  unread: index === 0,
-}));
-
+import { MessageSquareText, Search, Edit3, Users, Loader2 } from 'lucide-react';
+import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders'; // MOCK_USER_ID is no longer needed here
+import type { DisplayConversation, FirestoreConversation, User } from '@/types';
+import { NewMessageModal } from '@/components/message/new-message-modal';
+import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp } from '@/lib/firebase';
 
 export default function MessagesPage() {
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
+  const [conversations, setConversations] = useState<DisplayConversation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const currentAuthUser = auth.currentUser;
+
+  useEffect(() => {
+    if (!currentAuthUser) {
+      // AppLayout should handle redirect, but as a safeguard
+      router.push('/login');
+      return;
+    }
+    setIsLoading(true);
+    const conversationsCollectionRef = collection(db, 'conversations');
+    const q = query(
+      conversationsCollectionRef,
+      where('participants', 'array-contains', currentAuthUser.uid),
+      orderBy('lastMessageTimestamp', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedConversations: DisplayConversation[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data() as FirestoreConversation;
+        const otherParticipantId = data.participants.find(pId => pId !== currentAuthUser.uid);
+
+        if (otherParticipantId) {
+          // Try to get details from denormalized data first
+          let otherParticipantDetails = data.participantDetails?.[otherParticipantId];
+          
+          // Fallback to placeholder if not available
+          if (!otherParticipantDetails) {
+            const placeholder = getPlaceholderUser(otherParticipantId);
+            if (placeholder) {
+              otherParticipantDetails = { 
+                id: placeholder.id, 
+                username: placeholder.username, 
+                name: placeholder.name, 
+                avatarUrl: placeholder.avatarUrl 
+              };
+            } else {
+              // If even placeholder is not found, use a generic fallback
+              otherParticipantDetails = { 
+                id: otherParticipantId, 
+                username: 'Unknown User', 
+                name: 'Unknown User', 
+                avatarUrl: undefined 
+              };
+            }
+          }
+          
+          fetchedConversations.push({
+            id: docSnap.id, // This is the Firestore conversation ID (e.g., uid1_uid2)
+            otherParticipant: otherParticipantDetails,
+            lastMessage: data.lastMessageText || 'No messages yet',
+            lastMessageTime: data.lastMessageTimestamp ? formatTimeAgo((data.lastMessageTimestamp as Timestamp).toDate().toISOString()) : '',
+            unread: false, // Unread count logic not implemented in this pass
+          });
+        }
+      });
+      setConversations(fetchedConversations);
+      setIsLoading(false);
+      setError(null);
+    }, (err) => {
+      console.error("Error fetching conversations: ", err);
+      setError("Failed to load conversations.");
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [currentAuthUser, router]);
 
   return (
     <>
@@ -62,25 +110,32 @@ export default function MessagesPage() {
                 type="search"
                 placeholder="Search messages or users..."
                 className="w-full pl-10 py-2 rounded-lg"
+                // Search functionality to be implemented later
               />
             </div>
           </CardHeader>
 
           <ScrollArea className="flex-grow">
             <CardContent className="p-0">
-              {mockConversations.length > 0 ? (
+              {isLoading && (
+                <div className="flex items-center justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary" /></div>
+              )}
+              {!isLoading && error && (
+                <div className="text-center py-20 text-destructive">{error}</div>
+              )}
+              {!isLoading && !error && conversations.length > 0 ? (
                 <div className="divide-y">
-                  {mockConversations.map((convo) => (
-                    <Link key={convo.id} href={`/messages/${convo.user.id}`} passHref>
+                  {conversations.map((convo) => (
+                    <Link key={convo.id} href={`/messages/${convo.otherParticipant.id}`} passHref>
                       <div className="flex items-center p-4 hover:bg-muted/50 cursor-pointer transition-colors">
                         <Avatar className="h-12 w-12 mr-4 border">
-                          <AvatarImage src={convo.user.avatarUrl} alt={convo.user.name || convo.user.username} data-ai-hint="person user"/>
-                          <AvatarFallback>{(convo.user.name || convo.user.username)?.charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarImage src={convo.otherParticipant.avatarUrl} alt={convo.otherParticipant.name || convo.otherParticipant.username} data-ai-hint="person user"/>
+                          <AvatarFallback>{(convo.otherParticipant.name || convo.otherParticipant.username)?.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="flex-grow overflow-hidden">
                           <div className="flex justify-between items-center">
                             <h3 className={`font-semibold truncate ${convo.unread ? 'text-foreground' : 'text-foreground'}`}>
-                              {convo.user.name || convo.user.username}
+                              {convo.otherParticipant.name || convo.otherParticipant.username}
                             </h3>
                             <span className={`text-xs ${convo.unread ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                               {convo.lastMessageTime}
@@ -98,16 +153,18 @@ export default function MessagesPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20">
-                  <Users className="mx-auto h-16 w-16 text-muted-foreground/50 mb-4" />
-                  <p className="text-xl font-semibold text-foreground">No Messages Yet</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Start a new conversation to see your messages here.
-                  </p>
-                  <Button className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => setIsNewMessageModalOpen(true)}>
-                    <Edit3 className="mr-2 h-4 w-4" /> Start a New Chat
-                  </Button>
-                </div>
+                !isLoading && !error && (
+                  <div className="text-center py-20">
+                    <Users className="mx-auto h-16 w-16 text-muted-foreground/50 mb-4" />
+                    <p className="text-xl font-semibold text-foreground">No Messages Yet</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Start a new conversation to see your messages here.
+                    </p>
+                    <Button className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => setIsNewMessageModalOpen(true)}>
+                      <Edit3 className="mr-2 h-4 w-4" /> Start a New Chat
+                    </Button>
+                  </div>
+                )
               )}
             </CardContent>
           </ScrollArea>
