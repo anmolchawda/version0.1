@@ -1,14 +1,15 @@
+
 // src/components/layout/sidebar.tsx
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useMemo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import type { NavLink, User } from '@/types';
-import { getPlaceholderUser } from '@/lib/placeholders';
+import type { NavLink, User } from '@/types'; // User type may not be fully populated from auth alone
+import { getPlaceholderUser } from '@/lib/placeholders'; // Keep for fallback data if needed
 import {
   FlaskConical,
   SprayCan,
@@ -19,12 +20,16 @@ import {
   ScrollText,
   CloudSun,
   CalendarDays,
+  LogOut, // Import LogOut icon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { auth } from '@/lib/firebase'; // Import Firebase auth
+import { signOut } from 'firebase/auth'; // Import signOut
+import { useToast } from '@/hooks/use-toast';
 
-const MOCK_USER_ID = '1';
+const MOCK_USER_ID_FALLBACK = '1'; // Fallback if auth user is not available
 
 interface NavLinkItemProps {
   href: string;
@@ -84,8 +89,18 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { isSidebarOpen, closeSidebar } = useSidebarContext();
-  const mockUser: User | undefined = getPlaceholderUser(MOCK_USER_ID);
+  const router = useRouter();
+  const { toast } = useToast();
+  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
+  
+  // Get current Firebase auth user details for display
+  const firebaseUser = auth.currentUser;
+  const currentUserName = firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'User';
+  const currentUserAvatar = firebaseUser?.photoURL;
+  const currentUserUsername = firebaseUser?.email?.split('@')[0] || 'krishix_user'; // Fallback username
+
+  const userIdForProfile = authUserId || MOCK_USER_ID_FALLBACK;
+
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
 
@@ -119,10 +134,22 @@ export function Sidebar() {
   ], [currentLanguage]);
 
   const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
+  const logoutLabel = useMemo(() => (currentLanguage === 'hi' ? 'लॉग आउट' : 'Logout'), [currentLanguage]);
 
-  const userAvatarFallback = mockUser?.username ? mockUser.username.substring(0, 2).toUpperCase() : 'U';
-  const userNameDisplay = mockUser?.name || mockUser?.username || 'KrishiX User';
+  const userAvatarFallback = currentUserName.substring(0, 2).toUpperCase();
   
+  const handleLogout = async () => {
+    closeSidebar(); // Close sidebar first
+    try {
+      await signOut(auth);
+      toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
+      router.push('/login'); // Redirect to login page
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({ title: 'Logout Failed', description: 'Could not log out. Please try again.', variant: 'destructive' });
+    }
+  };
+
   const settingsLinkElement = (
       <Button
         asChild
@@ -141,24 +168,40 @@ export function Sidebar() {
       </Button>
   );
 
+  const logoutButtonElement = (
+     <Button
+        variant={isSidebarOpen ? "destructive" : "ghost"}
+        className={cn(
+          "w-full justify-start gap-3",
+          isSidebarOpen ? "bg-destructive/10 hover:bg-destructive/20 text-destructive" : "text-destructive hover:bg-destructive/10",
+           !isSidebarOpen && "justify-center p-2 h-auto"
+        )}
+        onClick={handleLogout}
+        aria-label={!isSidebarOpen ? logoutLabel : undefined}
+      >
+        <LogOut className="h-5 w-5" />
+        {isSidebarOpen && <span>{logoutLabel}</span>}
+      </Button>
+  );
+
   const userProfileElement = (
     <Link
-      href={`/profile/${MOCK_USER_ID}`}
+      href={`/profile/${userIdForProfile}`}
       className={cn(
         "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
         !isSidebarOpen && "justify-center"
       )}
       onClick={closeSidebar}
-      aria-label={!isSidebarOpen ? `${userNameDisplay} Profile` : undefined}
+      aria-label={!isSidebarOpen ? `${currentUserName} Profile` : undefined}
     >
       <Avatar className="h-9 w-9 border">
-        <AvatarImage src={mockUser?.avatarUrl || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={userNameDisplay} data-ai-hint="person farmer"/>
+        <AvatarImage src={currentUserAvatar || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={currentUserName} data-ai-hint="person farmer"/>
         <AvatarFallback>{userAvatarFallback}</AvatarFallback>
       </Avatar>
       {isSidebarOpen && (
         <div className="flex flex-col overflow-hidden">
-          <span className="text-sm font-medium group-hover:text-primary truncate">{userNameDisplay}</span>
-          <span className="text-xs text-muted-foreground truncate">@{mockUser?.username}</span>
+          <span className="text-sm font-medium group-hover:text-primary truncate">{currentUserName}</span>
+          <span className="text-xs text-muted-foreground truncate">@{currentUserUsername}</span>
         </div>
       )}
     </Link>
@@ -168,7 +211,7 @@ export function Sidebar() {
     <aside
       className={cn(
         "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 top-16 h-[calc(100vh-8rem)] shadow-lg", // 8rem = 4rem top + 4rem bottom
+        "fixed left-0 top-16 h-[calc(100vh-8rem)] shadow-lg", 
         "transition-transform duration-300 ease-in-out z-30",
         isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
       )}
@@ -198,9 +241,20 @@ export function Sidebar() {
                  </TooltipContent>
               )}
             </Tooltip>
+             <Tooltip>
+              <TooltipTrigger asChild>{logoutButtonElement}</TooltipTrigger>
+              {logoutLabel && (
+                 <TooltipContent side="right" className="bg-background text-foreground border">
+                    <p>{logoutLabel}</p>
+                 </TooltipContent>
+              )}
+            </Tooltip>
           </TooltipProvider>
         ) : (
-          settingsLinkElement
+          <>
+            {settingsLinkElement}
+            {logoutButtonElement}
+          </>
         )}
 
         <Separator />
@@ -209,10 +263,10 @@ export function Sidebar() {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>{userProfileElement}</TooltipTrigger>
-               {userNameDisplay && (
+               {currentUserName && (
                   <TooltipContent side="right" className="bg-background text-foreground border">
-                    <p>{userNameDisplay}</p>
-                    {mockUser?.username && <p className="text-xs text-muted-foreground">@{mockUser?.username}</p>}
+                    <p>{currentUserName}</p>
+                    {currentUserUsername && <p className="text-xs text-muted-foreground">@{currentUserUsername}</p>}
                   </TooltipContent>
                )}
             </Tooltip>

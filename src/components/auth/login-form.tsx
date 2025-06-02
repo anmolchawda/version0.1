@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type AuthError } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -31,44 +33,75 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleLogin = (method: 'email' | 'google') => {
-    if (method === 'email') {
-      setIsLoading(true);
-    } else {
-      setIsGoogleLoading(true);
+  const handleFirebaseError = (error: AuthError) => {
+    console.error("Firebase Auth Error:", error);
+    let message = "An unexpected error occurred. Please try again.";
+    switch (error.code) {
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        message = "Invalid email or password. Please try again.";
+        break;
+      case "auth/invalid-email":
+        message = "The email address is not valid.";
+        break;
+      case "auth/user-disabled":
+        message = "This user account has been disabled.";
+        break;
+      case "auth/popup-closed-by-user":
+        message = "Google Sign-In popup closed. Please try again.";
+        return; // Don't show toast for this common scenario
+      case "auth/account-exists-with-different-credential":
+        message = "An account already exists with this email address using a different sign-in method.";
+        break;
+      // Add more specific cases as needed
     }
-
-    // Simulate API call
-    console.log(`Logging in with ${method}:`, { email, password });
-    return new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
-      localStorage.setItem('isMockAuthenticated', 'true');
-      toast({
-        title: 'Login Successful (Simulated)',
-        description: `Welcome back via ${method}!`,
-      });
-      if (method === 'email') {
-        setIsLoading(false);
-      } else {
-        setIsGoogleLoading(false);
-      }
-      router.push('/'); // Redirect to the main feed page
+    toast({
+      title: 'Login Failed',
+      description: message,
+      variant: 'destructive',
     });
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await handleLogin('email');
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      toast({
+        title: 'Login Successful!',
+        description: 'Welcome back!',
+      });
+      router.push('/');
+    } catch (error) {
+      handleFirebaseError(error as AuthError);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = async () => {
-    await handleLogin('google');
+    setIsGoogleLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({
+        title: 'Login Successful!',
+        description: 'Welcome via Google!',
+      });
+      router.push('/');
+    } catch (error) {
+      handleFirebaseError(error as AuthError);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary">Welcome Back!</CardTitle>
-        <CardDescription>Log in to continue to FARMDOCC.</CardDescription>
+        <CardDescription>Log in to continue to KrishiX.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <Button 
@@ -106,7 +139,7 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <div className="space-y-2">
@@ -118,7 +151,7 @@ export function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || isGoogleLoading}>

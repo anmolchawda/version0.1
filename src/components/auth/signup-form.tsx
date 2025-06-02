@@ -3,15 +3,17 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // Added for redirection
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus } from 'lucide-react';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, type AuthError } from 'firebase/auth';
 
-// Simple Google G logo SVG (same as login-form)
+// Simple Google G logo SVG
 const GoogleLogo = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" fillRule="evenodd">
@@ -29,55 +31,91 @@ export function SignupForm() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Added for Google button
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
-  const router = useRouter(); // Added for redirection
+  const router = useRouter();
 
-  const handleSignup = (method: 'email' | 'google') => {
-    if (method === 'email') {
-      if (password !== confirmPassword) {
-        toast({
-          title: 'Password Mismatch',
-          description: 'The passwords do not match. Please try again.',
-          variant: 'destructive',
-        });
-        return Promise.reject(new Error('Password mismatch'));
-      }
-      setIsLoading(true);
-    } else {
-      setIsGoogleLoading(true);
+  const handleFirebaseError = (error: AuthError) => {
+    console.error("Firebase Auth Error:", error);
+    let message = "An unexpected error occurred. Please try again.";
+    switch (error.code) {
+      case "auth/email-already-in-use":
+        message = "This email address is already in use by another account.";
+        break;
+      case "auth/invalid-email":
+        message = "The email address is not valid.";
+        break;
+      case "auth/operation-not-allowed":
+        message = "Email/password accounts are not enabled.";
+        break;
+      case "auth/weak-password":
+        message = "The password is too weak. Please use a stronger password.";
+        break;
+      case "auth/popup-closed-by-user":
+        message = "Google Sign-Up popup closed. Please try again.";
+        return; // Don't show toast
+      case "auth/account-exists-with-different-credential":
+        message = "An account already exists with this email address using a different sign-in method. Try logging in.";
+        break;
+      // Add more specific cases as needed
     }
-
-    // Simulate API call
-    console.log(`Signing up with ${method}:`, { username, email, password });
-    return new Promise(resolve => setTimeout(resolve, 1500)).then(() => {
-      localStorage.setItem('isMockAuthenticated', 'true'); // Simulate authentication
-      toast({
-        title: `Signup Successful via ${method}! (Simulated)`,
-        description: `Welcome to FARMDOCC, ${username || 'Google User'}!`,
-      });
-      if (method === 'email') {
-        setIsLoading(false);
-      } else {
-        setIsGoogleLoading(false);
-      }
-      router.push('/'); // Redirect to the main feed page
+    toast({
+      title: 'Signup Failed',
+      description: message,
+      variant: 'destructive',
     });
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await handleSignup('email').catch(() => setIsLoading(false)); // Ensure loading state is reset on error
+    if (password !== confirmPassword) {
+      toast({
+        title: 'Password Mismatch',
+        description: 'The passwords do not match. Please try again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: username });
+      }
+      toast({
+        title: 'Signup Successful!',
+        description: `Welcome to KrishiX, ${username}!`,
+      });
+      router.push('/');
+    } catch (error) {
+      handleFirebaseError(error as AuthError);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignup = async () => {
-    await handleSignup('google');
+    setIsGoogleLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      toast({
+        title: 'Signup Successful!',
+        description: `Welcome to KrishiX, ${result.user.displayName || 'Google User'}!`,
+      });
+      // Optionally, create a user document in Firestore here if it's a new user
+      router.push('/');
+    } catch (error) {
+      handleFirebaseError(error as AuthError);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary">Join FARMDOCC</CardTitle>
+        <CardTitle className="text-3xl font-bold text-primary">Join KrishiX</CardTitle>
         <CardDescription>Create your account and connect with farmers.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -116,7 +154,7 @@ export function SignupForm() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <div className="space-y-2">
@@ -128,7 +166,7 @@ export function SignupForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <div className="space-y-2">
@@ -136,11 +174,11 @@ export function SignupForm() {
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="•••••••• (min. 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <div className="space-y-2">
@@ -152,7 +190,7 @@ export function SignupForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              disabled={isGoogleLoading}
+              disabled={isLoading || isGoogleLoading}
             />
           </div>
           <Button type="submit" className="w-full text-lg py-3 mt-2 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || isGoogleLoading}>
@@ -172,5 +210,3 @@ export function SignupForm() {
     </Card>
   );
 }
-
-    
