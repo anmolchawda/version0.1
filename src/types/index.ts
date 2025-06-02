@@ -18,7 +18,7 @@ export interface Post {
   user: User;
   imageUrl?: string;
   caption: string;
-  hashtags: string[];
+  hashtags?: string[]; // Made optional
   likesCount: number;
   commentsCount: number;
   createdAt: string; // ISO date string for consistent time handling

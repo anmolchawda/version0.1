@@ -6,22 +6,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
-import { formatTimeAgo, getPlaceholderUser } from '@/lib/placeholders';
+import { formatTimeAgo } from '@/lib/placeholders';
+import { MOCK_USER_ID } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp } from 'firebase/firestore';
 
 interface PostCardProps {
   post: Post;
+  priority?: boolean; // For image optimization
 }
 
-const MOCK_USER_ID = '1'; // Simulate a logged-in user
-
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, priority = false }: PostCardProps) {
   const timeAgo = formatTimeAgo(post.createdAt);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
@@ -30,43 +32,46 @@ export function PostCard({ post }: PostCardProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
+  const [isLoadingLike, setIsLoadingLike] = useState(false);
 
-  // For SAVED posts, we'll continue to store just post.id
+  const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
+  const postDocRef = doc(db, 'posts', post.id);
+
+  useEffect(() => {
+    const checkInitialLike = async () => {
+      setIsLoadingLike(true);
+      try {
+        const docSnap = await getDoc(likedDocRef);
+        setIsLiked(docSnap.exists());
+      } catch (error) {
+        console.error("Error checking initial like status:", error);
+      } finally {
+        setIsLoadingLike(false);
+      }
+    };
+    checkInitialLike();
+    setLocalLikesCount(post.likesCount);
+  }, [post.id, post.likesCount, likedDocRef]);
+
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
     return saved ? JSON.parse(saved) : [];
   };
 
-  // For LIKED posts, we'll store composite IDs: "userId_postId"
-  const getLikedItemsFromStorage = (): string[] => {
-    if (typeof window === 'undefined') return [];
-    const liked = localStorage.getItem(`farmdocc_liked_posts_${MOCK_USER_ID}`);
-    return liked ? JSON.parse(liked) : [];
-  };
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPostFullUrl(`${window.location.origin}/post/${post.id}`);
-      
-      // Saved posts check (uses postId)
       const savedPosts = getSavedPostsFromStorage();
       setIsSaved(savedPosts.includes(post.id));
-
-      // Liked posts check (uses "userId_postId")
-      const likedItems = getLikedItemsFromStorage();
-      const currentLikeId = `${MOCK_USER_ID}_${post.id}`;
-      setIsLiked(likedItems.includes(currentLikeId));
-      
-      setLocalLikesCount(post.likesCount); // Initialize with server count
     }
-  }, [post.id, post.likesCount]);
+  }, [post.id]);
 
   const handleToggleSave = () => {
     const savedPosts = getSavedPostsFromStorage();
     let updatedSavedPosts: string[];
 
-    if (isSaved) { // isSaved means post.id was in savedPosts
+    if (isSaved) {
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
       toast({ title: "Post Unsaved", description: "Removed from your favorites." });
     } else {
@@ -77,23 +82,36 @@ export function PostCard({ post }: PostCardProps) {
     setIsSaved(!isSaved);
   };
 
-  const handleToggleLike = () => {
-    const likedItems = getLikedItemsFromStorage(); // Array of "userId_postId"
-    const currentLikeId = `${MOCK_USER_ID}_${post.id}`;
-    let updatedLikedItems: string[];
+  const handleToggleLike = async () => {
+    if (isLoadingLike) return;
+    setIsLoadingLike(true);
 
-    if (isLiked) { // isLiked means currentLikeId was in likedItems
-      updatedLikedItems = likedItems.filter(id => id !== currentLikeId);
-      setLocalLikesCount(prev => Math.max(0, prev - 1)); // Ensure likes don't go below 0
-      toast({ title: "Post Unliked" });
-    } else {
-      updatedLikedItems = [...likedItems, currentLikeId];
-      setLocalLikesCount(prev => prev + 1);
-      toast({ title: "Post Liked!" });
+    const newLikedState = !isLiked;
+
+    try {
+      if (newLikedState) {
+        await setDoc(likedDocRef, { likedAt: Timestamp.now() });
+        await updateDoc(postDocRef, {
+          likesCount: increment(1)
+        });
+        setLocalLikesCount(prev => prev + 1);
+      } else {
+        await deleteDoc(likedDocRef);
+        await updateDoc(postDocRef, {
+          likesCount: increment(-1)
+        });
+        setLocalLikesCount(prev => Math.max(0, prev - 1));
+      }
+      setIsLiked(newLikedState);
+    } catch (error) {
+      console.error("Error updating like status:", error);
+      toast({ title: "Error", description: "Could not update like status.", variant: "destructive" });
+      // Revert optimistic updates if Firestore fails
+      setLocalLikesCount(post.likesCount); // Revert to original server count
+      setIsLiked(!newLikedState); // Revert liked state
+    } finally {
+      setIsLoadingLike(false);
     }
-    localStorage.setItem(`farmdocc_liked_posts_${MOCK_USER_ID}`, JSON.stringify(updatedLikedItems));
-    setIsLiked(!isLiked);
-    // In a real app, you'd also update the backend here.
   };
 
 
@@ -118,17 +136,18 @@ export function PostCard({ post }: PostCardProps) {
             <Image
               src={post.imageUrl}
               alt={`Post by ${post.user.username}: ${post.caption.substring(0,50)}`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{objectFit:"cover"}}
               className="rounded-none"
               data-ai-hint="farm field crop"
+              priority={priority}
             />
           </Link>
         )}
 
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike}>
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike} disabled={isLoadingLike}>
               <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />
               <span className="sr-only">Like</span>
             </Button>
@@ -157,7 +176,7 @@ export function PostCard({ post }: PostCardProps) {
             <span className="ml-1">{post.caption}</span>
           </p>
 
-          {post.hashtags.length > 0 && (
+          {post.hashtags && post.hashtags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {post.hashtags.map((tag) => (
                 <Link href={`/discover?tag=${tag.replace('#', '')}`} key={tag}>

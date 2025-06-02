@@ -2,56 +2,85 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { Post } from '@/types';
+import type { Post as PostType, User } from '@/types';
 import { PostCard } from './post-card';
-import { placeholderPosts as initialPosts } from '@/lib/placeholders';
+import { getPlaceholderUser } from '@/lib/placeholders';
 import { RefreshCw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, query, orderBy, Timestamp, type DocumentData } from 'firebase/firestore';
 
-const PULL_THRESHOLD = 70; // Pixels to pull down to trigger refresh
-const MAX_PULL_VISUAL_EFFECT_DISTANCE = 100; // Max distance for visual effect (e.g., icon movement)
-const WHEEL_PULL_ACTIVATION_THRESHOLD = 20; // Minimum deltaY magnitude for a wheel event to trigger refresh
+const PULL_THRESHOLD = 70;
+const MAX_PULL_VISUAL_EFFECT_DISTANCE = 100;
+const WHEEL_PULL_ACTIVATION_THRESHOLD = 20;
 
 export function FeedList() {
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [isLoading, setIsLoading] = useState(false);
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // Start true for initial fetch
 
   const [pullStartY, setPullStartY] = useState<number | null>(null);
   const [pullDeltaY, setPullDeltaY] = useState(0);
   const [isEligibleToPull, setIsEligibleToPull] = useState(false);
-  const [isDragging, setIsDragging] = useState(false); // To track mouse dragging specifically
+  const [isDragging, setIsDragging] = useState(false);
 
   const feedContainerRef = useRef<HTMLDivElement>(null);
 
+  const fetchPostsFromFirestore = useCallback(async () => {
+    setIsLoading(true); // Ensure loading is true at the start of fetch
+    try {
+      const postsCollectionRef = collection(db, 'posts');
+      const q = query(postsCollectionRef, orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const fetchedPosts: PostType[] = [];
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data() as DocumentData;
+        const user = getPlaceholderUser(data.userId) as User; 
+
+        if (user) { 
+          fetchedPosts.push({
+            id: docSnap.id,
+            user: user,
+            imageUrl: data.imageUrl,
+            caption: data.caption || data.text || '',
+            hashtags: data.hashtags || [],
+            likesCount: data.likesCount || 0,
+            commentsCount: data.commentsCount || 0,
+            createdAt: (data.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
+          });
+        } else {
+          console.warn(`User with ID ${data.userId} not found for post ${docSnap.id}`);
+        }
+      });
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error("Error fetching posts from Firestore:", error);
+      // setPosts([]); // Clear posts on error or show stale if desired
+    } finally {
+      setIsLoading(false);
+      setPullDeltaY(0); // Reset pull delta after loading attempt
+    }
+  }, []);
+
+
   useEffect(() => {
+    fetchPostsFromFirestore(); 
+    
     const checkScrollPosition = () => {
       const atTop = window.scrollY === 0;
       setIsEligibleToPull(atTop);
     };
-
     window.addEventListener('scroll', checkScrollPosition, { passive: true });
-    checkScrollPosition(); 
-
+    checkScrollPosition();
     return () => {
       window.removeEventListener('scroll', checkScrollPosition);
     };
-  }, []);
+  }, [fetchPostsFromFirestore]);
 
   const handleRefresh = useCallback(async () => {
     if (isLoading) return;
-    setIsLoading(true);
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const newPosts = [...initialPosts].sort(() => Math.random() - 0.5); // Refresh from initial set for demo
-    setPosts(newPosts);
-    setIsLoading(false);
-    setPullDeltaY(0); // Reset pullDeltaY after loading is complete
-  }, [isLoading]); // Removed posts from dependency array as we re-fetch/re-shuffle from a base set or API
-
-  useEffect(() => {
-    setPosts(initialPosts);
-  }, []);
+    await fetchPostsFromFirestore();
+  }, [isLoading, fetchPostsFromFirestore]);
 
   // Touch Events
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -65,11 +94,10 @@ export function FeedList() {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (pullStartY === null || isLoading || e.touches.length === 0) return;
-
     const currentY = e.touches[0].clientY;
     let delta = currentY - pullStartY;
     if (delta < 0) delta = 0; 
-    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50)); // Allow some overpull
+    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50));
   };
 
   const handleTouchEnd = () => {
@@ -77,15 +105,14 @@ export function FeedList() {
     if (pullDeltaY > PULL_THRESHOLD) {
       handleRefresh();
     } else {
-      setPullDeltaY(0); // Reset if not pulled enough
+      setPullDeltaY(0);
     }
     setPullStartY(null);
-    // pullDeltaY is reset by handleRefresh or above else
   };
 
   // Mouse Events
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (isLoading || !isEligibleToPull || e.button !== 0) { // Only main (left) click
+    if (isLoading || !isEligibleToPull || e.button !== 0) {
       setIsDragging(false);
       setPullStartY(null);
       return;
@@ -93,18 +120,16 @@ export function FeedList() {
     setIsDragging(true);
     setPullStartY(e.clientY);
     setPullDeltaY(0);
-    
     window.addEventListener('mousemove', handleWindowMouseMove);
     window.addEventListener('mouseup', handleWindowMouseUp);
   };
 
   const handleWindowMouseMove = (e: MouseEvent) => {
     if (!isDragging || pullStartY === null || isLoading) return;
-
     const currentY = e.clientY;
     let delta = currentY - pullStartY;
     if (delta < 0) delta = 0;
-    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50)); // Allow some overpull
+    setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50));
   };
 
   const handleWindowMouseUp = () => {
@@ -115,35 +140,24 @@ export function FeedList() {
       setPullStartY(null);
       return;
     }
-
     if (pullDeltaY > PULL_THRESHOLD) {
       handleRefresh();
     } else {
-      setPullDeltaY(0); // Reset if not pulled enough
+      setPullDeltaY(0);
     }
-    
     setIsDragging(false);
     setPullStartY(null);
-    // pullDeltaY is reset by handleRefresh or above else
-
     window.removeEventListener('mousemove', handleWindowMouseMove);
     window.removeEventListener('mouseup', handleWindowMouseUp);
   };
   
-  // Wheel Event for Trackpad/Mouse Wheel
   const handleWheel = (e: React.WheelEvent) => {
-    if (isLoading || !isEligibleToPull || e.ctrlKey || e.metaKey) {
-      return;
-    }
-
-    // User is at the top and scrolls "up" (pulls down on trackpad, deltaY < 0)
+    if (isLoading || !isEligibleToPull || e.ctrlKey || e.metaKey) return;
     if (e.deltaY < 0) {
       const pullStrength = -e.deltaY;
       if (pullStrength > WHEEL_PULL_ACTIVATION_THRESHOLD) {
-        // To show the loading spinner correctly via existing logic:
-        setPullDeltaY(PULL_THRESHOLD + 1); // Make it look like it was pulled enough to trigger refresh
+        setPullDeltaY(PULL_THRESHOLD + 1); 
         handleRefresh();
-        // pullDeltaY will be reset by handleRefresh after loading.
       }
     }
   };
@@ -171,12 +185,10 @@ export function FeedList() {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
-      onWheel={handleWheel} // Added wheel event handler
+      onWheel={handleWheel}
       className="relative" 
       style={{ 
         userSelect: isDragging ? 'none' : 'auto',
-        // If content is shorter than viewport, ensure it can still be "pulled"
-        // minHeight: 'calc(100vh + 1px)' // This might be too aggressive, ensure it doesn't break layout
       }}
     >
       <div
@@ -203,24 +215,24 @@ export function FeedList() {
       <div 
         className="space-y-6 max-w-xl mx-auto transition-transform duration-200 ease-out"
         style={{
-          // Content push down effect
           transform: `translateY(${isLoading ? Math.max(40, pullDeltaY * 0.3) : Math.min(pullDeltaY, MAX_PULL_VISUAL_EFFECT_DISTANCE) * 0.3}px)`,
-          paddingTop: '1px' // Helps with scroll detection at the very top
+          paddingTop: '1px' 
         }}
       >
         {posts.length === 0 && !isLoading && (
           <div 
             className="text-center py-10"
-            style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(2.5, pullDeltaY * 0.3 / 16)}rem` : '2.5rem' }} // Adjust pt if pulling
+            style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(2.5, pullDeltaY * 0.3 / 16)}rem` : '2.5rem' }}
           >
-            <p className="text-xl text-muted-foreground">No posts yet. Follow some farmers to see their updates!</p>
+            <p className="text-xl text-muted-foreground">No posts yet. Follow some farmers to see their updates or check your Firestore 'posts' collection!</p>
           </div>
         )}
 
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+        {posts.map((post, index) => ( // Added index for priority
+          <PostCard key={post.id} post={post} priority={index < 2} /> // Pass priority
         ))}
       </div>
     </div>
   );
 }
+
