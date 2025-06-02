@@ -8,8 +8,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import type { NavLink, User } from '@/types'; // User type may not be fully populated from auth alone
-import { getPlaceholderUser } from '@/lib/placeholders'; // Keep for fallback data if needed
+import type { NavLink as NavLinkType } from '@/types'; // Renamed to avoid conflict
 import {
   FlaskConical,
   SprayCan,
@@ -20,16 +19,17 @@ import {
   ScrollText,
   CloudSun,
   CalendarDays,
-  LogOut, // Import LogOut icon
+  LogOut,
+  Bell, // Added Bell icon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { auth } from '@/lib/firebase'; // Import Firebase auth
-import { signOut } from 'firebase/auth'; // Import signOut
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
-const MOCK_USER_ID_FALLBACK = '1'; // Fallback if auth user is not available
+const MOCK_USER_ID_FALLBACK = '1';
 
 interface NavLinkItemProps {
   href: string;
@@ -39,9 +39,10 @@ interface NavLinkItemProps {
   isSidebarOpen: boolean;
   itemClassName?: string;
   ariaLabel?: string;
+  badgeCount?: number;
 }
 
-const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, isSidebarOpen, itemClassName, ariaLabel }) => {
+const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, isSidebarOpen, itemClassName, ariaLabel, badgeCount }) => {
   const { closeSidebar: contextCloseSidebar } = useSidebarContext();
 
   const handleClick = () => {
@@ -54,7 +55,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
     <Link
       href={href}
       className={cn(
-        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors relative', // Added relative for badge positioning
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -66,6 +67,11 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
     >
       {React.cloneElement(icon, { className: cn(icon.props.className, 'h-5 w-5') })}
       {isSidebarOpen && <span className="truncate">{label}</span>}
+      {isSidebarOpen && badgeCount !== undefined && badgeCount > 0 && (
+        <span className="ml-auto h-5 min-w-[1.25rem] px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+          {badgeCount > 99 ? '99+' : badgeCount}
+        </span>
+      )}
     </Link>
   );
 
@@ -73,10 +79,19 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
     return (
       <TooltipProvider delayDuration={0}>
         <Tooltip>
-          <TooltipTrigger asChild>{linkElement}</TooltipTrigger>
+          <TooltipTrigger asChild>
+            <div className="relative">
+              {linkElement}
+              {badgeCount !== undefined && badgeCount > 0 && (
+                <span className="absolute top-1 right-1 h-4 w-4 min-w-[1rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center pointer-events-none">
+                  {badgeCount > 9 ? '9+' : badgeCount}
+                </span>
+              )}
+            </div>
+          </TooltipTrigger>
           {label && (
             <TooltipContent side="right" className="bg-background text-foreground border">
-              <p>{label}</p>
+              <p>{label} {badgeCount !== undefined && badgeCount > 0 ? `(${badgeCount})` : ''}</p>
             </TooltipContent>
           )}
         </Tooltip>
@@ -91,13 +106,12 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
+  const { isSidebarOpen, closeSidebar, authUserId, notificationCount } = useSidebarContext();
   
-  // Get current Firebase auth user details for display
   const firebaseUser = auth.currentUser;
   const currentUserName = firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'User';
   const currentUserAvatar = firebaseUser?.photoURL;
-  const currentUserUsername = firebaseUser?.email?.split('@')[0] || 'krishix_user'; // Fallback username
+  const currentUserUsername = firebaseUser?.email?.split('@')[0] || 'krishix_user';
 
   const userIdForProfile = authUserId || MOCK_USER_ID_FALLBACK;
 
@@ -121,7 +135,11 @@ export function Sidebar() {
     };
   }, []);
 
-  const secondaryNavLinks = useMemo((): NavLink[] => [
+  const primaryNavLinks = useMemo((): NavLinkType[] => [
+     { href: '/notifications', label: currentLanguage === 'hi' ? 'सूचनाएं' : 'Notifications', icon: <Bell />, badgeCount: notificationCount },
+  ], [currentLanguage, notificationCount]);
+
+  const secondaryNavLinks = useMemo((): NavLinkType[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
     { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun /> },
     { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu /> },
@@ -139,11 +157,11 @@ export function Sidebar() {
   const userAvatarFallback = currentUserName.substring(0, 2).toUpperCase();
   
   const handleLogout = async () => {
-    closeSidebar(); // Close sidebar first
+    closeSidebar(); 
     try {
       await signOut(auth);
       toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
-      router.push('/login'); // Redirect to login page
+      router.push('/login'); 
     } catch (error) {
       console.error("Error signing out:", error);
       toast({ title: 'Logout Failed', description: 'Could not log out. Please try again.', variant: 'destructive' });
@@ -217,6 +235,19 @@ export function Sidebar() {
       )}
     >
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        {primaryNavLinks.map((link) => (
+           <NavLinkItem
+            key={link.href}
+            href={link.href}
+            label={link.label}
+            icon={link.icon}
+            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
+            isSidebarOpen={isSidebarOpen}
+            ariaLabel={link.label}
+            badgeCount={link.badgeCount}
+          />
+        ))}
+        <Separator className="my-2"/>
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}

@@ -39,6 +39,7 @@ export interface NavLink {
   href: string;
   label: string;
   icon?: JSX.Element;
+  badgeCount?: number; // Optional: for notification/message counts
 }
 
 export interface MandiListing {

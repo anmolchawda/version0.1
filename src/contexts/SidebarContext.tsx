@@ -10,14 +10,18 @@ interface SidebarContextType {
   toggleSidebar: () => void;
   openSidebar: () => void;
   closeSidebar: () => void;
-  authUserId: string | null; // Added to store authenticated user's ID
+  authUserId: string | null;
+  setContextAuthUserId: (uid: string | null) => void; // Added for explicit typing
+  notificationCount: number; // Added for notification count
+  setNotificationCount: (count: number) => void; // Added for notification count
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [authUserId, setAuthUserId] = useState<string | null>(null); // State for authUserId
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [notificationCount, setNotificationCount] = useState(0); // Initialize notification count
 
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen(prev => !prev);
@@ -31,14 +35,26 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     setIsSidebarOpen(false);
   }, []);
 
-  // Function to be called by AppLayoutContent to update authUserId
   const setContextAuthUserId = useCallback((uid: string | null) => {
     setAuthUserId(uid);
   }, []);
 
+  const updateNotificationCount = useCallback((count: number) => {
+    setNotificationCount(count);
+  }, []);
+
 
   return (
-    <SidebarContext.Provider value={{ isSidebarOpen, toggleSidebar, openSidebar, closeSidebar, authUserId, setContextAuthUserId } as any}>
+    <SidebarContext.Provider value={{ 
+      isSidebarOpen, 
+      toggleSidebar, 
+      openSidebar, 
+      closeSidebar, 
+      authUserId, 
+      setContextAuthUserId,
+      notificationCount,
+      setNotificationCount: updateNotificationCount
+    }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -51,3 +67,4 @@ export function useSidebarContext() {
   }
   return context;
 }
+
