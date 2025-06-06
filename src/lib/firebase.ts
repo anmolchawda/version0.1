@@ -16,7 +16,7 @@ import {
   increment,
   enableNetwork,
   initializeFirestore,
-  persistentLocalCache, // Corrected import for client-side persistence provider
+  persistentLocalCache, // Correct import for client-side persistence provider
   memoryLocalCache,    // Correct import for server-side/fallback persistence provider
   type Firestore
 } from 'firebase/firestore';
@@ -69,27 +69,27 @@ if (!getApps().length) {
   storageInstance = getStorage(app);
   console.log("Firebase Auth and Storage initialized (singleton).");
 
-  // Enable network AFTER db instance is configured with persistence,
-  // and only on the client-side.
-  if (typeof window !== 'undefined') {
-      enableNetwork(db)
-        .then(() => {
-          console.log("Firebase Firestore network connection explicitly enabled (client-side).");
-        })
-        .catch((error) => {
-          console.error("Error explicitly enabling Firebase Firestore network (client-side):", error);
-        });
-  }
-
 } else {
   app = getApp(); // Get existing app
-  // Retrieve the ALREADY initialized instances
-  // Firestore instance (db) should be set from the `if` block.
-  // Re-getting might cause issues if persistence was already set.
-  db = getFirestore(app); // Ensure db is assigned the existing instance.
+  // Retrieve the ALREADY initialized instances.
+  // getFirestore(app) should return the same instance that was configured with persistence
+  // if the FirebaseApp instance 'app' is the same.
+  db = getFirestore(app);
   authInstance = getAuth(app);
   storageInstance = getStorage(app);
   console.log("Firebase app already initialized. Using existing service instances.");
+}
+
+// Ensure network is enabled for the db instance on the client side,
+// after db has been assigned, regardless of first init or HMR.
+if (typeof window !== 'undefined' && db) {
+  enableNetwork(db)
+    .then(() => {
+      console.log("Firebase Firestore network connection explicitly enabled/re-affirmed (client-side).");
+    })
+    .catch((error) => {
+      console.error("Error explicitly enabling/re-affirming Firebase Firestore network (client-side):", error);
+    });
 }
 
 export {
