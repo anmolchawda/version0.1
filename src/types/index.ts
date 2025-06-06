@@ -22,7 +22,7 @@ export interface Post {
   hashtags?: string[];
   likesCount: number;
   commentsCount: number;
-  createdAt: string; // ISO date string for consistent time handling
+  createdAt: string | FirebaseTimestamp; // Allow FirebaseTimestamp for Firestore interaction
 }
 
 export interface Comment {
@@ -96,4 +96,25 @@ export interface DisplayConversation {
   lastMessage: string;
   lastMessageTime: string; // Formatted string e.g., "2h ago" or "10:30 AM"
   unread?: boolean; // UI purposes, not fully backed by Firestore logic yet
+}
+
+// For Notifications
+export interface ActorInfo {
+  id: string;
+  username: string;
+  avatarUrl?: string;
+  name?: string; // Added name for better display
+}
+
+export interface Notification {
+  id: string; // Firestore document ID
+  type: 'like' | 'comment' | 'follow';
+  actor: ActorInfo; // User who performed the action
+  postId?: string; // ID of the post, if applicable
+  postImageUrl?: string; // For visual cue if it's a post-related notification
+  postCaption?: string; // For context on post-related notifications
+  commentText?: string; // Snippet of the comment
+  timestamp: FirebaseTimestamp; // Firestore Timestamp when the notification occurred
+  read: boolean; // If the notification has been read by the targetUser
+  targetUserId: string; // The user ID for whom this notification is intended
 }
