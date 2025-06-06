@@ -20,7 +20,7 @@ import {
   CloudSun,
   CalendarDays,
   LogOut,
-  Bell, // Added Bell icon
+  // Bell, // Bell icon no longer needed for primaryNavLinks in sidebar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
@@ -106,7 +106,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  const { isSidebarOpen, closeSidebar, authUserId, notificationCount } = useSidebarContext();
+  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext(); // Removed notificationCount as it's not used in sidebar nav links anymore
   
   const firebaseUser = auth.currentUser;
   const currentUserName = firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'User';
@@ -136,8 +136,8 @@ export function Sidebar() {
   }, []);
 
   const primaryNavLinks = useMemo((): NavLinkType[] => [
-     { href: '/notifications', label: currentLanguage === 'hi' ? 'सूचनाएं' : 'Notifications', icon: <Bell />, badgeCount: notificationCount },
-  ], [currentLanguage, notificationCount]);
+     // Notifications link removed from here
+  ], []);
 
   const secondaryNavLinks = useMemo((): NavLinkType[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
@@ -235,19 +235,23 @@ export function Sidebar() {
       )}
     >
       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {primaryNavLinks.map((link) => (
-           <NavLinkItem
-            key={link.href}
-            href={link.href}
-            label={link.label}
-            icon={link.icon}
-            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
-            isSidebarOpen={isSidebarOpen}
-            ariaLabel={link.label}
-            badgeCount={link.badgeCount}
-          />
-        ))}
-        <Separator className="my-2"/>
+        {primaryNavLinks.length > 0 && (
+          <>
+            {primaryNavLinks.map((link) => (
+            <NavLinkItem
+                key={link.href}
+                href={link.href}
+                label={link.label}
+                icon={link.icon}
+                isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
+                isSidebarOpen={isSidebarOpen}
+                ariaLabel={link.label}
+                badgeCount={link.badgeCount}
+            />
+            ))}
+            <Separator className="my-2"/>
+          </>
+        )}
         {secondaryNavLinks.map((link) => (
            <NavLinkItem
             key={link.href}
