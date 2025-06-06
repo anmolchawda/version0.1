@@ -1,5 +1,5 @@
 
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
   Timestamp,
@@ -14,10 +14,14 @@ import {
   serverTimestamp,
   writeBatch,
   increment,
-  enableIndexedDbPersistence // Import for enabling persistence
+  enableNetwork,
+  initializeFirestore,
+  indexedDbLocalCache, // Correct import for client-side persistence provider
+  memoryLocalCache,    // Correct import for server-side/fallback persistence provider
+  type Firestore
 } from 'firebase/firestore';
-import { getStorage } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
+import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDWF0xqZ7EPCZdfAXZfDoVmT6Tf4WaN3kY",
@@ -30,30 +34,66 @@ const firebaseConfig = {
     measurementId: "G-FVS7PM8WTB"
   };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
+let app: FirebaseApp;
+let db: Firestore;
+let authInstance: Auth;
+let storageInstance: FirebaseStorage;
 
-// Attempt to enable Firestore offline persistence
-enableIndexedDbPersistence(db)
-  .catch((err) => {
-    if (err.code === 'failed-precondition') {
-      // Multiple tabs open, persistence can only be enabled
-      // in one tab at a time. This is a common scenario.
-      console.warn("Firestore persistence failed-precondition: Multiple tabs open or other Firestore instances active.");
-    } else if (err.code === 'unimplemented') {
-      // The current browser does not support all of the features required to enable persistence
-      console.warn("Firestore persistence unimplemented: This browser does not support the required features for offline persistence.");
-    } else {
-      console.error("Firestore persistence error:", err);
+if (!getApps().length) {
+  app = initializeApp(firebaseConfig);
+
+  if (typeof window !== 'undefined') {
+    // Client-side environment
+    try {
+      db = initializeFirestore(app, {
+        localCache: indexedDbLocalCache({
+          // Optional: configure tab synchronization if needed, e.g.
+          // tabManager: new MemoryTabManager() or new WebStorageTabManager()
+          // forceOwnership: true // This option is not directly available for indexedDbLocalCache.
+                                 // Tab management is more complex if needed.
+        }),
+      });
+      console.log("Firestore initialized with IndexedDB persistence (client-side).");
+    } catch (e: any) {
+      console.error("Error initializing Firestore with IndexedDB on client, falling back to memory cache:", e.message, e);
+      db = initializeFirestore(app, { localCache: memoryLocalCache() });
+      console.log("Firestore initialized with memory cache (client-side fallback).");
     }
-  });
+  } else {
+    // Server-side environment or non-browser (e.g., during SSR build)
+    db = initializeFirestore(app, { localCache: memoryLocalCache() });
+    console.log("Firestore initialized with memory cache (server-side).");
+  }
+
+  authInstance = getAuth(app);
+  storageInstance = getStorage(app);
+  console.log("Firebase services initialized (singleton).");
+
+  // Enable network AFTER db instance is configured with persistence,
+  // and only on the client-side.
+  if (typeof window !== 'undefined') {
+      enableNetwork(db)
+        .then(() => {
+          console.log("Firebase Firestore network connection explicitly enabled (client-side).");
+        })
+        .catch((error) => {
+          console.error("Error explicitly enabling Firebase Firestore network (client-side):", error);
+        });
+  }
+
+} else {
+  app = getApp(); // Get existing app
+  // Retrieve the ALREADY initialized instances
+  db = getFirestore(app); 
+  authInstance = getAuth(app);
+  storageInstance = getStorage(app);
+  console.log("Firebase app already initialized. Using existing service instances.");
+}
 
 export {
   db,
-  auth,
-  storage,
+  authInstance as auth,
+  storageInstance as storage,
   Timestamp,
   doc,
   getDoc,
@@ -65,5 +105,8 @@ export {
   onSnapshot,
   serverTimestamp,
   writeBatch,
-  increment
+  increment,
+  // enableNetwork and persistence providers (indexedDbLocalCache, memoryLocalCache)
+  // are used internally during setup and usually don't need to be exported
+  // unless explicitly needed by other parts of the app for advanced control.
 };

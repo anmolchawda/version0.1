@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase'; // Removed getFirestore from here
+import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 
@@ -39,8 +39,6 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
           const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
-          // Removed the problematic isFirestoreOffline check
-          // The try-catch around getDoc and setDoc will handle actual Firestore errors (including offline if not cached)
 
           if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
             if (pathname === '/setup-profile') {
