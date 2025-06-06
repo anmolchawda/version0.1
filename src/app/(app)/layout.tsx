@@ -61,7 +61,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                 }, { merge: true });
               } catch (e) {
                 console.error("Error creating initial user doc:", e);
-                setError("Failed to initialize user profile. Please try again.");
+                setError("Failed to initialize user profile. Please check your browser console for more details, then try again.");
                 setIsLoadingAuth(false); // Still stop loading
                 return; // Exit if initial doc creation fails critically
               }
@@ -73,7 +73,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
           }
         } catch (e) {
           console.error("Error processing user document:", e);
-          setError("Failed to load user data. Please check your connection or try again later.");
+          setError("Failed to load user data. Please check your internet connection or browser console for more details, then try again.");
           setIsLoadingAuth(false); // Crucial: ensure loading stops on error
         }
       } else {
@@ -187,3 +187,4 @@ export default function AppPagesLayout({
     </SidebarProvider>
   );
 }
+
