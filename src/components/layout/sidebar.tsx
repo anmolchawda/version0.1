@@ -29,8 +29,6 @@ import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
-const MOCK_USER_ID_FALLBACK = '1';
-
 interface NavLinkItemProps {
   href: string;
   label: string;
@@ -113,7 +111,8 @@ export function Sidebar() {
   const currentUserAvatar = firebaseUser?.photoURL;
   const currentUserUsername = firebaseUser?.email?.split('@')[0] || 'krishix_user';
 
-  const userIdForProfile = authUserId || MOCK_USER_ID_FALLBACK;
+  // The profile link in the sidebar now always points to the root '/' for the current user's profile.
+  const userProfileLink = "/";
 
 
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -204,7 +203,7 @@ export function Sidebar() {
 
   const userProfileElement = (
     <Link
-      href={`/profile/${userIdForProfile}`}
+      href={userProfileLink} // Use the updated link
       className={cn(
         "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
         !isSidebarOpen && "justify-center"

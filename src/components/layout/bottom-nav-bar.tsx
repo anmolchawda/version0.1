@@ -10,9 +10,9 @@ import type { NavLink as NavLinkType } from '@/types'; // Renamed NavLink to Nav
 import { useEffect, useState } from 'react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
-const MOCK_USER_ID_FALLBACK = '1';
+const MOCK_USER_ID_FALLBACK = '1'; // Should ideally not be needed if authUserId is always present
 
-const getBottomNavLinks = (lang: string, userId: string | null, notificationCount: number): NavLinkType[] => [
+const getBottomNavLinks = (lang: string, notificationCount: number): NavLinkType[] => [
   { href: '/', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
   { href: '/discover', label: lang === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
   { href: '/post/create', label: lang === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
@@ -22,7 +22,7 @@ const getBottomNavLinks = (lang: string, userId: string | null, notificationCoun
     icon: <Bell className="h-5 w-5" />, 
     badgeCount: notificationCount 
   },
-  { href: `/profile/${userId || MOCK_USER_ID_FALLBACK}`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
+  { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
   // Mandi was removed in a previous step, so it's not included here.
   // If Mandi needs to be re-added, it would go here.
   // { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
@@ -30,9 +30,9 @@ const getBottomNavLinks = (lang: string, userId: string | null, notificationCoun
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  const { authUserId, notificationCount } = useSidebarContext();
+  const { authUserId, notificationCount } = useSidebarContext(); // authUserId is available if needed for other logic, but profile link is now static "/"
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  const [links, setLinks] = useState(() => getBottomNavLinks('en', authUserId, notificationCount));
+  const [links, setLinks] = useState(() => getBottomNavLinks('en', notificationCount));
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('selectedAppLanguage');
@@ -42,8 +42,8 @@ export function BottomNavBar() {
   }, []);
 
   useEffect(() => {
-    setLinks(getBottomNavLinks(currentLanguage, authUserId, notificationCount));
-  }, [authUserId, currentLanguage, notificationCount]);
+    setLinks(getBottomNavLinks(currentLanguage, notificationCount));
+  }, [currentLanguage, notificationCount]);
 
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
@@ -60,9 +60,14 @@ export function BottomNavBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40">
       {links.map((link) => {
-        const isActive = link.href.startsWith('/profile/') 
-          ? pathname.startsWith('/profile/') 
-          : (pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1));
+        // Updated isActive logic: If link.href is '/', it should only be active if pathname is strictly '/'.
+        // Other links can be active if pathname starts with link.href (for nested routes).
+        // The profile link specifically (now '/') should be active when pathname is '/'.
+        let isActive = pathname === link.href;
+        if (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1) {
+          // For non-root links, allow prefix matching for active state (e.g. /discover active for /discover/something)
+          isActive = true;
+        }
         
         // Special handling for notifications page to clear badge when active
         const displayBadgeCount = (link.href === '/notifications' && isActive) ? 0 : link.badgeCount;
