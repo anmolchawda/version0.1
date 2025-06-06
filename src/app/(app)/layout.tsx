@@ -63,7 +63,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
               } catch (e: any) {
                 console.error("Error creating initial user doc in Firestore:", e);
                 setError(
-                  "Failed to initialize user profile. Please ensure Firestore is enabled and security rules allow writes to 'users' collection for new users. Check browser console for specific Firebase error. Then try again."
+                  "Failed to initialize user profile. The application may be offline or unable to connect to the database. Please check your internet connection and browser console for specific Firebase error details. Then try again."
                 );
                 setIsLoadingAuth(false);
                 return;
@@ -74,9 +74,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
             }
           }
         } catch (e: any) {
-          console.error("Error fetching user document from Firestore:", e); // More detailed log
+          console.error("Error fetching user document from Firestore:", e); 
           setError(
-            "Failed to load user data. Please check your internet connection, Firestore setup (is it enabled in your Firebase project?), and security rules. Specific Firebase error logged in browser console. Then try again."
+            "Failed to load user data. The application may be offline or unable to connect to the database. Please check your internet connection and browser console for specific Firebase error details. Then try again."
           );
         } finally {
           setIsLoadingAuth(false);
