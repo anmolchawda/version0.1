@@ -16,7 +16,7 @@ import {
   increment,
   enableNetwork,
   initializeFirestore,
-  indexedDbLocalCache, // Correct import for client-side persistence provider
+  persistentLocalCache, // Corrected import for client-side persistence provider
   memoryLocalCache,    // Correct import for server-side/fallback persistence provider
   type Firestore
 } from 'firebase/firestore';
@@ -45,29 +45,29 @@ if (!getApps().length) {
   if (typeof window !== 'undefined') {
     // Client-side environment
     try {
+      // Initialize Firestore with IndexedDB persistence
       db = initializeFirestore(app, {
-        localCache: indexedDbLocalCache({
-          // Optional: configure tab synchronization if needed, e.g.
-          // tabManager: new MemoryTabManager() or new WebStorageTabManager()
-          // forceOwnership: true // This option is not directly available for indexedDbLocalCache.
-                                 // Tab management is more complex if needed.
+        localCache: persistentLocalCache({ // Use persistentLocalCache
+          // Optional: tabManager: new MemoryTabManager() for synchronizing multiple tabs
         }),
       });
-      console.log("Firestore initialized with IndexedDB persistence (client-side).");
+      console.log("Firestore initialized with persistentLocalCache (client-side).");
     } catch (e: any) {
-      console.error("Error initializing Firestore with IndexedDB on client, falling back to memory cache:", e.message, e);
+      console.error("Error initializing Firestore with persistentLocalCache on client, falling back to memory cache:", e.message, e);
+      // Fallback to memory cache if IndexedDB fails (e.g., in some private browsing modes or due to errors)
       db = initializeFirestore(app, { localCache: memoryLocalCache() });
       console.log("Firestore initialized with memory cache (client-side fallback).");
     }
   } else {
     // Server-side environment or non-browser (e.g., during SSR build)
+    // Use memory cache for server-side rendering
     db = initializeFirestore(app, { localCache: memoryLocalCache() });
     console.log("Firestore initialized with memory cache (server-side).");
   }
 
   authInstance = getAuth(app);
   storageInstance = getStorage(app);
-  console.log("Firebase services initialized (singleton).");
+  console.log("Firebase Auth and Storage initialized (singleton).");
 
   // Enable network AFTER db instance is configured with persistence,
   // and only on the client-side.
@@ -84,7 +84,9 @@ if (!getApps().length) {
 } else {
   app = getApp(); // Get existing app
   // Retrieve the ALREADY initialized instances
-  db = getFirestore(app); 
+  // Firestore instance (db) should be set from the `if` block.
+  // Re-getting might cause issues if persistence was already set.
+  db = getFirestore(app); // Ensure db is assigned the existing instance.
   authInstance = getAuth(app);
   storageInstance = getStorage(app);
   console.log("Firebase app already initialized. Using existing service instances.");
@@ -106,7 +108,4 @@ export {
   serverTimestamp,
   writeBatch,
   increment,
-  // enableNetwork and persistence providers (indexedDbLocalCache, memoryLocalCache)
-  // are used internally during setup and usually don't need to be exported
-  // unless explicitly needed by other parts of the app for advanced control.
 };
