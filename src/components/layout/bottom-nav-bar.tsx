@@ -1,4 +1,3 @@
-
 // src/components/layout/bottom-nav-bar.tsx
 'use client';
 
@@ -13,7 +12,7 @@ import { useSidebarContext } from '@/contexts/SidebarContext';
 const MOCK_USER_ID_FALLBACK = '1'; // Should ideally not be needed if authUserId is always present
 
 const getBottomNavLinks = (lang: string, notificationCount: number): NavLinkType[] => [
-  { href: '/', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
+  { href: '/feed', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> }, // Changed href to /feed
   { href: '/discover', label: lang === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
   { href: '/post/create', label: lang === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
   { 
@@ -22,7 +21,7 @@ const getBottomNavLinks = (lang: string, notificationCount: number): NavLinkType
     icon: <Bell className="h-5 w-5" />, 
     badgeCount: notificationCount 
   },
-  { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
+  { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> }, // Profile link remains /
   // Mandi was removed in a previous step, so it's not included here.
   // If Mandi needs to be re-added, it would go here.
   // { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
@@ -60,12 +59,10 @@ export function BottomNavBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40">
       {links.map((link) => {
-        // Updated isActive logic: If link.href is '/', it should only be active if pathname is strictly '/'.
-        // Other links can be active if pathname starts with link.href (for nested routes).
-        // The profile link specifically (now '/') should be active when pathname is '/'.
         let isActive = pathname === link.href;
-        if (link.href !== '/' && pathname.startsWith(link.href) && link.href.length > 1) {
-          // For non-root links, allow prefix matching for active state (e.g. /discover active for /discover/something)
+        // For links like /discover, /notifications etc., we want them active even if on sub-paths like /discover/search
+        // However, for '/' (Profile) and '/feed' (Feed), we want an exact match.
+        if (link.href !== '/' && link.href !== '/feed' && link.href.length > 1 && pathname.startsWith(link.href)) {
           isActive = true;
         }
         
