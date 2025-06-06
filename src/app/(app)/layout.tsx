@@ -6,12 +6,13 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { TopHeader } from '@/components/layout/top-header';
 import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode } from 'react';
-import { useRouter, usePathname } from 'next/navigation'; // Added usePathname
-import { Loader2 } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Loader2, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase'; // Import Firebase auth, db, doc, getDoc, setDoc, serverTimestamp
-import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'; // Import onAuthStateChanged
+import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase';
+import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { Button } from '@/components/ui/button'; // Added Button
 
 // Define a new type for the context that includes setContextAuthUserId
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
@@ -21,67 +22,72 @@ interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname(); // Get current pathname
+  const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [error, setError] = useState<string | null>(null); // Added error state
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
 
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setError(null); // Reset error on auth state change
       if (user) {
         setCurrentUser(user);
         if (setContextAuthUserId) {
           setContextAuthUserId(user.uid);
         }
 
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
-        if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
-          // Profile is set up, allow access to the app
-          if (pathname === '/setup-profile') {
-            router.replace('/feed'); // Redirect from setup if already complete
-          }
-          setIsLoadingAuth(false);
-        } else {
-          // Profile not set up or document doesn't exist
-          if (!userDocSnap.exists()) {
-            // Create a basic user doc if it doesn't exist
-            try {
-              await setDoc(userDocRef, {
-                id: user.uid,
-                username: user.email?.split('@')[0] || `user_${user.uid.substring(0,6)}`,
-                name: user.displayName || '',
-                email: user.email,
-                avatarUrl: user.photoURL || '',
-                profileSetupComplete: false, // Explicitly false
-                createdAt: serverTimestamp(),
-              }, { merge: true });
-            } catch (e) {
-              console.error("Error creating initial user doc:", e);
-              // Potentially logout or show error
+          if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
+            if (pathname === '/setup-profile') {
+              router.replace('/feed');
             }
+            setIsLoadingAuth(false);
+          } else {
+            if (!userDocSnap.exists()) {
+              try {
+                await setDoc(userDocRef, {
+                  id: user.uid,
+                  username: user.email?.split('@')[0] || `user_${user.uid.substring(0,6)}`,
+                  name: user.displayName || '',
+                  email: user.email,
+                  avatarUrl: user.photoURL || '',
+                  profileSetupComplete: false,
+                  createdAt: serverTimestamp(),
+                }, { merge: true });
+              } catch (e) {
+                console.error("Error creating initial user doc:", e);
+                setError("Failed to initialize user profile. Please try again.");
+                setIsLoadingAuth(false); // Still stop loading
+                return; // Exit if initial doc creation fails critically
+              }
+            }
+            if (pathname !== '/setup-profile' && pathname !== '/login' && pathname !== '/signup') {
+              router.replace('/setup-profile');
+            }
+            setIsLoadingAuth(false);
           }
-          // Redirect to setup profile if not already there
-          if (pathname !== '/setup-profile' && pathname !== '/login' && pathname !== '/signup') { // Avoid redirect from setup or auth pages
-            router.replace('/setup-profile');
-          }
-          setIsLoadingAuth(false);
+        } catch (e) {
+          console.error("Error processing user document:", e);
+          setError("Failed to load user data. Please check your connection or try again later.");
+          setIsLoadingAuth(false); // Crucial: ensure loading stops on error
         }
       } else {
-        // No user
         setCurrentUser(null);
         if (setContextAuthUserId) {
           setContextAuthUserId(null);
         }
-        if (!pathname.startsWith('/auth') && pathname !== '/setup-profile') { // Avoid redirect loops
+        if (!pathname.startsWith('/auth') && pathname !== '/setup-profile') {
            router.replace('/login');
         }
         setIsLoadingAuth(false);
       }
     });
-    return () => unsubscribe(); // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [router, setContextAuthUserId, pathname]);
 
 
@@ -94,10 +100,19 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  // If setup is not complete and user is trying to access other pages,
-  // they will be redirected by the effect above.
-  // If they are on /setup-profile, children (SetupProfilePage) will render.
-  // If auth is still loading or user is null and not on an auth page, this covers it.
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-center">
+        <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
+        <h1 className="text-xl font-semibold text-destructive">Application Error</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+        <Button onClick={() => window.location.reload()} className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground">
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
   if (!currentUser && !pathname.startsWith('/auth') && pathname !=='/setup-profile') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -107,17 +122,23 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
-  // Allow rendering of login/signup pages if user is not authenticated
    if (!currentUser && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
      return <>{children}</>;
   }
 
-  // Allow rendering setup-profile page
   if (pathname === '/setup-profile') {
+    // If user is somehow null but on setup page (should be caught by redirect logic)
+    // or if user is present and needs setup, render children (SetupProfilePage)
+    if (!currentUser && !pathname.startsWith('/auth')) {
+       router.replace('/login'); // Should not happen if logic above is correct
+       return  <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  <p className="mt-4 text-muted-foreground">Redirecting...</p>
+                </div>;
+    }
     return <>{children}</>;
   }
 
-  // If still no user and not on auth pages (should be caught by redirect earlier)
   if (!currentUser) {
     return (
        <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -131,7 +152,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   return (
     <>
       <TopHeader />
-      <div className="flex min-h-screen pt-16"> {/* pt-16 for TopHeader height */}
+      <div className="flex min-h-screen pt-16">
         <Sidebar />
         {isSidebarOpen && (
           <div
