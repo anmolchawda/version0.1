@@ -7,31 +7,28 @@ import { TopHeader } from '@/components/layout/top-header';
 import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Loader2, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
+import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
 import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase';
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { Button } from '@/components/ui/button'; // Added Button
+import { Button } from '@/components/ui/button';
 
-// Define a new type for the context that includes setContextAuthUserId
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
   setContextAuthUserId?: (uid: string | null) => void;
 }
-
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [error, setError] = useState<string | null>(null); // Added error state
+  const [error, setError] = useState<string | null>(null);
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
-
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setError(null); // Reset error on auth state change
+      setError(null);
       if (user) {
         setCurrentUser(user);
         if (setContextAuthUserId) {
@@ -46,9 +43,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
             if (pathname === '/setup-profile') {
               router.replace('/feed');
             }
-            setIsLoadingAuth(false);
           } else {
             if (!userDocSnap.exists()) {
+              console.log(`User document for ${user.uid} does not exist. Attempting to create initial document.`);
               try {
                 await setDoc(userDocRef, {
                   id: user.uid,
@@ -58,23 +55,31 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                   avatarUrl: user.photoURL || '',
                   profileSetupComplete: false,
                   createdAt: serverTimestamp(),
+                  followersCount: 0,
+                  followingCount: 0,
+                  postCount: 0,
                 }, { merge: true });
-              } catch (e) {
-                console.error("Error creating initial user doc:", e);
-                setError("Failed to initialize user profile. Please check your browser console for more details, then try again.");
-                setIsLoadingAuth(false); // Still stop loading
-                return; // Exit if initial doc creation fails critically
+                console.log(`Initial document created for ${user.uid}. Redirecting to /setup-profile.`);
+              } catch (e: any) {
+                console.error("Error creating initial user doc in Firestore:", e);
+                setError(
+                  "Failed to initialize user profile. Please ensure Firestore is enabled and security rules allow writes to 'users' collection for new users. Check browser console for specific Firebase error. Then try again."
+                );
+                setIsLoadingAuth(false);
+                return;
               }
             }
             if (pathname !== '/setup-profile' && pathname !== '/login' && pathname !== '/signup') {
               router.replace('/setup-profile');
             }
-            setIsLoadingAuth(false);
           }
-        } catch (e) {
-          console.error("Error processing user document:", e);
-          setError("Failed to load user data. Please check your internet connection or browser console for more details, then try again.");
-          setIsLoadingAuth(false); // Crucial: ensure loading stops on error
+        } catch (e: any) {
+          console.error("Error fetching user document from Firestore:", e); // More detailed log
+          setError(
+            "Failed to load user data. Please check your internet connection, Firestore setup (is it enabled in your Firebase project?), and security rules. Specific Firebase error logged in browser console. Then try again."
+          );
+        } finally {
+          setIsLoadingAuth(false);
         }
       } else {
         setCurrentUser(null);
@@ -89,7 +94,6 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     });
     return () => unsubscribe();
   }, [router, setContextAuthUserId, pathname]);
-
 
   if (isLoadingAuth) {
     return (
@@ -127,10 +131,8 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   }
 
   if (pathname === '/setup-profile') {
-    // If user is somehow null but on setup page (should be caught by redirect logic)
-    // or if user is present and needs setup, render children (SetupProfilePage)
     if (!currentUser && !pathname.startsWith('/auth')) {
-       router.replace('/login'); // Should not happen if logic above is correct
+       router.replace('/login'); 
        return  <div className="flex min-h-screen flex-col items-center justify-center bg-background">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   <p className="mt-4 text-muted-foreground">Redirecting...</p>
@@ -147,7 +149,6 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
 
   return (
     <>
@@ -187,4 +188,3 @@ export default function AppPagesLayout({
     </SidebarProvider>
   );
 }
-
