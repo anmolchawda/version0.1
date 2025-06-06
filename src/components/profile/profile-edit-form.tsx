@@ -2,44 +2,97 @@
 'use client';
 
 import { useState, type FormEvent, useEffect, type ChangeEvent } from 'react';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getPlaceholderUser, placeholderStates, placeholderCities } from '@/lib/placeholders';
-import type { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, Camera } from 'lucide-react'; // Added Camera icon
-import { cn } from '@/lib/utils';
-
-// Mock current user for initial form data
-const MOCK_CURRENT_USER_ID = '1';
+import { Loader2, Save, Camera } from 'lucide-react';
+import { auth, db } from '@/lib/firebase'; // Firebase auth and db
+import { doc, getDoc, setDoc } from 'firebase/firestore'; // Firestore functions
+import type { User as FirebaseUserType } from 'firebase/auth'; // Firebase Auth User type
+import type { User as AppUserType } from '@/types'; // Your app's User type
 
 export function ProfileEditForm() {
-  const [initialUser, setInitialUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUserType | null>(null);
+  const [profileData, setProfileData] = useState<Partial<AppUserType>>({}); // Use partial for initial state
+
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
   const [produceInput, setProduceInput] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('');
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | undefined>('');
+  
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    const user = getPlaceholderUser(MOCK_CURRENT_USER_ID);
-    if (user) {
-      setInitialUser(user);
-      setUsername(user.username || '');
-      setName(user.name || '');
-      setBio(user.bio || '');
-      setLocation(user.location || '');
-      setProduceInput((user.produce || []).join(', '));
-      setAvatarPreviewUrl(user.avatarUrl || '');
-    }
-  }, []);
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setFirebaseUser(user);
+        setIsLoadingData(true);
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const fetchedData = userDocSnap.data() as AppUserType;
+            setProfileData(fetchedData);
+            setUsername(fetchedData.username || user.email?.split('@')[0] || '');
+            setName(fetchedData.name || user.displayName || '');
+            setBio(fetchedData.bio || '');
+            setLocation(fetchedData.location || '');
+            setProduceInput((fetchedData.produce || []).join(', '));
+            setAvatarPreviewUrl(fetchedData.avatarUrl || user.photoURL || '');
+          } else {
+            // User document doesn't exist in Firestore, use auth data as fallback
+            const defaultUsername = user.email?.split('@')[0] || `user_${user.uid.substring(0,6)}`;
+            setUsername(defaultUsername);
+            setName(user.displayName || defaultUsername);
+            setBio(''); // No bio from auth
+            setLocation(''); // No location from auth
+            setProduceInput(''); // No produce from auth
+            setAvatarPreviewUrl(user.photoURL || '');
+            setProfileData({ // Set a minimal profileData
+              id: user.uid,
+              username: defaultUsername,
+              name: user.displayName || defaultUsername,
+              avatarUrl: user.photoURL || '',
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user profile from Firestore:", error);
+          toast({ title: "Error", description: "Could not load profile data.", variant: "destructive" });
+          // Fallback to auth data if Firestore fetch fails
+          const defaultUsernameOnError = user.email?.split('@')[0] || `user_err_${user.uid.substring(0,6)}`;
+          setUsername(defaultUsernameOnError);
+          setName(user.displayName || defaultUsernameOnError);
+          setAvatarPreviewUrl(user.photoURL || '');
+           setProfileData({
+              id: user.uid,
+              username: defaultUsernameOnError,
+              name: user.displayName || defaultUsernameOnError,
+              avatarUrl: user.photoURL || '',
+            });
+        } finally {
+          setIsLoadingData(false);
+        }
+      } else {
+        // No user logged in, or logged out
+        setFirebaseUser(null);
+        setProfileData({});
+        setIsLoadingData(false);
+        // Optionally redirect to login or show a message
+        // router.push('/login');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [toast]);
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -52,10 +105,10 @@ export function ProfileEditForm() {
         });
         return;
       }
-      setAvatarFile(file);
+      setAvatarFile(file); // Store the file object
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarPreviewUrl(reader.result as string);
+        setAvatarPreviewUrl(reader.result as string); // This will be a data URI
       };
       reader.readAsDataURL(file);
     }
@@ -63,31 +116,75 @@ export function ProfileEditForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!firebaseUser) {
+      toast({ title: "Not Authenticated", description: "Please log in to update your profile.", variant: "destructive" });
+      return;
+    }
     setIsSubmitting(true);
 
-    const updatedProfile = {
-      username,
-      name,
-      bio,
+    // TODO: In a real app, if avatarFile is set, upload it to Firebase Storage
+    // and get the downloadURL to save in Firestore.
+    // For this iteration, we'll save the avatarPreviewUrl (which might be a data URI if changed locally,
+    // or the existing URL if not). A real implementation needs storage upload.
+    let finalAvatarUrl = profileData.avatarUrl; // Start with existing or auth URL
+    if (avatarFile && avatarPreviewUrl?.startsWith('data:')) { 
+        // This indicates a new local file was selected.
+        // Ideally, upload avatarFile to Firebase Storage here and get its URL.
+        // For now, we'll just use the data URI for preview, but this isn't scalable for DB.
+        // For this exercise, if a new file is picked, we'll simulate by just acknowledging it.
+        // In a real scenario, you'd replace `avatarPreviewUrl` with the actual storage URL.
+        // For now, let's assume `avatarPreviewUrl` could be the (simulated) new URL.
+        finalAvatarUrl = avatarPreviewUrl; 
+        console.log("Avatar changed, would upload new file:", avatarFile.name);
+        // For a real app: finalAvatarUrl = await uploadImageToStorage(avatarFile);
+    } else if (avatarPreviewUrl && !avatarPreviewUrl.startsWith('data:')) {
+        // Existing URL from Firestore or Auth, no new file selected.
+        finalAvatarUrl = avatarPreviewUrl;
+    }
+
+
+    const updatedProfileData: AppUserType = {
+      id: firebaseUser.uid,
+      username: username.trim() || firebaseUser.email?.split('@')[0] || `user_${firebaseUser.uid.substring(0,6)}`,
+      name: name.trim() || firebaseUser.displayName || '',
+      bio: bio.trim(),
       location: location.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
-      avatarUrl: avatarPreviewUrl, // In a real app, this would be the URL after upload
-      avatarFile: avatarFile, // This would be sent to the backend
+      // If avatarFile exists, it means a new image was selected.
+      // Ideally, upload avatarFile to Firebase Storage and get the URL.
+      // For now, if avatarFile is present, use avatarPreviewUrl (which is a data URI).
+      // If no new file, use existing profileData.avatarUrl or firebaseUser.photoURL.
+      avatarUrl: finalAvatarUrl,
+      // Counts should be managed by backend logic (e.g. Cloud Functions) or separate updates
+      followersCount: profileData.followersCount || 0,
+      followingCount: profileData.followingCount || 0,
+      postCount: profileData.postCount || 0,
     };
 
-    console.log('Updating profile:', updatedProfile);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const userDocRef = doc(db, 'users', firebaseUser.uid);
+      await setDoc(userDocRef, updatedProfileData, { merge: true }); // Use merge to avoid overwriting counts if not managed here
+      
+      setProfileData(updatedProfileData); // Update local state to reflect saved data
 
-    toast({
-      title: 'Profile Updated',
-      description: 'Your profile information has been saved.',
-    });
-    setIsSubmitting(false);
+      toast({
+        title: 'Profile Updated',
+        description: 'Your profile information has been saved.',
+      });
+    } catch (error) {
+      console.error("Error updating profile in Firestore:", error);
+      toast({ title: "Update Failed", description: "Could not save profile changes.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!initialUser) {
-    return <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (isLoadingData) {
+    return <div className="flex justify-center items-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /> <span className="ml-2">Loading profile...</span></div>;
+  }
+
+  if (!firebaseUser && !isLoadingData) {
+     return <div className="text-center py-10"><p className="text-muted-foreground">Please log in to edit your profile.</p></div>;
   }
   
   const avatarInitialDisplay = (name || username || 'U').charAt(0).toUpperCase();
@@ -102,6 +199,7 @@ export function ProfileEditForm() {
                   className="relative group rounded-full cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
                 >
                     <Avatar className="h-24 w-24 border-2 border-primary group-hover:opacity-80 transition-opacity">
+                        {/* Use avatarPreviewUrl for the src */}
                         <AvatarImage src={avatarPreviewUrl || `https://placehold.co/96x96.png?text=${avatarInitialDisplay}`} alt={name || username} data-ai-hint="person farmer" />
                         <AvatarFallback className="text-3xl">{avatarInitialDisplay}</AvatarFallback>
                     </Avatar>
@@ -129,11 +227,11 @@ export function ProfileEditForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
             <Label htmlFor="username" className="text-base font-medium">Username</Label>
-            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Your unique username" required />
         </div>
         <div className="space-y-2">
             <Label htmlFor="name" className="text-base font-medium">Full Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name"/>
         </div>
         </div>
 
@@ -150,9 +248,6 @@ export function ProfileEditForm() {
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g., Raipur, Chhattisgarh"
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              Provide your city and state. Dynamic suggestions are not available for this field.
-            </p>
         </div>
 
         <div className="space-y-2">
@@ -161,7 +256,7 @@ export function ProfileEditForm() {
         </div>
 
         <div className="flex justify-end pt-4">
-            <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 text-base" disabled={isSubmitting}>
+            <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 text-base" disabled={isSubmitting || isLoadingData}>
                 {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
                 {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
             </Button>
