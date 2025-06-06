@@ -3,43 +3,58 @@
 
 import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
-import { getPlaceholderUser, getPlaceholderPostsForUser } from '@/lib/placeholders';
+import { getPlaceholderPostsForUser } from '@/lib/placeholders'; // Posts still from placeholders
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { auth } from '@/lib/firebase'; // Import Firebase auth
+import { auth, db, doc, getDoc } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
+import type { User, Post } from '@/types';
 
 export default function UserProfilePage({ params: { userId } }: { params: { userId: string } }) {
-  const user = getPlaceholderUser(userId); // User being viewed
-
-  const [isCurrentUser, setIsCurrentUser] = useState<boolean | undefined>(undefined); // undefined for loading state
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [viewedUser, setViewedUser] = useState<User | null | 'not-found'>(null);
+  const [isCurrentUserProfile, setIsCurrentUserProfile] = useState<boolean | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userPosts, setUserPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        setIsCurrentUser(userId === firebaseUser.uid);
-      } else {
-        // This case should ideally be handled by the main app layout's redirect
-        // If an unauthenticated user somehow reaches here, treat as not current user.
-        setIsCurrentUser(false);
+    const fetchProfileData = async () => {
+      setIsLoading(true);
+      try {
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const fetchedData = { id: userId, ...userDocSnap.data() } as User;
+           // Posts are still from placeholders for this user
+          const placeholderPosts = getPlaceholderPostsForUser(userId);
+          setUserPosts(placeholderPosts);
+          // Update postCount in fetchedData if it exists
+          setViewedUser({ ...fetchedData, postCount: placeholderPosts.length });
+        } else {
+          setViewedUser('not-found');
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setViewedUser('not-found'); // Treat error as not found
       }
-      setIsLoadingAuth(false);
-    });
-    return () => unsubscribe(); // Cleanup subscription on unmount
+
+      const unsubscribeAuth = auth.onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
+        setIsCurrentUserProfile(firebaseUser ? userId === firebaseUser.uid : false);
+        setIsLoading(false);
+      });
+      return () => unsubscribeAuth(); // Cleanup auth listener
+    };
+
+    if (userId) {
+      fetchProfileData();
+    } else {
+      setViewedUser('not-found'); // No userId, definitely not found
+      setIsLoading(false);
+    }
   }, [userId]);
 
-  if (!user) {
-    // If placeholder user data itself is not found for the given userId
-    notFound();
-  }
-
-  // Fetch placeholder posts for the user
-  const userPosts = getPlaceholderPostsForUser(userId);
-
-  if (isLoadingAuth || isCurrentUser === undefined) {
-    // Show loader while authentication state is being determined
+  if (isLoading || isCurrentUserProfile === undefined) {
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -48,9 +63,24 @@ export default function UserProfilePage({ params: { userId } }: { params: { user
     );
   }
 
+  if (viewedUser === 'not-found') {
+    // It's better to call notFound() during render for Next.js to handle it properly
+    notFound(); 
+    return null; // Should not be reached if notFound() works as expected
+  }
+  
+  if (!viewedUser) { // Should be caught by 'not-found' or loader, but as a fallback
+      return (
+        <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center text-destructive">
+          <AlertTriangle className="h-12 w-12 mb-4" />
+          <p className="mt-4 text-lg">Profile could not be loaded.</p>
+        </div>
+      );
+  }
+
   return (
     <div className="space-y-8">
-      <ProfileDetails user={user} isCurrentUser={isCurrentUser} />
+      <ProfileDetails user={viewedUser} isCurrentUser={isCurrentUserProfile} />
       <UserPostGrid posts={userPosts} />
     </div>
   );
