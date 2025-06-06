@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase';
+import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase'; // Removed getFirestore from here
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 
@@ -39,6 +39,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
           const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
 
+          // Removed the problematic isFirestoreOffline check
+          // The try-catch around getDoc and setDoc will handle actual Firestore errors (including offline if not cached)
+
           if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
             if (pathname === '/setup-profile') {
               router.replace('/feed');
@@ -61,9 +64,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                 }, { merge: true });
                 console.log(`Initial document created for ${user.uid}. Redirecting to /setup-profile.`);
               } catch (e: any) {
-                console.error("Error creating initial user doc in Firestore:", e);
+                console.error("Error creating initial user doc in Firestore:", e.message, e);
                 setError(
-                  "Failed to initialize user profile. The application may be offline or unable to connect to the database. Please check your internet connection and browser console for specific Firebase error details. Then try again."
+                  "Failed to initialize user profile. Please check your browser console for more details, then try again."
                 );
                 setIsLoadingAuth(false);
                 return;
@@ -74,9 +77,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
             }
           }
         } catch (e: any) {
-          console.error("Error fetching user document from Firestore:", e); 
+          console.error("Error fetching user document from Firestore:", e.message, e); 
           setError(
-            "Failed to load user data. The application may be offline or unable to connect to the database. Please check your internet connection and browser console for specific Firebase error details. Then try again."
+            "Failed to load user data. Please check your internet connection or browser console for more details, then try again."
           );
         } finally {
           setIsLoadingAuth(false);

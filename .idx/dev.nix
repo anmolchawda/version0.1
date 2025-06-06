@@ -21,6 +21,12 @@
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       # "vscodevim.vim"
+      "cweijan.dbclient-jdbc"
+      "cweijan.vscode-mysql-client2"
+      "ms-python.debugpy"
+      "ms-python.python"
+      "ms-vscode.js-debug"
+      "vscjava.vscode-java-debug"
     ];
     workspace = {
       onCreate = {
