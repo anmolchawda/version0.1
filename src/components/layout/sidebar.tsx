@@ -20,14 +20,14 @@ import {
   CloudSun,
   CalendarDays,
   LogOut,
-  // Bell, // Bell icon no longer needed for primaryNavLinks in sidebar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/lib/firebase'; // auth can be null in mock mode
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { getPlaceholderUser } from '@/lib/placeholders'; // Import for mock user data
 
 interface NavLinkItemProps {
   href: string;
@@ -53,7 +53,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
     <Link
       href={href}
       className={cn(
-        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors relative', // Added relative for badge positioning
+        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors relative',
         isActive
           ? 'bg-primary/10 text-primary'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -104,14 +104,14 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext(); // Removed notificationCount as it's not used in sidebar nav links anymore
+  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
   
-  const firebaseUser = auth.currentUser;
-  const currentUserName = firebaseUser?.displayName || firebaseUser?.email?.split('@')[0] || 'User';
-  const currentUserAvatar = firebaseUser?.photoURL;
-  const currentUserUsername = firebaseUser?.email?.split('@')[0] || 'krishix_user';
+  const currentUserDetails = authUserId ? getPlaceholderUser(authUserId) : null;
 
-  // The profile link in the sidebar now always points to the root '/' for the current user's profile.
+  const currentUserName = currentUserDetails?.name || currentUserDetails?.username || 'User';
+  const currentUserAvatar = currentUserDetails?.avatarUrl;
+  const currentUserUsername = currentUserDetails?.username || 'krishix_user';
+
   const userProfileLink = "/";
 
 
@@ -134,9 +134,7 @@ export function Sidebar() {
     };
   }, []);
 
-  const primaryNavLinks = useMemo((): NavLinkType[] => [
-     // Notifications link removed from here
-  ], []);
+  const primaryNavLinks = useMemo((): NavLinkType[] => [], []);
 
   const secondaryNavLinks = useMemo((): NavLinkType[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
@@ -156,7 +154,13 @@ export function Sidebar() {
   const userAvatarFallback = currentUserName.substring(0, 2).toUpperCase();
   
   const handleLogout = async () => {
-    closeSidebar(); 
+    closeSidebar();
+    if (!auth) { // auth instance is null in mock mode
+      toast({ title: 'Logged Out (Mock)', description: 'You have been successfully logged out.' });
+      router.push('/login');
+      return;
+    }
+    // Real Firebase logout
     try {
       await signOut(auth);
       toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
@@ -203,7 +207,7 @@ export function Sidebar() {
 
   const userProfileElement = (
     <Link
-      href={userProfileLink} // Use the updated link
+      href={userProfileLink}
       className={cn(
         "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
         !isSidebarOpen && "justify-center"
@@ -312,3 +316,5 @@ export function Sidebar() {
     </aside>
   );
 }
+
+    
