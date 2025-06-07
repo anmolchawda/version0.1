@@ -1,11 +1,3 @@
-useEffect(() => {
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    // ... your snapshot handling logic
-  });
-
-  // Cleanup function to unsubscribe when the component unmounts
-  return () => unsubscribe();
-}, [q]); // Add dependencies if needed
 
 // src/app/(app)/messages/page.tsx
 'use client';
