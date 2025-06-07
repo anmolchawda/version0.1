@@ -1,7 +1,6 @@
 
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
-  getFirestore,
   Timestamp,
   doc,
   getDoc,
@@ -16,8 +15,8 @@ import {
   increment,
   enableNetwork,
   initializeFirestore,
-  persistentLocalCache, // Correct import for client-side persistence provider
-  memoryLocalCache,    // Correct import for server-side/fallback persistence provider
+  persistentLocalCache, 
+  memoryLocalCache,    
   type Firestore
 } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from "firebase/storage";
@@ -28,7 +27,7 @@ const firebaseConfig = {
     authDomain: "fieldverse-m99ip.firebaseapp.com",
     databaseURL: "https://fieldverse-m99ip-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "fieldverse-m99ip",
-    storageBucket: "fieldverse-m99ip.firebasestorage.app",
+    storageBucket: "fieldverse-m99ip.appspot.com",
     messagingSenderId: "1084327516741",
     appId: "1:1084327516741:web:0eb1efac54766dc625612c",
     measurementId: "G-FVS7PM8WTB"
@@ -39,62 +38,66 @@ let db: Firestore;
 let authInstance: Auth;
 let storageInstance: FirebaseStorage;
 
-if (!getApps().length) {
-  console.log("Firebase: Initializing new app and services...");
+if (getApps().length === 0) {
+  console.log("Firebase: Initializing new Firebase app instance...");
   app = initializeApp(firebaseConfig);
-
-  if (typeof window !== 'undefined') {
-    // Client-side environment
-    try {
-      // Initialize Firestore with IndexedDB persistence
-      db = initializeFirestore(app, {
-        localCache: persistentLocalCache({ // Use persistentLocalCache
-          // Optional: tabManager: new MemoryTabManager() for synchronizing multiple tabs
-        }),
-      });
-      console.log("Firebase: Firestore initialized with persistentLocalCache (client-side).");
-    } catch (e: any) {
-      console.error("Firebase: Error initializing Firestore with persistentLocalCache on client, falling back to memory cache:", e.message, e);
-      // Fallback to memory cache if IndexedDB fails (e.g., in some private browsing modes or due to errors)
-      db = initializeFirestore(app, { localCache: memoryLocalCache() });
-      console.log("Firebase: Firestore initialized with memory cache (client-side fallback).");
-    }
-  } else {
-    // Server-side environment or non-browser (e.g., during SSR build)
-    // Use memory cache for server-side rendering
-    db = initializeFirestore(app, { localCache: memoryLocalCache() });
-    console.log("Firebase: Firestore initialized with memory cache (server-side).");
-  }
-
-  authInstance = getAuth(app);
-  storageInstance = getStorage(app);
-  console.log("Firebase: Auth and Storage initialized (singleton).");
-
+  console.log("Firebase: New Firebase app instance CREATED.");
 } else {
-  console.log("Firebase: Using existing app instance.");
-  app = getApp(); // Get existing app
-  db = getFirestore(app); // Retrieve the already initialized Firestore instance
-  authInstance = getAuth(app); // Retrieve the already initialized Auth instance
-  storageInstance = getStorage(app); // Retrieve the already initialized Storage instance
-  console.log("Firebase: Re-assigned existing service instances.");
+  console.log("Firebase: Re-using existing Firebase app instance.");
+  app = getApp();
+  console.log("Firebase: Existing Firebase app instance RETRIEVED.");
 }
 
-// Ensure network is enabled for the db instance on the client side,
-// after db has been assigned, regardless of first init or HMR.
+// Initialize Firestore with persistence options
+// This section will run every time the module is evaluated,
+// but initializeFirestore is idempotent for a given app instance.
+if (typeof window !== 'undefined') {
+  // Client-side environment
+  try {
+    console.log("Firebase: Attempting to initialize Firestore with persistentLocalCache (client-side)...");
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        // Optional: tabManager for synchronizing multiple tabs
+      }),
+    });
+    console.log("Firebase: Firestore successfully initialized with persistentLocalCache (client-side).");
+  } catch (e: any) {
+    console.warn("Firebase: Error initializing Firestore with persistentLocalCache on client, falling back to memory cache:", e.message);
+    // Fallback to memory cache if IndexedDB fails
+    db = initializeFirestore(app, { localCache: memoryLocalCache() });
+    console.log("Firebase: Firestore initialized with memory cache (client-side fallback).");
+  }
+} else {
+  // Server-side environment
+  console.log("Firebase: Initializing Firestore with memoryLocalCache (server-side)...");
+  db = initializeFirestore(app, { localCache: memoryLocalCache() });
+  console.log("Firebase: Firestore successfully initialized with memoryLocalCache (server-side).");
+}
+
+// Initialize other Firebase services (Auth, Storage)
+// These are generally safe to call multiple times as they return the existing instance for the given app.
+authInstance = getAuth(app);
+storageInstance = getStorage(app);
+console.log("Firebase: Auth and Storage instances obtained/re-confirmed.");
+
+
+// Explicitly enable network for Firestore on the client-side, after db is initialized.
+// This is crucial to ensure Firestore attempts to connect.
 if (typeof window !== 'undefined') {
   if (db) {
-    console.log("Firebase: Attempting to enable network for Firestore instance on client...", db);
+    console.log("Firebase: Attempting to enable network for Firestore instance on client...");
     enableNetwork(db)
       .then(() => {
-        console.log("Firebase: Firestore network connection EXPLICITLY ENABLED/RE-AFFIRMED (client-side).");
+        console.log("Firebase: Firestore network connection ENABLED/RE-AFFIRMED (client-side).");
       })
       .catch((error) => {
-        console.error("Firebase: Error EXPLICITLY ENABLING/RE-AFFIRMING Firestore network (client-side):", error);
+        console.error("Firebase: Error enabling/re-affirming Firestore network (client-side):", error);
       });
   } else {
-    console.error("Firebase: DB instance NOT AVAILABLE for enableNetwork call on client. This is unexpected.");
+    console.error("Firebase: DB instance NOT AVAILABLE for enableNetwork call on client. This is very unexpected if initializeFirestore succeeded.");
   }
 }
+
 
 export {
   db,
