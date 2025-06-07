@@ -13,10 +13,11 @@ import { auth, db } from '@/lib/firebase'; // Firebase auth and db
 import { doc, getDoc, setDoc } from 'firebase/firestore'; // Firestore functions
 import type { User as FirebaseUserType } from 'firebase/auth'; // Firebase Auth User type
 import type { User as AppUserType } from '@/types'; // Your app's User type
+import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders'; // Import MOCK_USER_ID and getPlaceholderUser
 
 export function ProfileEditForm() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUserType | null>(null);
-  const [profileData, setProfileData] = useState<Partial<AppUserType>>({}); // Use partial for initial state
+  const [profileData, setProfileData] = useState<Partial<AppUserType>>({}); 
 
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
@@ -31,10 +32,47 @@ export function ProfileEditForm() {
   const { toast } = useToast();
 
   useEffect(() => {
+    // If in mock mode (auth is null from firebase.ts)
+    if (!auth) {
+      console.log("[ProfileEditForm] MOCK_DATA mode: Simulating auth and loading mock profile.");
+      const mockProfile = getPlaceholderUser(MOCK_USER_ID);
+      if (mockProfile) {
+        // Simulate a FirebaseUser object structure
+        const mockFbUser: FirebaseUserType = {
+          uid: mockProfile.id,
+          email: mockProfile.email || `${mockProfile.username}@example.com`,
+          displayName: mockProfile.name || mockProfile.username,
+          photoURL: mockProfile.avatarUrl || null,
+          emailVerified: true, isAnonymous: false, metadata: {}, providerData: [], providerId: 'mock',
+          refreshToken: '', tenantId: null, delete: async () => {}, getIdToken: async () => '',
+          getIdTokenResult: async () => ({} as any), reload: async () => {}, toJSON: () => ({}),
+        };
+        setFirebaseUser(mockFbUser);
+        setProfileData(mockProfile); // This will be the full AppUserType structure from placeholders
+        setUsername(mockProfile.username || '');
+        setName(mockProfile.name || '');
+        setBio(mockProfile.bio || '');
+        setLocation(mockProfile.location || '');
+        setProduceInput((mockProfile.produce || []).join(', '));
+        setAvatarPreviewUrl(mockProfile.avatarUrl || '');
+      } else {
+        toast({ title: "Error", description: "Mock user data not found.", variant: "destructive" });
+      }
+      setIsLoadingData(false);
+      return () => {}; // No Firebase listener to unsubscribe from in mock mode
+    }
+
+    // Real Firebase Auth logic (auth is not null)
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         setFirebaseUser(user);
         setIsLoadingData(true);
+        if (!db) { // Should not happen if auth is not null, but a safeguard
+             console.error("[ProfileEditForm] Auth is available, but DB is null. Cannot fetch Firestore profile.");
+             setIsLoadingData(false);
+             toast({ title: "Configuration Error", description: "Cannot load profile.", variant: "destructive" });
+             return;
+        }
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
@@ -49,45 +87,27 @@ export function ProfileEditForm() {
             setProduceInput((fetchedData.produce || []).join(', '));
             setAvatarPreviewUrl(fetchedData.avatarUrl || user.photoURL || '');
           } else {
-            // User document doesn't exist in Firestore, use auth data as fallback
             const defaultUsername = user.email?.split('@')[0] || `user_${user.uid.substring(0,6)}`;
             setUsername(defaultUsername);
-            setName(user.displayName || defaultUsername);
-            setBio(''); // No bio from auth
-            setLocation(''); // No location from auth
-            setProduceInput(''); // No produce from auth
+setName(user.displayName || defaultUsername);
             setAvatarPreviewUrl(user.photoURL || '');
-            setProfileData({ // Set a minimal profileData
-              id: user.uid,
-              username: defaultUsername,
-              name: user.displayName || defaultUsername,
-              avatarUrl: user.photoURL || '',
-            });
+            setProfileData({ id: user.uid, username: defaultUsername, name: user.displayName || defaultUsername, avatarUrl: user.photoURL || undefined });
           }
         } catch (error) {
           console.error("Error fetching user profile from Firestore:", error);
           toast({ title: "Error", description: "Could not load profile data.", variant: "destructive" });
-          // Fallback to auth data if Firestore fetch fails
           const defaultUsernameOnError = user.email?.split('@')[0] || `user_err_${user.uid.substring(0,6)}`;
           setUsername(defaultUsernameOnError);
           setName(user.displayName || defaultUsernameOnError);
           setAvatarPreviewUrl(user.photoURL || '');
-           setProfileData({
-              id: user.uid,
-              username: defaultUsernameOnError,
-              name: user.displayName || defaultUsernameOnError,
-              avatarUrl: user.photoURL || '',
-            });
+          setProfileData({ id: user.uid, username: defaultUsernameOnError, name: user.displayName || defaultUsernameOnError, avatarUrl: user.photoURL || undefined });
         } finally {
           setIsLoadingData(false);
         }
       } else {
-        // No user logged in, or logged out
         setFirebaseUser(null);
         setProfileData({});
         setIsLoadingData(false);
-        // Optionally redirect to login or show a message
-        // router.push('/login');
       }
     });
 
@@ -105,10 +125,10 @@ export function ProfileEditForm() {
         });
         return;
       }
-      setAvatarFile(file); // Store the file object
+      setAvatarFile(file); 
       const reader = new FileReader();
       reader.onloadend = () => {
-        setAvatarPreviewUrl(reader.result as string); // This will be a data URI
+        setAvatarPreviewUrl(reader.result as string); 
       };
       reader.readAsDataURL(file);
     }
@@ -122,50 +142,46 @@ export function ProfileEditForm() {
     }
     setIsSubmitting(true);
 
-    // TODO: In a real app, if avatarFile is set, upload it to Firebase Storage
-    // and get the downloadURL to save in Firestore.
-    // For this iteration, we'll save the avatarPreviewUrl (which might be a data URI if changed locally,
-    // or the existing URL if not). A real implementation needs storage upload.
-    let finalAvatarUrl = profileData.avatarUrl; // Start with existing or auth URL
-    if (avatarFile && avatarPreviewUrl?.startsWith('data:')) { 
-        // This indicates a new local file was selected.
-        // Ideally, upload avatarFile to Firebase Storage here and get its URL.
-        // For now, we'll just use the data URI for preview, but this isn't scalable for DB.
-        // For this exercise, if a new file is picked, we'll simulate by just acknowledging it.
-        // In a real scenario, you'd replace `avatarPreviewUrl` with the actual storage URL.
-        // For now, let's assume `avatarPreviewUrl` could be the (simulated) new URL.
-        finalAvatarUrl = avatarPreviewUrl; 
-        console.log("Avatar changed, would upload new file:", avatarFile.name);
-        // For a real app: finalAvatarUrl = await uploadImageToStorage(avatarFile);
-    } else if (avatarPreviewUrl && !avatarPreviewUrl.startsWith('data:')) {
-        // Existing URL from Firestore or Auth, no new file selected.
-        finalAvatarUrl = avatarPreviewUrl;
+    let finalAvatarUrl = avatarPreviewUrl || firebaseUser.photoURL || '';
+    if (avatarFile) {
+      console.log("Avatar changed, would upload new file:", avatarFile.name);
+      // For a real app: finalAvatarUrl = await uploadImageToStorage(avatarFile);
+      // For mock or if data URI is acceptable for your Firestore structure temporarily:
+      finalAvatarUrl = avatarPreviewUrl || ''; 
     }
-
 
     const updatedProfileData: AppUserType = {
       id: firebaseUser.uid,
       username: username.trim() || firebaseUser.email?.split('@')[0] || `user_${firebaseUser.uid.substring(0,6)}`,
       name: name.trim() || firebaseUser.displayName || '',
+      email: firebaseUser.email || '', // Persist email
       bio: bio.trim(),
       location: location.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
-      // If avatarFile exists, it means a new image was selected.
-      // Ideally, upload avatarFile to Firebase Storage and get the URL.
-      // For now, if avatarFile is present, use avatarPreviewUrl (which is a data URI).
-      // If no new file, use existing profileData.avatarUrl or firebaseUser.photoURL.
       avatarUrl: finalAvatarUrl,
-      // Counts should be managed by backend logic (e.g. Cloud Functions) or separate updates
       followersCount: profileData.followersCount || 0,
       followingCount: profileData.followingCount || 0,
       postCount: profileData.postCount || 0,
+      profileSetupComplete: profileData.profileSetupComplete || true, // Assume setup if editing
     };
 
+    // If in mock mode (db is null from firebase.ts)
+    if (!db) {
+      console.log("[ProfileEditForm] MOCK_DATA mode: Simulating profile update.");
+      setProfileData(updatedProfileData); // Update local state
+      toast({
+        title: 'Profile Updated (Mock)',
+        description: 'Your profile information has been "saved".',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    
+    // Real Firebase logic (db is not null)
     try {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
-      await setDoc(userDocRef, updatedProfileData, { merge: true }); // Use merge to avoid overwriting counts if not managed here
-      
-      setProfileData(updatedProfileData); // Update local state to reflect saved data
+      await setDoc(userDocRef, updatedProfileData, { merge: true }); 
+      setProfileData(updatedProfileData); 
 
       toast({
         title: 'Profile Updated',
@@ -199,7 +215,6 @@ export function ProfileEditForm() {
                   className="relative group rounded-full cursor-pointer focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
                 >
                     <Avatar className="h-24 w-24 border-2 border-primary group-hover:opacity-80 transition-opacity">
-                        {/* Use avatarPreviewUrl for the src */}
                         <AvatarImage src={avatarPreviewUrl || `https://placehold.co/96x96.png?text=${avatarInitialDisplay}`} alt={name || username} data-ai-hint="person farmer" />
                         <AvatarFallback className="text-3xl">{avatarInitialDisplay}</AvatarFallback>
                     </Avatar>
@@ -215,9 +230,10 @@ export function ProfileEditForm() {
                         onChange={handleAvatarChange}
                         className="hidden"
                     />
+                     <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('avatarUpload')?.click()}>
+                        Change Photo
+                    </Button>
                     <p className="text-xs text-muted-foreground mt-1">
-                        Click photo to change.
-                        <br />
                         PNG, JPG, GIF up to 2MB.
                     </p>
                 </div>
