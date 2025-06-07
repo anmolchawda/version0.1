@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Search, Store, ListChecks, PlusCircle } from 'lucide-react';
+import { Search, Store, ListChecks, PlusCircle, RotateCcw } from 'lucide-react';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 
@@ -73,6 +73,18 @@ export default function MandiPage() {
     
     return matchesSearch && matchesLocation && matchesCategory;
   });
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSelectedState(undefined);
+    setSelectedCity(undefined);
+    setSelectedCategory('all');
+    setAvailableCities([]);
+  };
+
+  const areFiltersActive = () => {
+    return searchTerm !== '' || selectedState !== undefined || selectedCity !== undefined || selectedCategory !== 'all';
+  };
 
 
   return (
@@ -133,6 +145,14 @@ export default function MandiPage() {
                 </SelectContent>
               </Select>
             </div>
+            {areFiltersActive() && (
+              <div className="mt-4 flex justify-end">
+                <Button variant="outline" onClick={handleResetFilters} size="sm">
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Reset Filters
+                </Button>
+              </div>
+            )}
           </div>
 
           <section>
@@ -169,3 +189,4 @@ export default function MandiPage() {
     </div>
   );
 }
+
