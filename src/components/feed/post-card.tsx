@@ -15,7 +15,7 @@ import { MOCK_USER_ID } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase'; // db can be null
 import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp } from 'firebase/firestore';
 
 interface PostCardProps {
@@ -34,10 +34,19 @@ export function PostCard({ post, priority = false }: PostCardProps) {
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
   const [isLoadingLike, setIsLoadingLike] = useState(false);
 
-  const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
-  const postDocRef = doc(db, 'posts', post.id);
+  const isFirestoreAvailable = db !== null; // Check if db instance is available
 
   useEffect(() => {
+    if (!isFirestoreAvailable) {
+      setIsLoadingLike(false);
+      // In mock mode, we can assume posts are not liked by default or read from a mock state if needed
+      setIsLiked(false); 
+      setLocalLikesCount(post.likesCount); // Use initial prop value for mock
+      return;
+    }
+
+    // Firestore-dependent logic
+    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
     const checkInitialLike = async () => {
       setIsLoadingLike(true);
       try {
@@ -45,13 +54,14 @@ export function PostCard({ post, priority = false }: PostCardProps) {
         setIsLiked(docSnap.exists());
       } catch (error) {
         console.error("Error checking initial like status:", error);
+        // Don't toast here, could be noisy on initial load for many cards
       } finally {
         setIsLoadingLike(false);
       }
     };
     checkInitialLike();
-    setLocalLikesCount(post.likesCount);
-  }, [post.id, post.likesCount, likedDocRef]);
+    setLocalLikesCount(post.likesCount); // Sync with prop on initial load or post change
+  }, [post.id, post.likesCount, isFirestoreAvailable, MOCK_USER_ID]); // Ensure MOCK_USER_ID is stable or part of context
 
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
@@ -88,6 +98,19 @@ export function PostCard({ post, priority = false }: PostCardProps) {
 
     const newLikedState = !isLiked;
 
+    if (!isFirestoreAvailable) {
+      // Mock mode: simulate like toggle
+      setIsLiked(newLikedState);
+      setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
+      toast({ title: `Post ${newLikedState ? 'Liked' : 'Unliked'} (Mock)` });
+      setIsLoadingLike(false);
+      return;
+    }
+
+    // Firestore mode
+    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
+    const postDocRef = doc(db, 'posts', post.id);
+
     try {
       if (newLikedState) {
         await setDoc(likedDocRef, { likedAt: Timestamp.now() });
@@ -107,8 +130,8 @@ export function PostCard({ post, priority = false }: PostCardProps) {
       console.error("Error updating like status:", error);
       toast({ title: "Error", description: "Could not update like status.", variant: "destructive" });
       // Revert optimistic updates if Firestore fails
-      setLocalLikesCount(post.likesCount); // Revert to original server count
-      setIsLiked(!newLikedState); // Revert liked state
+      setLocalLikesCount(post.likesCount); 
+      setIsLiked(!newLikedState); 
     } finally {
       setIsLoadingLike(false);
     }
