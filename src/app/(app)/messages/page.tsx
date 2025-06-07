@@ -11,10 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquareText, Search, Edit3, Users, Loader2 } from 'lucide-react';
-import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders'; // MOCK_USER_ID is no longer needed here
+import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import type { DisplayConversation, FirestoreConversation, User } from '@/types';
 import { NewMessageModal } from '@/components/message/new-message-modal';
-import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp } from '@/lib/firebase';
+import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp } from '@/lib/firebase'; // db can be null
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 export default function MessagesPage() {
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
@@ -22,19 +23,34 @@ export default function MessagesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const currentAuthUser = auth.currentUser;
+  const { authUserId } = useSidebarContext(); // Use authUserId from context
 
   useEffect(() => {
-    if (!currentAuthUser) {
-      // AppLayout should handle redirect, but as a safeguard
-      router.push('/login');
+    setIsLoading(true);
+    setError(null);
+
+    if (!authUserId) {
+      // This state should ideally be caught by the AppLayout if user is not authenticated.
+      // If using mock_user_id, authUserId should be set.
+      console.warn("[MessagesPage] No authUserId found in context. User might not be logged in.");
+      setError("User not authenticated. Please log in.");
+      setIsLoading(false);
+      // router.push('/login'); // Or handle as per app's auth flow for unauthenticated users
       return;
     }
-    setIsLoading(true);
+
+    if (!db) { // Check if db is null (MOCK_DATA mode)
+      console.log("[MessagesPage] MOCK_DATA mode: db is null. Displaying empty conversations list.");
+      setConversations([]); // In mock mode, show no conversations or load from placeholders if available
+      setIsLoading(false);
+      return;
+    }
+
+    // Real Firebase mode: db is available, proceed with Firestore query
     const conversationsCollectionRef = collection(db, 'conversations');
     const q = query(
       conversationsCollectionRef,
-      where('participants', 'array-contains', currentAuthUser.uid),
+      where('participants', 'array-contains', authUserId),
       orderBy('lastMessageTimestamp', 'desc')
     );
 
@@ -42,13 +58,11 @@ export default function MessagesPage() {
       const fetchedConversations: DisplayConversation[] = [];
       querySnapshot.forEach((docSnap) => {
         const data = docSnap.data() as FirestoreConversation;
-        const otherParticipantId = data.participants.find(pId => pId !== currentAuthUser.uid);
+        const otherParticipantId = data.participants.find(pId => pId !== authUserId);
 
         if (otherParticipantId) {
-          // Try to get details from denormalized data first
           let otherParticipantDetails = data.participantDetails?.[otherParticipantId];
           
-          // Fallback to placeholder if not available
           if (!otherParticipantDetails) {
             const placeholder = getPlaceholderUser(otherParticipantId);
             if (placeholder) {
@@ -59,7 +73,6 @@ export default function MessagesPage() {
                 avatarUrl: placeholder.avatarUrl 
               };
             } else {
-              // If even placeholder is not found, use a generic fallback
               otherParticipantDetails = { 
                 id: otherParticipantId, 
                 username: 'Unknown User', 
@@ -70,11 +83,11 @@ export default function MessagesPage() {
           }
           
           fetchedConversations.push({
-            id: docSnap.id, // This is the Firestore conversation ID (e.g., uid1_uid2)
+            id: docSnap.id,
             otherParticipant: otherParticipantDetails,
             lastMessage: data.lastMessageText || 'No messages yet',
             lastMessageTime: data.lastMessageTimestamp ? formatTimeAgo((data.lastMessageTimestamp as Timestamp).toDate().toISOString()) : '',
-            unread: false, // Unread count logic not implemented in this pass
+            unread: false, 
           });
         }
       });
@@ -88,7 +101,7 @@ export default function MessagesPage() {
     });
 
     return () => unsubscribe();
-  }, [currentAuthUser, router]);
+  }, [authUserId, router]); // Removed db from dependency array as its presence is checked initially
 
   return (
     <>
@@ -110,7 +123,6 @@ export default function MessagesPage() {
                 type="search"
                 placeholder="Search messages or users..."
                 className="w-full pl-10 py-2 rounded-lg"
-                // Search functionality to be implemented later
               />
             </div>
           </CardHeader>
