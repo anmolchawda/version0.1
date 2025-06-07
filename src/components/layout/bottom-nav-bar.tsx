@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, PlusSquare, Store, User as UserIconLucide, Bell } from 'lucide-react'; // Store icon is already imported
+import { Home, Search, PlusSquare, Store, User as UserIconLucide } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavLink as NavLinkType } from '@/types';
 import { useEffect, useState } from 'react';
@@ -12,25 +12,25 @@ import { useSidebarContext } from '@/contexts/SidebarContext';
 
 const MOCK_USER_ID_FALLBACK = '1';
 
-const getBottomNavLinks = (lang: string, notificationCount: number): NavLinkType[] => [
+const getBottomNavLinks = (lang: string): NavLinkType[] => [
   { href: '/feed', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
   { href: '/discover', label: lang === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
   { href: '/post/create', label: lang === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
-  { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> }, // Restored Mandi link
-  { 
-    href: '/notifications', 
-    label: lang === 'hi' ? 'सूचनाएं' : 'Alerts', 
-    icon: <Bell className="h-5 w-5" />, 
-    badgeCount: notificationCount 
-  },
+  { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
+  // { 
+  //   href: '/notifications', 
+  //   label: lang === 'hi' ? 'सूचनाएं' : 'Alerts', 
+  //   icon: <Bell className="h-5 w-5" />, 
+  //   badgeCount: notificationCount // This was the line to remove/comment out
+  // },
   { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
 ];
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  const { authUserId, notificationCount } = useSidebarContext();
+  const { authUserId, notificationCount } = useSidebarContext(); // notificationCount is no longer directly used here for links
   const [currentLanguage, setCurrentLanguage] = useState('en');
-  const [links, setLinks] = useState(() => getBottomNavLinks('en', notificationCount));
+  const [links, setLinks] = useState(() => getBottomNavLinks('en'));
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('selectedAppLanguage');
@@ -40,8 +40,8 @@ export function BottomNavBar() {
   }, []);
 
   useEffect(() => {
-    setLinks(getBottomNavLinks(currentLanguage, notificationCount));
-  }, [currentLanguage, notificationCount]);
+    setLinks(getBottomNavLinks(currentLanguage));
+  }, [currentLanguage]);
 
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
@@ -63,7 +63,8 @@ export function BottomNavBar() {
           isActive = true;
         }
         
-        const displayBadgeCount = (link.href === '/notifications' && isActive) ? 0 : link.badgeCount;
+        // Badge count logic is removed as the notification link itself is removed
+        // const displayBadgeCount = (link.href === '/notifications' && isActive) ? 0 : link.badgeCount;
 
         return (
           <Link
@@ -78,11 +79,7 @@ export function BottomNavBar() {
           >
             <div className="relative">
               {link.icon}
-              {displayBadgeCount !== undefined && displayBadgeCount > 0 && (
-                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold">
-                  {displayBadgeCount > 9 ? '9+' : displayBadgeCount}
-                </span>
-              )}
+              {/* Badge rendering logic removed as notification link is removed */}
             </div>
             <span className="mt-0.5 truncate">{link.label}</span>
           </Link>
