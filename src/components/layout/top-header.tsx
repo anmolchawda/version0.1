@@ -9,60 +9,71 @@ import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/core/app-logo';
 import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { auth, db, doc, onSnapshot, setDoc } from '@/lib/firebase'; // Added setDoc
+import { db, doc, onSnapshot, setDoc } from '@/lib/firebase'; // Removed auth import as authUserId from context is preferred
 
 export function TopHeader() {
-  const { toggleSidebar, setNotificationCount } = useSidebarContext();
+  const { toggleSidebar, setNotificationCount, authUserId } = useSidebarContext(); // Get authUserId from context
   const pathname = usePathname();
   const [unreadMessageCount, setUnreadMessageCount] = useState(3); // Mock message count
   const [localNotificationCount, setLocalNotificationCount] = useState(0);
-
-  const currentAuthUser = auth.currentUser;
 
   useEffect(() => {
     if (pathname === '/messages' || pathname.startsWith('/messages/')) {
       setUnreadMessageCount(0);
     }
+    // This effect handles clearing based on pathname, the one below handles Firestore interaction
     if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
-      setNotificationCount(0);
-      if (currentAuthUser) {
-        // Mark notifications as read in Firestore when visiting the page
-        const userNotificationsMetaRef = doc(db, 'notificationsMeta', currentAuthUser.uid);
-        setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true })
-          .catch(error => console.error("Error clearing notification count in Firestore:", error));
-      }
+      setNotificationCount(0); // Update context immediately
+      // Backend update will happen in the other useEffect if authUserId is present
     }
-  }, [pathname, setNotificationCount, currentAuthUser]);
+  }, [pathname, setNotificationCount]);
 
   useEffect(() => {
-    if (currentAuthUser) {
-      const notificationDocRef = doc(db, 'notificationsMeta', currentAuthUser.uid); // Use currentAuthUser.uid
+    if (authUserId) {
+      console.log("[TopHeader] AuthUserId available:", authUserId, "Setting up notification listener.");
+      const notificationDocRef = doc(db, 'notificationsMeta', authUserId);
+      
       const unsubscribe = onSnapshot(notificationDocRef, (docSnap) => {
+        let count = 0;
         if (docSnap.exists()) {
-          const count = docSnap.data()?.unreadCount || 0;
-          setLocalNotificationCount(count);
-          // Only update context if not on the notifications page itself to avoid loop/overwrite
-          if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
-            setNotificationCount(count);
-          }
+          count = docSnap.data()?.unreadCount || 0;
+          console.log("[TopHeader] Notification count from Firestore:", count, "for user:", authUserId);
         } else {
-          console.log(`Notification summary document for user ${currentAuthUser.uid} does not exist. Assuming 0 unread.`);
-          setLocalNotificationCount(0);
-          setNotificationCount(0); // Ensure context is also 0 if doc doesn't exist
+          console.log(`[TopHeader] Notification summary document for user ${authUserId} does not exist. Assuming 0 unread.`);
+        }
+        
+        setLocalNotificationCount(count);
+        // Only update context if not on the notifications page itself to avoid loop/overwrite
+        if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
+          setNotificationCount(count);
         }
       }, (error) => {
-        console.error("Error fetching notification count:", error);
+        console.error("[TopHeader] Error fetching notification count for user", authUserId, ":", error);
         setLocalNotificationCount(0);
-        setNotificationCount(0);
+        if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
+          setNotificationCount(0);
+        }
       });
 
-      return () => unsubscribe();
+      // If on notifications page, also try to reset the count in Firestore
+      if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
+        console.log("[TopHeader] On notifications page, attempting to reset unreadCount in Firestore for user:", authUserId);
+        setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
+          .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
+      }
+
+      return () => {
+        console.log("[TopHeader] Unsubscribing from notification listener for user:", authUserId);
+        unsubscribe();
+      };
     } else {
+      console.log("[TopHeader] No AuthUserId available. Clearing notification counts.");
       setLocalNotificationCount(0);
       setNotificationCount(0);
     }
-  }, [currentAuthUser, setNotificationCount, pathname]);
+  }, [authUserId, setNotificationCount, pathname]); // Depend on authUserId from context
 
+  // Determine display count based on current page
   const displayNotificationCount = (pathname === '/notifications' || pathname.startsWith('/notifications/'))
                                      ? 0
                                      : localNotificationCount;
