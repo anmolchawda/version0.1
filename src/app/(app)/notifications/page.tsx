@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight } from "lucide-react";
-import { auth, db, collection, query, where, orderBy, onSnapshot, writeBatch, doc, Timestamp, setDoc } from '@/lib/firebase';
+import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, setDoc } from '@/lib/firebase'; // db can be null
 import type { Notification as NotificationType, ActorInfo } from '@/types';
 import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,10 @@ import { useSidebarContext } from '@/contexts/SidebarContext';
 
 function NotificationItem({ notification }: { notification: NotificationType }) {
   const { actor, type, postImageUrl, postId, commentText, timestamp, read } = notification;
-  const timeAgo = formatTimeAgo((timestamp as Timestamp).toDate().toISOString());
+  // Ensure timestamp is a Date object before formatting
+  const dateToFormat = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp as unknown as string);
+  const timeAgo = formatTimeAgo(dateToFormat.toISOString());
+
 
   // Fetch actor details using placeholder for now
   // In a real app, this might come from a user context or a separate fetch
@@ -80,17 +83,21 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { setNotificationCount } = useSidebarContext();
+  const { setNotificationCount, authUserId } = useSidebarContext();
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    // If db is null (mock mode) or no authUserId, don't attempt Firebase operations
+    if (!db || !authUserId) {
+      console.log("[NotificationsPage] Mock mode or no authUserId. Skipping Firestore listener for notifications.");
+      setNotifications([]); // Show no notifications in mock mode
       setIsLoading(false);
-      // setError("You must be logged in to see notifications."); // Or redirect via layout
+      setNotificationCount(0); // Clear badge in context
       return;
     }
 
-    const notificationsRef = collection(db, 'users', currentUser.uid, 'notifications');
+    // Proceed with Firebase operations if db and authUserId are available
+    setIsLoading(true);
+    const notificationsRef = collection(db, 'users', authUserId, 'notifications');
     const q = query(notificationsRef, orderBy('timestamp', 'desc'));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
@@ -98,7 +105,7 @@ export default function NotificationsPage() {
       const unreadNotificationIds: string[] = [];
 
       querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data() as Omit<NotificationType, 'id'>; // Type assertion
+        const data = docSnap.data() as Omit<NotificationType, 'id'>;
         const notification = { id: docSnap.id, ...data } as NotificationType;
         fetchedNotifications.push(notification);
         if (!notification.read) {
@@ -109,33 +116,29 @@ export default function NotificationsPage() {
       setNotifications(fetchedNotifications);
       setIsLoading(false);
 
-      // Mark fetched unread notifications as read and update overall unread count
       if (unreadNotificationIds.length > 0) {
         const batch = writeBatch(db);
         unreadNotificationIds.forEach(id => {
-          const notifDocRef = doc(db, 'users', currentUser.uid, 'notifications', id);
+          const notifDocRef = doc(db, 'users', authUserId, 'notifications', id);
           batch.update(notifDocRef, { read: true });
         });
         
         try {
           await batch.commit();
-          // After successfully marking as read, update the unread count in notificationsMeta
-          const userNotificationsMetaRef = doc(db, 'notificationsMeta', currentUser.uid);
+          const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
           await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
-          setNotificationCount(0); // Update context
+          setNotificationCount(0);
         } catch (e) {
           console.error("Error marking notifications as read or updating meta:", e);
         }
-      } else if (fetchedNotifications.length > 0) { 
-        // If there are notifications but all are read, ensure unread count is 0
-         const userNotificationsMetaRef = doc(db, 'notificationsMeta', currentUser.uid);
-         const docSnap = await doc(userNotificationsMetaRef).get(); // Check if it exists
+      } else if (fetchedNotifications.length > 0) {
+         const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
+         const docSnap = await getDoc(userNotificationsMetaRef);
          if(docSnap.exists() && docSnap.data()?.unreadCount !== 0) {
             await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
          }
-         setNotificationCount(0); // Update context
+         setNotificationCount(0);
       }
-
 
     }, (err) => {
       console.error("Error fetching notifications:", err);
@@ -143,15 +146,10 @@ export default function NotificationsPage() {
       setIsLoading(false);
     });
 
-    // Cleanup: also clear context count when navigating away if desired,
-    // or rely on TopHeader/BottomNav clearing it based on pathname
     return () => {
       unsubscribe();
-      // If on this page, count should already be 0.
-      // This logic handled in TopHeader for when pathname is /notifications
     };
-  }, [setNotificationCount]);
-
+  }, [authUserId, setNotificationCount]); // db is stable, no need to include unless it can change
 
   if (isLoading) {
     return (
@@ -162,8 +160,8 @@ export default function NotificationsPage() {
     );
   }
   
-  const currentUser = auth.currentUser;
-  if (!currentUser && !isLoading) { // Ensure not loading before showing this state
+  // Handle case where authUserId is null even after loading (should be caught by AppLayout, but as a safeguard)
+  if (!authUserId && !isLoading) { 
     return (
       <div className="space-y-6">
         <Card className="shadow-lg rounded-xl">
@@ -184,7 +182,6 @@ export default function NotificationsPage() {
     );
   }
 
-
   if (error) {
     return (
       <div className="text-center py-10 text-destructive">
@@ -193,7 +190,6 @@ export default function NotificationsPage() {
       </div>
     );
   }
-  
 
   return (
     <div className="space-y-6">
