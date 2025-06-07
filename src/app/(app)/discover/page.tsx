@@ -5,12 +5,12 @@
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { ProfileCard } from '@/components/profile/profile-card';
-import { placeholderUsers, placeholderPosts, placeholderListings, type MandiListing } from '@/lib/placeholders';
+import { placeholderUsers, placeholderPosts, placeholderListings } from '@/lib/placeholders';
 import { PostCard } from '@/components/feed/post-card';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
-import { Search, Users, Image as ImageIcon, Store, ListChecks } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { User, Post } from '@/types';
+import { Search, Users, Image as ImageIcon, Store, ListChecks, Tractor, Info } from 'lucide-react';
+import type { User, Post, MandiListing } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +18,7 @@ export default function DiscoverPage() {
   const searchLower = searchTerm.toLowerCase();
 
   const filteredUsers = useMemo(() => {
-    if (!searchLower) return placeholderUsers.slice(0, 6);
+    if (!searchLower) return [];
     return placeholderUsers.filter(user =>
       user.username.toLowerCase().includes(searchLower) ||
       (user.name && user.name.toLowerCase().includes(searchLower)) ||
@@ -29,7 +29,7 @@ export default function DiscoverPage() {
   }, [searchLower]);
 
   const filteredPosts = useMemo(() => {
-    if (!searchLower) return placeholderPosts.slice(0, 4);
+    if (!searchLower) return [];
     return placeholderPosts.filter(post =>
       post.caption.toLowerCase().includes(searchLower) ||
       post.user.username.toLowerCase().includes(searchLower) ||
@@ -38,7 +38,7 @@ export default function DiscoverPage() {
   }, [searchLower]);
 
   const filteredMandiListings = useMemo(() => {
-    if (!searchLower) return placeholderListings.slice(0, 6);
+    if (!searchLower) return [];
     return placeholderListings.filter(listing =>
       listing.name.toLowerCase().includes(searchLower) ||
       listing.category.toLowerCase().includes(searchLower) ||
@@ -48,91 +48,95 @@ export default function DiscoverPage() {
     );
   }, [searchLower]);
 
-  const renderEmptyState = (itemType: string) => (
-    <div className="text-center py-16">
-      <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-      <p className="text-xl font-semibold text-muted-foreground">No {itemType} found for &quot;{searchTerm}&quot;.</p>
-      <p className="text-sm text-muted-foreground mt-2">Try a different search term or browse all items.</p>
-    </div>
-  );
+  const hasResults = filteredUsers.length > 0 || filteredPosts.length > 0 || filteredMandiListings.length > 0;
 
   return (
     <div className="space-y-8">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search KrishiX..."
-          className="w-full pl-10 py-3 text-sm sm:text-base rounded-lg shadow-sm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      
-      <Tabs defaultValue="farmers" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="farmers" className="py-2.5 text-sm">
-            <Users className="mr-2 h-5 w-5 shrink-0" /> Farmers
-          </TabsTrigger>
-          <TabsTrigger value="posts" className="py-2.5 text-sm">
-            <ImageIcon className="mr-2 h-5 w-5 shrink-0" /> Posts
-          </TabsTrigger>
-          <TabsTrigger value="mandi" className="py-2.5 text-sm">
-            <Store className="mr-2 h-5 w-5 shrink-0" /> Mandi
-          </TabsTrigger>
-        </TabsList>
+      <Card className="shadow-xl rounded-xl">
+        <CardHeader>
+            <CardTitle className="text-2xl font-bold text-primary flex items-center">
+                <Search className="mr-3 h-7 w-7" /> Universal Search
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                type="search"
+                placeholder="Search farmers, posts, mandi items, diseases, codes..."
+                className="w-full pl-10 py-3 text-base rounded-lg shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="farmers">
-          <section>
-            <h2 className="text-2xl font-semibold mb-6 text-primary">
-              {searchTerm ? `Farmers matching "${searchTerm}"` : "Suggested Farmers"}
-            </h2>
-            {filteredUsers.length > 0 ? (
+      {searchTerm && !hasResults && (
+        <div className="text-center py-16">
+          <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+          <p className="text-xl font-semibold text-muted-foreground">No results found for &quot;{searchTerm}&quot;.</p>
+          <p className="text-sm text-muted-foreground mt-2">Try a different search term or check spelling.</p>
+        </div>
+      )}
+
+      {!searchTerm && (
+         <div className="text-center py-16">
+          <Search className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+          <p className="text-xl font-semibold text-muted-foreground">Search KrishiX</p>
+          <p className="text-sm text-muted-foreground mt-2">Find farmers, posts, mandi items, crop information, and more.</p>
+        </div>
+      )}
+
+      {searchTerm && hasResults && (
+        <div className="space-y-8">
+          {filteredUsers.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-primary flex items-center"><Users className="mr-2 h-6 w-6"/> Matching Farmers</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredUsers.map((user) => (
                   <ProfileCard key={user.id} user={user} />
                 ))}
               </div>
-            ) : (
-              renderEmptyState('farmers')
-            )}
-          </section>
-        </TabsContent>
+            </section>
+          )}
 
-        <TabsContent value="posts">
-           <section>
-            <h2 className="text-2xl font-semibold mb-6 text-primary">
-              {searchTerm ? `Posts matching "${searchTerm}"` : "Trending Posts"}
-            </h2>
-            {filteredPosts.length > 0 ? (
+          {filteredPosts.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-primary flex items-center"><ImageIcon className="mr-2 h-6 w-6"/> Matching Posts</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredPosts.map((post) => (
                   <PostCard key={post.id} post={post} />
                 ))}
               </div>
-            ) : (
-               renderEmptyState('posts')
-            )}
-          </section>
-        </TabsContent>
+            </section>
+          )}
 
-        <TabsContent value="mandi">
-           <section>
-            <h2 className="text-2xl font-semibold mb-6 text-primary">
-              {searchTerm ? `Mandi items matching "${searchTerm}"` : "Marketplace Listings"}
-            </h2>
-            {filteredMandiListings.length > 0 ? (
+          {filteredMandiListings.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-primary flex items-center"><Store className="mr-2 h-6 w-6"/> Matching Mandi Items</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredMandiListings.map((listing) => (
                   <MandiItemCard key={listing.id} listing={listing} />
                 ))}
               </div>
-            ) : (
-               renderEmptyState('Mandi items')
-            )}
-          </section>
-        </TabsContent>
-      </Tabs>
+            </section>
+          )}
+        </div>
+      )}
+      
+      <Card className="mt-8 bg-muted/50">
+        <CardContent className="p-4 text-sm text-muted-foreground">
+            <div className="flex items-center">
+                <Info className="h-5 w-5 mr-2 text-primary shrink-0"/>
+                <div>
+                    Currently searching farmers, posts, and mandi items. 
+                    <br className="sm:hidden"/>
+                    Expanded search for diseases, codes, events, and yojanas is coming soon!
+                </div>
+            </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
