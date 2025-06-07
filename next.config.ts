@@ -1,11 +1,10 @@
 import type { NextConfig } from 'next';
 
-const nextConfig = {
-  experimental: {
-    allowedDevOrigins: [
-      'https://9003-firebase-studio-1748099875903.cluster-htdgsbmflbdmov5xrjithceibm.cloudworkstations.dev'
-    ]
-  }
+const nextConfig: NextConfig = {
+  // The experimental.allowedDevOrigins option has been removed
+  // as it was deprecated in Next.js 14 and is not supported in Next.js 15.
+  // Default CORS handling for development should suffice for most cases.
+  // If specific CORS headers are needed, they can be configured via the headers() function.
 };
 
 module.exports = nextConfig;
