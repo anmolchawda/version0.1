@@ -3,7 +3,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { MOCK_USER_ID } from '@/lib/placeholders'; // Import MOCK_USER_ID
 
 interface SidebarContextType {
   isSidebarOpen: boolean;
@@ -11,9 +12,9 @@ interface SidebarContextType {
   openSidebar: () => void;
   closeSidebar: () => void;
   authUserId: string | null;
-  setContextAuthUserId: (uid: string | null) => void; // Added for explicit typing
-  notificationCount: number; // Added for notification count
-  setNotificationCount: (count: number) => void; // Added for notification count
+  setContextAuthUserId: (uid: string | null) => void;
+  notificationCount: number;
+  setNotificationCount: (count: number) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -21,7 +22,20 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
-  const [notificationCount, setNotificationCount] = useState(0); // Initialize notification count
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // Simulate a logged-in user in mock mode
+  useEffect(() => {
+    // Check if we are in a mock environment (e.g., based on an env variable or a global const)
+    // For now, let's assume if src/lib/firebase.ts is in mock mode, this should also behave as mock.
+    // A more robust way would be a shared constant or env variable.
+    // For this exercise, we'll directly use MOCK_USER_ID if no Firebase auth happens.
+    if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || !authUserId) { // Fallback if auth flow is bypassed
+      setAuthUserId(MOCK_USER_ID);
+      console.log("[SidebarContext] Mock mode: Setting authUserId to MOCK_USER_ID:", MOCK_USER_ID);
+    }
+  }, [authUserId]); // Re-evaluate if authUserId changes externally (though less likely in full mock)
+
 
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen(prev => !prev);
@@ -67,4 +81,3 @@ export function useSidebarContext() {
   }
   return context;
 }
-

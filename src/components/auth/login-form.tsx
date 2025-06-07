@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
-import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type AuthError } from 'firebase/auth';
+// import { auth } from '@/lib/firebase'; // Firebase Auth not used in mock mode
+// import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type AuthError } from 'firebase/auth';
+
+const USE_MOCK_DATA = true; // Master switch
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -33,68 +35,37 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleFirebaseError = (error: AuthError) => {
-    console.error("Firebase Auth Error:", error);
-    let message = "An unexpected error occurred. Please try again.";
-    switch (error.code) {
-      case "auth/user-not-found":
-      case "auth/wrong-password":
-      case "auth/invalid-credential":
-        message = "Invalid email or password. Please try again.";
-        break;
-      case "auth/invalid-email":
-        message = "The email address is not valid.";
-        break;
-      case "auth/user-disabled":
-        message = "This user account has been disabled.";
-        break;
-      case "auth/popup-closed-by-user":
-        message = "Google Sign-In popup closed. Please try again.";
-        return; // Don't show toast for this common scenario
-      case "auth/account-exists-with-different-credential":
-        message = "An account already exists with this email address using a different sign-in method.";
-        break;
-      // Add more specific cases as needed
-    }
-    toast({
-      title: 'Login Failed',
-      description: message,
-      variant: 'destructive',
-    });
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
       toast({
-        title: 'Login Successful!',
+        title: 'Login Successful (Mock)!',
         description: 'Welcome back!',
       });
-      router.push('/');
-    } catch (error) {
-      handleFirebaseError(error as AuthError);
-    } finally {
-      setIsLoading(false);
+      router.push('/feed'); // Redirect to feed or main app page
+    } else {
+      // Original Firebase login logic would go here
+      toast({ title: "Login Disabled", description: "Firebase login is currently disabled in mock mode.", variant: "destructive"});
     }
+    setIsLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500));
       toast({
-        title: 'Login Successful!',
+        title: 'Login Successful (Mock Google)!',
         description: 'Welcome via Google!',
       });
-      router.push('/');
-    } catch (error) {
-      handleFirebaseError(error as AuthError);
-    } finally {
-      setIsGoogleLoading(false);
+      router.push('/feed');
+    } else {
+      // Original Google login logic
+       toast({ title: "Login Disabled", description: "Google login is currently disabled in mock mode.", variant: "destructive"});
     }
+    setIsGoogleLoading(false);
   };
 
   return (

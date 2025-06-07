@@ -10,8 +10,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus } from 'lucide-react';
-import { auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, type AuthError } from 'firebase/auth';
+// import { auth } from '@/lib/firebase'; // Firebase Auth not used in mock mode
+// import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, type AuthError } from 'firebase/auth';
+
+const USE_MOCK_DATA = true; // Master switch
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -35,37 +37,6 @@ export function SignupForm() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleFirebaseError = (error: AuthError) => {
-    console.error("Firebase Auth Error:", error);
-    let message = "An unexpected error occurred. Please try again.";
-    switch (error.code) {
-      case "auth/email-already-in-use":
-        message = "This email address is already in use by another account.";
-        break;
-      case "auth/invalid-email":
-        message = "The email address is not valid.";
-        break;
-      case "auth/operation-not-allowed":
-        message = "Email/password accounts are not enabled.";
-        break;
-      case "auth/weak-password":
-        message = "The password is too weak. Please use a stronger password.";
-        break;
-      case "auth/popup-closed-by-user":
-        message = "Google Sign-Up popup closed. Please try again.";
-        return; // Don't show toast
-      case "auth/account-exists-with-different-credential":
-        message = "An account already exists with this email address using a different sign-in method. Try logging in.";
-        break;
-      // Add more specific cases as needed
-    }
-    toast({
-      title: 'Signup Failed',
-      description: message,
-      variant: 'destructive',
-    });
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -77,39 +48,34 @@ export function SignupForm() {
       return;
     }
     setIsLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, { displayName: username });
-      }
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500));
       toast({
-        title: 'Signup Successful!',
+        title: 'Signup Successful (Mock)!',
         description: `Welcome to KrishiX, ${username}!`,
       });
-      router.push('/');
-    } catch (error) {
-      handleFirebaseError(error as AuthError);
-    } finally {
-      setIsLoading(false);
+      router.push('/feed'); // Redirect to feed or profile setup if that's separate
+    } else {
+      // Original Firebase signup logic
+      toast({ title: "Signup Disabled", description: "Firebase signup is currently disabled in mock mode.", variant: "destructive"});
     }
+    setIsLoading(false);
   };
 
   const handleGoogleSignup = async () => {
     setIsGoogleLoading(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
+    if (USE_MOCK_DATA) {
+      await new Promise(resolve => setTimeout(resolve, 500));
       toast({
-        title: 'Signup Successful!',
-        description: `Welcome to KrishiX, ${result.user.displayName || 'Google User'}!`,
+        title: 'Signup Successful (Mock Google)!',
+        description: `Welcome to KrishiX, Google User!`,
       });
-      // Optionally, create a user document in Firestore here if it's a new user
-      router.push('/');
-    } catch (error) {
-      handleFirebaseError(error as AuthError);
-    } finally {
-      setIsGoogleLoading(false);
+      router.push('/feed');
+    } else {
+      // Original Google signup logic
+      toast({ title: "Signup Disabled", description: "Google signup is currently disabled in mock mode.", variant: "destructive"});
     }
+    setIsGoogleLoading(false);
   };
 
   return (
