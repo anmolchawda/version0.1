@@ -1,19 +1,20 @@
+
 // src/components/layout/bottom-nav-bar.tsx
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react'; // Correctly import React and its hooks
-import { Home, Search, PlusSquare, Store, User as UserIconLucide } from 'lucide-react'; // Icons from lucide-react
+import React, { useEffect, useState } from 'react';
+import { Home, Cpu, PlusSquare, Store, User as UserIconLucide } from 'lucide-react'; // Replaced Search with Cpu
 import { cn } from '@/lib/utils';
 import type { NavLink as NavLinkType } from '@/types';
-import { useSidebarContext } from '@/contexts/SidebarContext';
+// import { useSidebarContext } from '@/contexts/SidebarContext'; // Not directly used for link rendering currently
 
 const MOCK_USER_ID_FALLBACK = '1'; 
 
 const getBottomNavLinks = (lang: string): NavLinkType[] => [
   { href: '/feed', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
-  { href: '/discover', label: lang === 'hi' ? 'खोजें' : 'Discover', icon: <Search className="h-5 w-5" /> },
+  { href: '/ai-features', label: 'AI', icon: <Cpu className="h-5 w-5" /> }, // Changed from Discover to AI
   { href: '/post/create', label: lang === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
   { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
   { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
@@ -49,8 +50,6 @@ const BottomNavLinkItem = React.memo(BottomNavLinkItemComponent);
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  // authUserId and notificationCount from context are not directly used to render links here anymore
-  // const { authUserId } = useSidebarContext(); 
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [links, setLinks] = useState(() => getBottomNavLinks('en'));
 
@@ -87,6 +86,12 @@ export function BottomNavBar() {
         } else if (link.href !== '/' && link.href !== '/feed' && link.href.length > 1 && pathname.startsWith(link.href)) {
           isActive = true;
         }
+        
+        // Specific check for /ai-features
+        if (link.href === '/ai-features' && pathname === '/ai-features') {
+            isActive = true;
+        }
+
 
         return (
           <BottomNavLinkItem
