@@ -1,4 +1,3 @@
-
 // src/components/layout/top-header.tsx
 'use client';
 
@@ -9,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/core/app-logo';
 import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { db, doc, onSnapshot, setDoc } from '@/lib/firebase'; // db can be null
+import { db, doc, onSnapshot, setDoc, getDoc } from '@/lib/firebase'; // db can be null
 
 export function TopHeader() {
   const { toggleSidebar, setNotificationCount, authUserId } = useSidebarContext();
   const pathname = usePathname();
-  const [unreadMessageCount, setUnreadMessageCount] = useState(3); // Mock message count
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0); // Changed initial mock message count to 0
   const [localNotificationCount, setLocalNotificationCount] = useState(0);
 
   useEffect(() => {
@@ -31,7 +30,7 @@ export function TopHeader() {
       console.log("[TopHeader] AuthUserId and db available, setting up notification listener for user:", authUserId);
       const notificationDocRef = doc(db, 'notificationsMeta', authUserId);
       
-      const unsubscribe = onSnapshot(notificationDocRef, (docSnap) => {
+      const unsubscribe = onSnapshot(notificationDocRef, async (docSnap) => {
         let count = 0;
         if (docSnap.exists()) {
           count = docSnap.data()?.unreadCount || 0;
@@ -44,6 +43,18 @@ export function TopHeader() {
         if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
           setNotificationCount(count);
         }
+
+        // If on notifications page and count became 0, ensure it's reflected in Firestore
+        if ((pathname === '/notifications' || pathname.startsWith('/notifications/')) && count > 0) {
+           // This scenario should ideally be handled by NotificationsPage marking as read
+           // For safety, if we are on the page and detect a server-side count > 0, reset it.
+           // However, this might conflict with NotificationsPage's own logic.
+           // The primary "mark as read" logic should be in NotificationsPage.
+        } else if ((pathname === '/notifications' || pathname.startsWith('/notifications/')) && count === 0) {
+           // Already 0, context is fine.
+        }
+
+
       }, (error) => {
         console.error("[TopHeader] Error fetching notification count for user", authUserId, ":", error);
         setLocalNotificationCount(0);
@@ -51,12 +62,17 @@ export function TopHeader() {
           setNotificationCount(0);
         }
       });
-
+      
+      // Initial check and reset if on notifications page
       if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
-        console.log("[TopHeader] On notifications page, attempting to reset unreadCount in Firestore for user:", authUserId);
-        setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
-          .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
+        console.log("[TopHeader] On notifications page, attempting to ensure unreadCount is 0 in Firestore for user:", authUserId);
+        const currentDoc = await getDoc(notificationDocRef);
+        if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
+            setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
+            .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
+        }
       }
+
 
       return () => {
         console.log("[TopHeader] Unsubscribing from notification listener for user:", authUserId);
