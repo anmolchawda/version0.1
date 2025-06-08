@@ -1,16 +1,15 @@
-
 // src/components/layout/bottom-nav-bar.tsx
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { Home, Search, PlusSquare, Store, User as UserIconLucide } from 'lucide-react'; // Added React
+import React, { useEffect, useState } from 'react'; // Correctly import React and its hooks
+import { Home, Search, PlusSquare, Store, User as UserIconLucide } from 'lucide-react'; // Icons from lucide-react
 import { cn } from '@/lib/utils';
 import type { NavLink as NavLinkType } from '@/types';
-import { useEffect, useState } from 'react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
-const MOCK_USER_ID_FALLBACK = '1'; // This seems unused now, authUserId from context is preferred
+const MOCK_USER_ID_FALLBACK = '1'; 
 
 const getBottomNavLinks = (lang: string): NavLinkType[] => [
   { href: '/feed', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
