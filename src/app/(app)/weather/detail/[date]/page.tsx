@@ -235,32 +235,36 @@ export default function WeatherDetailPage() {
            <MapPin className="h-4 w-4 mr-1 text-primary" /> 
            {usedDefaultLocation ? "Raipur, Chhattisgarh" : (() => {
               if (!dayDetails) return "Loading location...";
-              
-              const locNameTrimmed = dayDetails.locationName.trim();
-              const countryCodeTrimmed = dayDetails.country.trim();
 
-              if (!locNameTrimmed) return countryCodeTrimmed.toUpperCase() || "Unknown Location";
-              if (!countryCodeTrimmed) return locNameTrimmed;
-              
-              const normLocName = locNameTrimmed.toLowerCase();
-              const normCountryCode = countryCodeTrimmed.toLowerCase();
+              let namePart = dayDetails.locationName.trim();
+              const countryPart = dayDetails.country.trim().toUpperCase();
 
-              // Check if locNameTrimmed already ends with the countryCode (potentially with a comma and/or space)
-              // e.g. "City, CC" or "City CC" or "City, State, CC" or "City, State CC"
-              if (normLocName.endsWith(normCountryCode)) {
-                  const partBeforeCountry = normLocName.substring(0, normLocName.length - normCountryCode.length).trim();
-                  if (partBeforeCountry.endsWith(",")) {
-                      return locNameTrimmed; // e.g. locName is "City, CC"
-                  } else if (partBeforeCountry === "" && normLocName === normCountryCode) {
-                      return locNameTrimmed; // locName is just "CC"
-                  } else if (partBeforeCountry.length > 0 && !partBeforeCountry.endsWith(",")){
-                      // This handles cases like "City CC" -> returns "City CC"
-                      // or if locName is "City, State CC"
-                      return locNameTrimmed;
-                  }
+              if (countryPart) {
+                // Remove country part from namePart if it's already there to avoid duplication
+                const countryPatternWithComma = `, ${countryPart}`;
+                const countryPatternWithSpace = ` ${countryPart}`;
+                
+                if (namePart.toUpperCase().endsWith(countryPatternWithComma)) {
+                  namePart = namePart.substring(0, namePart.length - countryPatternWithComma.length);
+                } else if (namePart.toUpperCase().endsWith(countryPatternWithSpace)) {
+                  namePart = namePart.substring(0, namePart.length - countryPatternWithSpace.length);
+                } else if (namePart.toUpperCase() === countryPart) {
+                  // If namePart is just the country, we might want to keep it or rely on countryPart
+                  // For now, if name is just country, it might be an API anomaly, rely on countryPart
+                  // This specific case is less likely to lead to "IN, IN" but handles if name is just "IN"
+                  // and country is also "IN".
+                }
+                 // After potential stripping, append the country code if namePart is not empty
+                // and is not just the country code itself.
+                if (namePart && namePart.toUpperCase() !== countryPart) {
+                    return `${namePart}, ${countryPart}`;
+                } else {
+                    // If namePart became empty or is just the country, just show the countryPart
+                    return countryPart;
+                }
+
               }
-              // If not cleanly ending or country code not obviously part of it, append.
-              return `${locNameTrimmed}, ${countryCodeTrimmed.toUpperCase()}`;
+              return namePart; // Fallback to just namePart if no countryCode
            })()}
         </CardDescription>
         {usedDefaultLocation && error && !error.includes("Date parameter is missing.") && (
@@ -339,3 +343,4 @@ export default function WeatherDetailPage() {
   );
 }
 
+    
