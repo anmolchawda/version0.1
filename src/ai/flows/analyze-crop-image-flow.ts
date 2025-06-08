@@ -43,6 +43,7 @@ export async function analyzeCropImage(input: AnalyzeCropImageInput): Promise<An
 
 const prompt = ai.definePrompt({
   name: 'analyzeCropImagePrompt',
+  model: 'googleai/gemini-1.5-flash-latest', // Explicitly set a vision-capable model
   input: {schema: AnalyzeCropImageInputSchema},
   output: {schema: AnalyzeCropImageOutputSchema},
   prompt: `You are an expert agricultural AI specializing in plant health analysis from images.
