@@ -4,15 +4,19 @@ import { getPlaceholderPostById, getPlaceholderCommentsForPost } from '@/lib/pla
 import { PostDetailDisplay } from '@/components/post/post-detail-display';
 import { CommentSection } from '@/components/comment/comment-section';
 import type { Metadata, ResolvingMetadata } from 'next';
+import React from 'react'; // Ensure React is imported
 
 interface PostPageProps {
   params: { postId: string };
 }
 
 export async function generateMetadata(
-  { params: { postId } }: PostPageProps, // Destructured postId
+  props: PostPageProps,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  // Explicitly create a plain object for params if needed, or access directly
+  const plainParams = { postId: props.params.postId };
+  const postId = plainParams.postId;
   const post = getPlaceholderPostById(postId);
 
   if (!post) {
@@ -29,13 +33,16 @@ export async function generateMetadata(
     openGraph: {
       title: `Post by @${post.user.username}`,
       description: post.caption,
-      images: post.imageUrl ? [{ url: post.imageUrl }, ...previousImages] : previousImages,
+      images: post.imageUrl ? [{ url: post.imageUrl, width: 800, height: 600, alt: post.caption.substring(0,50) }, ...previousImages] : previousImages,
     },
   };
 }
 
 
-export default async function PostPage({ params: { postId } }: PostPageProps) { // Destructured postId
+export default async function PostPage(props: PostPageProps) {
+  // Explicitly create a plain object for params if needed, or access directly
+  const plainParams = { postId: props.params.postId };
+  const postId = plainParams.postId;
   const post = getPlaceholderPostById(postId);
   
   if (!post) {
