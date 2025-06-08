@@ -14,7 +14,6 @@ import {
   SprayCan,
   Bug,
   Code2,
-  Cpu,
   Settings as SettingsIcon,
   ScrollText,
   CloudSun,
@@ -139,7 +138,6 @@ export function Sidebar() {
   const secondaryNavLinks = useMemo((): NavLinkType[] => [
     { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
     { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun /> },
-    { href: '/ai-features', label: currentLanguage === 'hi' ? 'AI' : 'AI', icon: <Cpu /> },
     { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText /> },
     { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays /> },
     { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan /> },
