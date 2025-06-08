@@ -1,6 +1,6 @@
 
 import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/googleai';
+import {googleAI} from '@genkit-ai/googleai'; // Use Google AI plugin
 
 // Attempt to read the API key from the environment variables.
 // The .env file should be loaded by src/ai/dev.ts for local Genkit development.
@@ -9,7 +9,7 @@ const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
 if (!apiKey && process.env.NODE_ENV === 'development') {
   // This console.warn will appear in the terminal where `npm run genkit:dev` or `npm run genkit:watch` is running.
   console.warn(
-    `\n🔴🔴🔴 WARNING: Gemini API Key is Missing 🔴🔴🔴\n` +
+    `\n🔴🔴🔴 WARNING: Google AI API Key is Missing 🔴🔴🔴\n` +
     `It seems the GOOGLE_API_KEY or GEMINI_API_KEY is not set in your environment.\n` +
     `Please create or update the .env file in the root of your project with:\n\n` +
     `  GOOGLE_API_KEY=YOUR_ACTUAL_API_KEY\n` +
@@ -28,5 +28,5 @@ export const ai = genkit({
       apiKey: apiKey,
     }),
   ],
-  model: 'googleai/gemini-2.0-flash', // Default model for text generation
+  model: 'googleai/gemini-1.5-flash-latest', // Default model for text generation
 });
