@@ -231,40 +231,36 @@ export default function WeatherDetailPage() {
 
     return (
       <>
-        <CardDescription className="text-center text-sm text-muted-foreground -mt-2 mb-4 capitalize flex items-center justify-center">
+        <CardDescription className="text-center text-sm text-muted-foreground -mt-2 capitalize flex items-center justify-center">
            <MapPin className="h-4 w-4 mr-1 text-primary" /> 
-           {usedDefaultLocation ? "Raipur, Chhattisgarh" : (() => {
+           {usedDefaultLocation ? "Raipur, Chhattisgarh, IN" : (() => {
               if (!dayDetails) return "Loading location...";
 
-              let namePart = dayDetails.locationName.trim();
-              const countryPart = dayDetails.country.trim().toUpperCase();
+              let nameToDisplay = dayDetails.locationName.trim();
+              const countryCode = dayDetails.country.trim().toUpperCase();
+              const nameUpper = nameToDisplay.toUpperCase();
 
-              if (countryPart) {
-                // Remove country part from namePart if it's already there to avoid duplication
-                const countryPatternWithComma = `, ${countryPart}`;
-                const countryPatternWithSpace = ` ${countryPart}`;
-                
-                if (namePart.toUpperCase().endsWith(countryPatternWithComma)) {
-                  namePart = namePart.substring(0, namePart.length - countryPatternWithComma.length);
-                } else if (namePart.toUpperCase().endsWith(countryPatternWithSpace)) {
-                  namePart = namePart.substring(0, namePart.length - countryPatternWithSpace.length);
-                } else if (namePart.toUpperCase() === countryPart) {
-                  // If namePart is just the country, we might want to keep it or rely on countryPart
-                  // For now, if name is just country, it might be an API anomaly, rely on countryPart
-                  // This specific case is less likely to lead to "IN, IN" but handles if name is just "IN"
-                  // and country is also "IN".
-                }
-                 // After potential stripping, append the country code if namePart is not empty
-                // and is not just the country code itself.
-                if (namePart && namePart.toUpperCase() !== countryPart) {
-                    return `${namePart}, ${countryPart}`;
-                } else {
-                    // If namePart became empty or is just the country, just show the countryPart
-                    return countryPart;
-                }
+              // Regex to catch "..., CODE, CODE" or "... CODE, CODE" at the end of the string
+              const doubleCountryPattern = new RegExp(`(?:,\\s*|\\s+)${countryCode},\\s*${countryCode}$`, 'i');
+              // Regex to catch "..., CODE" or "... CODE" at the end
+              const singleCountryPattern = new RegExp(`(?:,\\s*|\\s+)${countryCode}$`, 'i');
 
+              if (doubleCountryPattern.test(nameToDisplay)) {
+                // If "..., CODE, CODE", replace with "..., CODE"
+                // This finds the first occurrence of country code in the double pattern and replaces from there
+                const match = nameToDisplay.match(new RegExp(`(.*)(?:,\\s*|\\s+)(${countryCode}),\\s*(${countryCode})$`, 'i'));
+                if (match && match[1] && match[2]) {
+                    nameToDisplay = `${match[1]}, ${match[2]}`;
+                }
+                // Fallback or if regex is tricky, a simpler replace if original structure is "X, Y, CC, CC"
+                // nameToDisplay = nameToDisplay.replace(new RegExp(`,\\s*${countryCode},\\s*${countryCode}$`, 'i'), `, ${countryCode}`);
+              } else if (!singleCountryPattern.test(nameToDisplay) && nameUpper !== countryCode) {
+                // If single country code is NOT present at the end, and name is not just the country code itself
+                nameToDisplay = `${nameToDisplay}, ${countryCode}`;
               }
-              return namePart; // Fallback to just namePart if no countryCode
+              // If single country code IS present and not duplicated, or name is just country code, nameToDisplay should be correct.
+              
+              return nameToDisplay;
            })()}
         </CardDescription>
         {usedDefaultLocation && error && !error.includes("Date parameter is missing.") && (
