@@ -147,8 +147,9 @@ export default function WeatherPage() {
   const fetchWeather = useCallback(async (latitude: number, longitude: number, locationName?: string) => {
     setIsLoading(true);
     setError(null);
-    setWeatherData(null);
-    setDailyForecast([]);
+    // Don't clear weatherData and dailyForecast here immediately to prevent flicker on search error
+    // setWeatherData(null); 
+    // setDailyForecast([]);
 
     try {
       const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
@@ -183,25 +184,32 @@ export default function WeatherPage() {
         pressure: `${firstForecast.main.pressure} hPa`,
         visibility: `${(firstForecast.visibility / 1000).toFixed(1)} km`,
       };
-      setWeatherData(transformedCurrentData);
-      setDailyForecast(processForecastData(data.list));
+      setWeatherData(transformedCurrentData); // Set new data
+      setDailyForecast(processForecastData(data.list)); // Set new forecast
       setUsedDefaultLocation(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE);
 
     } catch (err) {
       console.error("Error fetching weather data:", err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred while fetching weather.";
-      setError(errorMessage);
-      toast({ title: "Weather Error", description: errorMessage, variant: "destructive"});
-      if (!usedDefaultLocation && !(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE)) { // Avoid re-fetching default if it also failed
+      setError(errorMessage); // Set page level error
+      toast({ title: "Weather Update Error", description: errorMessage, variant: "destructive"});
+      // If the primary fetchWeather fails, we might clear or revert to default.
+      // If this fetchWeather was called as a fallback (e.g. after geolocation fail), this logic might need refinement.
+      if (!usedDefaultLocation && !(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE)) {
         setUsedDefaultLocation(true);
         setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
-        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+        // Potentially try to fetch default location weather again, or just show error
+        // fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur"); // Be cautious of loops
+      } else {
+        // If default location fetch also fails, clear data to show error state
+        setWeatherData(null);
+        setDailyForecast([]);
       }
     } finally {
       setIsLoading(false);
-      setIsSearchingLocation(false);
+      setIsSearchingLocation(false); // Ensure search spinner stops
     }
-  }, [usedDefaultLocation, toast]); // Removed fetchWeather from deps as it's defined outside and causes infinite loop if used directly
+  }, [usedDefaultLocation, toast]);
   
   const fetchUserGeolocationAndWeather = useCallback(() => {
     setIsLoading(true);
@@ -221,7 +229,7 @@ export default function WeatherPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        fetchWeather(latitude, longitude); // Name will be fetched from API
+        fetchWeather(latitude, longitude); 
       },
       (err) => {
         let errorMsg = "Unable to retrieve your location. ";
@@ -249,33 +257,44 @@ export default function WeatherPage() {
       return;
     }
     setIsSearchingLocation(true);
-    setError(null);
+    // Don't set global error, but clear previous search-specific error if any
+    // setError(null); 
     try {
       const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationSearchTerm)}&limit=1&appid=${OPENWEATHERMAP_API_KEY}`;
       const response = await fetch(geocodeUrl);
       if (!response.ok) {
-        throw new Error(`Geocoding failed: ${response.status} ${response.statusText}`);
+        // Handle HTTP errors from geocoding API
+        const errorText = await response.text();
+        throw new Error(`Geocoding failed: ${response.status} ${response.statusText}. ${errorText}`);
       }
       const geoData: GeocodingResult[] = await response.json();
       if (geoData.length === 0) {
-        throw new Error(`Location "${locationSearchTerm}" not found.`);
+        toast({ 
+            title: "Location Not Found", 
+            description: `Could not find "${locationSearchTerm}". Please check the spelling or try a different location.`, 
+            variant: "destructive" 
+        });
+        setIsSearchingLocation(false);
+        return; // Exit here, don't proceed to fetchWeather or set global error
       }
       const { lat, lon, name, country, state } = geoData[0];
       const searchedLocationName = state ? `${name}, ${state}` : name;
-      fetchWeather(lat, lon, searchedLocationName);
-      setLocationSearchTerm(''); // Clear search input after successful search
+      fetchWeather(lat, lon, searchedLocationName); // This will set loading states internally
+      setLocationSearchTerm(''); 
     } catch (err) {
       console.error("Error in location search:", err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred during location search.";
-      setError(errorMessage);
+      // For actual API/network errors during geocoding, we might still want a toast
       toast({ title: "Search Error", description: errorMessage, variant: "destructive" });
       setIsSearchingLocation(false);
+      // We don't set the main page 'error' state here unless it's a critical failure
+      // that prevents even fallback. The fetchWeather itself will handle its errors.
     }
   };
 
 
   const renderWeatherContent = () => {
-    if (isLoading && !isSearchingLocation) { // Show initial loading only if not also search loading
+    if (isLoading && !isSearchingLocation && !weatherData) { 
       return (
         <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
           <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -283,17 +302,16 @@ export default function WeatherPage() {
         </div>
       );
     }
-    if (isSearchingLocation) {
+    if (isSearchingLocation && !isLoading) { // Show search loading if actively searching and main load is done or was quick
          return (
             <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-lg">Searching for {locationSearchTerm}...</p>
+            <p className="text-lg">Searching for {locationSearchTerm || 'location'}...</p>
             </div>
         );
     }
 
-
-    if (error && !weatherData && !isLoading) { // Show main error if no data and not loading
+    if (error && !weatherData && !isLoading && !isSearchingLocation) { // Show main error if no data and not loading/searching
       return (
         <div className="flex flex-col items-center justify-center py-10 text-destructive">
           <AlertTriangle className="h-12 w-12 mb-4" />
@@ -304,7 +322,7 @@ export default function WeatherPage() {
       );
     }
 
-    if (!weatherData && !isLoading) { // No data and not loading (e.g. after a failed search that didn't fallback)
+    if (!weatherData && !isLoading && !isSearchingLocation) { 
       return (
         <div className="text-center py-10 text-muted-foreground">
           <p>Weather data is currently unavailable for {currentDisplayLocation}.</p>
@@ -313,7 +331,6 @@ export default function WeatherPage() {
       );
     }
     
-    // If weatherData exists, render it, even if there was a non-critical error (like geolocation fail but default loaded)
     if (weatherData) {
       return (
         <div className="space-y-4">
@@ -321,7 +338,7 @@ export default function WeatherPage() {
              <MapPin className="h-4 w-4 mr-1 text-primary" /> 
              {currentDisplayLocation}
           </CardDescription>
-          {error && usedDefaultLocation && ( // Show specific error if default was used due to an issue
+          {error && usedDefaultLocation && ( 
             <Card className="bg-yellow-50 border-yellow-300 text-yellow-700 p-3">
               <div className="flex items-center">
                 <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
@@ -394,7 +411,11 @@ export default function WeatherPage() {
         </div>
       );
     }
-    return null; // Fallback, should be covered by other conditions
+    // If still loading but also searching, the search loader is shown above.
+    // If just initial loading and no data yet, the initial loader is shown.
+    // This return null is a fallback if somehow no other condition matches,
+    // though ideally one of the loaders or content/error states should render.
+    return null; 
   };
 
   return (
@@ -432,3 +453,4 @@ export default function WeatherPage() {
     </div>
   );
 }
+
