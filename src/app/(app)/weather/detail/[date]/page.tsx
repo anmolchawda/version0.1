@@ -233,7 +233,23 @@ export default function WeatherDetailPage() {
       <>
         <CardDescription className="text-center text-sm text-muted-foreground -mt-2 mb-4 capitalize flex items-center justify-center">
            <MapPin className="h-4 w-4 mr-1 text-primary" /> 
-           {usedDefaultLocation ? "Raipur, Chhattisgarh" : `${dayDetails.locationName}, ${dayDetails.country}`}
+           {usedDefaultLocation ? "Raipur, Chhattisgarh" : (() => {
+              if (!dayDetails) return "Loading location...";
+              const locName = dayDetails.locationName;
+              const countryCode = dayDetails.country;
+              if (!locName) return countryCode?.toUpperCase() || "Unknown Location";
+              if (!countryCode) return locName;
+
+              const normalizedLocName = locName.trim().toLowerCase();
+              const normalizedCountryCode = countryCode.trim().toLowerCase();
+
+              // Check if locationName already ends with country code (possibly preceded by a comma and/or space)
+              const endsWithCountryPattern = new RegExp(`(?:,\\s*|\\s+)${normalizedCountryCode}$`);
+              if (endsWithCountryPattern.test(normalizedLocName) || normalizedLocName === normalizedCountryCode) {
+                return locName.trim(); // locationName already includes country
+              }
+              return `${locName.trim()}, ${countryCode.trim().toUpperCase()}`; // Append country code
+           })()}
         </CardDescription>
         {usedDefaultLocation && error && !error.includes("Date parameter is missing.") && (
             <Card className="bg-yellow-50 border-yellow-300 text-yellow-700 p-3 mb-4">
