@@ -1,5 +1,6 @@
 
 // src/components/comment/comment-item.tsx
+import React from 'react'; // Added React import
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ interface CommentItemProps {
   depth: number; // For indentation and reply logic
 }
 
-export function CommentItem({ comment, onStartReply, depth }: CommentItemProps) {
+const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps) => {
   const timeAgo = formatTimeAgo(comment.createdAt);
   // const { toast } = useToast(); // Toast is now handled by CommentInput/Section
 
@@ -69,3 +70,5 @@ export function CommentItem({ comment, onStartReply, depth }: CommentItemProps) 
     </div>
   );
 }
+
+export const CommentItem = React.memo(CommentItemComponent);

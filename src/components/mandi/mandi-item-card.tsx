@@ -2,6 +2,7 @@
 // src/components/mandi/mandi-item-card.tsx
 'use client';
 
+import React from 'react'; // Added React import
 import type { MandiListing } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -23,7 +24,7 @@ interface MandiItemCardProps {
   listing: MandiListing;
 }
 
-export function MandiItemCard({ listing }: MandiItemCardProps) {
+const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
   return (
     <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <div className="relative w-full aspect-square bg-muted">
@@ -79,3 +80,4 @@ export function MandiItemCard({ listing }: MandiItemCardProps) {
   );
 }
 
+export const MandiItemCard = React.memo(MandiItemCardComponent);

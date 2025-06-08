@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Added React import
 import Image from 'next/image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,7 +23,7 @@ interface PostCardProps {
   priority?: boolean; // For image optimization
 }
 
-export function PostCard({ post, priority = false }: PostCardProps) {
+const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   const timeAgo = formatTimeAgo(post.createdAt);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
@@ -61,7 +61,7 @@ export function PostCard({ post, priority = false }: PostCardProps) {
     };
     checkInitialLike();
     setLocalLikesCount(post.likesCount); // Sync with prop on initial load or post change
-  }, [post.id, post.likesCount, isFirestoreAvailable, MOCK_USER_ID]); // Ensure MOCK_USER_ID is stable or part of context
+  }, [post.id, post.likesCount, isFirestoreAvailable]); 
 
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
@@ -229,3 +229,5 @@ export function PostCard({ post, priority = false }: PostCardProps) {
     </>
   );
 }
+
+export const PostCard = React.memo(PostCardComponent);

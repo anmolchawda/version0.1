@@ -1,4 +1,5 @@
 
+import React from 'react'; // Added React import
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ interface ProfileCardProps {
   user: User;
 }
 
-export function ProfileCard({ user }: ProfileCardProps) {
+const ProfileCardComponent = ({ user }: ProfileCardProps) => {
   return (
     <Card className="overflow-hidden shadow-lg rounded-xl hover:shadow-xl transition-shadow">
       <CardHeader className="items-center text-center p-6">
@@ -52,3 +53,5 @@ export function ProfileCard({ user }: ProfileCardProps) {
     </Card>
   );
 }
+
+export const ProfileCard = React.memo(ProfileCardComponent);
