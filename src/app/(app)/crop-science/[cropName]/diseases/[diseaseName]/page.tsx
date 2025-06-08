@@ -174,6 +174,10 @@ export default function DiseaseDetailPage() {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
         determinedAiHint = 'tomato spotted_wilt_virus';
         determinedUnoptimized = true;
+      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl === "septoria leaf spot" || normalizedNameFromSheet === "septoria leaf spot")) {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSeptoriaLeafSpot_Main.jpg?alt=media&token=unique-septoria-token-for-main-image-12345";
+        determinedAiHint = 'tomato septoria_leaf_spot';
+        determinedUnoptimized = true;
       }
       else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
         determinedImageUrl = diseaseDetails.IMAGE_URL;
@@ -323,11 +327,12 @@ export default function DiseaseDetailPage() {
                   <Image
                       src={mainImageUrl}
                       alt={nameForDisplay || 'Disease image'}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       data-ai-hint={mainImageAiHint}
                       unoptimized={mainImageUnoptimized}
                       className="transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, 600px"
                   />
                 )}
             </button>
@@ -366,11 +371,12 @@ export default function DiseaseDetailPage() {
                   <Image
                     src={imgData.url}
                     alt={`Additional image ${index + 1} of ${nameForDisplay || 'disease'}`}
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    style={{ objectFit: "cover" }}
                     data-ai-hint={imgData.hint}
                     unoptimized={imgData.unoptimized} 
                     className="transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 640px) 30vw, 200px"
                   />
                 </button>
               ))}
@@ -405,3 +411,4 @@ export default function DiseaseDetailPage() {
   );
 }
     
+
