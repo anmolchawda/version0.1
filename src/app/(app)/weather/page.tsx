@@ -147,9 +147,6 @@ export default function WeatherPage() {
   const fetchWeather = useCallback(async (latitude: number, longitude: number, locationName?: string) => {
     setIsLoading(true);
     setError(null);
-    // Don't clear weatherData and dailyForecast here immediately to prevent flicker on search error
-    // setWeatherData(null); 
-    // setDailyForecast([]);
 
     try {
       const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHERMAP_API_KEY}&units=metric`;
@@ -184,34 +181,32 @@ export default function WeatherPage() {
         pressure: `${firstForecast.main.pressure} hPa`,
         visibility: `${(firstForecast.visibility / 1000).toFixed(1)} km`,
       };
-      setWeatherData(transformedCurrentData); // Set new data
-      setDailyForecast(processForecastData(data.list)); // Set new forecast
-      setUsedDefaultLocation(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE);
+      setWeatherData(transformedCurrentData);
+      setDailyForecast(processForecastData(data.list));
+      setUsedDefaultLocation(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE && displayLocName.includes("Raipur"));
+
 
     } catch (err) {
       console.error("Error fetching weather data:", err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred while fetching weather.";
-      setError(errorMessage); // Set page level error
+      setError(errorMessage);
       toast({ title: "Weather Update Error", description: errorMessage, variant: "destructive"});
-      // If the primary fetchWeather fails, we might clear or revert to default.
-      // If this fetchWeather was called as a fallback (e.g. after geolocation fail), this logic might need refinement.
       if (!usedDefaultLocation && !(latitude === DEFAULT_LATITUDE && longitude === DEFAULT_LONGITUDE)) {
-        setUsedDefaultLocation(true);
         setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
-        // Potentially try to fetch default location weather again, or just show error
-        // fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur"); // Be cautious of loops
+        // Fallback to default on error if not already on default
+        await fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur"); 
+        setUsedDefaultLocation(true); // Mark that default is now used after an error.
       } else {
-        // If default location fetch also fails, clear data to show error state
         setWeatherData(null);
         setDailyForecast([]);
       }
     } finally {
       setIsLoading(false);
-      setIsSearchingLocation(false); // Ensure search spinner stops
+      setIsSearchingLocation(false);
     }
-  }, [usedDefaultLocation, toast]);
+  }, [usedDefaultLocation, toast]); // Added toast dependency
   
-  const fetchUserGeolocationAndWeather = useCallback(() => {
+  const fetchUserGeolocationAndWeather = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     setWeatherData(null);
@@ -222,29 +217,68 @@ export default function WeatherPage() {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser. Showing weather for Raipur.");
       setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
-      fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+      await fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+      setUsedDefaultLocation(true);
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        fetchWeather(latitude, longitude); 
-      },
-      (err) => {
-        let errorMsg = "Unable to retrieve your location. ";
-        switch (err.code) {
-          case err.PERMISSION_DENIED: errorMsg += "Location permission denied."; break;
-          case err.POSITION_UNAVAILABLE: errorMsg += "Location information is unavailable."; break;
-          case err.TIMEOUT: errorMsg += "The request to get user location timed out."; break;
-          default: errorMsg += "An unknown error occurred."; break;
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+        if (permissionStatus.state === 'denied') {
+          toast({
+            title: "Location Permission Denied",
+            description: "Please enable location access in your browser settings for current location weather. Showing weather for Raipur.",
+            variant: "destructive",
+            duration: 7000,
+          });
+          setError("Location permission denied. Showing weather for Raipur.");
+          setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
+          await fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+          setUsedDefaultLocation(true);
+          return;
         }
-        setError(errorMsg + " Showing weather for Raipur.");
-        setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
-        fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+        // If 'granted' or 'prompt', proceed to getCurrentPosition
+      } else {
+        console.warn("Permissions API not supported for geolocation. Proceeding directly.");
       }
-    );
-  }, [fetchWeather]);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          await fetchWeather(latitude, longitude); 
+          setUsedDefaultLocation(false);
+        },
+        async (err) => {
+          let errorMsg = "Unable to retrieve your location. ";
+          switch (err.code) {
+            case err.PERMISSION_DENIED:
+              errorMsg += "You denied location access.";
+              toast({
+                title: "Location Denied",
+                description: errorMsg + " Showing default location weather (Raipur).",
+                variant: "destructive",
+                duration: 7000,
+              });
+              break;
+            case err.POSITION_UNAVAILABLE: errorMsg += "Information unavailable."; break;
+            case err.TIMEOUT: errorMsg += "Request timed out."; break;
+            default: errorMsg += "Unknown error."; break;
+          }
+          setError(errorMsg + " Showing weather for Raipur.");
+          setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
+          await fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+          setUsedDefaultLocation(true);
+        }
+      );
+    } catch (permError) {
+      console.error("Error with geolocation permissions:", permError);
+      setError("Could not check location permissions. Showing weather for Raipur.");
+      setCurrentDisplayLocation(DEFAULT_LOCATION_NAME);
+      await fetchWeather(DEFAULT_LATITUDE, DEFAULT_LONGITUDE, "Raipur");
+      setUsedDefaultLocation(true);
+    }
+  }, [fetchWeather, toast]);
   
   useEffect(() => {
     fetchUserGeolocationAndWeather();
@@ -257,13 +291,10 @@ export default function WeatherPage() {
       return;
     }
     setIsSearchingLocation(true);
-    // Don't set global error, but clear previous search-specific error if any
-    // setError(null); 
     try {
       const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationSearchTerm)}&limit=1&appid=${OPENWEATHERMAP_API_KEY}`;
       const response = await fetch(geocodeUrl);
       if (!response.ok) {
-        // Handle HTTP errors from geocoding API
         const errorText = await response.text();
         throw new Error(`Geocoding failed: ${response.status} ${response.statusText}. ${errorText}`);
       }
@@ -271,24 +302,22 @@ export default function WeatherPage() {
       if (geoData.length === 0) {
         toast({ 
             title: "Location Not Found", 
-            description: `Could not find "${locationSearchTerm}". Please check the spelling or try a different location.`, 
-            variant: "destructive" 
+            description: `Could not find "${locationSearchTerm}". Please check the spelling or try a different location. Current weather data remains unchanged.`, 
+            variant: "destructive",
+            duration: 5000,
         });
         setIsSearchingLocation(false);
-        return; // Exit here, don't proceed to fetchWeather or set global error
+        return; 
       }
       const { lat, lon, name, country, state } = geoData[0];
-      const searchedLocationName = state ? `${name}, ${state}` : name;
-      fetchWeather(lat, lon, searchedLocationName); // This will set loading states internally
+      const searchedLocationDisplayName = state ? `${name}, ${state}, ${country}` : `${name}, ${country}`;
+      await fetchWeather(lat, lon, searchedLocationDisplayName);
       setLocationSearchTerm(''); 
     } catch (err) {
       console.error("Error in location search:", err);
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred during location search.";
-      // For actual API/network errors during geocoding, we might still want a toast
       toast({ title: "Search Error", description: errorMessage, variant: "destructive" });
       setIsSearchingLocation(false);
-      // We don't set the main page 'error' state here unless it's a critical failure
-      // that prevents even fallback. The fetchWeather itself will handle its errors.
     }
   };
 
@@ -302,7 +331,7 @@ export default function WeatherPage() {
         </div>
       );
     }
-    if (isSearchingLocation && !isLoading) { // Show search loading if actively searching and main load is done or was quick
+    if (isSearchingLocation && !isLoading) { 
          return (
             <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -311,7 +340,7 @@ export default function WeatherPage() {
         );
     }
 
-    if (error && !weatherData && !isLoading && !isSearchingLocation) { // Show main error if no data and not loading/searching
+    if (error && !weatherData && !isLoading && !isSearchingLocation) { 
       return (
         <div className="flex flex-col items-center justify-center py-10 text-destructive">
           <AlertTriangle className="h-12 w-12 mb-4" />
@@ -342,7 +371,7 @@ export default function WeatherPage() {
             <Card className="bg-yellow-50 border-yellow-300 text-yellow-700 p-3">
               <div className="flex items-center">
                 <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
-                <p className="text-xs">{error}</p>
+                <p className="text-xs">{error.replace(" Showing weather for Raipur.", "")}</p>
               </div>
             </Card>
           )}
@@ -411,10 +440,6 @@ export default function WeatherPage() {
         </div>
       );
     }
-    // If still loading but also searching, the search loader is shown above.
-    // If just initial loading and no data yet, the initial loader is shown.
-    // This return null is a fallback if somehow no other condition matches,
-    // though ideally one of the loaders or content/error states should render.
     return null; 
   };
 
