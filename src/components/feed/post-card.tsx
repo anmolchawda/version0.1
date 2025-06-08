@@ -164,6 +164,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
               className="rounded-none"
               data-ai-hint="farm field crop"
               priority={priority}
+              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 672px"
             />
           </Link>
         )}

@@ -52,13 +52,14 @@ const commonCrops: CropInfo[] = [
 ];
 
 export default function CropSciencePage() {
-  const sizes = `
+  // This detailed sizes prop is good for multi-column grids.
+  const imageSizes = `
     (max-width: 639px) calc(45vw - 16px), 
     (max-width: 767px) calc(30vw - 16px), 
     (max-width: 1023px) calc(22vw - 16px), 
     (max-width: 1279px) calc(18vw - 16px), 
     250px
-  `; // Adjusted to account for gap and padding
+  `;
 
   return (
     <div className="space-y-6">
@@ -82,12 +83,12 @@ export default function CropSciencePage() {
                       <Image
                         src={crop.imageUrl}
                         alt={crop.name || 'Crop image'}
-                        layout="fill"
-                        objectFit="contain"
+                        fill
+                        style={{ objectFit: "contain" }}
                         className="rounded-md max-h-full max-w-full"
                         data-ai-hint={crop.aiHint}
                         unoptimized={crop.unoptimized}
-                        sizes={sizes}
+                        sizes={imageSizes} // Using the detailed sizes prop
                         onError={(e) => {
                           console.error(`Error loading image for ${crop.name}: ${crop.imageUrl}`, e.target);
                           // Optionally, you could set a fallback image source here
@@ -113,4 +114,3 @@ export default function CropSciencePage() {
 }
 
 // Added a comment to ensure file change is detected if content is identical.
-
