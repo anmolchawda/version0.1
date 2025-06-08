@@ -126,7 +126,11 @@ export default function DiseaseDetailPage() {
       const nameFromSheet = cropNameParam === 'tomato' ? diseaseDetails["TOMATO PEST AND DISEASES"] : diseaseDetails.NAME;
       const normalizedNameFromSheet = nameFromSheet ? String(nameFromSheet).trim().toLowerCase() : "";
 
-      if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
+      if (isTomatoCrop && (normalizedDiseaseNameFromUrl.includes("septoria leaf spot") || normalizedNameFromSheet.includes("septoria leaf spot"))) {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSeptoria%20Leaf%20Spot.JPG?alt=media&token=54198675-7740-4dbf-a833-721e6bd6439f";
+        determinedAiHint = 'tomato septoria_leaf_spot';
+        determinedUnoptimized = true;
+      } else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
         determinedAiHint = 'tomato anthracnose';
         determinedUnoptimized = true;
@@ -173,10 +177,6 @@ export default function DiseaseDetailPage() {
       } else if (isTomatoCrop && normalizedNameFromSheet.includes("spotted wilt virus")) { 
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
         determinedAiHint = 'tomato spotted_wilt_virus';
-        determinedUnoptimized = true;
-      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl.includes("septoria leaf spot") || normalizedNameFromSheet.includes("septoria leaf spot"))) {
-        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSeptoriaLeafSpot_Main.jpg?alt=media&token=unique-septoria-token-for-main-image-12345";
-        determinedAiHint = 'tomato septoria_leaf_spot';
         determinedUnoptimized = true;
       }
       else if (diseaseDetails.IMAGE_URL && typeof diseaseDetails.IMAGE_URL === 'string') {
@@ -411,3 +411,4 @@ export default function DiseaseDetailPage() {
   );
 }
     
+
