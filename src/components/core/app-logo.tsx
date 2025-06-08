@@ -2,8 +2,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import React from 'react'; // Added React
 
-export function AppLogo({ className, textClassName, iconClassName }: { className?: string; textClassName?: string; iconClassName?: string }) {
+interface AppLogoProps { // Added interface for props
+  className?: string;
+  textClassName?: string;
+  iconClassName?: string;
+}
+
+const AppLogoComponent = ({ className, textClassName, iconClassName }: AppLogoProps) => { // Changed to named component
   const logoUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/KrishiX%20logo%2FKrishiX%20PNG%20Logo.png?alt=media&token=f1b5520f-83f5-4665-81d8-45c8d2fb4d72";
 
   return (
@@ -22,3 +29,5 @@ export function AppLogo({ className, textClassName, iconClassName }: { className
     </Link>
   );
 }
+
+export const AppLogo = React.memo(AppLogoComponent); // Memoize

@@ -91,8 +91,12 @@ export function FeedList() {
     }
 
     const checkScrollPosition = () => {
-      const atTop = window.scrollY === 0;
-      setIsEligibleToPull(atTop);
+      const newAtTop = window.scrollY === 0;
+      // Only update state if the value actually changes
+      setIsEligibleToPull(prev => {
+        if (prev !== newAtTop) return newAtTop;
+        return prev;
+      });
     };
     window.addEventListener('scroll', checkScrollPosition, { passive: true });
     checkScrollPosition(); // Initial check
@@ -275,3 +279,4 @@ export function FeedList() {
     </div>
   );
 }
+
