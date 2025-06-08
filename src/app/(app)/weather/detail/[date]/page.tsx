@@ -235,20 +235,32 @@ export default function WeatherDetailPage() {
            <MapPin className="h-4 w-4 mr-1 text-primary" /> 
            {usedDefaultLocation ? "Raipur, Chhattisgarh" : (() => {
               if (!dayDetails) return "Loading location...";
-              const locName = dayDetails.locationName;
-              const countryCode = dayDetails.country;
-              if (!locName) return countryCode?.toUpperCase() || "Unknown Location";
-              if (!countryCode) return locName;
+              
+              const locNameTrimmed = dayDetails.locationName.trim();
+              const countryCodeTrimmed = dayDetails.country.trim();
 
-              const normalizedLocName = locName.trim().toLowerCase();
-              const normalizedCountryCode = countryCode.trim().toLowerCase();
+              if (!locNameTrimmed) return countryCodeTrimmed.toUpperCase() || "Unknown Location";
+              if (!countryCodeTrimmed) return locNameTrimmed;
+              
+              const normLocName = locNameTrimmed.toLowerCase();
+              const normCountryCode = countryCodeTrimmed.toLowerCase();
 
-              // Check if locationName already ends with country code (possibly preceded by a comma and/or space)
-              const endsWithCountryPattern = new RegExp(`(?:,\\s*|\\s+)${normalizedCountryCode}$`);
-              if (endsWithCountryPattern.test(normalizedLocName) || normalizedLocName === normalizedCountryCode) {
-                return locName.trim(); // locationName already includes country
+              // Check if locNameTrimmed already ends with the countryCode (potentially with a comma and/or space)
+              // e.g. "City, CC" or "City CC" or "City, State, CC" or "City, State CC"
+              if (normLocName.endsWith(normCountryCode)) {
+                  const partBeforeCountry = normLocName.substring(0, normLocName.length - normCountryCode.length).trim();
+                  if (partBeforeCountry.endsWith(",")) {
+                      return locNameTrimmed; // e.g. locName is "City, CC"
+                  } else if (partBeforeCountry === "" && normLocName === normCountryCode) {
+                      return locNameTrimmed; // locName is just "CC"
+                  } else if (partBeforeCountry.length > 0 && !partBeforeCountry.endsWith(",")){
+                      // This handles cases like "City CC" -> returns "City CC"
+                      // or if locName is "City, State CC"
+                      return locNameTrimmed;
+                  }
               }
-              return `${locName.trim()}, ${countryCode.trim().toUpperCase()}`; // Append country code
+              // If not cleanly ending or country code not obviously part of it, append.
+              return `${locNameTrimmed}, ${countryCodeTrimmed.toUpperCase()}`;
            })()}
         </CardDescription>
         {usedDefaultLocation && error && !error.includes("Date parameter is missing.") && (
