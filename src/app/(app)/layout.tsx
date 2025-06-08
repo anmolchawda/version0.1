@@ -10,23 +10,21 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-// Firebase direct imports are removed or will be conditionally used
-// import { auth, db, doc, getDoc, setDoc, serverTimestamp } from '@/lib/firebase';
-// import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { auth, db, doc, getDoc } from '@/lib/firebase'; // db can be null
+import type { User as FirebaseUser } from 'firebase/auth';
+import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders';
 import { Button } from '@/components/ui/button';
-import type { User as FirebaseUser } from 'firebase/auth'; // Keep type for mock user structure
-import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders'; // Import mock user data
 
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
   setContextAuthUserId?: (uid: string | null) => void;
 }
 
-const USE_MOCK_DATA = true; // Master switch, should ideally be an env variable
+const USE_MOCK_DATA = auth === null; // Determine mock mode based on auth instance
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null); // Use FirebaseUser type for mock
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
@@ -36,32 +34,21 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       console.log("[AppLayoutContent] Using MOCK_DATA mode for auth.");
       const mockUserData = getPlaceholderUser(MOCK_USER_ID);
       if (mockUserData) {
-        // Simulate a FirebaseUser object
         const mockFirebaseUser: FirebaseUser = {
           uid: mockUserData.id,
           email: mockUserData.email || `${mockUserData.username}@example.com`,
           displayName: mockUserData.name || mockUserData.username,
           photoURL: mockUserData.avatarUrl || null,
-          // Add other required FirebaseUser properties as null or default
-          emailVerified: true,
-          isAnonymous: false,
-          metadata: {},
-          providerData: [],
-          providerId: 'mock',
-          refreshToken: '',
-          tenantId: null,
-          delete: async () => {},
-          getIdToken: async () => '',
-          getIdTokenResult: async () => ({} as any),
-          reload: async () => {},
-          toJSON: () => ({}),
+          emailVerified: true, isAnonymous: false, metadata: {}, providerData: [],
+          providerId: 'mock', refreshToken: '', tenantId: null, delete: async () => {},
+          getIdToken: async () => '', getIdTokenResult: async () => ({} as any),
+          reload: async () => {}, toJSON: () => ({}),
         };
         setCurrentUser(mockFirebaseUser);
         if (setContextAuthUserId) {
           setContextAuthUserId(mockFirebaseUser.uid);
         }
-        // Assume profile is always set up in mock mode to avoid /setup-profile redirect
-        if (pathname === '/setup-profile') {
+        if (pathname === '/setup-profile' || (pathname === '/' && router.asPath === '/')) {
           router.replace('/feed');
         }
       } else {
@@ -69,12 +56,52 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       }
       setIsLoadingAuth(false);
     } else {
-      // Original Firebase Auth logic would go here
-      // const unsubscribe = onAuthStateChanged(auth, async (user) => { ... });
-      // return () => unsubscribe();
-      console.error("Firebase Auth logic is disabled as USE_MOCK_DATA is false but not implemented here for this specific change. Please ensure Firebase is correctly initialized if not using mock data.");
-      setError("Authentication system not configured for non-mock mode in this version.");
-      setIsLoadingAuth(false);
+      // Real Firebase Auth logic
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        setIsLoadingAuth(true); // Set loading true while checking profile
+        if (user) {
+          setCurrentUser(user);
+          if (setContextAuthUserId) setContextAuthUserId(user.uid);
+
+          if (!db) { // Safeguard if db is somehow null in non-mock mode
+            console.error("[AppLayoutContent] Critical: Firebase Auth user exists, but db instance is null.");
+            setError("Application configuration error. Cannot verify profile status.");
+            setIsLoadingAuth(false);
+            return;
+          }
+
+          try {
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
+
+            if (!userProfile?.profileSetupComplete) {
+              if (pathname !== '/setup-profile' && !pathname.startsWith('/auth')) {
+                router.replace('/setup-profile');
+              }
+            } else { // Profile IS complete
+              if (pathname === '/setup-profile' || (pathname === '/' && router.asPath === '/')) {
+                router.replace('/feed');
+              }
+            }
+          } catch (profileError) {
+            console.error("Error fetching user profile for redirection logic:", profileError);
+            setError("Could not verify profile status. Please try again.");
+            // Potentially redirect to an error page or login
+          } finally {
+            setIsLoadingAuth(false);
+          }
+        } else {
+          // Not logged in
+          setCurrentUser(null);
+          if (setContextAuthUserId) setContextAuthUserId(null);
+          if (!pathname.startsWith('/auth')) {
+            router.replace('/login');
+          }
+          setIsLoadingAuth(false);
+        }
+      });
+      return () => unsubscribe();
     }
   }, [router, setContextAuthUserId, pathname]);
 
@@ -100,15 +127,11 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  // If in mock mode and currentUser is set, proceed.
-  // If not in mock mode, original Firebase logic would redirect if !currentUser.
   if (USE_MOCK_DATA && !currentUser) {
-     // This case should ideally not be hit if mockUser is found
      return <div className="flex min-h-screen flex-col items-center justify-center bg-background"><p>Error: Mock user could not be loaded.</p></div>;
   }
-
-  // Allow access to login/signup pages even if using mock data for the main app,
-  // as the user might want to see these pages.
+  
+  // If not in mock mode, and no current user, and not on auth pages (already handled by useEffect, but as a safeguard)
   if (!USE_MOCK_DATA && !currentUser && !pathname.startsWith('/auth') && pathname !=='/setup-profile') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -118,32 +141,25 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
+  // Allow access to login/signup pages
   if (!USE_MOCK_DATA && !currentUser && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
      return <>{children}</>;
   }
 
-  // In mock mode, /setup-profile should be skipped if we assume profile is complete.
-  // The useEffect above already handles redirecting from /setup-profile to /feed in mock mode.
-  if (pathname === '/setup-profile' && !USE_MOCK_DATA) {
-    if (!currentUser && !pathname.startsWith('/auth')) {
+  // Specific handling for setup-profile page if logic above hasn't redirected yet
+  // (e.g., user is authenticated but profile isn't complete)
+  if (pathname === '/setup-profile') {
+    // Ensure user is authenticated for this page if not in mock mode
+    if (!USE_MOCK_DATA && !currentUser) {
        router.replace('/login'); 
        return  <div className="flex min-h-screen flex-col items-center justify-center bg-background">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
                   <p className="mt-4 text-muted-foreground">Redirecting...</p>
                 </div>;
     }
-    return <>{children}</>;
+    return <>{children}</>; // Allow access to setup-profile page
   }
 
-
-  if (!USE_MOCK_DATA && !currentUser) {
-     return (
-       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
-      </div>
-    );
-  }
 
   return (
     <>

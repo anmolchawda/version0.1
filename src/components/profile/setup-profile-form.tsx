@@ -47,14 +47,18 @@ export function SetupProfileForm() {
         setName(user.displayName || '');
         setAvatarPreviewUrl(user.photoURL || undefined);
         
-        // Check if profile is already setup (though layout should prevent this page)
+        if (!db) {
+          console.error("[SetupProfileForm] DB instance is null. Cannot check existing profile.");
+          setIsLoadingAuth(false);
+          return;
+        }
         const userDocRef = doc(db, 'users', user.uid);
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
-          router.replace('/feed'); // Already setup, redirect
+          router.replace('/feed'); 
         }
       } else {
-        router.replace('/login'); // Not logged in
+        router.replace('/login'); 
       }
       setIsLoadingAuth(false);
     });
@@ -67,7 +71,7 @@ export function SetupProfileForm() {
     else if (username.trim().length < 3) errors.username = "Username must be at least 3 characters.";
     if (!bio.trim()) errors.bio = "Bio is required.";
     if (!location.trim()) errors.location = "Location is required.";
-    if (!avatarPreviewUrl && !avatarFile) errors.avatar = "Profile photo is required."; // Check if either existing or new is set
+    if (!avatarPreviewUrl && !avatarFile) errors.avatar = "Profile photo is required.";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -87,50 +91,57 @@ export function SetupProfileForm() {
         setAvatarPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-      if (formErrors.avatar) setFormErrors(prev => ({ ...prev, avatar: ''})); // Clear error on selection
+      if (formErrors.avatar) setFormErrors(prev => ({ ...prev, avatar: ''})); 
     }
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!validateForm() || !firebaseUser) {
-      toast({ title: "Validation Error", description: "Please fill all mandatory fields.", variant: "destructive"});
+      if (!firebaseUser) {
+        toast({ title: "Authentication Error", description: "User not found. Please try logging in again.", variant: "destructive"});
+      } else {
+        toast({ title: "Validation Error", description: "Please fill all mandatory fields correctly.", variant: "destructive"});
+      }
       return;
     }
     setIsSubmitting(true);
 
     let finalAvatarUrl = avatarPreviewUrl || firebaseUser.photoURL || '';
-    // In a real app, if avatarFile is set, upload it to Firebase Storage
-    // and get the downloadURL. For this exercise, we simulate this.
+
     if (avatarFile) {
-      // finalAvatarUrl = await uploadImageToStorage(avatarFile); // Simulated
       console.log("New avatar selected, would upload:", avatarFile.name);
-      // For now, we'll use the data URI if available for Firestore, though not ideal for production.
-      // A better approach is to store the Firebase Storage URL.
-      // Since we are using avatarPreviewUrl which is already a dataURI or existing URL:
-      finalAvatarUrl = avatarPreviewUrl || '';
+      // In a real app, upload avatarFile to Firebase Storage and get finalAvatarUrl
+      // For now, we'll use the data URI from avatarPreviewUrl
+      finalAvatarUrl = avatarPreviewUrl || ''; 
     }
 
     const profileDataToSave: Partial<AppUserType> = {
       id: firebaseUser.uid,
       username: username.trim(),
-      name: name.trim() || username.trim(), // Default name to username if not provided
-      email: firebaseUser.email, // Save email
+      name: name.trim() || username.trim(),
+      email: firebaseUser.email,
       bio: bio.trim(),
       location: location.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
       avatarUrl: finalAvatarUrl,
-      profileSetupComplete: true, // Mark as complete
-      createdAt: serverTimestamp(), // Add/update creation timestamp
-      // Initialize counts for new profiles
+      profileSetupComplete: true,
+      createdAt: serverTimestamp(),
       followersCount: 0,
       followingCount: 0,
       postCount: 0,
     };
 
+    if (!db) {
+        console.error("[SetupProfileForm] DB instance is null. Cannot save profile.");
+        toast({ title: "Configuration Error", description: "Could not save profile. Database not available.", variant: "destructive" });
+        setIsSubmitting(false);
+        return;
+    }
+
     try {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
-      await setDoc(userDocRef, profileDataToSave, { merge: true }); // Use merge:true to update if doc exists
+      await setDoc(userDocRef, profileDataToSave, { merge: true }); 
       
       toast({
         title: 'Profile Setup Complete!',
