@@ -9,14 +9,13 @@ import React from 'react'; // Ensure React is imported
 
 interface PostPageProps {
   params: { postId: string };
-  searchParams?: { [key: string]: string | string[] | undefined }; // Explicitly include searchParams
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export async function generateMetadata(
-  { params, searchParams }: PostPageProps, // Destructure params and searchParams
+  { params: { postId }, searchParams }: PostPageProps, // Destructure postId directly
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const postId = params.postId;
   const post = getPlaceholderPostById(postId);
 
   if (!post) {
@@ -39,18 +38,12 @@ export async function generateMetadata(
 }
 
 
-export default async function PostPage({ params, searchParams }: PostPageProps) { // Destructure params and searchParams
-  const postId = params.postId;
+export default async function PostPage({ params: { postId }, searchParams }: PostPageProps) { // Destructure postId directly
   const post = getPlaceholderPostById(postId);
   
   if (!post) {
     notFound();
   }
-
-  // Example of how you might use searchParams if needed, though not currently used:
-  // if (searchParams?.someQuery) {
-  //   console.log("Query parameter found:", searchParams.someQuery);
-  // }
 
   const comments = getPlaceholderCommentsForPost(postId);
 
