@@ -138,6 +138,10 @@ export default function DiseaseDetailPage() {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSouthern%20Blight%203.jpg?alt=media&token=a92525aa-254a-41ac-8f4a-41b8cdcad313";
         determinedAiHint = 'tomato southern_blight';
         determinedUnoptimized = true;
+      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl.includes("root-knot nematodes") || normalizedNameFromSheet.includes("root-knot nematodes"))) {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FRoot-knot%20Nematode.jpeg?alt=media&token=2c455755-6f6b-4de6-9132-efd84206e9c5";
+        determinedAiHint = 'tomato root_knot_nematodes';
+        determinedUnoptimized = true;
       } else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
         determinedAiHint = 'tomato anthracnose';
