@@ -174,7 +174,7 @@ export default function DiseaseDetailPage() {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSpotted%20wilt%202.jpg?alt=media&token=906856b4-44bf-4f34-ae1a-562f8f6dca04AC";
         determinedAiHint = 'tomato spotted_wilt_virus';
         determinedUnoptimized = true;
-      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl === "septoria leaf spot" || normalizedNameFromSheet === "septoria leaf spot")) {
+      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl.includes("septoria leaf spot") || normalizedNameFromSheet.includes("septoria leaf spot"))) {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSeptoriaLeafSpot_Main.jpg?alt=media&token=unique-septoria-token-for-main-image-12345";
         determinedAiHint = 'tomato septoria_leaf_spot';
         determinedUnoptimized = true;
@@ -411,4 +411,3 @@ export default function DiseaseDetailPage() {
   );
 }
     
-
