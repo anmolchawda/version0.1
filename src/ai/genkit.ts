@@ -28,5 +28,6 @@ export const ai = genkit({
       apiKey: apiKey,
     }),
   ],
-  model: 'googleai/gemini-1.5-flash-latest', // Default model for text generation
+  model: 'googleai/gemini-2.5-pro', // Default model for text generation
 });
+
