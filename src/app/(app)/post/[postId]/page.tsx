@@ -1,3 +1,4 @@
+
 // src/app/(app)/post/[postId]/page.tsx
 import { notFound } from 'next/navigation';
 import { getPlaceholderPostById, getPlaceholderCommentsForPost } from '@/lib/placeholders';
@@ -11,12 +12,10 @@ interface PostPageProps {
 }
 
 export async function generateMetadata(
-  props: PostPageProps,
+  { params }: PostPageProps, // Destructure params from props
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // Explicitly create a plain object for params if needed, or access directly
-  const plainParams = { postId: props.params.postId };
-  const postId = plainParams.postId;
+  const postId = params.postId; // Use destructured params
   const post = getPlaceholderPostById(postId);
 
   if (!post) {
@@ -39,10 +38,8 @@ export async function generateMetadata(
 }
 
 
-export default async function PostPage(props: PostPageProps) {
-  // Explicitly create a plain object for params if needed, or access directly
-  const plainParams = { postId: props.params.postId };
-  const postId = plainParams.postId;
+export default async function PostPage({ params }: PostPageProps) { // Destructure params from props
+  const postId = params.postId; // Use destructured params
   const post = getPlaceholderPostById(postId);
   
   if (!post) {
