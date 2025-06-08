@@ -130,6 +130,10 @@ export default function DiseaseDetailPage() {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FSeptoria%20Leaf%20Spot.JPG?alt=media&token=54198675-7740-4dbf-a833-721e6bd6439f";
         determinedAiHint = 'tomato septoria_leaf_spot';
         determinedUnoptimized = true;
+      } else if (isTomatoCrop && (normalizedDiseaseNameFromUrl.includes("powdery mildew") || normalizedNameFromSheet.includes("powdery mildew"))) {
+        determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FPowdery%20Mildew.jpg?alt=media&token=370bdfd1-4fba-4bde-8dc2-04e97079210d";
+        determinedAiHint = 'tomato powdery_mildew';
+        determinedUnoptimized = true;
       } else if (isTomatoCrop && normalizedDiseaseNameFromUrl === "anthracnose (colletotrichum spp.)") {
         determinedImageUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FAnthracnose%204.jpg?alt=media&token=d181c8e5-dd78-4ada-8f2b-4826f21ffc66";
         determinedAiHint = 'tomato anthracnose';
