@@ -1,3 +1,4 @@
+
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -26,7 +27,37 @@ export type TranslationKey =
   | 'emptyPostErrorTitle' | 'emptyPostErrorDescription'
   | 'postCreatedSuccessTitle' | 'postCreatedSuccessDescription'
   | 'suggestHashtagsButton' | 'suggestingHashtagsText' | 'aiSuggestedHashtagsLabel' | 'noSuggestionsFoundText'
-  | 'posts' | 'followers' | 'following' | 'specializesIn' | 'follow' | 'message' | 'editProfile';
+  | 'posts' | 'followers' | 'following' | 'specializesIn' | 'follow' | 'message' | 'editProfile'
+  | 'settingsAccount' | 'settingsPayments' | 'settingsLanguage' | 'settingsDevices'
+  | 'settingsUploads' | 'settingsStats' | 'settingsFavorites' | 'settingsHelp'
+  | 'aiFeatures'
+  | 'aiCropHealthAnalyzerTitle' | 'aiCropHealthAnalyzerDescription'
+  | 'aiUploadCropImageLabel' | 'aiChangeImageButton' | 'aiUploadAnImageButton'
+  | 'aiImageFormatsAcceptedWithLimit' | 'aiAnalyzingButton' | 'aiAnalyzeImageButton'
+  | 'aiAnalyzingImageText' | 'aiAnalyzingWaitText' | 'aiAnalysisErrorAlertTitle'
+  | 'aiAnalysisResultsTitle' | 'aiObjectIdentificationTitle' | 'aiObjectNotIdentifiedDescription'
+  | 'aiPlantIdentifiedTitle' | 'aiPlantIdentifiedDefaultDescription'
+  | 'aiAnalysisDetailDiseaseTitle' | 'aiAnalysisDetailNutrientTitle' | 'aiAnalysisDetailInsectTitle'
+  | 'aiAnalysisDetailNoIssueDetected' | 'aiOverallAssessmentTitle' | 'aiSuggestionsTitle'
+  | 'toastImageTooLargeTitle' | 'toastImageTooLargeDescription'
+  | 'toastNoImageSelectedTitle' | 'toastNoImageSelectedDescription'
+  | 'toastAnalysisFailedTitle' | 'toastAnalysisFailedDescription'
+  | 'likeCountSingular' | 'likeCountPlural'
+  | 'viewAllCommentsText'
+  | 'postUnsavedToastTitle' | 'postUnsavedToastDescription'
+  | 'postSavedToastTitle' | 'postSavedToastDescription'
+  | 'errorToastTitle' | 'likeUpdateErrorToastDescription'
+  | 'postLikedMockToastTitle' | 'postUnlikedMockToastTitle'
+  | 'mandiTitle' | 'mandiDescription'
+  | 'profilePhotoLabel' | 'changePhotoButton' | 'imageUploadHelperText'
+  | 'usernameLabel' | 'usernamePlaceholder' | 'fullNameLabel' | 'fullNamePlaceholder'
+  | 'bioLabel' | 'bioPlaceholder' | 'locationLabel' | 'locationPlaceholder'
+  | 'produceLabel' | 'producePlaceholder' | 'savingChangesButton' | 'saveChangesButton'
+  | 'toastNotAuthenticatedTitle' | 'toastNotAuthenticatedDescription'
+  | 'toastProfileUpdatedMockTitle' | 'toastProfileUpdatedMockDescription'
+  | 'toastProfileUpdatedTitle' | 'toastProfileUpdatedDescription'
+  | 'toastUpdateFailedTitle' | 'toastUpdateFailedDescription'
+  | 'backToSettingsButton' | 'backToProfileButton';
 
 type Translations = Record<TranslationKey, string>;
 
@@ -39,7 +70,10 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/hi.json`)).default;
     } else if (lang === 'hne') { // Assuming 'hne' is the code for Chhattisgarhi
       translations = (await import(`../locales/cg.json`)).default;
-    } else {
+    } else if (lang === 'mr') { // Added Marathi
+      translations = (await import(`../locales/mh.json`)).default;
+    }
+     else {
       translations = (await import(`../locales/en.json`)).default;
     }
     return translations;
