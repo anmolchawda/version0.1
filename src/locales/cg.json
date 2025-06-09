@@ -60,5 +60,13 @@
   "specializesIn": "इसमें माहिर: [CG]",
   "follow": "फ़ॉलो करें [CG]",
   "message": "संदेश [CG]",
-  "editProfile": "प्रोफ़ाइल संपादित करें [CG]"
+  "editProfile": "प्रोफ़ाइल संपादित करें [CG]",
+  "settingsAccount": "अकाउंट [CG]",
+  "settingsPayments": "भुगतान [CG]",
+  "settingsLanguage": "भाषा [CG]",
+  "settingsDevices": "उपकरण [CG]",
+  "settingsUploads": "अपलोड [CG]",
+  "settingsStats": "आंकड़े [CG]",
+  "settingsFavorites": "पसंदीदा [CG]",
+  "settingsHelp": "सहायता [CG]"
 }

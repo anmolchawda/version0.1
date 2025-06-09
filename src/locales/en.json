@@ -60,5 +60,13 @@
   "specializesIn": "Specializes in",
   "follow": "Follow",
   "message": "Message",
-  "editProfile": "Edit Profile"
+  "editProfile": "Edit Profile",
+  "settingsAccount": "Account",
+  "settingsPayments": "Payments",
+  "settingsLanguage": "Language",
+  "settingsDevices": "Devices",
+  "settingsUploads": "Uploads",
+  "settingsStats": "Stats",
+  "settingsFavorites": "Favorites",
+  "settingsHelp": "Help"
 }
