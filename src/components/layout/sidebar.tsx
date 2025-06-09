@@ -27,6 +27,7 @@ import { auth } from '@/lib/firebase'; // auth can be null in mock mode
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 import { getPlaceholderUser } from '@/lib/placeholders'; // Import for mock user data
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 interface NavLinkItemProps {
   href: string;
@@ -104,6 +105,7 @@ export function Sidebar() {
   const router = useRouter();
   const { toast } = useToast();
   const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
+  const { t } = useTranslations(); // Use the translation hook
   
   const currentUserDetails = authUserId ? getPlaceholderUser(authUserId) : null;
 
@@ -113,41 +115,21 @@ export function Sidebar() {
 
   const userProfileLink = "/";
 
-
-  const [currentLanguage, setCurrentLanguage] = useState('en');
-
-  useEffect(() => {
-    const storedLanguage = localStorage.getItem('selectedAppLanguage');
-    if (storedLanguage) {
-      setCurrentLanguage(storedLanguage);
-    }
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'selectedAppLanguage' && event.newValue) {
-        setCurrentLanguage(event.newValue);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
   const primaryNavLinks = useMemo((): NavLinkType[] => [], []);
 
   const secondaryNavLinks = useMemo((): NavLinkType[] => [
-    { href: '/crop-science', label: currentLanguage === 'hi' ? 'फसल विज्ञान' : 'Crop Science', icon: <FlaskConical /> },
-    { href: '/weather', label: currentLanguage === 'hi' ? 'मौसम' : 'Weather', icon: <CloudSun /> },
-    { href: '/yojna', label: currentLanguage === 'hi' ? 'योजना' : 'Yojna', icon: <ScrollText /> },
-    { href: '/events', label: currentLanguage === 'hi' ? 'कार्यक्रम' : 'Events', icon: <CalendarDays /> },
-    { href: '/fungicides', label: currentLanguage === 'hi' ? 'कवकनाशी' : 'Fungicides', icon: <SprayCan /> },
-    { href: '/insecticides', label: currentLanguage === 'hi' ? 'कीटनाशक' : 'Insecticides', icon: <Bug /> },
-    { href: '/irac-code', label: currentLanguage === 'hi' ? 'IRAC कोड' : 'IRAC Code', icon: <Code2 /> },
-    { href: '/frac-code', label: currentLanguage === 'hi' ? 'FRAC कोड' : 'FRAC Code', icon: <Code2 /> },
-  ], [currentLanguage]);
+    { href: '/crop-science', label: t('cropScience'), icon: <FlaskConical /> },
+    { href: '/weather', label: t('weather'), icon: <CloudSun /> },
+    { href: '/yojna', label: t('yojna'), icon: <ScrollText /> },
+    { href: '/events', label: t('events'), icon: <CalendarDays /> },
+    { href: '/fungicides', label: t('fungicides'), icon: <SprayCan /> },
+    { href: '/insecticides', label: t('insecticides'), icon: <Bug /> },
+    { href: '/irac-code', label: t('iracCode'), icon: <Code2 /> },
+    { href: '/frac-code', label: t('fracCode'), icon: <Code2 /> },
+  ], [t]);
 
-  const settingsLabel = useMemo(() => (currentLanguage === 'hi' ? 'सेटिंग्स' : 'Settings'), [currentLanguage]);
-  const logoutLabel = useMemo(() => (currentLanguage === 'hi' ? 'लॉग आउट' : 'Logout'), [currentLanguage]);
+  const settingsLabel = useMemo(() => t('settings'), [t]);
+  const logoutLabel = useMemo(() => t('logout'), [t]);
 
   const userAvatarFallback = currentUserName.substring(0, 2).toUpperCase();
   
@@ -314,5 +296,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
-    
