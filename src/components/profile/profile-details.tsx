@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from '@/components/ui/separator';
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 interface ProfileDetailsProps {
   user: User;
@@ -26,13 +27,14 @@ interface ProfileDetailsProps {
 export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsProps) {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const avatarInitial = (user.name || user.username)?.charAt(0).toUpperCase() || 'U';
+  const { t } = useTranslations(); // Initialize the hook
 
   return (
     <>
       <div className="bg-card text-card-foreground rounded-xl shadow-lg overflow-hidden relative">
         {isCurrentUser && (
           <Link href="/settings/account" className="absolute top-3 right-3 z-10">
-            <Button variant="ghost" size="icon" aria-label="Edit Profile" className="h-10 w-10">
+            <Button variant="ghost" size="icon" aria-label={t('editProfile')} className="h-10 w-10">
               <Settings className="h-5 w-5" />
             </Button>
           </Link>
@@ -83,15 +85,15 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
             <div className="flex flex-1 justify-around items-center text-center w-full sm:w-auto sm:pt-2">
               <div className="px-2">
                 <p className="text-lg font-semibold text-foreground">{user.postCount ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Posts</p>
+                <p className="text-xs text-muted-foreground">{t('posts')}</p>
               </div>
               <div className="px-2">
                 <p className="text-lg font-semibold text-foreground">{user.followersCount ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Followers</p>
+                <p className="text-xs text-muted-foreground">{t('followers')}</p>
               </div>
               <Link href={`/profile/${user.id}/following`} className="hover:opacity-80 transition-opacity px-2">
                 <p className="text-lg font-semibold text-foreground">{user.followingCount ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Following</p>
+                <p className="text-xs text-muted-foreground">{t('following')}</p>
               </Link>
             </div>
           </div>
@@ -113,7 +115,7 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
               {user.produce && user.produce.length > 0 && (
                 <div className="flex items-center">
                   <Leaf className="h-4 w-4 mr-1.5 text-primary" />
-                  <span>Specializes in: {user.produce.join(', ')}</span>
+                  <span>{t('specializesIn')}: {user.produce.join(', ')}</span>
                 </div>
               )}
             </div>
@@ -124,11 +126,11 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
           <div className="pt-4 mt-4 border-t">
             <div className="flex gap-2">
                 <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground flex-1">
-                    <UserPlus className="mr-1.5 h-4 w-4" /> Follow
+                    <UserPlus className="mr-1.5 h-4 w-4" /> {t('follow')}
                 </Button>
                 <Button variant="outline" size="sm" asChild className="flex-1">
                     <Link href={`/messages/${user.id}`}>
-                    <MessageSquare className="mr-1.5 h-4 w-4" /> Message
+                    <MessageSquare className="mr-1.5 h-4 w-4" /> {t('message')}
                     </Link>
                 </Button>
             </div>
