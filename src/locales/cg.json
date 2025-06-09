@@ -98,5 +98,16 @@
   "toastNoImageSelectedTitle": "कोई छवि नहीं चुनी गई [CG]",
   "toastNoImageSelectedDescription": "कृपया विश्लेषण के लिए एक छवि अपलोड करें। [CG]",
   "toastAnalysisFailedTitle": "विश्लेषण विफल [CG]",
-  "toastAnalysisFailedDescription": "छवि का विश्लेषण नहीं किया जा सका। कृपया पुनः प्रयास करें। [CG]"
+  "toastAnalysisFailedDescription": "छवि का विश्लेषण नहीं किया जा सका। कृपया पुनः प्रयास करें। [CG]",
+  "likeCountSingular": "like",
+  "likeCountPlural": "likes",
+  "viewAllCommentsText": "View all {count} comments",
+  "postUnsavedToastTitle": "Post Unsaved",
+  "postUnsavedToastDescription": "Removed from your favorites.",
+  "postSavedToastTitle": "Post Saved!",
+  "postSavedToastDescription": "Added to your favorites.",
+  "errorToastTitle": "Error",
+  "likeUpdateErrorToastDescription": "Could not update like status.",
+  "postLikedMockToastTitle": "Post Liked (Mock)",
+  "postUnlikedMockToastTitle": "Post Unliked (Mock)"
 }

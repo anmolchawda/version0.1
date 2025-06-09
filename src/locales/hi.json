@@ -98,5 +98,16 @@
   "toastNoImageSelectedTitle": "कोई छवि नहीं चुनी गई",
   "toastNoImageSelectedDescription": "कृपया विश्लेषण के लिए एक छवि अपलोड करें।",
   "toastAnalysisFailedTitle": "विश्लेषण विफल",
-  "toastAnalysisFailedDescription": "छवि का विश्लेषण नहीं किया जा सका। कृपया पुनः प्रयास करें।"
+  "toastAnalysisFailedDescription": "छवि का विश्लेषण नहीं किया जा सका। कृपया पुनः प्रयास करें।",
+  "likeCountSingular": "लाइक",
+  "likeCountPlural": "लाइक",
+  "viewAllCommentsText": "सभी {count} टिप्पणियाँ देखें",
+  "postUnsavedToastTitle": "पोस्ट सहेजा नहीं गया",
+  "postUnsavedToastDescription": "आपके पसंदीदा से हटा दिया गया।",
+  "postSavedToastTitle": "पोस्ट सहेजा गया!",
+  "postSavedToastDescription": "आपके पसंदीदा में जोड़ा गया।",
+  "errorToastTitle": "त्रुटि",
+  "likeUpdateErrorToastDescription": "लाइक स्थिति अपडेट नहीं की जा सकी।",
+  "postLikedMockToastTitle": "पोस्ट लाइक किया गया (मॉक)",
+  "postUnlikedMockToastTitle": "पोस्ट अनलाइक किया गया (मॉक)"
 }

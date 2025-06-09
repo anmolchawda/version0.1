@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase'; // db can be null
 import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp } from 'firebase/firestore';
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 interface PostCardProps {
   post: Post;
@@ -28,6 +29,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
   const { toast } = useToast();
+  const { t } = useTranslations(); // Initialize the hook
 
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -83,10 +85,10 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 
     if (isSaved) {
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
-      toast({ title: "Post Unsaved", description: "Removed from your favorites." });
+      toast({ title: t('postUnsavedToastTitle'), description: t('postUnsavedToastDescription') });
     } else {
       updatedSavedPosts = [...savedPosts, post.id];
-      toast({ title: "Post Saved!", description: "Added to your favorites." });
+      toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
     }
     localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
@@ -102,7 +104,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
       // Mock mode: simulate like toggle
       setIsLiked(newLikedState);
       setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
-      toast({ title: `Post ${newLikedState ? 'Liked' : 'Unliked'} (Mock)` });
+      toast({ title: newLikedState ? t('postLikedMockToastTitle') : t('postUnlikedMockToastTitle') });
       setIsLoadingLike(false);
       return;
     }
@@ -128,7 +130,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
       setIsLiked(newLikedState);
     } catch (error) {
       console.error("Error updating like status:", error);
-      toast({ title: "Error", description: "Could not update like status.", variant: "destructive" });
+      toast({ title: t('errorToastTitle'), description: t('likeUpdateErrorToastDescription'), variant: "destructive" });
       // Revert optimistic updates if Firestore fails
       setLocalLikesCount(post.likesCount); 
       setIsLiked(!newLikedState); 
@@ -192,7 +194,9 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
           </div>
           
           {localLikesCount > 0 && (
-            <p className="text-sm font-semibold">{localLikesCount} {localLikesCount === 1 ? 'like' : 'likes'}</p>
+             <p className="text-sm font-semibold">
+              {localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}
+            </p>
           )}
 
           <p className="text-sm">
@@ -212,7 +216,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 
           {post.commentsCount > 0 && (
             <Link href={`/post/${post.id}#comments`} className="text-sm text-muted-foreground hover:underline">
-              View all {post.commentsCount} comments
+              {t('viewAllCommentsText', { count: post.commentsCount })}
             </Link>
           )}
           <p className="text-xs text-muted-foreground uppercase">{timeAgo}</p>

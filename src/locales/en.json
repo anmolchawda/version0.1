@@ -98,5 +98,16 @@
   "toastNoImageSelectedTitle": "No Image Selected",
   "toastNoImageSelectedDescription": "Please upload an image to analyze.",
   "toastAnalysisFailedTitle": "Analysis Failed",
-  "toastAnalysisFailedDescription": "Could not analyze the image. Please try again."
+  "toastAnalysisFailedDescription": "Could not analyze the image. Please try again.",
+  "likeCountSingular": "like",
+  "likeCountPlural": "likes",
+  "viewAllCommentsText": "View all {count} comments",
+  "postUnsavedToastTitle": "Post Unsaved",
+  "postUnsavedToastDescription": "Removed from your favorites.",
+  "postSavedToastTitle": "Post Saved!",
+  "postSavedToastDescription": "Added to your favorites.",
+  "errorToastTitle": "Error",
+  "likeUpdateErrorToastDescription": "Could not update like status.",
+  "postLikedMockToastTitle": "Post Liked (Mock)",
+  "postUnlikedMockToastTitle": "Post Unliked (Mock)"
 }
