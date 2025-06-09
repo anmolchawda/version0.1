@@ -5,19 +5,19 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { Home, Cpu, PlusSquare, Store, User as UserIconLucide } from 'lucide-react'; // Replaced Search with Cpu
+import { Home, Cpu, PlusSquare, Store, User as UserIconLucide } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavLink as NavLinkType } from '@/types';
-// import { useSidebarContext } from '@/contexts/SidebarContext'; // Not directly used for link rendering currently
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 const MOCK_USER_ID_FALLBACK = '1'; 
 
-const getBottomNavLinks = (lang: string): NavLinkType[] => [
-  { href: '/feed', label: lang === 'hi' ? 'फ़ीड' : 'Feed', icon: <Home className="h-5 w-5" /> },
-  { href: '/ai-features', label: 'AI', icon: <Cpu className="h-5 w-5" /> }, // Changed from Discover to AI
-  { href: '/post/create', label: lang === 'hi' ? 'बनाएं' : 'Create', icon: <PlusSquare className="h-5 w-5" /> },
-  { href: '/mandi', label: lang === 'hi' ? 'मंडी' : 'Mandi', icon: <Store className="h-5 w-5" /> },
-  { href: `/`, label: lang === 'hi' ? 'प्रोफ़ाइल' : 'Profile', icon: <UserIconLucide className="h-5 w-5" /> },
+const getBottomNavLinks = (t: (key: any) => string): NavLinkType[] => [ // Pass t function
+  { href: '/feed', label: t('feed'), icon: <Home className="h-5 w-5" /> },
+  { href: '/ai-features', label: t('aiFeatures'), icon: <Cpu className="h-5 w-5" /> },
+  { href: '/post/create', label: t('create'), icon: <PlusSquare className="h-5 w-5" /> },
+  { href: '/mandi', label: t('mandi'), icon: <Store className="h-5 w-5" /> },
+  { href: `/`, label: t('profile'), icon: <UserIconLucide className="h-5 w-5" /> },
 ];
 
 interface BottomNavLinkItemProps {
@@ -50,31 +50,15 @@ const BottomNavLinkItem = React.memo(BottomNavLinkItemComponent);
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  const [currentLanguage, setCurrentLanguage] = useState('en');
-  const [links, setLinks] = useState(() => getBottomNavLinks('en'));
+  const { t, currentLanguage, isLoadingTranslations } = useTranslations(); // Use the hook
+  const [links, setLinks] = useState(() => getBottomNavLinks(t));
 
   useEffect(() => {
-    const storedLanguage = localStorage.getItem('selectedAppLanguage');
-    if (storedLanguage) {
-      setCurrentLanguage(storedLanguage);
+    if (!isLoadingTranslations) { // Ensure translations are loaded before setting links
+      setLinks(getBottomNavLinks(t));
     }
-  }, []);
+  }, [currentLanguage, t, isLoadingTranslations]);
 
-  useEffect(() => {
-    setLinks(getBottomNavLinks(currentLanguage));
-  }, [currentLanguage]);
-
-  useEffect(() => {
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'selectedAppLanguage' && event.newValue) {
-        setCurrentLanguage(event.newValue);
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40">
