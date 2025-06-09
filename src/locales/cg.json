@@ -135,6 +135,6 @@
   "toastProfileUpdatedDescription": "Your profile information has been saved. [CG]",
   "toastUpdateFailedTitle": "Update Failed [CG]",
   "toastUpdateFailedDescription": "Could not save profile changes. [CG]",
-  "backToSettingsButton": "सेटिंग्स में वापस जाएं [CG]"
+  "backToSettingsButton": "सेटिंग्स में वापस जाएं [CG]",
+  "backToProfileButton": "प्रोफ़ाइल पर वापस जाएं [CG]"
 }
-

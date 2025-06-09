@@ -135,6 +135,6 @@
   "toastProfileUpdatedDescription": "आपकी प्रोफ़ाइल जानकारी सहेजी गई है।",
   "toastUpdateFailedTitle": "अपडेट विफल",
   "toastUpdateFailedDescription": "प्रोफ़ाइल परिवर्तन सहेजे नहीं जा सके।",
-  "backToSettingsButton": "सेटिंग्स पर वापस जाएं"
+  "backToSettingsButton": "सेटिंग्स पर वापस जाएं",
+  "backToProfileButton": "प्रोफ़ाइल पर वापस जाएं"
 }
-

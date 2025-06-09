@@ -14,8 +14,8 @@ export default function AccountSettingsPage() {
   return (
     <div className="space-y-6">
       <Button variant="ghost" asChild className="mb-2 inline-flex items-center text-primary hover:text-primary/80">
-        <Link href="/settings">
-          <ChevronLeft className="mr-2 h-5 w-5" /> {t('backToSettingsButton')}
+        <Link href="/">
+          <ChevronLeft className="mr-2 h-5 w-5" /> {t('backToProfileButton')}
         </Link>
       </Button>
       <Card className="shadow-lg rounded-xl">
@@ -32,4 +32,3 @@ export default function AccountSettingsPage() {
     </div>
   );
 }
-
