@@ -109,5 +109,7 @@
   "errorToastTitle": "Error",
   "likeUpdateErrorToastDescription": "Could not update like status.",
   "postLikedMockToastTitle": "Post Liked (Mock)",
-  "postUnlikedMockToastTitle": "Post Unliked (Mock)"
+  "postUnlikedMockToastTitle": "Post Unliked (Mock)",
+  "mandiTitle": "Mandi (Marketplace)",
+  "mandiDescription": "Discover and trade agriculture products"
 }

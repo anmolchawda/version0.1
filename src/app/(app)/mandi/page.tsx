@@ -25,9 +25,11 @@ import {
 import { Search, Store, ListChecks, PlusCircle, RotateCcw } from 'lucide-react';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
+import { useTranslations } from '@/hooks/useTranslations';
 
 
 export default function MandiPage() {
+  const { t } = useTranslations();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
   const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
@@ -94,9 +96,9 @@ export default function MandiPage() {
           <div className="flex items-center space-x-4 text-primary">
             <Store className="h-10 w-10" />
             <div>
-              <CardTitle className="text-2xl sm:text-3xl font-bold">Mandi (Marketplace)</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl font-bold">{t('mandiTitle')}</CardTitle>
               <CardDescription className="text-sm sm:text-md text-muted-foreground">
-                Discover and trade agriculture products
+                {t('mandiDescription')}
               </CardDescription>
             </div>
           </div>

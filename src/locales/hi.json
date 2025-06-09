@@ -109,5 +109,7 @@
   "errorToastTitle": "त्रुटि",
   "likeUpdateErrorToastDescription": "लाइक स्थिति अपडेट नहीं की जा सकी।",
   "postLikedMockToastTitle": "पोस्ट लाइक किया गया (मॉक)",
-  "postUnlikedMockToastTitle": "पोस्ट अनलाइक किया गया (मॉक)"
+  "postUnlikedMockToastTitle": "पोस्ट अनलाइक किया गया (मॉक)",
+  "mandiTitle": "मंडी (बाज़ार)",
+  "mandiDescription": "कृषि उत्पादों की खोज करें और उनका व्यापार करें"
 }
