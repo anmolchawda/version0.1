@@ -14,6 +14,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'; // Firestore functions
 import type { User as FirebaseUserType } from 'firebase/auth'; // Firebase Auth User type
 import type { User as AppUserType } from '@/types'; // Your app's User type
 import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders'; // Import MOCK_USER_ID and getPlaceholderUser
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 export function ProfileEditForm() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUserType | null>(null);
@@ -30,6 +31,7 @@ export function ProfileEditForm() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslations(); // Initialize the hook
 
   useEffect(() => {
     // If in mock mode (auth is null from firebase.ts)
@@ -56,7 +58,7 @@ export function ProfileEditForm() {
         setProduceInput((mockProfile.produce || []).join(', '));
         setAvatarPreviewUrl(mockProfile.avatarUrl || '');
       } else {
-        toast({ title: "Error", description: "Mock user data not found.", variant: "destructive" });
+        toast({ title: t('errorToastTitle'), description: "Mock user data not found.", variant: "destructive" });
       }
       setIsLoadingData(false);
       return () => {}; // No Firebase listener to unsubscribe from in mock mode
@@ -70,7 +72,7 @@ export function ProfileEditForm() {
         if (!db) { // Should not happen if auth is not null, but a safeguard
              console.error("[ProfileEditForm] Auth is available, but DB is null. Cannot fetch Firestore profile.");
              setIsLoadingData(false);
-             toast({ title: "Configuration Error", description: "Cannot load profile.", variant: "destructive" });
+             toast({ title: t('errorToastTitle'), description: "Cannot load profile.", variant: "destructive" });
              return;
         }
         try {
@@ -95,7 +97,7 @@ setName(user.displayName || defaultUsername);
           }
         } catch (error) {
           console.error("Error fetching user profile from Firestore:", error);
-          toast({ title: "Error", description: "Could not load profile data.", variant: "destructive" });
+          toast({ title: t('errorToastTitle'), description: "Could not load profile data.", variant: "destructive" });
           const defaultUsernameOnError = user.email?.split('@')[0] || `user_err_${user.uid.substring(0,6)}`;
           setUsername(defaultUsernameOnError);
           setName(user.displayName || defaultUsernameOnError);
@@ -112,15 +114,15 @@ setName(user.displayName || defaultUsername);
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, [toast, t]); // Added t to dependencies
 
   const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         toast({
-          title: "Image Too Large",
-          description: "Please select an image smaller than 2MB.",
+          title: t('toastImageTooLargeTitle'),
+          description: t('toastImageTooLargeDescription'), // Assuming this key exists or will be added
           variant: "destructive",
         });
         return;
@@ -137,7 +139,7 @@ setName(user.displayName || defaultUsername);
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!firebaseUser) {
-      toast({ title: "Not Authenticated", description: "Please log in to update your profile.", variant: "destructive" });
+      toast({ title: t('toastNotAuthenticatedTitle'), description: t('toastNotAuthenticatedDescription'), variant: "destructive" });
       return;
     }
     setIsSubmitting(true);
@@ -145,8 +147,6 @@ setName(user.displayName || defaultUsername);
     let finalAvatarUrl = avatarPreviewUrl || firebaseUser.photoURL || '';
     if (avatarFile) {
       console.log("Avatar changed, would upload new file:", avatarFile.name);
-      // For a real app: finalAvatarUrl = await uploadImageToStorage(avatarFile);
-      // For mock or if data URI is acceptable for your Firestore structure temporarily:
       finalAvatarUrl = avatarPreviewUrl || ''; 
     }
 
@@ -154,7 +154,7 @@ setName(user.displayName || defaultUsername);
       id: firebaseUser.uid,
       username: username.trim() || firebaseUser.email?.split('@')[0] || `user_${firebaseUser.uid.substring(0,6)}`,
       name: name.trim() || firebaseUser.displayName || '',
-      email: firebaseUser.email || '', // Persist email
+      email: firebaseUser.email || '', 
       bio: bio.trim(),
       location: location.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
@@ -162,34 +162,32 @@ setName(user.displayName || defaultUsername);
       followersCount: profileData.followersCount || 0,
       followingCount: profileData.followingCount || 0,
       postCount: profileData.postCount || 0,
-      profileSetupComplete: profileData.profileSetupComplete || true, // Assume setup if editing
+      profileSetupComplete: profileData.profileSetupComplete || true, 
     };
 
-    // If in mock mode (db is null from firebase.ts)
     if (!db) {
       console.log("[ProfileEditForm] MOCK_DATA mode: Simulating profile update.");
-      setProfileData(updatedProfileData); // Update local state
+      setProfileData(updatedProfileData); 
       toast({
-        title: 'Profile Updated (Mock)',
-        description: 'Your profile information has been "saved".',
+        title: t('toastProfileUpdatedMockTitle'),
+        description: t('toastProfileUpdatedMockDescription'),
       });
       setIsSubmitting(false);
       return;
     }
     
-    // Real Firebase logic (db is not null)
     try {
       const userDocRef = doc(db, 'users', firebaseUser.uid);
       await setDoc(userDocRef, updatedProfileData, { merge: true }); 
       setProfileData(updatedProfileData); 
 
       toast({
-        title: 'Profile Updated',
-        description: 'Your profile information has been saved.',
+        title: t('toastProfileUpdatedTitle'),
+        description: t('toastProfileUpdatedDescription'),
       });
     } catch (error) {
       console.error("Error updating profile in Firestore:", error);
-      toast({ title: "Update Failed", description: "Could not save profile changes.", variant: "destructive" });
+      toast({ title: t('toastUpdateFailedTitle'), description: t('toastUpdateFailedDescription'), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -208,7 +206,7 @@ setName(user.displayName || defaultUsername);
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-            <Label className="text-base font-medium">Profile Photo</Label>
+            <Label className="text-base font-medium">{t('profilePhotoLabel')}</Label>
             <div className="flex items-center space-x-4">
                 <Label 
                   htmlFor="avatarUpload" 
@@ -231,10 +229,10 @@ setName(user.displayName || defaultUsername);
                         className="hidden"
                     />
                      <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById('avatarUpload')?.click()}>
-                        Change Photo
+                        {t('changePhotoButton')}
                     </Button>
                     <p className="text-xs text-muted-foreground mt-1">
-                        PNG, JPG, GIF up to 2MB.
+                        {t('imageUploadHelperText')}
                     </p>
                 </div>
             </div>
@@ -242,39 +240,39 @@ setName(user.displayName || defaultUsername);
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-            <Label htmlFor="username" className="text-base font-medium">Username</Label>
-            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Your unique username" required />
+            <Label htmlFor="username" className="text-base font-medium">{t('usernameLabel')}</Label>
+            <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder={t('usernamePlaceholder')} required />
         </div>
         <div className="space-y-2">
-            <Label htmlFor="name" className="text-base font-medium">Full Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name"/>
+            <Label htmlFor="name" className="text-base font-medium">{t('fullNameLabel')}</Label>
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('fullNamePlaceholder')}/>
         </div>
         </div>
 
         <div className="space-y-2">
-        <Label htmlFor="bio" className="text-base font-medium">Bio</Label>
-        <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Tell us about yourself and your farm" rows={3} className="resize-none" />
+        <Label htmlFor="bio" className="text-base font-medium">{t('bioLabel')}</Label>
+        <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t('bioPlaceholder')} rows={3} className="resize-none" />
         </div>
 
         <div className="space-y-2">
-            <Label htmlFor="location" className="text-base font-medium">Location (City, State)</Label>
+            <Label htmlFor="location" className="text-base font-medium">{t('locationLabel')}</Label>
             <Input
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., Raipur, Chhattisgarh"
+                placeholder={t('locationPlaceholder')}
             />
         </div>
 
         <div className="space-y-2">
-            <Label htmlFor="produce" className="text-base font-medium">Main Produce (comma-separated)</Label>
-            <Input id="produce" value={produceInput} onChange={(e) => setProduceInput(e.target.value)} placeholder="e.g., Tomatoes, Corn, Apples" />
+            <Label htmlFor="produce" className="text-base font-medium">{t('produceLabel')}</Label>
+            <Input id="produce" value={produceInput} onChange={(e) => setProduceInput(e.target.value)} placeholder={t('producePlaceholder')} />
         </div>
 
         <div className="flex justify-end pt-4">
             <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 text-base" disabled={isSubmitting || isLoadingData}>
                 {isSubmitting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Save className="mr-2 h-5 w-5" />}
-                {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
+                {isSubmitting ? t('savingChangesButton') : t('saveChangesButton')}
             </Button>
         </div>
     </form>
