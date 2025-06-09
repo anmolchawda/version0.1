@@ -1,3 +1,4 @@
+
 // src/app/(app)/ai-features/page.tsx
 'use client';
 
@@ -11,8 +12,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Brain, UploadCloud, Image as ImageIcon, Sparkles, AlertCircle, CheckCircle, Leaf, X } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow';
+import { useTranslations } from '@/hooks/useTranslations';
+import type { TranslationKey } from '@/hooks/useTranslations';
 
 export default function AiFeaturesPage() {
+  const { t } = useTranslations();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
@@ -27,8 +31,8 @@ export default function AiFeaturesPage() {
     if (file) {
       if (file.size > 4 * 1024 * 1024) { // Limit file size (e.g., 4MB)
         toast({
-          title: "Image Too Large",
-          description: "Please select an image smaller than 4MB.",
+          title: t('toastImageTooLargeTitle'),
+          description: t('toastImageTooLargeDescription'),
           variant: "destructive",
         });
         removeImage();
@@ -62,8 +66,8 @@ export default function AiFeaturesPage() {
   const handleAnalyzeClick = async () => {
     if (!imageDataUri) {
       toast({
-        title: "No Image Selected",
-        description: "Please upload an image to analyze.",
+        title: t('toastNoImageSelectedTitle'),
+        description: t('toastNoImageSelectedDescription'),
         variant: "destructive",
       });
       return;
@@ -80,8 +84,8 @@ export default function AiFeaturesPage() {
       console.error("Error analyzing crop image:", e);
       setError(e instanceof Error ? e.message : "An unknown error occurred during analysis.");
       toast({
-        title: "Analysis Failed",
-        description: "Could not analyze the image. Please try again.",
+        title: t('toastAnalysisFailedTitle'),
+        description: t('toastAnalysisFailedDescription'),
         variant: "destructive",
       });
     } finally {
@@ -89,14 +93,15 @@ export default function AiFeaturesPage() {
     }
   };
 
-  const AnalysisDetailCard = ({ title, data, icon }: { title: string, data: { detected: boolean, name?: string, description?: string, confidence?: string }, icon: React.ReactNode }) => {
+  const AnalysisDetailCard = ({ titleKey, data, icon }: { titleKey: TranslationKey, data: { detected: boolean, name?: string, description?: string, confidence?: string }, icon: React.ReactNode }) => {
     if (!data) return null;
+    const translatedTitle = t(titleKey);
     return (
       <Card className="bg-card/50">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
             {icon}
-            <span className="ml-2">{title}</span>
+            <span className="ml-2">{translatedTitle}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -107,7 +112,7 @@ export default function AiFeaturesPage() {
               {data.confidence && <p className="text-xs text-muted-foreground mt-1">Confidence: {data.confidence}</p>}
             </>
           ) : (
-            <p className="text-sm text-primary">No specific {title.toLowerCase()} detected.</p>
+            <p className="text-sm text-primary">{t('aiAnalysisDetailNoIssueDetected', { issue: translatedTitle.toLowerCase() })}</p>
           )}
         </CardContent>
       </Card>
@@ -121,15 +126,15 @@ export default function AiFeaturesPage() {
         <CardHeader>
           <CardTitle className="flex items-center text-2xl font-bold">
             <Brain className="mr-3 h-8 w-8 text-primary" />
-            Crop Health Analyzer
+            {t('aiCropHealthAnalyzerTitle')}
           </CardTitle>
           <CardDescription>
-            Upload an image of your crop to detect potential diseases, nutrient deficiencies, or insect presence using AI.
+            {t('aiCropHealthAnalyzerDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <Label htmlFor="cropImage" className="text-base font-medium">Upload Crop Image</Label>
+            <Label htmlFor="cropImage" className="text-base font-medium">{t('aiUploadCropImageLabel')}</Label>
             <div className={`
               mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
               rounded-md group hover:border-primary transition-colors
@@ -164,7 +169,7 @@ export default function AiFeaturesPage() {
                     htmlFor="cropImage"
                     className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 py-1 px-2"
                   >
-                    <span>{imagePreviewUrl ? "Change image" : "Upload an image"}</span>
+                    <span>{imagePreviewUrl ? t('aiChangeImageButton') : t('aiUploadAnImageButton')}</span>
                     <Input
                       id="cropImage"
                       name="cropImage"
@@ -176,9 +181,9 @@ export default function AiFeaturesPage() {
                       disabled={isLoading}
                     />
                   </Label>
-                  {!imagePreviewUrl && <p className="pl-1">or drag and drop</p>}
+                  {!imagePreviewUrl && <p className="pl-1">{t('aiDragAndDropText')}</p>}
                 </div>
-                {!imagePreviewUrl && <p className="text-xs text-muted-foreground">PNG, JPG, JPEG up to 4MB</p>}
+                {!imagePreviewUrl && <p className="text-xs text-muted-foreground">{t('aiImageFormatsAcceptedWithLimit')}</p>}
               </div>
             </div>
           </div>
@@ -190,22 +195,22 @@ export default function AiFeaturesPage() {
               ) : (
                 <Sparkles className="mr-2 h-5 w-5" />
               )}
-              {isLoading ? "Analyzing..." : "Analyze Image"}
+              {isLoading ? t('aiAnalyzingButton') : t('aiAnalyzeImageButton')}
             </Button>
           )}
 
           {isLoading && (
             <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-              <p className="text-lg">AI is analyzing your image...</p>
-              <p className="text-sm">This may take a few moments.</p>
+              <p className="text-lg">{t('aiAnalyzingImageText')}</p>
+              <p className="text-sm">{t('aiAnalyzingWaitText')}</p>
             </div>
           )}
 
           {error && !isLoading && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Analysis Error</AlertTitle>
+              <AlertTitle>{t('aiAnalysisErrorAlertTitle')}</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -213,32 +218,32 @@ export default function AiFeaturesPage() {
           {analysisResult && !isLoading && !error && (
             <Card className="mt-6 bg-background shadow-inner">
               <CardHeader>
-                <CardTitle className="text-xl text-primary">Analysis Results</CardTitle>
+                <CardTitle className="text-xl text-primary">{t('aiAnalysisResultsTitle')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {!analysisResult.isPlant ? (
                   <Alert>
                     <Leaf className="h-4 w-4" />
-                    <AlertTitle>Object Identification</AlertTitle>
-                    <AlertDescription>The AI could not confidently identify a plant in the uploaded image. Please upload a clear image of a plant.</AlertDescription>
+                    <AlertTitle>{t('aiObjectIdentificationTitle')}</AlertTitle>
+                    <AlertDescription>{t('aiObjectNotIdentifiedDescription')}</AlertDescription>
                   </Alert>
                 ) : (
                   <>
                     <Alert variant="default" className="border-primary/30 bg-primary/5">
                        <CheckCircle className="h-4 w-4 text-primary" />
-                      <AlertTitle className="text-primary">Plant Identified</AlertTitle>
+                      <AlertTitle className="text-primary">{t('aiPlantIdentifiedTitle')}</AlertTitle>
                       <AlertDescription>
-                        {analysisResult.plantTypeGuess || "A plant was identified."}
+                        {analysisResult.plantTypeGuess || t('aiPlantIdentifiedDefaultDescription')}
                       </AlertDescription>
                     </Alert>
                     
-                    <AnalysisDetailCard title="Disease" data={analysisResult.diseaseAnalysis} icon={<Leaf className="text-red-500" />} />
-                    <AnalysisDetailCard title="Nutrient Deficiency" data={analysisResult.nutrientDeficiencyAnalysis} icon={<Leaf className="text-yellow-500" />} />
-                    <AnalysisDetailCard title="Insect Presence" data={analysisResult.insectAnalysis} icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bug text-orange-500"><path d="M12 20h-4a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><path d="M12 20v-4"/><path d="M12 20h4"/><path d="m19 16-3-4"/><path d="m5 16 3-4"/><path d="M16 4h-2"/><path d="M8 4H6"/><path d="M12 8h-2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2Z"/><path d="M16 10h0"/><path d="M8 10h0"/></svg>} />
+                    <AnalysisDetailCard titleKey="aiAnalysisDetailDiseaseTitle" data={analysisResult.diseaseAnalysis} icon={<Leaf className="text-red-500" />} />
+                    <AnalysisDetailCard titleKey="aiAnalysisDetailNutrientTitle" data={analysisResult.nutrientDeficiencyAnalysis} icon={<Leaf className="text-yellow-500" />} />
+                    <AnalysisDetailCard titleKey="aiAnalysisDetailInsectTitle" data={analysisResult.insectAnalysis} icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bug text-orange-500"><path d="M12 20h-4a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><path d="M12 20v-4"/><path d="M12 20h4"/><path d="m19 16-3-4"/><path d="m5 16 3-4"/><path d="M16 4h-2"/><path d="M8 4H6"/><path d="M12 8h-2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2Z"/><path d="M16 10h0"/><path d="M8 10h0"/></svg>} />
 
                     <Card className="bg-card/50">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-lg">Overall Assessment</CardTitle>
+                        <CardTitle className="text-lg">{t('aiOverallAssessmentTitle')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm">{analysisResult.overallAssessment}</p>
@@ -248,7 +253,7 @@ export default function AiFeaturesPage() {
                     {analysisResult.suggestions && analysisResult.suggestions.length > 0 && (
                        <Card className="bg-accent/10 border-accent">
                         <CardHeader className="pb-2">
-                          <CardTitle className="text-lg text-accent-foreground">Suggestions</CardTitle>
+                          <CardTitle className="text-lg text-accent-foreground">{t('aiSuggestionsTitle')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <ul className="list-disc list-inside space-y-1 text-sm">
