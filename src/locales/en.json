@@ -134,5 +134,7 @@
   "toastProfileUpdatedTitle": "Profile Updated",
   "toastProfileUpdatedDescription": "Your profile information has been saved.",
   "toastUpdateFailedTitle": "Update Failed",
-  "toastUpdateFailedDescription": "Could not save profile changes."
+  "toastUpdateFailedDescription": "Could not save profile changes.",
+  "backToSettingsButton": "Back to Settings"
 }
+
