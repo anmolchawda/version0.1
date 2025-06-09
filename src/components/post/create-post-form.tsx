@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { HashtagSuggester } from './hashtag-suggester';
 import { ImageUp, Send, Tag, X, Loader2, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 export function CreatePostForm() {
   const [caption, setCaption] = useState('');
@@ -26,6 +27,7 @@ export function CreatePostForm() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter(); // Initialize router
+  const { t } = useTranslations(); // Initialize the hook
 
   const handleMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,7 +49,7 @@ export function CreatePostForm() {
           window.URL.revokeObjectURL(videoElement.src);
           if (videoElement.duration > 60) {
             toast({
-              title: "Video Too Long",
+              title: t('videoDurationWarning'), // Using t() for toast title
               description: "Please select a video that is 60 seconds or shorter.",
               variant: "destructive",
             });
@@ -58,7 +60,7 @@ export function CreatePostForm() {
       } else {
         setMediaType(null);
          toast({
-            title: "Unsupported File Type",
+            title: "Unsupported File Type", // This could be translated too
             description: "Please select an image or video file.",
             variant: "destructive",
           });
@@ -112,8 +114,8 @@ export function CreatePostForm() {
     event.preventDefault();
     if (!caption && !mediaFile) {
       toast({
-        title: "Empty Post",
-        description: "Please add a caption or an image/video to your post.",
+        title: t('emptyPostErrorTitle'),
+        description: t('emptyPostErrorDescription'),
         variant: "destructive",
       });
       return;
@@ -123,8 +125,8 @@ export function CreatePostForm() {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     toast({
-      title: "Post Created!",
-      description: "Your post has been successfully shared.",
+      title: t('postCreatedSuccessTitle'),
+      description: t('postCreatedSuccessDescription'),
     });
 
     setCaption('');
@@ -138,24 +140,24 @@ export function CreatePostForm() {
   return (
     <Card className="w-full max-w-lg mx-auto shadow-xl rounded-xl">
       <CardHeader>
-        <CardTitle className="text-xl sm:text-2xl font-bold text-center text-primary">Create New Post</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl font-bold text-center text-primary">{t('createPostTitle')}</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="caption" className="text-sm sm:text-base">Caption</Label>
+            <Label htmlFor="caption" className="text-sm sm:text-base">{t('captionLabel')}</Label>
             <Textarea
               id="caption"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Share what's happening on your farm..."
+              placeholder={t('captionPlaceholder')}
               rows={4}
               className="resize-none"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm sm:text-base">Image / Video (Optional)</Label>
+            <Label className="text-sm sm:text-base">{t('mediaLabel')}</Label>
             <div className={`
               mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
               rounded-md group hover:border-primary transition-colors border-input
@@ -167,7 +169,7 @@ export function CreatePostForm() {
                     htmlFor="mediaUploadField"
                     className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 py-1 px-2"
                   >
-                    <span>Upload a file</span>
+                    <span>{t('uploadFileButton')}</span>
                     <Input
                       id="mediaUploadField"
                       name="mediaUploadField"
@@ -178,12 +180,12 @@ export function CreatePostForm() {
                       ref={fileInputRef}
                     />
                   </Label>
-                  <p className="pl-1">or drag and drop</p>
+                  <p className="pl-1">{t('dragAndDropText')}</p>
                 </div>
-                <p className="text-xs text-muted-foreground">PNG, JPG, MP4, WEBM. Max 10MB.</p>
+                <p className="text-xs text-muted-foreground">{t('mediaFormatsAccepted')}</p>
               </div>
             </div>
-             <p className="text-xs text-muted-foreground mt-1">(Max 60 seconds for videos)</p>
+             <p className="text-xs text-muted-foreground mt-1">{t('videoDurationWarning')}</p>
             {mediaPreviewUrl && (
               <div className="relative mt-2 group">
                 {mediaType === 'image' && (
@@ -221,7 +223,7 @@ export function CreatePostForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="hashtags" className="text-sm sm:text-base">Hashtags</Label>
+            <Label htmlFor="hashtags" className="text-sm sm:text-base">{t('hashtagsLabel')}</Label>
             <div className="flex items-center gap-2">
               <Tag className="h-5 w-5 text-muted-foreground" />
               <Input
@@ -230,7 +232,7 @@ export function CreatePostForm() {
                 value={currentHashtagInput}
                 onChange={handleCurrentHashtagInputChange}
                 onKeyDown={handleCurrentHashtagKeyDown}
-                placeholder="Add tags (e.g., #organic)"
+                placeholder={t('hashtagsPlaceholder')}
                 className="flex-1"
               />
             </div>
@@ -267,7 +269,7 @@ export function CreatePostForm() {
             ) : (
               <Send className="mr-2 h-5 w-5" />
             )}
-            {isSubmitting ? 'Posting...' : 'Share Post'}
+            {isSubmitting ? t('postingButton') : t('sharePostButton')}
           </Button>
         </CardFooter>
       </form>
