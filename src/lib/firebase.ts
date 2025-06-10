@@ -1,23 +1,24 @@
 
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
-  Timestamp,
-  doc,
-  getDoc,
-  setDoc,
   collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  serverTimestamp,
-  writeBatch,
-  increment,
+  doc,
   enableNetwork,
+  getDoc,
+  getDocs, // Ensured getDocs is in the import list
+  increment,
   initializeFirestore,
-  persistentLocalCache, 
-  memoryLocalCache,    
-  type Firestore
+  memoryLocalCache,
+  onSnapshot,
+  orderBy,
+  persistentLocalCache,
+  query,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  type Firestore,
+  where,
+  writeBatch,
 } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 import { getAuth, type Auth } from "firebase/auth";
@@ -34,10 +35,10 @@ const firebaseConfig = {
     measurementId: "G-FVS7PM8WTB"
   };
 
-let app: FirebaseApp | null = null; // Allow app to be null
-let db: Firestore | null = null; // Allow db to be null
-let authInstance: Auth | null = null; // Allow authInstance to be null
-let storageInstance: FirebaseStorage | null = null; // Allow storageInstance to be null
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+let authInstance: Auth | null = null;
+let storageInstance: FirebaseStorage | null = null;
 
 const USE_MOCK_DATA = true; // Master switch
 
@@ -92,17 +93,24 @@ if (!USE_MOCK_DATA) {
   }
 } else {
   console.log("Firebase: MOCK_DATA mode is ON. Firebase services will not be initialized.");
-  // In mock mode, we can assign mock objects or keep them null
-  // For simplicity, we keep them null and components will use placeholder data directly.
-  // If any component *requires* a non-null auth object for example, this might need adjustment.
 }
 
-// Exporting potentially null values. Components using these need to be aware.
-// Or, provide mock implementations if needed. For now, this signals to use placeholders.
 export {
-  db, // This will be null in mock mode
-  authInstance as auth, // This will be null in mock mode
-  storageInstance as storage, // This will be null in mock mode
-  Timestamp, // Still useful for type definitions
-  doc, getDoc, setDoc, collection, query, where, orderBy, onSnapshot, serverTimestamp, writeBatch, increment, // These will fail if db is null
+  db,
+  authInstance as auth,
+  storageInstance as storage,
+  Timestamp,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch,
+  increment,
+  getDocs, // Ensured getDocs is in the export list
+  enableNetwork // Added enableNetwork to exports just in case it's needed elsewhere, though not directly related to this error.
 };
