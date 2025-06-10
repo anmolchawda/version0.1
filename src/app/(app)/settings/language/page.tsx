@@ -1,4 +1,3 @@
-
 // src/app/(app)/settings/language/page.tsx
 'use client';
 
@@ -38,6 +37,8 @@ const mainLanguages: Language[] = [
   { code: 'gu', englishName: 'Gujarati', nativeName: 'ગુજરાતી' },
   { code: 'pa', englishName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ' },
   { code: 'ml', englishName: 'Malayalam', nativeName: 'മലയാളം' },
+  { code: 'or', englishName: 'Odia', nativeName: 'ଓଡ଼ିଆ' },
+  { code: 'bn', englishName: 'Bengali', nativeName: 'বাংলা' },
 ];
 
 const englishLanguage: Language = { code: 'en', englishName: 'English', nativeName: 'English' };

@@ -1,4 +1,3 @@
-
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -84,6 +83,10 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/pu.json`)).default;
     } else if (lang === 'ml') {
       translations = (await import(`../locales/ma.json`)).default;
+    } else if (lang === 'or') {
+      translations = (await import(`../locales/or.json`)).default;
+    } else if (lang === 'bn') {
+      translations = (await import(`../locales/bn.json`)).default;
     }
      else {
       translations = (await import(`../locales/en.json`)).default;
@@ -144,4 +147,3 @@ export function useTranslations() {
 
   return { t, currentLanguage: language, isLoadingTranslations: isLoading };
 }
-
