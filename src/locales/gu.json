@@ -29,11 +29,11 @@
     "addCommentPlaceholder": "એક टिप्पणी ઉમેરો...",
     "replyingToPlaceholder": "@{username} ને જવાબ આપવું...",
     "cancelReply": "જવાબ રદ્દ કરો",
-    "postCommentButton": "ટિપ્పણી પોસ્ટ કરો",
+    "postCommentButton": "ટિપ્પણી પોસ્ટ કરો",
     "postReplyButton": "જવાબ પોસ્ટ કરો",
     "emptyCommentErrorTitle": "ખાલી टिप्पणी",
     "emptyCommentErrorDescription": "પોસ્ટ કરતાં પહેલાં કૃપા કરીને કંઈં લખો.",
-    "commentPostedSuccess": "ટિપ્పણી પોસ્ટ થઈ ગઈ!",
+    "commentPostedSuccess": "ટિપ્પણી પોસ્ટ થઈ ગઈ!",
     "replyPostedSuccess": "જવાબ પોસ્ટ થઈ ગયો!",
     "createPostTitle": "નવી પોસ્ટ બનાવો",
     "captionLabel": "શીર્ષક",
@@ -138,4 +138,3 @@
     "backToSettingsButton": "સેટિંગ્સ પર પાછા જાઓ",
     "backToProfileButton": "પ્રોફાઇલ પર પાછા જાઓ"
   }
-  
