@@ -74,8 +74,10 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/mh.json`)).default;
     } else if (lang === 'kn') { 
       translations = (await import(`../locales/kn.json`)).default;
-    } else if (lang === 'ta') { // Use 'ta' for Tamil language code
-      translations = (await import(`../locales/tl.json`)).default; // Load from tl.json
+    } else if (lang === 'ta') {
+      translations = (await import(`../locales/tl.json`)).default; 
+    } else if (lang === 'te') { // Telugu language code
+      translations = (await import(`../locales/tg.json`)).default; // Load from tg.json
     }
      else {
       translations = (await import(`../locales/en.json`)).default;

@@ -70,7 +70,7 @@
   "settingsStats": "आंकड़े",
   "settingsFavorites": "पसंदीदा",
   "settingsHelp": "सहायता",
-  "aiFeatures": "एआई सुविधाएँ",
+  "aiFeatures": "एआई",
   "aiCropHealthAnalyzerTitle": "फसल स्वास्थ्य विश्लेषक",
   "aiCropHealthAnalyzerDescription": "एआई का उपयोग करके संभावित बीमारियों, पोषक तत्वों की कमी, या कीटों की उपस्थिति का पता लगाने के लिए अपनी फसल की एक छवि अपलोड करें।",
   "aiUploadCropImageLabel": "फसल की छवि अपलोड करें",
