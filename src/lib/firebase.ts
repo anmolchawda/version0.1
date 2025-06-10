@@ -5,7 +5,7 @@ import {
   doc,
   enableNetwork,
   getDoc,
-  getDocs, // Ensured getDocs is in the import list
+  getDocs, // Restored getDocs import
   increment,
   initializeFirestore,
   memoryLocalCache,
@@ -111,6 +111,6 @@ export {
   serverTimestamp,
   writeBatch,
   increment,
-  getDocs, // Ensured getDocs is in the export list
-  enableNetwork // Added enableNetwork to exports just in case it's needed elsewhere, though not directly related to this error.
+  getDocs, // Restored getDocs export
+  enableNetwork
 };
