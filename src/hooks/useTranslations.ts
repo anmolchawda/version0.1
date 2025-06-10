@@ -70,8 +70,10 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/hi.json`)).default;
     } else if (lang === 'hne') { // Assuming 'hne' is the code for Chhattisgarhi
       translations = (await import(`../locales/cg.json`)).default;
-    } else if (lang === 'mr') { // Added Marathi
+    } else if (lang === 'mr') { 
       translations = (await import(`../locales/mh.json`)).default;
+    } else if (lang === 'kn') { // Added Kannada
+      translations = (await import(`../locales/kn.json`)).default;
     }
      else {
       translations = (await import(`../locales/en.json`)).default;
@@ -132,3 +134,4 @@ export function useTranslations() {
 
   return { t, currentLanguage: language, isLoadingTranslations: isLoading };
 }
+
