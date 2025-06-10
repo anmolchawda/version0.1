@@ -8,22 +8,30 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight } from "lucide-react";
-import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, setDoc } from '@/lib/firebase'; // db can be null
+import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight, Trash2, AlertTriangle } from "lucide-react";
+import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, setDoc, getDoc, getDocs } from '@/lib/firebase';
 import type { Notification as NotificationType, ActorInfo } from '@/types';
 import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 function NotificationItem({ notification }: { notification: NotificationType }) {
   const { actor, type, postImageUrl, postId, commentText, timestamp, read } = notification;
-  // Ensure timestamp is a Date object before formatting
   const dateToFormat = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp as unknown as string);
   const timeAgo = formatTimeAgo(dateToFormat.toISOString());
 
-
-  // Fetch actor details using placeholder for now
-  // In a real app, this might come from a user context or a separate fetch
   const actorDetails = getPlaceholderUser(actor.id) || actor;
 
   let message = '';
@@ -84,18 +92,19 @@ export default function NotificationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { setNotificationCount, authUserId } = useSidebarContext();
+  const { toast } = useToast();
+  const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
-    // If db is null (mock mode) or no authUserId, don't attempt Firebase operations
     if (!db || !authUserId) {
       console.log("[NotificationsPage] Mock mode or no authUserId. Skipping Firestore listener for notifications.");
-      setNotifications([]); // Show no notifications in mock mode
+      setNotifications([]);
       setIsLoading(false);
-      setNotificationCount(0); // Clear badge in context
+      setNotificationCount(0);
       return;
     }
 
-    // Proceed with Firebase operations if db and authUserId are available
     setIsLoading(true);
     const notificationsRef = collection(db, 'users', authUserId, 'notifications');
     const q = query(notificationsRef, orderBy('timestamp', 'desc'));
@@ -149,7 +158,56 @@ export default function NotificationsPage() {
     return () => {
       unsubscribe();
     };
-  }, [authUserId, setNotificationCount]); // db is stable, no need to include unless it can change
+  }, [authUserId, setNotificationCount]);
+
+  const handleClearAllNotifications = async () => {
+    if (isClearing) return;
+    setIsClearing(true);
+
+    if (!db || !authUserId) {
+      // Mock mode or no auth
+      setNotifications([]);
+      setNotificationCount(0);
+      toast({ title: "Notifications Cleared (Mock)", description: "All notifications have been removed from view." });
+      setIsClearing(false);
+      setShowClearConfirmDialog(false);
+      return;
+    }
+
+    try {
+      const notificationsRef = collection(db, 'users', authUserId, 'notifications');
+      const querySnapshot = await getDocs(notificationsRef);
+      
+      if (querySnapshot.empty) {
+        toast({ title: "No Notifications to Clear", description: "Your notification list is already empty." });
+        setIsClearing(false);
+        setShowClearConfirmDialog(false);
+        return;
+      }
+
+      const batch = writeBatch(db);
+      querySnapshot.forEach((docSnap) => {
+        batch.delete(docSnap.ref);
+      });
+      await batch.commit();
+
+      // Update meta count
+      const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
+      await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
+      
+      setNotifications([]); // Clear local state
+      setNotificationCount(0); // Update context
+      toast({ title: "Notifications Cleared", description: "All your notifications have been deleted." });
+
+    } catch (e) {
+      console.error("Error clearing notifications:", e);
+      toast({ title: "Error Clearing Notifications", description: "Could not clear all notifications. Please try again.", variant: "destructive" });
+    } finally {
+      setIsClearing(false);
+      setShowClearConfirmDialog(false);
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -160,7 +218,6 @@ export default function NotificationsPage() {
     );
   }
   
-  // Handle case where authUserId is null even after loading (should be caught by AppLayout, but as a safeguard)
   if (!authUserId && !isLoading) { 
     return (
       <div className="space-y-6">
@@ -185,6 +242,7 @@ export default function NotificationsPage() {
   if (error) {
     return (
       <div className="text-center py-10 text-destructive">
+        <AlertTriangle className="mx-auto h-12 w-12 mb-4" />
         <p className="text-lg font-semibold">Error</p>
         <p>{error}</p>
       </div>
@@ -192,33 +250,70 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="shadow-lg rounded-xl">
-        <CardHeader>
-          <CardTitle className="flex items-center text-2xl font-bold text-primary">
-            <BellRing className="mr-3 h-7 w-7" />
-            Notifications
-          </CardTitle>
-          <CardDescription>
-            Your latest updates and alerts from KrishiX.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          {notifications.length > 0 ? (
-            <div className="divide-y divide-border">
-              {notifications.map(notification => (
-                <NotificationItem key={notification.id} notification={notification} />
-              ))}
+    <>
+      <div className="space-y-6">
+        <Card className="shadow-lg rounded-xl">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center text-2xl font-bold text-primary">
+                <BellRing className="mr-3 h-7 w-7" />
+                Notifications
+              </CardTitle>
+              <CardDescription>
+                Your latest updates and alerts from KrishiX.
+              </CardDescription>
             </div>
-          ) : (
-            <div className="text-center py-16 text-muted-foreground">
-              <ListChecks className="mx-auto h-16 w-16 mb-4 text-gray-400" />
-              <p className="text-xl font-semibold">All caught up!</p>
-              <p className="text-sm mt-1">You have no new notifications.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            {notifications.length > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowClearConfirmDialog(true)}
+                disabled={isClearing}
+              >
+                {isClearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4 text-destructive" />}
+                Clear All
+              </Button>
+            )}
+          </CardHeader>
+          <CardContent className="p-0">
+            {notifications.length > 0 ? (
+              <div className="divide-y divide-border max-h-[calc(100vh-15rem)] overflow-y-auto">
+                {notifications.map(notification => (
+                  <NotificationItem key={notification.id} notification={notification} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <ListChecks className="mx-auto h-16 w-16 mb-4 text-gray-400" />
+                <p className="text-xl font-semibold">All caught up!</p>
+                <p className="text-sm mt-1">You have no new notifications.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <AlertDialog open={showClearConfirmDialog} onOpenChange={setShowClearConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Clear All Notifications</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete all your notifications? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowClearConfirmDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearAllNotifications}
+              disabled={isClearing}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isClearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Clear All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
