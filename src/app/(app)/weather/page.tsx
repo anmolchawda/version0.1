@@ -461,7 +461,7 @@ export default function WeatherPage() {
               type="text"
               value={locationSearchTerm}
               onChange={(e) => setLocationSearchTerm(e.target.value)}
-              placeholder="Search city name (e.g., London, New York)"
+              placeholder="Search city name (e.g., Raipur, Nagpur)"
               className="flex-grow"
               disabled={isSearchingLocation || isLoading}
             />
