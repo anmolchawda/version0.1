@@ -82,6 +82,8 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/gu.json`)).default;
     } else if (lang === 'pa') {
       translations = (await import(`../locales/pu.json`)).default;
+    } else if (lang === 'ml') {
+      translations = (await import(`../locales/ma.json`)).default;
     }
      else {
       translations = (await import(`../locales/en.json`)).default;
