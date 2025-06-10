@@ -39,6 +39,7 @@ const mainLanguages: Language[] = [
   { code: 'ml', englishName: 'Malayalam', nativeName: 'മലയാളം' },
   { code: 'or', englishName: 'Odia', nativeName: 'ଓଡ଼ିଆ' },
   { code: 'bn', englishName: 'Bengali', nativeName: 'বাংলা' },
+  { code: 'bho', englishName: 'Bhojpuri', nativeName: 'भोजपुरी' },
 ];
 
 const englishLanguage: Language = { code: 'en', englishName: 'English', nativeName: 'English' };
