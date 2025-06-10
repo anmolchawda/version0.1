@@ -68,12 +68,14 @@ async function loadTranslations(lang: string): Promise<Translations> {
     let translations;
     if (lang === 'hi') {
       translations = (await import(`../locales/hi.json`)).default;
-    } else if (lang === 'hne') { // Assuming 'hne' is the code for Chhattisgarhi
+    } else if (lang === 'hne') { 
       translations = (await import(`../locales/cg.json`)).default;
     } else if (lang === 'mr') { 
       translations = (await import(`../locales/mh.json`)).default;
-    } else if (lang === 'kn') { // Added Kannada
+    } else if (lang === 'kn') { 
       translations = (await import(`../locales/kn.json`)).default;
+    } else if (lang === 'ta') { // Use 'ta' for Tamil language code
+      translations = (await import(`../locales/tl.json`)).default; // Load from tl.json
     }
      else {
       translations = (await import(`../locales/en.json`)).default;
