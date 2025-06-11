@@ -1,3 +1,4 @@
+
 // src/components/post/post-detail-display.tsx
 'use client';
 
@@ -14,6 +15,7 @@ import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft } from 
 import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from './share-modal';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 interface PostDetailDisplayProps {
   post: Post;
@@ -28,6 +30,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
   const router = useRouter(); // Initialize router
+  const { t } = useTranslations(); // Initialize the hook
 
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
@@ -49,10 +52,10 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
 
     if (savedPosts.includes(post.id)) {
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
-      toast({ title: "Post Unsaved", description: "Removed from your favorites." });
+      toast({ title: t('toastPostUnsavedTitle'), description: t('toastPostUnsavedDescription') });
     } else {
       updatedSavedPosts = [...savedPosts, post.id];
-      toast({ title: "Post Saved!", description: "Added to your favorites." });
+      toast({ title: t('toastPostSavedTitle'), description: t('toastPostSavedDescription') });
     }
     localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
@@ -68,7 +71,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
             size="icon"
             onClick={() => router.back()}
             className="h-9 w-9 sm:h-10 sm:w-10"
-            aria-label="Go back"
+            aria-label={t('backButton')}
           >
             <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </Button>
@@ -124,24 +127,24 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
           <div className="flex items-center space-x-2 w-full">
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20">
               <Heart className="h-6 w-6" />
-              <span className="sr-only">Like</span>
+              <span className="sr-only">{t('likeAction')}</span>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20">
               <MessageCircle className="h-6 w-6" />
-              <span className="sr-only">Comment</span>
+              <span className="sr-only">{t('commentAction')}</span>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20" onClick={() => setIsShareModalOpen(true)}>
               <Send className="h-6 w-6" />
-              <span className="sr-only">Share</span>
+              <span className="sr-only">{t('shareAction')}</span>
             </Button>
             <Button variant="ghost" size="icon" className="ml-auto rounded-full hover:bg-accent/20" onClick={handleToggleSave}>
               <Bookmark className={`h-6 w-6 ${isSaved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
-              <span className="sr-only">Save</span>
+              <span className="sr-only">{t('saveAction')}</span>
             </Button>
           </div>
           
           {post.likesCount > 0 && (
-            <p className="text-sm font-semibold">{post.likesCount} likes</p>
+            <p className="text-sm font-semibold">{post.likesCount} {post.likesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}</p>
           )}
         </CardFooter>
       </Card>
