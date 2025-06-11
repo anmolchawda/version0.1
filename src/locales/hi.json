@@ -100,7 +100,7 @@
   "toastAnalysisFailedTitle": "विश्लेषण विफल",
   "toastAnalysisFailedDescription": "छवि का विश्लेषण नहीं किया जा सका। कृपया पुनः प्रयास करें।",
   "likeCountSingular": "लाइक",
-  "likeCountPlural": "लाइक",
+  "likeCountPlural": "लाइकें",
   "viewAllCommentsText": "सभी {count} टिप्पणियाँ देखें",
   "postUnsavedToastTitle": "पोस्ट सहेजा नहीं गया",
   "postUnsavedToastDescription": "आपके पसंदीदा से हटा दिया गया।",

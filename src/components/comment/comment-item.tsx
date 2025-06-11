@@ -1,12 +1,11 @@
-
 // src/components/comment/comment-item.tsx
-import React from 'react'; // Added React import
+import React from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import type { Comment as CommentType } from '@/types';
 import { formatTimeAgo } from '@/lib/placeholders';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface CommentItemProps {
   comment: CommentType;
@@ -16,7 +15,7 @@ interface CommentItemProps {
 
 const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps) => {
   const timeAgo = formatTimeAgo(comment.createdAt);
-  // const { toast } = useToast(); // Toast is now handled by CommentInput/Section
+  const { t } = useTranslations();
 
   const handleReplyClick = () => {
     onStartReply(comment.id, comment.user.username);
@@ -44,13 +43,13 @@ const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps
           </div>
           <div className="flex items-center space-x-2 mt-0.5 pl-2">
             <p className="text-xs text-muted-foreground">{timeAgo}</p>
-            <Button 
-              variant="link" 
-              size="sm" 
+            <Button
+              variant="link"
+              size="sm"
               className="p-0 h-auto text-xs text-muted-foreground hover:text-primary"
               onClick={handleReplyClick}
             >
-              Reply
+              {t('replyButtonText')}
             </Button>
           </div>
         </div>
