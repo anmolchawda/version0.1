@@ -8,6 +8,7 @@ import { CommentItem } from './comment-item';
 import { CommentInput } from './comment-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageCircle } from 'lucide-react';
+import { useTranslations } from '@/hooks/useTranslations'; // Ensure this is imported
 
 // Mock current user for adding new comments
 const MOCK_CURRENT_USER_ID = '1';
@@ -24,6 +25,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
   const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [replyingToUsername, setReplyingToUsername] = useState<string | null>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
+  const { t } = useTranslations(); // Initialize the hook
 
   useEffect(() => {
     setComments(initialComments);
@@ -106,7 +108,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
       <CardHeader>
         <CardTitle className="text-xl flex items-center">
           <MessageCircle className="mr-2 h-5 w-5 text-primary" />
-          Comments ({totalCommentCount})
+          {t('commentsTitle', { count: totalCommentCount })}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -121,7 +123,7 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
               />
             ))
           ) : (
-            <p className="py-4 text-sm text-muted-foreground text-center">No comments yet. Be the first to comment!</p>
+            <p className="py-4 text-sm text-muted-foreground text-center">{t('noCommentsYet')}</p>
           )}
         </div>
         <CommentInput
