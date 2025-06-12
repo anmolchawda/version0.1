@@ -9,6 +9,7 @@ import { Send, Loader2, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Comment } from '@/types';
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 // Mock current user ID, replace with actual auth context later
 const MOCK_CURRENT_USER_ID = '1';
@@ -28,13 +29,14 @@ export function CommentInput({ postId, onCommentAdded, replyingToUsername, onCan
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslations(); // Initialize the hook
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!commentText.trim()) {
       toast({
-        title: 'Empty Comment',
-        description: 'Please write something before posting.',
+        title: t('emptyCommentErrorTitle'),
+        description: t('emptyCommentErrorDescription'),
         variant: 'destructive',
       });
       return;
@@ -53,21 +55,21 @@ export function CommentInput({ postId, onCommentAdded, replyingToUsername, onCan
     setCommentText('');
     setIsSubmitting(false);
     toast({
-      title: replyingToUsername ? 'Reply Posted!' : 'Comment Posted!',
+      title: replyingToUsername ? t('replyPostedSuccess') : t('commentPostedSuccess'),
     });
   };
 
   const placeholderText = replyingToUsername 
-    ? `Replying to @${replyingToUsername}...` 
-    : "Add a comment...";
+    ? t('replyingToPlaceholder', { username: replyingToUsername })
+    : t('addCommentPlaceholder');
 
   return (
     <form onSubmit={handleSubmitComment} className="flex flex-col space-y-2 py-4 border-t">
       {replyingToUsername && onCancelReply && (
         <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-          <span>Replying to @{replyingToUsername}</span>
+          <span>{t('replyingToPlaceholder', { username: replyingToUsername })}</span>
           <Button variant="ghost" size="sm" onClick={onCancelReply} className="p-1 h-auto">
-            <XCircle className="h-3.5 w-3.5 mr-1"/> Cancel
+            <XCircle className="h-3.5 w-3.5 mr-1"/> {t('cancelReply')}
           </Button>
         </div>
       )}
@@ -87,7 +89,7 @@ export function CommentInput({ postId, onCommentAdded, replyingToUsername, onCan
         />
         <Button type="submit" size="icon" className="rounded-full h-10 w-10" disabled={isSubmitting || !commentText.trim()}>
           {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-          <span className="sr-only">Post comment</span>
+          <span className="sr-only">{replyingToUsername ? t('postReplyButton') : t('postCommentButton')}</span>
         </Button>
       </div>
     </form>
