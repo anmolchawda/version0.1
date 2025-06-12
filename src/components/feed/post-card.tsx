@@ -175,21 +175,21 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike} disabled={isLoadingLike}>
               <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />
-              <span className="sr-only">Like</span>
+              <span className="sr-only">{t('likeAction')}</span>
             </Button>
             <Link href={`/post/${post.id}#comments`}>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <MessageCircle className="h-6 w-6" />
-                <span className="sr-only">Comment</span>
+                <span className="sr-only">{t('commentAction')}</span>
               </Button>
             </Link>
             <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsShareModalOpen(true)}>
               <Send className="h-6 w-6" />
-              <span className="sr-only">Share</span>
+              <span className="sr-only">{t('shareAction')}</span>
             </Button>
             <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave}>
               <Bookmark className={`h-6 w-6 ${isSaved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
-              <span className="sr-only">Save</span>
+              <span className="sr-only">{t('saveAction')}</span>
             </Button>
           </div>
           
@@ -236,3 +236,4 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 }
 
 export const PostCard = React.memo(PostCardComponent);
+
