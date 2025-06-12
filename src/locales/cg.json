@@ -112,6 +112,7 @@
   "postLikedMockToastTitle": "पोस्ट लाइक होइस (मॉक)",
   "postUnlikedMockToastTitle": "पोस्ट अनलाइक होइस (मॉक)",
   "mandiDescription": "खेती के समान खोजव अउ बेचा-बिक्री करव",
+  "mandiTitle": "मंडी (बजार)",
   "profilePhotoLabel": "प्रोफाइल फोटो",
   "changePhotoButton": "फोटो बदलव",
   "imageUploadHelperText": "PNG, JPG, GIF – 2MB तक",
@@ -137,8 +138,12 @@
   "toastUpdateFailedDescription": "प्रोफाइल बदलाव सेव मं गलती होइस.",
   "backToSettingsButton": "सेटिंग्स पर वापस जाएं",
   "backToProfileButton": "प्रोफाइल पर वापस जाएं",
+  "backButton": "पिछलग्गू",
   "likeAction": "लाइक कर",
   "commentAction": "टिप्पणी कर",
   "shareAction": "शेयर कर",
-  "saveAction": "सेव कर"
+  "saveAction": "सेव कर",
+  "unsaveAction": "अनसेव कर",
+  "replyButtonText": "जवाब देवव",
+  "likesLabel": "लाइक्स"
 }
