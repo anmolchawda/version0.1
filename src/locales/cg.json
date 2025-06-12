@@ -111,8 +111,8 @@
   "likeUpdateErrorToastDescription": "Could not update like status.",
   "postLikedMockToastTitle": "Post Liked (Mock)",
   "postUnlikedMockToastTitle": "Post Unliked (Mock)",
-  "mandiTitle": "Mandi (Marketplace)",
-  "mandiDescription": "Discover and trade agriculture products",
+  "mandiTitle": "मंडी (बजार)",
+  "mandiDescription": "खेती के समान खोजव अउ बेचा-बिक्री करव",
   "profilePhotoLabel": "प्रोफाइल फोटो",
   "changePhotoButton": "फोटो बदलव",
   "imageUploadHelperText": "PNG, JPG, GIF – 2MB तक",
@@ -139,3 +139,4 @@
   "backToSettingsButton": "सेटिंग्स पर वापस जाएं",
   "backToProfileButton": "प्रोफाइल पर वापस जाएं"
 }
+
