@@ -136,5 +136,6 @@
   "toastUpdateFailedTitle": "अपडेट अयशस्वी",
   "toastUpdateFailedDescription": "प्रोफाइल बदल जतन करता आले नाहीत.",
   "backToSettingsButton": "सेटिंग्जवर परत जा",
-  "backToProfileButton": "प्रोफाइलवर परत जा"
+  "backToProfileButton": "प्रोफाइलवर परत जा",
+  "replyButtonText": "उत्तर द्या"
 }
