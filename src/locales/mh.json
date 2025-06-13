@@ -175,5 +175,22 @@
   "commentedOnYourPostText": "तुमच्या पोस्टवर टिप्पणी केली:",
   "onYourPostText": "तुमच्या पोस्टवर.",
   "startedFollowingYouText": "तुम्हाला फॉलो करायला सुरुवात केली आहे.",
-  "newNotificationText": "नवीन सूचना."
+  "newNotificationText": "नवीन सूचना.",
+  "discoverUniversalSearchTitle": "सार्वत्रिक शोध",
+  "discoverSearchPlaceholder": "शेतकरी, पोस्ट, मंडी आयटम, रोग, कोड, योजना शोधा...",
+  "discoverInitialSearchPromptTitle": "कृषीX शोधा",
+  "discoverInitialSearchPromptDescription": "शेतकरी, पोस्ट, मंडी आयटम, पिकांची माहिती, रोग, योजना आणि बरेच काही शोधा.",
+  "discoverNoResultsFound": "\"{searchTerm}\" साठी कोणतेही परिणाम आढळले नाहीत.",
+  "discoverNoResultsSuggestion": "वेगळा शोध शब्द वापरून पहा किंवा स्पेलिंग तपासा.",
+  "discoverMatchingFarmersTitle": "जुळणारे शेतकरी",
+  "discoverMatchingPostsTitle": "जुळणाऱ्या पोस्ट्स",
+  "discoverMatchingMandiTitle": "जुळणारे मंडी आयटम",
+  "discoverMatchingDiseasesTitle": "जुळणारे पिकांचे रोग",
+  "discoverMatchingEventsTitle": "जुळणारे कार्यक्रम",
+  "discoverMatchingYojnasTitle": "जुळणाऱ्या योजना",
+  "discoverMatchingCropsTitle": "जुळणारी पिके",
+  "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत."
 }
+
+
+    
