@@ -1,3 +1,4 @@
+
 {
   "feed": "ಫೀಡ್",
   "discover": "ಶೋಧಿಸಿ",
@@ -136,5 +137,7 @@
   "toastUpdateFailedTitle": "ನವೀಕರಣ ವಿಫಲ",
   "toastUpdateFailedDescription": "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆಗಳನ್ನು ಸಂಚಯಿಸಲು ವಿಫಲವಾಗಿದೆ.",
   "backToSettingsButton": "ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
-  "backToProfileButton": "ಪ್ರೊಫೈಲ್ಗೆ ಹಿಂತಿರುಗಿ"
+  "backToProfileButton": "ಪ್ರೊಫೈಲ್ಗೆ ಹಿಂತಿರುಗಿ",
+  "replyButtonText": "ಉತ್ತರಿಸಿ"
 }
+
