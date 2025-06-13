@@ -157,5 +157,20 @@
   "discoverMatchingDiseasesTitle": "मिलते-जुलते फसल रोग",
   "discoverMatchingEventsTitle": "मिलते-जुलते कार्यक्रम",
   "discoverMatchingYojnasTitle": "मिलती-जुलती योजनाएं",
-  "discoverInfoFooter": "वर्तमान में किसान, पोस्ट, मंडी आइटम, रोग, कार्यक्रम और योजनाएं खोजी जा रही हैं।"
+  "discoverMatchingCropsTitle": "मिलती-जुलती फसलें",
+  "discoverInfoFooter": "वर्तमान में किसान, पोस्ट, मंडी आइटम, रोग, कार्यक्रम और योजनाएं खोजी जा रही हैं।",
+  "messagesTitle": "संदेश",
+  "newMessageAriaLabel": "नया संदेश",
+  "searchMessagesPlaceholder": "संदेश या उपयोगकर्ता खोजें...",
+  "noMessagesYetTitle": "अभी तक कोई संदेश नहीं है",
+  "noMessagesYetDescription": "अपने संदेश यहाँ देखने के लिए एक नई बातचीत शुरू करें।",
+  "startNewChatButton": "नई चैट शुरू करें",
+  "userNotAuthenticatedError": "उपयोगकर्ता प्रमाणित नहीं है। कृपया लॉग इन करें।",
+  "failedToLoadConversationsError": "बातचीत लोड करने में विफल।",
+  "newMessageModalTitle": "नया संदेश",
+  "newMessageModalDescription": "बातचीत शुरू करने के लिए उपयोगकर्ताओं को खोजें।",
+  "searchUsersPlaceholder": "उपयोगकर्ता खोजें...",
+  "noUsersFoundError": "आपकी खोज से मेल खाने वाले कोई उपयोगकर्ता नहीं मिले।"
 }
+
+    

@@ -69,7 +69,15 @@ export type TranslationKey =
   | 'noMessagesYetTitle' | 'noMessagesYetDescription' | 'startNewChatButton'
   | 'userNotAuthenticatedError' | 'failedToLoadConversationsError'
   | 'newMessageModalTitle' | 'newMessageModalDescription' | 'searchUsersPlaceholder'
-  | 'noUsersFoundError';
+  | 'noUsersFoundError'
+  | 'notificationsTitle' | 'notificationsDescription' | 'clearAllButton'
+  | 'loadingNotificationsText' | 'loginToViewNotificationsText' | 'loginButtonText'
+  | 'failedToLoadNotificationsError' | 'allCaughtUpTitle' | 'noNewNotificationsText'
+  | 'confirmClearAllTitle' | 'confirmClearAllDescription' | 'cancelButtonText' | 'clearAllConfirmButton'
+  | 'toastNotificationsClearedMockTitle' | 'toastNotificationsClearedMockDescription'
+  | 'toastNoNotificationsToClearTitle' | 'toastNoNotificationsToClearDescription'
+  | 'toastNotificationsClearedTitle' | 'toastNotificationsClearedDescription'
+  | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription';
 
 type Translations = Record<TranslationKey, string>;
 

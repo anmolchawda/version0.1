@@ -1,4 +1,3 @@
-
 // src/app/(app)/notifications/page.tsx
 'use client';
 
@@ -25,9 +24,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslations } from '@/hooks/useTranslations';
 
 
 function NotificationItem({ notification }: { notification: NotificationType }) {
+  const { t } = useTranslations();
   const { actor, type, postImageUrl, postId, commentText, timestamp, read } = notification;
   const dateToFormat = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp as unknown as string);
   const timeAgo = formatTimeAgo(dateToFormat.toISOString());
@@ -40,22 +41,24 @@ function NotificationItem({ notification }: { notification: NotificationType }) 
 
   switch (type) {
     case 'like':
-      message = `${actorDetails.name || actorDetails.username} liked your post.`;
+      message = `${actorDetails.name || actorDetails.username} ${t('likedYourPostText') || 'liked your post.'}`;
       if (postId) link = `/post/${postId}`;
       actionIcon = <ThumbsUp className="h-5 w-5 text-pink-500" />;
       break;
     case 'comment':
-      message = `${actorDetails.name || actorDetails.username} commented: "${commentText ? (commentText.length > 50 ? commentText.substring(0, 47) + '...' : commentText) : 'on your post.'}"`;
+      message = `${actorDetails.name || actorDetails.username} ${t('commentedOnYourPostText') || 'commented:'} "${commentText ? (commentText.length > 50 ? commentText.substring(0, 47) + '...' : commentText) : t('onYourPostText') || 'on your post.'}"`;
       if (postId) link = `/post/${postId}#comments`;
       actionIcon = <MessageSquare className="h-5 w-5 text-green-500" />;
       break;
     case 'follow':
-      message = `${actorDetails.name || actorDetails.username} started following you.`;
+      message = `${actorDetails.name || actorDetails.username} ${t('startedFollowingYouText') || 'started following you.'}`;
       actionIcon = <UserPlus className="h-5 w-5 text-purple-500" />;
       break;
     default:
-      message = 'New notification.';
+      message = t('newNotificationText') || 'New notification.';
   }
+  // Placeholder keys for the above, assuming they will be added:
+  // likedYourPostText, commentedOnYourPostText, onYourPostText, startedFollowingYouText, newNotificationText
 
   return (
     <Link href={link} passHref>
@@ -95,6 +98,7 @@ export default function NotificationsPage() {
   const { toast } = useToast();
   const [showClearConfirmDialog, setShowClearConfirmDialog] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const { t } = useTranslations();
 
   useEffect(() => {
     if (!db || !authUserId) {
@@ -151,14 +155,14 @@ export default function NotificationsPage() {
 
     }, (err) => {
       console.error("Error fetching notifications:", err);
-      setError("Failed to load notifications.");
+      setError(t('failedToLoadNotificationsError'));
       setIsLoading(false);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [authUserId, setNotificationCount]);
+  }, [authUserId, setNotificationCount, t]);
 
   const handleClearAllNotifications = async () => {
     if (isClearing) return;
@@ -168,7 +172,7 @@ export default function NotificationsPage() {
       // Mock mode or no auth
       setNotifications([]);
       setNotificationCount(0);
-      toast({ title: "Notifications Cleared (Mock)", description: "All notifications have been removed from view." });
+      toast({ title: t('toastNotificationsClearedMockTitle'), description: t('toastNotificationsClearedMockDescription') });
       setIsClearing(false);
       setShowClearConfirmDialog(false);
       return;
@@ -179,7 +183,7 @@ export default function NotificationsPage() {
       const querySnapshot = await getDocs(notificationsRef);
       
       if (querySnapshot.empty) {
-        toast({ title: "No Notifications to Clear", description: "Your notification list is already empty." });
+        toast({ title: t('toastNoNotificationsToClearTitle'), description: t('toastNoNotificationsToClearDescription') });
         setIsClearing(false);
         setShowClearConfirmDialog(false);
         return;
@@ -197,11 +201,11 @@ export default function NotificationsPage() {
       
       setNotifications([]); // Clear local state
       setNotificationCount(0); // Update context
-      toast({ title: "Notifications Cleared", description: "All your notifications have been deleted." });
+      toast({ title: t('toastNotificationsClearedTitle'), description: t('toastNotificationsClearedDescription') });
 
     } catch (e) {
       console.error("Error clearing notifications:", e);
-      toast({ title: "Error Clearing Notifications", description: "Could not clear all notifications. Please try again.", variant: "destructive" });
+      toast({ title: t('toastErrorClearingNotificationsTitle'), description: t('toastErrorClearingNotificationsDescription'), variant: "destructive" });
     } finally {
       setIsClearing(false);
       setShowClearConfirmDialog(false);
@@ -213,7 +217,7 @@ export default function NotificationsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p className="text-lg">Loading notifications...</p>
+        <p className="text-lg">{t('loadingNotificationsText')}</p>
       </div>
     );
   }
@@ -225,13 +229,13 @@ export default function NotificationsPage() {
           <CardHeader>
             <CardTitle className="flex items-center text-2xl font-bold text-primary">
               <BellRing className="mr-3 h-7 w-7" />
-              Notifications
+              {t('notificationsTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center py-10">
-            <p className="text-muted-foreground">Please log in to view your notifications.</p>
+            <p className="text-muted-foreground">{t('loginToViewNotificationsText')}</p>
             <Button asChild className="mt-4">
-              <Link href="/login">Log In</Link>
+              <Link href="/login">{t('loginButtonText')}</Link>
             </Button>
           </CardContent>
         </Card>
@@ -243,7 +247,7 @@ export default function NotificationsPage() {
     return (
       <div className="text-center py-10 text-destructive">
         <AlertTriangle className="mx-auto h-12 w-12 mb-4" />
-        <p className="text-lg font-semibold">Error</p>
+        <p className="text-lg font-semibold">{t('errorToastTitle')}</p>
         <p>{error}</p>
       </div>
     );
@@ -257,10 +261,10 @@ export default function NotificationsPage() {
             <div>
               <CardTitle className="flex items-center text-2xl font-bold text-primary">
                 <BellRing className="mr-3 h-7 w-7" />
-                Notifications
+                {t('notificationsTitle')}
               </CardTitle>
               <CardDescription>
-                Your latest updates and alerts from KrishiX.
+                {t('notificationsDescription')}
               </CardDescription>
             </div>
             {notifications.length > 0 && (
@@ -271,7 +275,7 @@ export default function NotificationsPage() {
                 disabled={isClearing}
               >
                 {isClearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4 text-destructive" />}
-                Clear All
+                {t('clearAllButton')}
               </Button>
             )}
           </CardHeader>
@@ -285,8 +289,8 @@ export default function NotificationsPage() {
             ) : (
               <div className="text-center py-16 text-muted-foreground">
                 <ListChecks className="mx-auto h-16 w-16 mb-4 text-gray-400" />
-                <p className="text-xl font-semibold">All caught up!</p>
-                <p className="text-sm mt-1">You have no new notifications.</p>
+                <p className="text-xl font-semibold">{t('allCaughtUpTitle')}</p>
+                <p className="text-sm mt-1">{t('noNewNotificationsText')}</p>
               </div>
             )}
           </CardContent>
@@ -296,20 +300,20 @@ export default function NotificationsPage() {
       <AlertDialog open={showClearConfirmDialog} onOpenChange={setShowClearConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Clear All Notifications</AlertDialogTitle>
+            <AlertDialogTitle>{t('confirmClearAllTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete all your notifications? This action cannot be undone.
+              {t('confirmClearAllDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowClearConfirmDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setShowClearConfirmDialog(false)}>{t('cancelButtonText')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleClearAllNotifications}
               disabled={isClearing}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isClearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Clear All
+              {t('clearAllConfirmButton')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
