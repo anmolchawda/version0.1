@@ -357,18 +357,28 @@ export const placeholderDiscoverDiseases: DiscoverDisease[] = [
     id: 'disease-potato-late-blight',
     name: 'Late Blight',
     cropName: 'Potato',
-    cropSlug: 'potato', // Assuming potato page exists or will be created
+    cropSlug: 'potato',
     symptomsSummary: 'Water-soaked lesions on leaves and stems, white mold on undersides.',
     imageUrl: 'https://placehold.co/100x100.png?text=Potato+Blight',
     aiHint: 'potato blight',
   },
   {
+    id: 'disease-tomato-late-blight',
+    name: 'Late Blight',
+    cropName: 'Tomato',
+    cropSlug: 'tomato',
+    symptomsSummary: 'Dark, water-soaked lesions on leaves, stems, and fruits. White mold may appear.',
+    imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f', // Using an existing relevant tomato image for late blight
+    aiHint: 'tomato blight disease',
+  },
+  {
     id: 'disease-corn-rust',
     name: 'Common Rust',
     cropName: 'Corn',
-    cropSlug: 'corn', // Assuming corn page exists or will be created
+    cropSlug: 'corn',
     symptomsSummary: 'Small, cinnamon-brown pustules on both leaf surfaces.',
     imageUrl: 'https://placehold.co/100x100.png?text=Corn+Rust',
     aiHint: 'corn rust disease',
   }
 ];
+
