@@ -43,7 +43,7 @@ const HeartPulse = ({ className }: { className?: string }) => (
   </svg>
 );
 
-interface MockEvent {
+export interface MockEvent {
   id: string;
   date: Date;
   title: string;
@@ -55,7 +55,7 @@ interface MockEvent {
 const today = new Date();
 const monthStart = startOfMonth(today);
 
-const mockEventsData: MockEvent[] = [
+export const mockEventsData: MockEvent[] = [
   {
     id: 'evt1',
     date: addDays(monthStart, 2),

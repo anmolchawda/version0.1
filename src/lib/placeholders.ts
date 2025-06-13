@@ -1,7 +1,9 @@
 
-import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation } from '@/types'; // Updated imports
+import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation, Yojna, DiscoverDisease } from '@/types'; // Updated imports
 import { formatDistanceToNow } from 'date-fns';
 import type { Timestamp } from 'firebase/firestore'; // Import Firebase Timestamp
+// Removed NotebookText import as icon field is removed from Yojna
+// import { NotebookText, ShieldAlert, CalendarDays as CalendarIconLucide } from 'lucide-react';
 
 export const MOCK_USER_ID = '1'; // Current logged-in user for placeholders if needed, auth.currentUser.uid should be used mostly
 
@@ -312,22 +314,61 @@ export const placeholderListings: MandiListing[] = [
   },
 ];
 
-// Mock Chat Messages (will be replaced by Firestore fetching)
-/*
-const placeholderChatMessages: Record<string, ChatMessage[]> = {
-  '2': [
-    { id: 'msg1', senderId: '2', text: 'Hey John, are you going to the farmers market this weekend?', timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
-    { id: 'msg2', senderId: MOCK_USER_ID, text: 'Hi Sarah! Yes, I plan to. Will have lots of fresh apples!', timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString() },
-    { id: 'msg3', senderId: '2', text: 'Great! I might need some for my pies.', timestamp: new Date(Date.now() - 7 * 60 * 1000).toISOString() },
-    { id: 'msg4', senderId: MOCK_USER_ID, text: 'Sounds good, see you there!', timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString() },
-  ],
-  '3': [
-    { id: 'msg5', senderId: MOCK_USER_ID, text: 'Mike, your microgreens setup looks amazing!', timestamp: new Date(Date.now() - 20 * 60 * 1000).toISOString() },
-    { id: 'msg6', senderId: '3', text: 'Thanks John! It\'s a lot of fun. Let me know if you want some samples.', timestamp: new Date(Date.now() - 18 * 60 * 1000).toISOString() },
-  ]
-};
+export const placeholderYojnas: Yojna[] = [
+  {
+    id: 'yojna1',
+    name: 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
+    description: 'A crop insurance scheme to provide financial support to farmers suffering crop loss/damage arising out of unforeseen events.',
+    eligibility: 'All farmers including sharecroppers and tenant farmers growing notified crops in the notified areas are eligible for coverage.',
+    benefits: 'Provides insurance coverage and financial support in case of crop failure. Stabilizes income of farmers.',
+    link: 'https://pmfby.gov.in/',
+    department: 'Ministry of Agriculture & Farmers Welfare',
+  },
+  {
+    id: 'yojna2',
+    name: 'Kisan Credit Card (KCC) Scheme',
+    description: 'Provides farmers with timely access to credit for their cultivation and other needs.',
+    eligibility: 'All farmers - individuals/joint borrowers who are owner cultivators; Tenant farmers, oral lessees & sharecroppers; SHGs or JLGs of farmers.',
+    benefits: 'Adequate and timely credit support for agricultural needs, simplified loan procedures, flexibility in drawing cash.',
+    department: 'Department of Financial Services, Ministry of Finance',
+  },
+  {
+    id: 'yojna3',
+    name: 'Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)',
+    description: 'Aims to enhance physical access of water on farm and expand cultivable area under assured irrigation, improve on-farm water use efficiency to reduce wastage of water.',
+    benefits: 'Improved water availability and efficiency, leading to increased agricultural productivity and better water resource management.',
+    link: 'https://pmksy.gov.in/',
+    department: 'Ministry of Jal Shakti & Ministry of Agriculture',
+  }
+];
 
-export function getPlaceholderMessagesForChat(chatPartnerId: string): ChatMessage[] {
-  return placeholderChatMessages[chatPartnerId] || [];
-}
-*/
+// Simplified list of diseases for Discover page search
+export const placeholderDiscoverDiseases: DiscoverDisease[] = [
+  {
+    id: 'disease-tomato-early-blight',
+    name: 'Early Blight',
+    cropName: 'Tomato',
+    cropSlug: 'tomato',
+    symptomsSummary: 'Dark, concentric lesions on lower leaves; yellowing.',
+    imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab',
+    aiHint: 'tomato blight',
+  },
+  {
+    id: 'disease-potato-late-blight',
+    name: 'Late Blight',
+    cropName: 'Potato',
+    cropSlug: 'potato', // Assuming potato page exists or will be created
+    symptomsSummary: 'Water-soaked lesions on leaves and stems, white mold on undersides.',
+    imageUrl: 'https://placehold.co/100x100.png?text=Potato+Blight',
+    aiHint: 'potato blight',
+  },
+  {
+    id: 'disease-corn-rust',
+    name: 'Common Rust',
+    cropName: 'Corn',
+    cropSlug: 'corn', // Assuming corn page exists or will be created
+    symptomsSummary: 'Small, cinnamon-brown pustules on both leaf surfaces.',
+    imageUrl: 'https://placehold.co/100x100.png?text=Corn+Rust',
+    aiHint: 'corn rust disease',
+  }
+];

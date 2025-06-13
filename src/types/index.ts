@@ -121,3 +121,25 @@ export interface Notification {
   read: boolean; // If the notification has been read by the targetUser
   targetUserId: string; // The user ID for whom this notification is intended
 }
+
+export interface Yojna {
+  id: string;
+  name: string;
+  description: string;
+  eligibility?: string;
+  benefits: string;
+  link?: string;
+  department?: string;
+  // icon?: JSX.Element; // Removed to fix parsing error in .ts file
+}
+
+// For simplified disease display on Discover page
+export interface DiscoverDisease {
+  id: string;
+  name: string;
+  cropName: string; // e.g., "Tomato"
+  cropSlug: string; // e.g., "tomato"
+  symptomsSummary: string;
+  imageUrl?: string;
+  aiHint?: string;
+}

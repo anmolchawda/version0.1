@@ -144,5 +144,18 @@
   "saveAction": "सहेजें",
   "unsaveAction": "असंरक्षित करें",
   "replyButtonText": "उत्तर दें",
-  "likesLabel": "लाइक"
+  "likesLabel": "लाइक",
+  "discoverUniversalSearchTitle": "यूनिवर्सल खोज",
+  "discoverSearchPlaceholder": "किसान, पोस्ट, मंडी आइटम, रोग, कोड, योजनाएं खोजें...",
+  "discoverInitialSearchPromptTitle": "कृषिX खोजें",
+  "discoverInitialSearchPromptDescription": "किसान, पोस्ट, मंडी आइटम, फसल जानकारी, रोग, योजनाएं और बहुत कुछ खोजें।",
+  "discoverNoResultsFound": "\"{searchTerm}\" के लिए कोई परिणाम नहीं मिला।",
+  "discoverNoResultsSuggestion": "एक अलग खोज शब्द आज़माएँ या वर्तनी जांचें।",
+  "discoverMatchingFarmersTitle": "मिलते-जुलते किसान",
+  "discoverMatchingPostsTitle": "मिलती-जुलती पोस्ट",
+  "discoverMatchingMandiTitle": "मिलते-जुलते मंडी आइटम",
+  "discoverMatchingDiseasesTitle": "मिलते-जुलते फसल रोग",
+  "discoverMatchingEventsTitle": "मिलते-जुलते कार्यक्रम",
+  "discoverMatchingYojnasTitle": "मिलती-जुलती योजनाएं",
+  "discoverInfoFooter": "वर्तमान में किसान, पोस्ट, मंडी आइटम, रोग, कार्यक्रम और योजनाएं खोजी जा रही हैं।"
 }
