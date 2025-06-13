@@ -56,7 +56,20 @@ export type TranslationKey =
   | 'toastProfileUpdatedMockTitle' | 'toastProfileUpdatedMockDescription'
   | 'toastProfileUpdatedTitle' | 'toastProfileUpdatedDescription'
   | 'toastUpdateFailedTitle' | 'toastUpdateFailedDescription'
-  | 'backToSettingsButton' | 'backToProfileButton';
+  | 'backToSettingsButton' | 'backToProfileButton'
+  | 'backButton' | 'likeAction' | 'commentAction' | 'shareAction' | 'saveAction'
+  | 'unsaveAction' | 'replyButtonText' | 'likesLabel'
+  | 'discoverUniversalSearchTitle' | 'discoverSearchPlaceholder'
+  | 'discoverInitialSearchPromptTitle' | 'discoverInitialSearchPromptDescription'
+  | 'discoverNoResultsFound' | 'discoverNoResultsSuggestion'
+  | 'discoverMatchingFarmersTitle' | 'discoverMatchingPostsTitle' | 'discoverMatchingMandiTitle'
+  | 'discoverMatchingDiseasesTitle' | 'discoverMatchingEventsTitle' | 'discoverMatchingYojnasTitle'
+  | 'discoverMatchingCropsTitle' | 'discoverInfoFooter'
+  | 'messagesTitle' | 'newMessageAriaLabel' | 'searchMessagesPlaceholder'
+  | 'noMessagesYetTitle' | 'noMessagesYetDescription' | 'startNewChatButton'
+  | 'userNotAuthenticatedError' | 'failedToLoadConversationsError'
+  | 'newMessageModalTitle' | 'newMessageModalDescription' | 'searchUsersPlaceholder'
+  | 'noUsersFoundError';
 
 type Translations = Record<TranslationKey, string>;
 

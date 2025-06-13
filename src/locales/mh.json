@@ -137,5 +137,17 @@
   "toastUpdateFailedDescription": "प्रोफाइल बदल जतन करता आले नाहीत.",
   "backToSettingsButton": "सेटिंग्जवर परत जा",
   "backToProfileButton": "प्रोफाइलवर परत जा",
-  "replyButtonText": "उत्तर द्या"
+  "replyButtonText": "उत्तर द्या",
+  "messagesTitle": "संदेश",
+  "newMessageAriaLabel": "नवीन संदेश",
+  "searchMessagesPlaceholder": "संदेश किंवा वापरकर्ते शोधा...",
+  "noMessagesYetTitle": "अद्याप कोणतेही संदेश नाहीत",
+  "noMessagesYetDescription": "तुमचे संदेश येथे पाहण्यासाठी नवीन संभाषण सुरू करा.",
+  "startNewChatButton": "नवीन चॅट सुरू करा",
+  "userNotAuthenticatedError": "वापरकर्ता प्रमाणीकृत नाही. कृपया लॉग इन करा.",
+  "failedToLoadConversationsError": "संभाषणे लोड करण्यात अयशस्वी.",
+  "newMessageModalTitle": "नवीन संदेश",
+  "newMessageModalDescription": "संभाषण सुरू करण्यासाठी वापरकर्त्यांना शोधा.",
+  "searchUsersPlaceholder": "वापरकर्ते शोधा...",
+  "noUsersFoundError": "तुमच्या शोधाशी जुळणारे कोणतेही वापरकर्ते आढळले नाहीत."
 }

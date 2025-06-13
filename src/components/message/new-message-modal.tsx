@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { placeholderUsers, MOCK_USER_ID } from '@/lib/placeholders';
 import type { User } from '@/types';
 import { Search, UserPlus, X } from 'lucide-react';
+import { useTranslations } from '@/hooks/useTranslations';
 
 interface NewMessageModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ interface NewMessageModalProps {
 export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
+  const { t } = useTranslations();
 
   const availableUsers = useMemo(() => {
     return placeholderUsers.filter(user => user.id !== MOCK_USER_ID); // Exclude current user
@@ -57,10 +59,10 @@ export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) 
       <DialogContent className="sm:max-w-md p-0">
         <DialogHeader className="p-6 pb-4 border-b">
           <DialogTitle className="text-xl text-primary flex items-center">
-            <UserPlus className="mr-2 h-6 w-6" /> New Message
+            <UserPlus className="mr-2 h-6 w-6" /> {t('newMessageModalTitle')}
           </DialogTitle>
           <DialogDescription>
-            Search for users to start a conversation.
+            {t('newMessageModalDescription')}
           </DialogDescription>
         </DialogHeader>
         <div className="p-6 pt-2 space-y-4">
@@ -68,7 +70,7 @@ export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) 
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search users..."
+              placeholder={t('searchUsersPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 py-2 text-sm"
@@ -97,14 +99,11 @@ export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) 
               </div>
             ) : (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                No users found matching your search.
+                {t('noUsersFoundError')}
               </div>
             )}
           </ScrollArea>
         </div>
-         {/* ShadCN Dialog already includes a close button, so an explicit one here might be redundant 
-             unless specific placement is needed. The default X is in DialogContent.
-         */}
       </DialogContent>
     </Dialog>
   );

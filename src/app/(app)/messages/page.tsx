@@ -16,6 +16,7 @@ import type { DisplayConversation, FirestoreConversation, User } from '@/types';
 import { NewMessageModal } from '@/components/message/new-message-modal';
 import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp } from '@/lib/firebase'; // db can be null
 import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export default function MessagesPage() {
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
@@ -23,30 +24,27 @@ export default function MessagesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { authUserId } = useSidebarContext(); // Use authUserId from context
+  const { authUserId } = useSidebarContext(); 
+  const { t } = useTranslations();
 
   useEffect(() => {
     setIsLoading(true);
     setError(null);
 
     if (!authUserId) {
-      // This state should ideally be caught by the AppLayout if user is not authenticated.
-      // If using mock_user_id, authUserId should be set.
       console.warn("[MessagesPage] No authUserId found in context. User might not be logged in.");
-      setError("User not authenticated. Please log in.");
+      setError(t('userNotAuthenticatedError'));
       setIsLoading(false);
-      // router.push('/login'); // Or handle as per app's auth flow for unauthenticated users
       return;
     }
 
-    if (!db) { // Check if db is null (MOCK_DATA mode)
+    if (!db) { 
       console.log("[MessagesPage] MOCK_DATA mode: db is null. Displaying empty conversations list.");
-      setConversations([]); // In mock mode, show no conversations or load from placeholders if available
+      setConversations([]); 
       setIsLoading(false);
       return;
     }
 
-    // Real Firebase mode: db is available, proceed with Firestore query
     const conversationsCollectionRef = collection(db, 'conversations');
     const q = query(
       conversationsCollectionRef,
@@ -96,12 +94,12 @@ export default function MessagesPage() {
       setError(null);
     }, (err) => {
       console.error("Error fetching conversations: ", err);
-      setError("Failed to load conversations.");
+      setError(t('failedToLoadConversationsError'));
       setIsLoading(false);
     });
 
     return () => unsubscribe();
-  }, [authUserId, router]); // Removed db from dependency array as its presence is checked initially
+  }, [authUserId, router, t]); 
 
   return (
     <>
@@ -111,9 +109,9 @@ export default function MessagesPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-2xl font-bold text-primary flex items-center">
                 <MessageSquareText className="mr-3 h-7 w-7" />
-                Messages
+                {t('messagesTitle')}
               </CardTitle>
-              <Button variant="ghost" size="icon" aria-label="New message" onClick={() => setIsNewMessageModalOpen(true)}>
+              <Button variant="ghost" size="icon" aria-label={t('newMessageAriaLabel')} onClick={() => setIsNewMessageModalOpen(true)}>
                 <Edit3 className="h-5 w-5" />
               </Button>
             </div>
@@ -121,7 +119,7 @@ export default function MessagesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search messages or users..."
+                placeholder={t('searchMessagesPlaceholder')}
                 className="w-full pl-10 py-2 rounded-lg"
               />
             </div>
@@ -168,12 +166,12 @@ export default function MessagesPage() {
                 !isLoading && !error && (
                   <div className="text-center py-20">
                     <Users className="mx-auto h-16 w-16 text-muted-foreground/50 mb-4" />
-                    <p className="text-xl font-semibold text-foreground">No Messages Yet</p>
+                    <p className="text-xl font-semibold text-foreground">{t('noMessagesYetTitle')}</p>
                     <p className="text-sm text-muted-foreground mt-2">
-                      Start a new conversation to see your messages here.
+                      {t('noMessagesYetDescription')}
                     </p>
                     <Button className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => setIsNewMessageModalOpen(true)}>
-                      <Edit3 className="mr-2 h-4 w-4" /> Start a New Chat
+                      <Edit3 className="mr-2 h-4 w-4" /> {t('startNewChatButton')}
                     </Button>
                   </div>
                 )
