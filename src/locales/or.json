@@ -137,5 +137,6 @@
   "toastUpdateFailedDescription": "ପ୍ରୋଫାଇଲ୍ ପରିବର୍ତ୍ତନ ସଞ୍ଚିତ ହେବାରେ ବିଫଳ ହେଲା ।",
   "backToSettingsButton": "ସେଟିଂସ୍କୁ ଫେରନ୍ତୁ",
   "backToProfileButton": "ପ୍ରୋଫାଇଲ୍ କୁ ଫେରନ୍ତୁ",
-  "loadingFeedText": "ଫିଡ୍ ଲୋଡ୍ ହେଉଛି..."
+  "loadingFeedText": "ଫିଡ୍ ଲୋଡ୍ ହେଉଛି...",
+  "replyButtonText": "ଉତ୍ତର ଦିଅନ୍ତୁ"
 }

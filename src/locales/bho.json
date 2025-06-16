@@ -137,5 +137,6 @@
   "toastUpdateFailedDescription": "Could not save profile changes.",
   "backToSettingsButton": "Back to Settings",
   "backToProfileButton": "Back to Profile",
-  "loadingFeedText": "फ़ीड लोड हो रहल बा..."
+  "loadingFeedText": "फ़ीड लोड हो रहल बा...",
+  "replyButtonText": "जबाब दीं"
 }

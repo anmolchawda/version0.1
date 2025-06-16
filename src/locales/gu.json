@@ -48,7 +48,7 @@
     "sharePostButton": "પોસ્ટ શેર કરો",
     "postingButton": "શેર કરી રહ્યું છે...",
     "emptyPostErrorTitle": "ખાલી પોસ્ટ",
-    "emptyPostErrorDescription": "પોસ્ટ માટે કૃપા કરીને કેપ્શન અથવા તસ્વીર/વિડિઓ ઉમેરો.",
+    "emptyPostErrorDescription": "પોસ્ટ માટે કૃપા કરીને કેપ્શન અથવા તસ્વીર/વિડਿઓ ઉમેરો.",
     "postCreatedSuccessTitle": "પોસ્ટ બનાવી!",
     "postCreatedSuccessDescription": "તમારી પોસ્ટ સફળતાપૂર્વક શેર થઈ ગઈ.",
     "suggestHashtagsButton": "હૅશટેਗ્સ સૂચવો",
@@ -137,5 +137,6 @@
     "toastUpdateFailedDescription": "પ્રોફાઇલ ફેરફાર સાચવી શક્યા નથી.",
     "backToSettingsButton": "સેટિંગ્સ પર પાછા જાઓ",
     "backToProfileButton": "પ્રોફાઇલ પર પાછા જાઓ",
-    "loadingFeedText": "ફીડ લોડ થઈ રહ્યું છે..."
+    "loadingFeedText": "ફીડ લોડ થઈ રહ્યું છે...",
+    "replyButtonText": "જવાબ આપો"
   }

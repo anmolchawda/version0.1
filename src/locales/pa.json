@@ -137,5 +137,7 @@
     "toastUpdateFailedDescription": "ਤਬਦੀਲੀਆਂ ਸੇਵ ਨਹੀਂ ਹੋ ਸਕੀਆਂ।",
     "backToSettingsButton": "ਸੈਟਿੰਗਜ਼ 'ਚ ਵਾਪਸ ਜਾਓ",
     "backToProfileButton": "ਪ੍ਰੋਫਾਈਲ 'ਚ ਵਾਪਸ ਜਾਓ",
-    "loadingFeedText": "ਫੀਡ ਲੋਡ ਹੋ ਰਹੀ ਹੈ..."
+    "loadingFeedText": "ਫੀਡ ਲੋਡ ਹੋ ਰਹੀ ਹੈ...",
+    "replyButtonText": "ਜਵਾਬ ਦਿਓ"
   }
+  

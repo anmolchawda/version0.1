@@ -137,5 +137,6 @@
   "toastUpdateFailedDescription": "প্রোফাইল পরিবর্তন সংরক্ষণ করতে ব্যর্থ।",
   "backToSettingsButton": "সেটিংসে ফিরে যান",
   "backToProfileButton": "প্রোফাইল এ ফিরে যান",
-  "loadingFeedText": "ফিড লোড হচ্ছে..."
+  "loadingFeedText": "ফিড লোড হচ্ছে...",
+  "replyButtonText": "উত্তর দিন"
 }

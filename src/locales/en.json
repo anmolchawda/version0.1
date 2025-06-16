@@ -137,5 +137,6 @@
   "toastUpdateFailedDescription": "Could not save profile changes.",
   "backToSettingsButton": "Back to Settings",
   "backToProfileButton": "Back to Profile",
-  "loadingFeedText": "Loading feed..."
+  "loadingFeedText": "Loading feed...",
+  "replyButtonText": "Reply"
 }
