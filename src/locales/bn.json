@@ -100,7 +100,7 @@
   "toastAnalysisFailedTitle": "বিশ্লেষণ ব্যর্থ",
   "toastAnalysisFailedDescription": "ছবি বিশ্লেষণ করা যায়নি। আবার চেষ্টা করুন।",
   "likeCountSingular": "লাইক",
-  "likeCountPlural": "লাইक्स",
+  "likeCountPlural": "লাইక్స్",
   "viewAllCommentsText": "সব {count} মন্তব্য দেখুন",
   "postUnsavedToastTitle": "পোস্ট সংরক্ষণ হয়নি",
   "postUnsavedToastDescription": "আপনার প্রিয় তালিকা থেকে সরিয়ে ফেলা হয়েছে।",
@@ -138,5 +138,21 @@
   "backToSettingsButton": "সেটিংসে ফিরে যান",
   "backToProfileButton": "প্রোফাইল এ ফিরে যান",
   "loadingFeedText": "ফিড লোড হচ্ছে...",
-  "replyButtonText": "উত্তর দিন"
+  "replyButtonText": "উত্তর দিন",
+  "discoverUniversalSearchTitle": "ইউনিভার্সাল অনুসন্ধান",
+  "discoverSearchPlaceholder": "কৃষক, পোস্ট, মন্ডি আইটেম, রোগ, কোড, পরিকল্পনা অনুসন্ধান করুন...",
+  "discoverInitialSearchPromptTitle": "কৃষিX অনুসন্ধান করুন",
+  "discoverInitialSearchPromptDescription": "কৃষক, পোস্ট, মন্ডি আইটেম, ফসল তথ্য, রোগ, পরিকল্পনা এবং আরও অনেক কিছু খুঁজুন।",
+  "discoverNoResultsFound": "\"{searchTerm}\" এর জন্য কোনও ফলাফল পাওয়া যায়নি।",
+  "discoverNoResultsSuggestion": "একটি ভিন্ন অনুসন্ধান শব্দ চেষ্টা করুন বা বানান পরীক্ষা করুন।",
+  "discoverMatchingFarmersTitle": "মিলে যাওয়া কৃষক",
+  "discoverMatchingPostsTitle": "মিলে যাওয়া পোস্ট",
+  "discoverMatchingMandiTitle": "মিলে যাওয়া মন্ডি আইটেম",
+  "discoverMatchingDiseasesTitle": "মিলে যাওয়া ফসলের রোগ",
+  "discoverMatchingEventsTitle": "মিলে যাওয়া ইভেন্ট",
+  "discoverMatchingYojnasTitle": "মিলে যাওয়া পরিকল্পনা",
+  "discoverMatchingCropsTitle": "মিলে যাওয়া ফসল",
+  "discoverInfoFooter": "বর্তমানে কৃষক, পোস্ট, মন্ডি আইটেম, রোগ, ইভেন্ট এবং পরিকল্পনাগুলিতে অনুসন্ধান করা হচ্ছে।"
 }
+
+    

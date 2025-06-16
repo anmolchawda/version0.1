@@ -90,7 +90,7 @@
   "aiPlantIdentifiedDefaultDescription": "ಬೆಳೆ ಗುರುತಿಸಲಾಗಿದೆ.",
   "aiAnalysisDetailDiseaseTitle": "ರೋಗ",
   "aiAnalysisDetailNutrientTitle": "ಪೋಷಕ ಕೊರತೆ",
-  "aiAnalysisDetailInsectTitle": "ಕೀಟಗಳ ಹಾಜರಾತಿ",
+  "aiAnalysisDetailInsectTitle": "ಕೀਟಗಳ ಹಾಜರಾತಿ",
   "aiAnalysisDetailNoIssueDetected": "{issue} ಕಂಡುಬರಲಿಲ್ಲ.",
   "aiOverallAssessmentTitle": "ಒಟ್ಟು ಅಂಕಣ",
   "aiSuggestionsTitle": "ಸಲಹೆಗಳು",
@@ -139,5 +139,21 @@
   "backToSettingsButton": "ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
   "backToProfileButton": "ಪ್ರೊಫೈಲ್ಗೆ ಹಿಂತಿರುಗಿ",
   "replyButtonText": "ಉತ್ತರಿಸಿ",
+  "discoverUniversalSearchTitle": "ಸಾರ್ವತ್ರಿಕ ಹುಡುಕಾಟ",
+  "discoverSearchPlaceholder": "ರೈತರು, ಪೋಸ್ಟ್‌ಗಳು, ಮಂಡಿ ವಸ್ತುಗಳು, ರೋಗಗಳು, ಕೋಡ್‌ಗಳು, ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಿ...",
+  "discoverInitialSearchPromptTitle": "ಕೃಷಿX ಹುಡುಕಿ",
+  "discoverInitialSearchPromptDescription": "ರೈತರು, ಪೋಸ್ಟ್‌ಗಳು, ಮಂಡಿ ವಸ್ತುಗಳು, ಬೆಳೆ ಮಾಹಿತಿ, ರೋಗಗಳು, ಯೋಜನೆಗಳು ಮತ್ತು ಹೆಚ್ಚಿನದನ್ನು ಹುಡುಕಿ.",
+  "discoverNoResultsFound": "\"{searchTerm}\" ಗೆ ಯಾವುದೇ ಫಲಿತಾಂಶಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+  "discoverNoResultsSuggestion": "ಬೇರೆ ಹುಡುಕಾಟ ಪದವನ್ನು ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಕಾಗುಣಿತವನ್ನು ಪರಿಶೀಲಿಸಿ.",
+  "discoverMatchingFarmersTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ರೈತರು",
+  "discoverMatchingPostsTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಪೋಸ್ಟ್‌ಗಳು",
+  "discoverMatchingMandiTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಮಂಡಿ ವಸ್ತುಗಳು",
+  "discoverMatchingDiseasesTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಬೆಳೆ ರೋಗಗಳು",
+  "discoverMatchingEventsTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಕಾರ್ಯಕ್ರಮಗಳು",
+  "discoverMatchingYojnasTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಯೋಜನೆಗಳು",
+  "discoverMatchingCropsTitle": "ಹೊಂದಾಣಿಕೆಯಾಗುವ ಬೆಳೆಗಳು",
+  "discoverInfoFooter": "ಪ್ರಸ್ತುತ ರೈತರು, ಪೋಸ್ಟ್‌ಗಳು, ಮಂಡಿ ವಸ್ತುಗಳು, ರೋಗಗಳು, ಘಟನೆಗಳು ಮತ್ತು ಯೋಜನೆಗಳಾದ್ಯಂತ ಹುಡುಕಲಾಗುತ್ತಿದೆ.",
   "loadingFeedText": "ಫೀಡ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ..."
 }
+
+    

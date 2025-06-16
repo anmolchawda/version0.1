@@ -138,6 +138,21 @@
     "backToSettingsButton": "ਸੈਟਿੰਗਜ਼ 'ਚ ਵਾਪਸ ਜਾਓ",
     "backToProfileButton": "ਪ੍ਰੋਫਾਈਲ 'ਚ ਵਾਪਸ ਜਾਓ",
     "loadingFeedText": "ਫੀਡ ਲੋਡ ਹੋ ਰਹੀ ਹੈ...",
-    "replyButtonText": "ਜਵਾਬ ਦਿਓ"
-  }
-  
+    "replyButtonText": "ਜਵਾਬ ਦਿਓ",
+    "discoverUniversalSearchTitle": "ਯੂਨੀਵਰਸਲ ਖੋਜ",
+    "discoverSearchPlaceholder": "ਕਿਸਾਨ, ਪੋਸਟਾਂ, ਮੰਡੀ ਆਈਟਮਾਂ, ਬਿਮਾਰੀਆਂ, ਕੋਡ, ਯੋਜਨਾਵਾਂ ਖੋਜੋ...",
+    "discoverInitialSearchPromptTitle": "ਕ੍ਰਿਸ਼ੀX ਖੋਜੋ",
+    "discoverInitialSearchPromptDescription": "ਕਿਸਾਨ, ਪੋਸਟਾਂ, ਮੰਡੀ ਆਈਟਮਾਂ, ਫਸਲ ਜਾਣਕਾਰੀ, ਬਿਮਾਰੀਆਂ, ਯੋਜਨਾਵਾਂ ਅਤੇ ਹੋਰ ਬਹੁਤ ਕੁਝ ਲੱਭੋ।",
+    "discoverNoResultsFound": "\"{searchTerm}\" ਲਈ ਕੋਈ ਨਤੀਜਾ ਨਹੀਂ ਮਿਲਿਆ।",
+    "discoverNoResultsSuggestion": "ਵੱਖਰਾ ਖੋਜ ਸ਼ਬਦ ਅਜ਼ਮਾਓ ਜਾਂ ਸਪੈਲਿੰਗ ਚੈੱਕ ਕਰੋ।",
+    "discoverMatchingFarmersTitle": "ਮਿਲਦੇ-ਜੁਲਦੇ ਕਿਸਾਨ",
+    "discoverMatchingPostsTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਪੋਸਟਾਂ",
+    "discoverMatchingMandiTitle": "ਮਿਲਦੇ-ਜੁਲਦੇ ਮੰਡੀ ਆਈਟਮ",
+    "discoverMatchingDiseasesTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਫਸਲਾਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ",
+    "discoverMatchingEventsTitle": "ਮਿਲਦੇ-ਜੁਲਦੇ ਸਮਾਗਮ",
+    "discoverMatchingYojnasTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਯੋਜਨਾਵਾਂ",
+    "discoverMatchingCropsTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਫਸਲਾਂ",
+    "discoverInfoFooter": "ਵਰਤਮਾਨ ਵਿੱਚ ਕਿਸਾਨਾਂ, ਪੋਸਟਾਂ, ਮੰਡੀ ਆਈਟਮਾਂ, ਬਿਮਾਰੀਆਂ, ਸਮਾਗਮਾਂ ਅਤੇ ਯੋਜਨਾਵਾਂ ਵਿੱਚ ਖੋਜ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ।"
+}
+
+    

@@ -142,7 +142,6 @@
     "discoverSearchPlaceholder": "விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், நோய்கள், குறியீடுகள், திட்டங்களைத் தேடுங்கள்...",
     "discoverInitialSearchPromptTitle": "KrishiX இல் தேடுங்கள்",
     "discoverInitialSearchPromptDescription": "விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், பயிர் தகவல், நோய்கள், திட்டங்கள் மற்றும் பலவற்றைத் தேடுங்கள்.",
-    "discoverInfoFooter": "தற்போது விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், நோய்கள், நிகழ்வுகள் மற்றும் திட்டங்கள் தேடப்படுகின்றன.",
     "discoverNoResultsFound": "\"{searchTerm}\" என்பதற்கு முடிவுகள் எதுவும் கிடைக்கவில்லை.",
     "discoverNoResultsSuggestion": "வேறு தேடல் வார்த்தையை முயற்சிக்கவும் அல்லது எழுத்துப்பிழை சரிபார்க்கவும்.",
     "discoverMatchingFarmersTitle": "பொருந்தும் விவசாயிகள்",
@@ -152,6 +151,7 @@
     "discoverMatchingEventsTitle": "பொருந்தும் நிகழ்வுகள்",
     "discoverMatchingYojnasTitle": "பொருந்தும் திட்டங்கள்",
     "discoverMatchingCropsTitle": "பொருந்தும் பயிர்கள்",
+    "discoverInfoFooter": "தற்போது விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், நோய்கள், நிகழ்வுகள் மற்றும் திட்டங்கள் தேடப்படுகின்றன.",
     "messagesTitle": "செய்திகள்",
     "newMessageAriaLabel": "புதிய செய்தி",
     "searchMessagesPlaceholder": "செய்திகள் அல்லது பயனர்களைத் தேடுங்கள்...",
@@ -192,3 +192,5 @@
     "newNotificationText": "புதிய அறிவிப்பு.",
     "loadingFeedText": "ஃபீட் ஏற்றப்படுகிறது..."
 }
+
+    

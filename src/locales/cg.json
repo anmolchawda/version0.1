@@ -147,8 +147,8 @@
   "replyButtonText": "जवाब देवव",
   "discoverUniversalSearchTitle": "यूनिवर्सल खोज",
   "discoverSearchPlaceholder": "किसान, पोस्ट, मंडी आइटम, रोग, कोड, योजनाएं खोजें...",
-  "discoverInitialSearchPromptTitle": "कृषिX खोजें",
-  "discoverInitialSearchPromptDescription": "किसान, पोस्ट, मंडी आइटम, फसल जानकारी, रोग, योजनाएं और बहुत कुछ खोजें।",
+  "discoverInitialSearchPromptTitle": "कृषिX खोजव",
+  "discoverInitialSearchPromptDescription": "किसान, पोस्ट, मंडी आइटम, फसल जानकारी, रोग, योजना अउ बहुत कुछ खोजव।",
   "discoverNoResultsFound": "\"{searchTerm}\" बर कोनो परिणाम नइ मिलिस।",
   "discoverNoResultsSuggestion": "दूसर खोज शब्द कोशिश करव या वर्तनी जांचव।",
   "discoverMatchingFarmersTitle": "मिलत-जुलत किसान",
@@ -192,5 +192,12 @@
   "toastNotificationsClearedDescription": "तोर सब सूचना हटा दे गे हे.",
   "toastErrorClearingNotificationsTitle": "सूचना साफ करे मं गलती",
   "toastErrorClearingNotificationsDescription": "सब सूचना साफ नइ हो सकिस. फेर कोशिश करव.",
+  "likedYourPostText": "ने आपकी पोस्ट को पसंद किया।",
+  "commentedOnYourPostText": "ने आपकी पोस्ट पर टिप्पणी की:",
+  "onYourPostText": "आपकी पोस्ट पर।",
+  "startedFollowingYouText": "ने आपको फ़ॉलो करना शुरू कर दिया है।",
+  "newNotificationText": "नई सूचना।",
   "loadingFeedText": "फीड लोड होवत हे..."
 }
+
+    

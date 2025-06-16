@@ -1,7 +1,7 @@
 
 {
     "feed": "ફિડ",
-    "discover": "ખોજ",
+    "discover": "શોધો",
     "create": "બનાવો",
     "mandi": "મંદી",
     "profile": "પ્રોફાઇલ",
@@ -138,5 +138,21 @@
     "backToSettingsButton": "સેટિંગ્સ પર પાછા જાઓ",
     "backToProfileButton": "પ્રોફાઇલ પર પાછા જાઓ",
     "loadingFeedText": "ફીડ લોડ થઈ રહ્યું છે...",
-    "replyButtonText": "જવાબ આપો"
-  }
+    "replyButtonText": "જવાબ આપો",
+    "discoverUniversalSearchTitle": "યુનિવર્સલ શોધ",
+    "discoverSearchPlaceholder": "ખેડૂતો, પોસ્ટ્સ, મંડી આઇટમ્સ, રોગો, કોડ, યોજનાઓ વગેરે શોધો...",
+    "discoverInitialSearchPromptTitle": "કૃષિX શોધો",
+    "discoverInitialSearchPromptDescription": "ખેડૂતો, પોસ્ટ્સ, મંડી આઇટમ્સ, પાકની માહિતી, રોગો, યોજનાઓ અને વધુ શોધો.",
+    "discoverNoResultsFound": "\"{searchTerm}\" માટે કોઈ પરિણામ મળ્યું નથી.",
+    "discoverNoResultsSuggestion": "અલગ શોધ શબ્દ અજમાવો અથવા જોડણી તપાસો.",
+    "discoverMatchingFarmersTitle": "મળતા ખેડૂતો",
+    "discoverMatchingPostsTitle": "મળતી પોસ્ટ્સ",
+    "discoverMatchingMandiTitle": "મળતી મંડી આઇટમ્સ",
+    "discoverMatchingDiseasesTitle": "મળતા પાકના રોગો",
+    "discoverMatchingEventsTitle": "મળતી ઘટનાઓ",
+    "discoverMatchingYojnasTitle": "મળતી યોજનાઓ",
+    "discoverMatchingCropsTitle": "મળતા પાક",
+    "discoverInfoFooter": "હાલમાં ખેડૂતો, પોસ્ટ્સ, મંડી આઇટમ્સ, રોગો, ઘટનાઓ અને યોજનાઓમાં શોધ કરી રહ્યા છીએ."
+}
+
+    

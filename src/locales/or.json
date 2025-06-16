@@ -125,7 +125,7 @@
   "locationPlaceholder": "ଉଦାହରଣ ସ୍ୱରୂପ: ରାୟପୁର, ଛତିଶଗଢ଼",
   "produceLabel": "ମୁଖ୍ୟ ଉତ୍ପାଦନ (କମାଦ୍ୱାରା ବିଭାଜିତ)",
   "producePlaceholder": "ଉଦାହରଣ: ଟମାଟୋ, ମକା, ଆପିଲ୍",
-  "savingChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ଚୟ କରାଯାଉଛି...",
+  "savingChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ਚୟ କରାଯାଉଛି...",
   "saveChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ਚୟ କରନ୍ତୁ",
   "toastNotAuthenticatedTitle": "ପ୍ରମାଣିତ ହୋଇନାହିଁ",
   "toastNotAuthenticatedDescription": "ପ୍ରୋଫାଇଲ୍ ଅଦ୍ୟତନ କରିବା ପାଇଁ ଲଗିନ୍ କରନ୍ତୁ ।",
@@ -138,5 +138,21 @@
   "backToSettingsButton": "ସେଟିଂସ୍କୁ ଫେରନ୍ତୁ",
   "backToProfileButton": "ପ୍ରୋଫାଇଲ୍ କୁ ଫେରନ୍ତୁ",
   "loadingFeedText": "ଫିଡ୍ ଲୋଡ୍ ହେଉଛି...",
-  "replyButtonText": "ଉତ୍ତର ଦିଅନ୍ତୁ"
+  "replyButtonText": "ଉତ୍ତର ଦିଅନ୍ତୁ",
+  "discoverUniversalSearchTitle": "ୟୁନିଭର୍ସାଲ୍ ସର୍ଚ୍ଚ",
+  "discoverSearchPlaceholder": "କୃଷକ, ପୋଷ୍ଟ, ମଣ୍ଡି ଆଇଟମ୍, ରୋଗ, କୋଡ୍, ଯୋଜନା ଖୋଜନ୍ତୁ...",
+  "discoverInitialSearchPromptTitle": "କୃଷିX ସର୍ଚ୍ଚ କରନ୍ତୁ",
+  "discoverInitialSearchPromptDescription": "କୃଷକ, ପୋଷ୍ଟ, ମଣ୍ଡି ଆଇଟମ୍, ଫସଲ ସୂଚନା, ରୋଗ, ଯୋଜନା ଏବଂ ଆହୁରି ଅନେକ ଖୋଜନ୍ତୁ।",
+  "discoverNoResultsFound": "\"{searchTerm}\" ପାଇଁ କୌଣସି ଫଳାଫଳ ମିଳିଲା ନାହିଁ।",
+  "discoverNoResultsSuggestion": "ଏକ ଭିନ୍ନ ସର୍ଚ୍ଚ ଶବ୍ଦ ଚେଷ୍ଟା କରନ୍ତୁ କିମ୍ବା ବନାନ ଯାଞ୍ଚ କରନ୍ତୁ।",
+  "discoverMatchingFarmersTitle": "ମେଳ ଖାଉଥିବା କୃଷକ",
+  "discoverMatchingPostsTitle": "ମେଳ ଖାଉଥିବା ପୋଷ୍ଟଗୁଡ଼ିକ",
+  "discoverMatchingMandiTitle": "ମେଳ ଖାଉଥିବା ମଣ୍ଡି ଆଇଟମ୍",
+  "discoverMatchingDiseasesTitle": "ମେଳ ଖାଉଥିବା ଫସଲ ରୋଗ",
+  "discoverMatchingEventsTitle": "ମେଳ ଖାଉଥିବା ଇଭେଣ୍ଟଗୁଡ଼ିକ",
+  "discoverMatchingYojnasTitle": "ମେଳ ଖାଉଥିବା ଯୋଜନାଗୁଡ଼ିକ",
+  "discoverMatchingCropsTitle": "ମେଳ ଖାଉଥିବା ଫସଲଗୁଡ଼ିକ",
+  "discoverInfoFooter": "ବର୍ତ୍ତମାନ କୃଷକ, ପୋଷ୍ଟ, ମଣ୍ଡି ଆଇଟମ୍, ରୋଗ, ଇଭେଣ୍ଟ ଏବଂ ଯୋଜନାଗୁଡ଼ିକରେ ସର୍ଚ୍ଚ କରାଯାଉଛି।"
 }
+
+    

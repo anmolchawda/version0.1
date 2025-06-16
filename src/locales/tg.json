@@ -138,6 +138,21 @@
     "backToSettingsButton": "అమరికలకు తిరిగి వెళ్ళు",
     "backToProfileButton": "ప్రొఫైల్‌కు తిరిగి వెళ్ళు",
     "loadingFeedText": "ఫీడ్ లోడ్ అవుతోంది...",
-    "replyButtonText": "జవాబివ్వండి"
-  }
-  
+    "replyButtonText": "జవాబివ్వండి",
+    "discoverUniversalSearchTitle": "యూనివర్సల్ శోధన",
+    "discoverSearchPlaceholder": "రైతులు, పోస్టులు, మండి వస్తువులు, వ్యాధులు, కోడ్‌లు, పథకాలను శోధించండి...",
+    "discoverInitialSearchPromptTitle": "కృషిX శోధించండి",
+    "discoverInitialSearchPromptDescription": "రైతులు, పోస్టులు, మండి వస్తువులు, పంట సమాచారం, వ్యాధులు, పథకాలు మరియు మరిన్నింటిని కనుగొనండి.",
+    "discoverNoResultsFound": "\"{searchTerm}\" కోసం ఫలితాలు కనుగొనబడలేదు.",
+    "discoverNoResultsSuggestion": "వేరే శోధన పదాన్ని ప్రయత్నించండి లేదా స్పెల్లింగ్‌ను తనిఖీ చేయండి.",
+    "discoverMatchingFarmersTitle": "సరిపోలుతున్న రైతులు",
+    "discoverMatchingPostsTitle": "సరిపోలుతున్న పోస్టులు",
+    "discoverMatchingMandiTitle": "సరిపోలుతున్న మండి వస్తువులు",
+    "discoverMatchingDiseasesTitle": "సరిపోలుతున్న పంట వ్యాధులు",
+    "discoverMatchingEventsTitle": "సరిపోలుతున్న ఈవెంట్‌లు",
+    "discoverMatchingYojnasTitle": "సరిపోలుతున్న పథకాలు",
+    "discoverMatchingCropsTitle": "సరిపోలుతున్న పంటలు",
+    "discoverInfoFooter": "ప్రస్తుతం రైతులు, పోస్ట్‌లు, మండి వస్తువులు, వ్యాధులు, ఈవెంట్‌లు మరియు పథకాలలో శోధిస్తున్నారు."
+}
+
+    

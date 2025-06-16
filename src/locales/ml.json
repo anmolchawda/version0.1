@@ -138,6 +138,21 @@
     "toastAnalysisFailedTitle": "വിശകലനം പരാജയപ്പെട്ടു",
     "toastAnalysisFailedDescription": "ചിത്രം വിശകലനം ചെയ്യാൻ കഴിഞ്ഞില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക.",
     "loadingFeedText": "ഫീഡ് ലോഡ് ചെയ്യുന്നു...",
-    "replyButtonText": "മറുപടി നൽകുക"
-  }
-  
+    "replyButtonText": "മറുപടി നൽകുക",
+    "discoverUniversalSearchTitle": "സാർവ്വത്രിക തിരയൽ",
+    "discoverSearchPlaceholder": "കർഷകർ, പോസ്റ്റുകൾ, മണ്ടി ഇനങ്ങൾ, രോഗങ്ങൾ, കോഡുകൾ, പദ്ധതികൾ എന്നിവ തിരയുക...",
+    "discoverInitialSearchPromptTitle": "കൃഷിX തിരയുക",
+    "discoverInitialSearchPromptDescription": "കർഷകർ, പോസ്റ്റുകൾ, മണ്ടി ഇനങ്ങൾ, വിള വിവരങ്ങൾ, രോഗങ്ങൾ, പദ്ധതികൾ എന്നിവയും അതിലേറെയും കണ്ടെത്തുക.",
+    "discoverNoResultsFound": "\"{searchTerm}\" എന്നതിന് ഫലങ്ങളൊന്നും കണ്ടെത്തിയില്ല.",
+    "discoverNoResultsSuggestion": "വ്യത്യസ്തമായ തിരയൽ പദം ഉപയോഗിക്കുക അല്ലെങ്കിൽ അക്ഷരത്തെറ്റ് പരിശോധിക്കുക.",
+    "discoverMatchingFarmersTitle": "ചേരുന്ന കർഷകർ",
+    "discoverMatchingPostsTitle": "ചേരുന്ന പോസ്റ്റുകൾ",
+    "discoverMatchingMandiTitle": "ചേരുന്ന മണ്ടി ഇനങ്ങൾ",
+    "discoverMatchingDiseasesTitle": "ചേരുന്ന വിള രോഗങ്ങൾ",
+    "discoverMatchingEventsTitle": "ചേരുന്ന പരിപാടികൾ",
+    "discoverMatchingYojnasTitle": "ചേരുന്ന പദ്ധതികൾ",
+    "discoverMatchingCropsTitle": "ചേരുന്ന വിളകൾ",
+    "discoverInfoFooter": "നിലവിൽ കർഷകർ, പോസ്റ്റുകൾ, മണ്ടി ഇനങ്ങൾ, രോഗങ്ങൾ, പരിപാടികൾ, പദ്ധതികൾ എന്നിവയിൽ തിരയുന്നു."
+}
+
+    

@@ -138,5 +138,21 @@
   "backToSettingsButton": "Back to Settings",
   "backToProfileButton": "Back to Profile",
   "loadingFeedText": "Loading feed...",
-  "replyButtonText": "Reply"
+  "replyButtonText": "Reply",
+  "discoverUniversalSearchTitle": "Universal Search",
+  "discoverSearchPlaceholder": "Search farmers, posts, mandi items, diseases, codes, schemes...",
+  "discoverInitialSearchPromptTitle": "Search KrishiX",
+  "discoverInitialSearchPromptDescription": "Find farmers, posts, mandi items, crop info, diseases, schemes, and more.",
+  "discoverNoResultsFound": "No results found for \"{searchTerm}\".",
+  "discoverNoResultsSuggestion": "Try a different search term or check spelling.",
+  "discoverMatchingFarmersTitle": "Matching Farmers",
+  "discoverMatchingPostsTitle": "Matching Posts",
+  "discoverMatchingMandiTitle": "Matching Mandi Items",
+  "discoverMatchingDiseasesTitle": "Matching Crop Diseases",
+  "discoverMatchingEventsTitle": "Matching Events",
+  "discoverMatchingYojnasTitle": "Matching Schemes",
+  "discoverMatchingCropsTitle": "Matching Crops",
+  "discoverInfoFooter": "Currently searching across farmers, posts, mandi items, diseases, events, and schemes."
 }
+
+    

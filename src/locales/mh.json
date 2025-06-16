@@ -116,7 +116,7 @@
   "changePhotoButton": "फोटो बदला",
   "imageUploadHelperText": "PNG, JPG, GIF 2MB पर्यंत.",
   "usernameLabel": "युजरनेम",
-  "usernamePlaceholder": "तुमचे युनिक युजरनेम",
+  "usernamePlaceholder": "तुमचे युनिक युजरनेમ",
   "fullNameLabel": "पूर्ण नाव",
   "fullNamePlaceholder": "तुमचे पूर्ण नाव",
   "bioLabel": "बायो",
@@ -192,3 +192,5 @@
   "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत.",
   "loadingFeedText": "फीड लोड होत आहे..."
 }
+
+    

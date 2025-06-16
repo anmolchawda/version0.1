@@ -138,5 +138,21 @@
   "backToSettingsButton": "Back to Settings",
   "backToProfileButton": "Back to Profile",
   "loadingFeedText": "फ़ीड लोड हो रहल बा...",
-  "replyButtonText": "जबाब दीं"
+  "replyButtonText": "जबाब दीं",
+  "discoverUniversalSearchTitle": "यूनिवर्सल खोज",
+  "discoverSearchPlaceholder": "किसान, पोस्ट, मंडी आइटम, बेमारी, कोड, योजना खोजऽ...",
+  "discoverInitialSearchPromptTitle": "कृषिX खोजऽ",
+  "discoverInitialSearchPromptDescription": "किसान, पोस्ट, मंडी आइटम, फसल जानकारी, रोग, योजना आ अउरी बहुत कुछ खोजऽ।",
+  "discoverNoResultsFound": "\"{searchTerm}\" खातिर कौनो परिणाम ना मिलल।",
+  "discoverNoResultsSuggestion": "दूसर खोज शब्द आजमावऽ या वर्तनी जांचऽ।",
+  "discoverMatchingFarmersTitle": "मिलत किसान",
+  "discoverMatchingPostsTitle": "मिलत पोस्ट",
+  "discoverMatchingMandiTitle": "मिलत मंडी आइटम",
+  "discoverMatchingDiseasesTitle": "मिलत फसल के बेमारी",
+  "discoverMatchingEventsTitle": "मिलत कार्यक्रम",
+  "discoverMatchingYojnasTitle": "मिलत योजना",
+  "discoverMatchingCropsTitle": "मिलत फसल",
+  "discoverInfoFooter": "वर्तमान में किसान, पोस्ट, मंडी आइटम, रोग, कार्यक्रम आ योजना में खोज हो रहल बा।"
 }
+
+    
