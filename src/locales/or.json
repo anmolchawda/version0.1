@@ -1,3 +1,4 @@
+
 {
   "feed": "ଫିଡ୍",
   "discover": "ଆବିଷ୍କାର",
@@ -125,7 +126,7 @@
   "produceLabel": "ମୁଖ୍ୟ ଉତ୍ପାଦନ (କମାଦ୍ୱାରା ବିଭାଜିତ)",
   "producePlaceholder": "ଉଦାହରଣ: ଟମାଟୋ, ମକା, ଆପିଲ୍",
   "savingChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ଚୟ କରାଯାଉଛି...",
-  "saveChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ଚୟ କରନ୍ତୁ",
+  "saveChangesButton": "ପରିବର୍ତ୍ତନ ସଞ୍ਚୟ କରନ୍ତୁ",
   "toastNotAuthenticatedTitle": "ପ୍ରମାଣିତ ହୋଇନାହିଁ",
   "toastNotAuthenticatedDescription": "ପ୍ରୋଫାଇଲ୍ ଅଦ୍ୟତନ କରିବା ପାଇଁ ଲଗିନ୍ କରନ୍ତୁ ।",
   "toastProfileUpdatedMockTitle": "ପ୍ରୋଫାଇଲ୍ ଅଦ୍ୟତନ (Mock)",
@@ -135,5 +136,6 @@
   "toastUpdateFailedTitle": "ଅଦ୍ୟତନ ବିଫଳ ହେଲା",
   "toastUpdateFailedDescription": "ପ୍ରୋଫାଇଲ୍ ପରିବର୍ତ୍ତନ ସଞ୍ଚିତ ହେବାରେ ବିଫଳ ହେଲା ।",
   "backToSettingsButton": "ସେଟିଂସ୍କୁ ଫେରନ୍ତୁ",
-  "backToProfileButton": "ପ୍ରୋଫାଇଲ୍ କୁ ଫେରନ୍ତୁ"
+  "backToProfileButton": "ପ୍ରୋଫାଇଲ୍ କୁ ଫେରନ୍ତୁ",
+  "loadingFeedText": "ଫିଡ୍ ଲୋଡ୍ ହେଉଛି..."
 }

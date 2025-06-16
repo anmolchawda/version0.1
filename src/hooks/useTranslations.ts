@@ -77,7 +77,9 @@ export type TranslationKey =
   | 'toastNotificationsClearedMockTitle' | 'toastNotificationsClearedMockDescription'
   | 'toastNoNotificationsToClearTitle' | 'toastNoNotificationsToClearDescription'
   | 'toastNotificationsClearedTitle' | 'toastNotificationsClearedDescription'
-  | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription';
+  | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription'
+  | 'likedYourPostText' | 'commentedOnYourPostText' | 'onYourPostText' | 'startedFollowingYouText' | 'newNotificationText'
+  | 'loadingFeedText'; // New key added
 
 type Translations = Record<TranslationKey, string>;
 

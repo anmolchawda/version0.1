@@ -136,6 +136,7 @@
     "toastUpdateFailedTitle": "నవీకరణ విఫలమైంది",
     "toastUpdateFailedDescription": "మార్పులను సేవ్ చేయలేకపోయాం.",
     "backToSettingsButton": "అమరికలకు తిరిగి వెళ్ళు",
-    "backToProfileButton": "ప్రొఫైల్‌కు తిరిగి వెళ్ళు"
+    "backToProfileButton": "ప్రొఫైల్‌కు తిరిగి వెళ్ళు",
+    "loadingFeedText": "ఫీడ్ లోడ్ అవుతోంది..."
   }
   

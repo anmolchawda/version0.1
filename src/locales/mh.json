@@ -189,8 +189,6 @@
   "discoverMatchingEventsTitle": "जुळणारे कार्यक्रम",
   "discoverMatchingYojnasTitle": "जुळणाऱ्या योजना",
   "discoverMatchingCropsTitle": "जुळणारी पिके",
-  "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत."
+  "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत.",
+  "loadingFeedText": "फीड लोड होत आहे..."
 }
-
-
-    

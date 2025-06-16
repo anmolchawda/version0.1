@@ -191,5 +191,6 @@
   "toastNotificationsClearedTitle": "सूचना साफ होगे",
   "toastNotificationsClearedDescription": "तोर सब सूचना हटा दे गे हे.",
   "toastErrorClearingNotificationsTitle": "सूचना साफ करे मं गलती",
-  "toastErrorClearingNotificationsDescription": "सब सूचना साफ नइ हो सकिस. फेर कोशिश करव."
+  "toastErrorClearingNotificationsDescription": "सब सूचना साफ नइ हो सकिस. फेर कोशिश करव.",
+  "loadingFeedText": "फीड लोड होवत हे..."
 }

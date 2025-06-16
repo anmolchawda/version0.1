@@ -138,6 +138,6 @@
   "toastUpdateFailedDescription": "ಪ್ರೊಫೈಲ್ ಬದಲಾವಣೆಗಳನ್ನು ಸಂಚಯಿಸಲು ವಿಫಲವಾಗಿದೆ.",
   "backToSettingsButton": "ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
   "backToProfileButton": "ಪ್ರೊಫೈಲ್ಗೆ ಹಿಂತಿರುಗಿ",
-  "replyButtonText": "ಉತ್ತರಿಸಿ"
+  "replyButtonText": "ಉತ್ತರಿಸಿ",
+  "loadingFeedText": "ಫೀಡ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ..."
 }
-

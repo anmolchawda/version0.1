@@ -9,6 +9,7 @@ import { RefreshCw, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase'; // db can be null
 import { collection, getDocs, query, orderBy, Timestamp, type DocumentData } from 'firebase/firestore';
+import { useTranslations } from '@/hooks/useTranslations';
 
 const PULL_THRESHOLD = 70;
 const MAX_PULL_VISUAL_EFFECT_DISTANCE = 100;
@@ -19,6 +20,7 @@ const COMPONENT_USE_MOCK_DATA = db === null; // Determine mock mode based on db 
 export function FeedList() {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [isLoading, setIsLoading] = useState(true); // Start true for initial fetch
+  const { t } = useTranslations();
 
   const [pullStartY, setPullStartY] = useState<number | null>(null);
   const [pullDeltaY, setPullDeltaY] = useState(0);
@@ -215,7 +217,7 @@ export function FeedList() {
      return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-        <p className="text-lg">Loading feed...</p>
+        <p className="text-lg">{t('loadingFeedText')}</p>
       </div>
     );
   }
@@ -279,4 +281,3 @@ export function FeedList() {
     </div>
   );
 }
-
