@@ -90,6 +90,7 @@
     "aiAnalysisDetailDiseaseTitle": "રোগ",
     "aiAnalysisDetailNutrientTitle": "પોષક તત્વોની ખોટ",
     "aiAnalysisDetailInsectTitle": "જિવાત હાજરી",
+    "aiAnalysisDetailWeedTitle": "નીંદણની હાજરી",
     "aiAnalysisDetailNoIssueDetected": "{issue} ની કોઈ ખાસ માહિતી મળી નથી.",
     "aiOverallAssessmentTitle": "સમગ્ર મૂલ્યાંકન",
     "aiSuggestionsTitle": "સૂચનો",
@@ -187,10 +188,8 @@
     "toastErrorClearingNotificationsTitle": "સૂચનાઓ સાફ કરવામાં ત્રુટિ",
     "toastErrorClearingNotificationsDescription": "બધી સૂચનાઓ સાફ કરી શકાઈ નથી. કૃપા કરીને ફરી પ્રયાસ કરો.",
     "likedYourPostText": "તમારી પોસ્ટ પસંદ કરી.",
-    "commentedOnYourPostText": "તમારી પોસ્ટ પર ટિપ્પણી કરી:",
+    "commentedOnYourPostText": "તમારી પોસ્ટ પર ટિપ્పણી કરી:",
     "onYourPostText": "તમારી પોસ્ટ પર.",
     "startedFollowingYouText": "તમને ફોલો કરવાનું શરૂ કર્યું છે.",
     "newNotificationText": "નવી સૂચના."
 }
-
-    

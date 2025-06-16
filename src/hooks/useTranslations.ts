@@ -36,7 +36,7 @@ export type TranslationKey =
   | 'aiAnalyzingImageText' | 'aiAnalyzingWaitText' | 'aiAnalysisErrorAlertTitle'
   | 'aiAnalysisResultsTitle' | 'aiObjectIdentificationTitle' | 'aiObjectNotIdentifiedDescription'
   | 'aiPlantIdentifiedTitle' | 'aiPlantIdentifiedDefaultDescription'
-  | 'aiAnalysisDetailDiseaseTitle' | 'aiAnalysisDetailNutrientTitle' | 'aiAnalysisDetailInsectTitle'
+  | 'aiAnalysisDetailDiseaseTitle' | 'aiAnalysisDetailNutrientTitle' | 'aiAnalysisDetailInsectTitle' | 'aiAnalysisDetailWeedTitle'
   | 'aiAnalysisDetailNoIssueDetected' | 'aiOverallAssessmentTitle' | 'aiSuggestionsTitle'
   | 'toastImageTooLargeTitle' | 'toastImageTooLargeDescription'
   | 'toastNoImageSelectedTitle' | 'toastNoImageSelectedDescription'

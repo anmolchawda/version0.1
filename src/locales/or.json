@@ -90,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "ରୋଗ",
   "aiAnalysisDetailNutrientTitle": "ପୋଷକ ଅଭାବ",
   "aiAnalysisDetailInsectTitle": "ପୋକା ଉପସ୍ଥିତି",
+  "aiAnalysisDetailWeedTitle": "ତୃଣ ଉପସ୍ଥିତି",
   "aiAnalysisDetailNoIssueDetected": "ନିର୍ଦ୍ଦିଷ୍ଟ {issue} ଚିହ୍ନଟ ହୋଇନଥିଲା ।",
   "aiOverallAssessmentTitle": "ସାଧାରଣ ମୂଲ୍ୟାଙ୍କନ",
   "aiSuggestionsTitle": "ସୂଚନା",
@@ -192,5 +193,3 @@
   "startedFollowingYouText": "ଆପଣଙ୍କୁ ଅନୁସରଣ କରିବା ଆରମ୍ଭ କଲେ।",
   "newNotificationText": "ନୂଆ ସୂଚନା।"
 }
-
-    

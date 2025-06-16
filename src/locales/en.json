@@ -90,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "Disease",
   "aiAnalysisDetailNutrientTitle": "Nutrient Deficiency",
   "aiAnalysisDetailInsectTitle": "Insect Presence",
+  "aiAnalysisDetailWeedTitle": "Weed Presence",
   "aiAnalysisDetailNoIssueDetected": "No specific {issue} detected.",
   "aiOverallAssessmentTitle": "Overall Assessment",
   "aiSuggestionsTitle": "Suggestions",
@@ -137,8 +138,14 @@
   "toastUpdateFailedDescription": "Could not save profile changes.",
   "backToSettingsButton": "Back to Settings",
   "backToProfileButton": "Back to Profile",
-  "loadingFeedText": "Loading feed...",
+  "backButton": "Back",
+  "likeAction": "Like",
+  "commentAction": "Comment",
+  "shareAction": "Share",
+  "saveAction": "Save",
+  "unsaveAction": "Unsave",
   "replyButtonText": "Reply",
+  "likesLabel": "Likes",
   "discoverUniversalSearchTitle": "Universal Search",
   "discoverSearchPlaceholder": "Search farmers, posts, mandi items, diseases, codes, schemes...",
   "discoverInitialSearchPromptTitle": "Search KrishiX",
@@ -190,7 +197,6 @@
   "commentedOnYourPostText": "commented on your post:",
   "onYourPostText": "on your post.",
   "startedFollowingYouText": "started following you.",
-  "newNotificationText": "New notification."
+  "newNotificationText": "New notification.",
+  "loadingFeedText": "Loading feed..."
 }
-
-    

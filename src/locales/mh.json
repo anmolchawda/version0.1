@@ -90,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "रोग",
   "aiAnalysisDetailNutrientTitle": "पोषक तत्वांची कमतरता",
   "aiAnalysisDetailInsectTitle": "कीटकांची उपस्थिती",
+  "aiAnalysisDetailWeedTitle": "तण उपस्थिती",
   "aiAnalysisDetailNoIssueDetected": "कोणताही विशिष्ट {issue} आढळला नाही.",
   "aiOverallAssessmentTitle": "एकूण मूल्यांकन",
   "aiSuggestionsTitle": "सूचना",
@@ -192,5 +193,3 @@
   "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत.",
   "loadingFeedText": "फीड लोड होत आहे..."
 }
-
-    

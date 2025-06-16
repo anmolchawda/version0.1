@@ -82,7 +82,6 @@
   "aiAnalyzingImageText": "AI ನಿಮ್ಮ ಚಿತ್ರ ವಿಶ್ಲೇಷಿಸುತ್ತದೆ...",
   "aiAnalyzingWaitText": "ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯ ಕಾಯಿರಿ.",
   "aiAnalysisErrorAlertTitle": "ವಿಶ್ಲೇಷಣೆಯಲ್ಲಿ ದೋಷ",
-  "aiAnalysisErrorAlertDescription": "ವಿಶ್ಲೇಷಣೆಯಲ್ಲಿ ವಿಫಲ. ದಯವಿಟ್ಟು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.",
   "aiAnalysisResultsTitle": "ವಿಶ್ಲೇಷಣೆಯ ಫಲಿತಾಂಶಗಳು",
   "aiObjectIdentificationTitle": "ವಸ್ತು ಗುರುತು",
   "aiObjectNotIdentifiedDescription": "ಚಿತ್ರದಲ್ಲಿ ಬೆಳೆ ಗುರುತಿಸಲು AI ಅಸಮರ್ಥವಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟ ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
@@ -91,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "ರೋಗ",
   "aiAnalysisDetailNutrientTitle": "ಪೋಷಕ ಕೊರತೆ",
   "aiAnalysisDetailInsectTitle": "ಕೀಟಗಳ ಹಾಜರಾತಿ",
+  "aiAnalysisDetailWeedTitle": "ಕಳೆ ಇರುವಿಕೆ",
   "aiAnalysisDetailNoIssueDetected": "{issue} ಕಂಡುಬರಲಿಲ್ಲ.",
   "aiOverallAssessmentTitle": "ಒಟ್ಟು ಅಂಕಣ",
   "aiSuggestionsTitle": "ಸಲಹೆಗಳು",
@@ -193,5 +193,3 @@
   "startedFollowingYouText": "ನಿಮ್ಮನ್ನು ಅನುಸರಿಸಲು ಪ್ರಾರಂಭಿಸಿದ್ದಾರೆ.",
   "newNotificationText": "ಹೊಸ ಅಧಿಸೂಚನೆ."
 }
-
-    

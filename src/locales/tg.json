@@ -90,6 +90,7 @@
     "aiAnalysisDetailDiseaseTitle": "రోగం",
     "aiAnalysisDetailNutrientTitle": "పోషక లోపం",
     "aiAnalysisDetailInsectTitle": "పురుగులు ఉన్నవి",
+    "aiAnalysisDetailWeedTitle": "కలుపు మొక్కల ఉనికి",
     "aiAnalysisDetailNoIssueDetected": "{issue} కనుగొనబడలేదు.",
     "aiOverallAssessmentTitle": "మొత్తం అంచనా",
     "aiSuggestionsTitle": "సిఫార్సులు",
@@ -192,5 +193,3 @@
     "startedFollowingYouText": "మిమ్మల్ని అనుసరించడం ప్రారంభించారు.",
     "newNotificationText": "కొత్త నోటిఫికేషన్."
 }
-
-    

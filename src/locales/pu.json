@@ -90,6 +90,7 @@
     "aiAnalysisDetailDiseaseTitle": "ਰੋਗ",
     "aiAnalysisDetailNutrientTitle": "ਪੋਸ਼ਕ ਘਾਟ",
     "aiAnalysisDetailInsectTitle": "ਕੀਟ ਮੌਜੂਦਗੀ",
+    "aiAnalysisDetailWeedTitle": "ਨਦੀਨ ਮੌਜੂਦਗੀ",
     "aiAnalysisDetailNoIssueDetected": "ਕੋਈ {issue} ਨਹੀਂ ਮਿਲਿਆ।",
     "aiOverallAssessmentTitle": "ਸੰਪੂਰਨ ਮੁਲਾਂਕਣ",
     "aiSuggestionsTitle": "ਸੁਝਾਵ",
@@ -192,5 +193,3 @@
     "startedFollowingYouText": "ਤੁਹਾਨੂੰ ਫਾਲੋ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰ ਦਿੱਤਾ ਹੈ।",
     "newNotificationText": "ਨਵੀਂ ਸੂਚਨਾ।"
 }
-
-    

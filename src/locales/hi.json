@@ -90,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "रोग",
   "aiAnalysisDetailNutrientTitle": "पोषक तत्वों की कमी",
   "aiAnalysisDetailInsectTitle": "कीट उपस्थिति",
+  "aiAnalysisDetailWeedTitle": "खरपतवार उपस्थिति",
   "aiAnalysisDetailNoIssueDetected": "कोई स्पष्ट {issue} नहीं मिला।",
   "aiOverallAssessmentTitle": "समग्र मूल्यांकन",
   "aiSuggestionsTitle": "सुझाव",
@@ -199,5 +200,3 @@
   "newNotificationText": "नई सूचना।",
   "loadingFeedText": "फ़ीड लोड हो रहा है..."
 }
-
-    

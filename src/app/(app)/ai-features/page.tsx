@@ -15,6 +15,14 @@ import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyz
 import { useTranslations } from '@/hooks/useTranslations';
 import type { TranslationKey } from '@/hooks/useTranslations';
 
+// Simple SVG for a weed icon (example)
+const WeedIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M2 22s2-4 4-4 2 4 4 4 2-4 4-4 2 4 4 4"/><path d="M20 14V6a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v1m0 0v4m-4-3v6M4 18V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </svg>
+);
+
+
 export default function AiFeaturesPage() {
   const { t } = useTranslations();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -240,6 +248,8 @@ export default function AiFeaturesPage() {
                     <AnalysisDetailCard titleKey="aiAnalysisDetailDiseaseTitle" data={analysisResult.diseaseAnalysis} icon={<Leaf className="text-red-500" />} />
                     <AnalysisDetailCard titleKey="aiAnalysisDetailNutrientTitle" data={analysisResult.nutrientDeficiencyAnalysis} icon={<Leaf className="text-yellow-500" />} />
                     <AnalysisDetailCard titleKey="aiAnalysisDetailInsectTitle" data={analysisResult.insectAnalysis} icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bug text-orange-500"><path d="M12 20h-4a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/><path d="M12 20v-4"/><path d="M12 20h4"/><path d="m19 16-3-4"/><path d="m5 16 3-4"/><path d="M16 4h-2"/><path d="M8 4H6"/><path d="M12 8h-2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2Z"/><path d="M16 10h0"/><path d="M8 10h0"/></svg>} />
+                    <AnalysisDetailCard titleKey="aiAnalysisDetailWeedTitle" data={analysisResult.weedAnalysis} icon={<WeedIcon className="text-lime-600 h-5 w-5" />} />
+
 
                     <Card className="bg-card/50">
                       <CardHeader className="pb-2">

@@ -90,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "রোগ",
   "aiAnalysisDetailNutrientTitle": "পুষ্টিহীনতা",
   "aiAnalysisDetailInsectTitle": "কীট উপস্থিতি",
+  "aiAnalysisDetailWeedTitle": "আগাছা উপস্থিতি",
   "aiAnalysisDetailNoIssueDetected": "নির্দিষ্ট কোনো {issue} সনাক্ত হয়নি।",
   "aiOverallAssessmentTitle": "সামগ্রিক মূল্যায়ন",
   "aiSuggestionsTitle": "সাজেশনস",
@@ -192,5 +193,3 @@
   "startedFollowingYouText": "আপনাকে অনুসরণ করা শুরু করেছেন।",
   "newNotificationText": "নতুন বিজ্ঞপ্তি।"
 }
-
-    

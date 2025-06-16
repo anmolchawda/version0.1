@@ -82,7 +82,6 @@
   "aiAnalyzingImageText": "AI तोर तस्वीर जांचत हे...",
   "aiAnalyzingWaitText": "कृपा करके थोड़ फेर ले इंतजार करव.",
   "aiAnalysisErrorAlertTitle": "विश्लेषण गलती",
-  "aiAnalysisErrorAlertDescription": "जांच मं गलती होइस. फेर कोशिश करव.",
   "aiAnalysisResultsTitle": "जांच नतीजा",
   "aiObjectIdentificationTitle": "ऑब्जेक्ट पहचान",
   "aiObjectNotIdentifiedDescription": "AI ला तस्वीर मं फसल पहचान मा दिक्कत होइस. साफ तस्वीर भेजव.",
@@ -91,6 +90,7 @@
   "aiAnalysisDetailDiseaseTitle": "बीमारी",
   "aiAnalysisDetailNutrientTitle": "पोषक कमी",
   "aiAnalysisDetailInsectTitle": "कीटक मौजूदगी",
+  "aiAnalysisDetailWeedTitle": "खरपतवार के स्थिति",
   "aiAnalysisDetailNoIssueDetected": "{issue} नइ मिले हे.",
   "aiOverallAssessmentTitle": "कुल मिलाके जाँच",
   "aiSuggestionsTitle": "सुझाव",
@@ -199,5 +199,3 @@
   "newNotificationText": "नई सूचना।",
   "loadingFeedText": "फीड लोड होवत हे..."
 }
-
-    
