@@ -136,5 +136,6 @@
     "toastUpdateFailedTitle": "புதுப்பிப்பு தோல்வியடைந்தது",
     "toastUpdateFailedDescription": "மாற்றங்களைச் சேமிக்க முடியவில்லை.",
     "backToSettingsButton": "அமைப்புகளுக்கு திரும்பு",
-    "backToProfileButton": "சுயவிவரத்திற்கு திரும்பு"
+    "backToProfileButton": "சுயவிவரத்திற்கு திரும்பு",
+    "replyButtonText": "பதிலளிக்கவும்"
   }
