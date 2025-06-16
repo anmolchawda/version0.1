@@ -137,5 +137,22 @@
     "toastUpdateFailedDescription": "மாற்றங்களைச் சேமிக்க முடியவில்லை.",
     "backToSettingsButton": "அமைப்புகளுக்கு திரும்பு",
     "backToProfileButton": "சுயவிவரத்திற்கு திரும்பு",
-    "replyButtonText": "பதிலளிக்கவும்"
-  }
+    "replyButtonText": "பதிலளிக்கவும்",
+    "discoverUniversalSearchTitle": "யுனிவர்சல் தேடல்",
+    "discoverSearchPlaceholder": "விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், நோய்கள், குறியீடுகள், திட்டங்களைத் தேடுங்கள்...",
+    "discoverInitialSearchPromptTitle": "KrishiX இல் தேடுங்கள்",
+    "discoverInitialSearchPromptDescription": "விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், பயிர் தகவல், நோய்கள், திட்டங்கள் மற்றும் பலவற்றைத் தேடுங்கள்.",
+    "discoverInfoFooter": "தற்போது விவசாயிகள், பதிவுகள், மண்டி பொருட்கள், நோய்கள், நிகழ்வுகள் மற்றும் திட்டங்கள் தேடப்படுகின்றன.",
+    "discoverNoResultsFound": "\"{searchTerm}\" என்பதற்கு முடிவுகள் எதுவும் கிடைக்கவில்லை.",
+    "discoverNoResultsSuggestion": "வேறு தேடல் வார்த்தையை முயற்சிக்கவும் அல்லது எழுத்துப்பிழை சரிபார்க்கவும்.",
+    "discoverMatchingFarmersTitle": "பொருந்தும் விவசாயிகள்",
+    "discoverMatchingPostsTitle": "பொருந்தும் பதிவுகள்",
+    "discoverMatchingMandiTitle": "பொருந்தும் மண்டி பொருட்கள்",
+    "discoverMatchingDiseasesTitle": "பொருந்தும் பயிர் நோய்கள்",
+    "discoverMatchingEventsTitle": "பொருந்தும் நிகழ்வுகள்",
+    "discoverMatchingYojnasTitle": "பொருந்தும் திட்டங்கள்",
+    "discoverMatchingCropsTitle": "பொருந்தும் பயிர்கள்"
+}
+
+
+    
