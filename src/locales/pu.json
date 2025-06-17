@@ -83,7 +83,7 @@
     "aiAnalyzingWaitText": "ਇਹ ਕੁਝ ਸਮਾਂ ਲੈ ਸਕਦਾ ਹੈ।",
     "aiAnalysisErrorAlertTitle": "ਵਿਸ਼ਲੇਸ਼ਣ ਵਿੱਚ ਗਲਤੀ",
     "aiAnalysisResultsTitle": "ਵਿਸ਼ਲੇਸ਼ਣ ਦੇ ਨਤੀਜੇ",
-    "aiObjectIdentificationTitle": "ਆਬਜੈਕਟ ਦੀ ਪਛਾਣ",
+    "aiObjectIdentificationTitle": "ਆਬਜੈਕਟ ਦੀ ਪਛਾณ",
     "aiObjectNotIdentifiedDescription": "AI ਸਪਸ਼ਟ ਤੌਰ 'ਤੇ ਪੌਦੇ ਦੀ ਪਛਾਣ ਨਹੀਂ ਕਰ ਸਕਿਆ।",
     "aiPlantIdentifiedTitle": "ਪੌਦਾ ਪਛਾਣਿਆ ਗਿਆ",
     "aiPlantIdentifiedDefaultDescription": "ਇੱਕ ਪੌਦਾ ਪਛਾਣਿਆ ਗਿਆ।",
@@ -153,7 +153,7 @@
     "discoverMatchingEventsTitle": "ਮਿਲਦੇ-ਜੁਲਦੇ ਸਮਾਗਮ",
     "discoverMatchingYojnasTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਯੋਜਨਾਵਾਂ",
     "discoverMatchingCropsTitle": "ਮਿਲਦੀਆਂ-ਜੁਲਦੀਆਂ ਫਸਲਾਂ",
-    "discoverInfoFooter": "ਵਰਤਮਾਨ ਵਿੱਚ ਕਿਸਾਨਾਂ, ਪੋਸਟਾਂ, ਮੰਡੀ ਆਈਟਮਾਂ, ਬਿਮਾਰੀਆਂ, ਸਮਾਗਮਾਂ ਅਤੇ ਯੋਜਨਾਵਾਂ ਵਿੱਚ ਖੋਜ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ।",
+    "discoverInfoFooter": "ਵਰਤਮਾਨ ਵਿੱਚ ਕਿਸਾਨਾਂ, ਪੋਸਟਾਂ, ਮੰਡੀ ਆਈਟਮਾਂ, ਬਿਮਾਰੀਆਂ, ਸਮਾਗਮਾਂ ਅਤੇ ਯੋਜਨਾਵਾਂ ਵਿੱਚ ਖੋਜ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ。",
     "messagesTitle": "ਸੁਨੇਹੇ",
     "newMessageAriaLabel": "ਨਵਾਂ ਸੁਨੇਹਾ",
     "searchMessagesPlaceholder": "ਸੁਨੇਹੇ ਜਾਂ ਉਪਭੋਗਤਾ ਖੋਜੋ...",
@@ -200,5 +200,6 @@
     "mandiNoListingsBuyerPrompt": "ਤੁਹਾਡੇ ਮਾਪਦੰਡਾਂ ਨਾਲ ਮੇਲ ਖਾਂਦੀ ਕੋਈ ਸੂਚੀ ਨਹੀਂ ਮਿਲੀ।",
     "mandiNoListingsBuyerSuggestion": "ਆਪਣੀ ਖੋਜ ਜਾਂ ਫਿਲਟਰਾਂ ਨੂੰ ਵਿਵਸਥਿਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ, ਜਾਂ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਜਾਂਚ ਕਰੋ!",
     "mandiNoListingsSellerPrompt": "ਤੁਸੀਂ ਅਜੇ ਤੱਕ ਕੋਈ ਆਈਟਮ ਸੂਚੀਬੱਧ ਨਹੀਂ ਕੀਤੀ ਹੈ।",
-    "mandiNoListingsSellerSuggestion": "ਆਪਣੇ ਉਤਪਾਦਾਂ ਜਾਂ ਉਪਕਰਣਾਂ ਨੂੰ ਮੰਡੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ 'ਨਵੀਂ ਆਈਟਮ ਸੂਚੀਬੱਧ ਕਰੋ' 'ਤੇ ਕਲਿੱਕ ਕਰੋ।"
+    "mandiNoListingsSellerSuggestion": "ਆਪਣੇ ਉਤਪਾਦਾਂ ਜਾਂ ਉਪਕਰਣਾਂ ਨੂੰ ਮੰਡੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ 'ਨਵੀਂ ਆਈਟਮ ਸੂਚੀਬੱਧ ਕਰੋ' 'ਤੇ ਕਲਿੱਕ ਕਰੋ।",
+    "myListingsButton": "ਮੇਰੀਆਂ ਸੂਚੀਆਂ"
 }

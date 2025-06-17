@@ -207,5 +207,6 @@
   "mandiNoListingsBuyerPrompt": "No listings found matching your criteria.",
   "mandiNoListingsBuyerSuggestion": "Try adjusting your search or filters, or check back later!",
   "mandiNoListingsSellerPrompt": "You haven't listed any items yet.",
-  "mandiNoListingsSellerSuggestion": "Click 'List New Item' to add your products or equipment to the Mandi."
+  "mandiNoListingsSellerSuggestion": "Click 'List New Item' to add your products or equipment to the Mandi.",
+  "myListingsButton": "My Listings"
 }

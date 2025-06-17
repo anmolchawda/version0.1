@@ -80,11 +80,12 @@ export type TranslationKey =
   | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription'
   | 'likedYourPostText' | 'commentedOnYourPostText' | 'onYourPostText' | 'startedFollowingYouText' | 'newNotificationText'
   | 'loadingFeedText'
-  | 'mandiViewAsBuyer' | 'mandiViewAsSeller' // New keys for Mandi toggle
-  | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' // New keys for Mandi titles
-  | 'mandiListNewItem' // New key for list new item button
-  | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' // New keys for no listings buyer view
-  | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'; // New keys for no listings seller view
+  | 'mandiViewAsBuyer' | 'mandiViewAsSeller' 
+  | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' 
+  | 'mandiListNewItem' 
+  | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' 
+  | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'
+  | 'myListingsButton'; // Added new key
 
 type Translations = Record<TranslationKey, string>;
 

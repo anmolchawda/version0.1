@@ -153,7 +153,7 @@
     "discoverMatchingEventsTitle": "సరిపోలుతున్న ఈవెంట్‌లు",
     "discoverMatchingYojnasTitle": "సరిపోలుతున్న పథకాలు",
     "discoverMatchingCropsTitle": "సరిపోలుతున్న పంటలు",
-    "discoverInfoFooter": "ప్రస్తుతం రైతులు, పోస్ట్‌లు, మండి వస్తువులు, వ్యాధులు, ఈవెంట్‌లు మరియు పథకాలలో శోధిస్తున్నారు.",
+    "discoverInfoFooter": "ప్రస్తుతం రైతులు, పోస్ట్‌లు, మండి వస్తువులు, వ్యాధులు, ఈవెంట్‌లు మరియు పథకాలలో శोధిస్తున్నారు.",
     "messagesTitle": "సందేశాలు",
     "newMessageAriaLabel": "కొత్త సందేశం",
     "searchMessagesPlaceholder": "సందేశాలు లేదా వినియోగదారులను శోధించండి...",
@@ -200,5 +200,6 @@
     "mandiNoListingsBuyerPrompt": "మీ ప్రమాణాలకు సరిపోయే జాబితాలు ఏవీ కనుగొనబడలేదు.",
     "mandiNoListingsBuyerSuggestion": "మీ శోధన లేదా ఫిల్టర్‌లను సర్దుబాటు చేయడానికి ప్రయత్నించండి లేదా తర్వాత మళ్ళీ తనిఖీ చేయండి!",
     "mandiNoListingsSellerPrompt": "మీరు ఇంకా ఏ వస్తువులను జాబితా చేయలేదు.",
-    "mandiNoListingsSellerSuggestion": "మీ ఉత్పత్తులు లేదా పరికరాలను మండికి జోడించడానికి 'కొత్త వస్తువును జాబితా చేయండి' క్లిక్ చేయండి."
+    "mandiNoListingsSellerSuggestion": "మీ ఉత్పత్తులు లేదా పరికరాలను మండికి జోడించడానికి 'కొత్త వస్తువును జాబితా చేయండి' క్లిక్ చేయండి.",
+    "myListingsButton": "నా జాబితాలు"
 }

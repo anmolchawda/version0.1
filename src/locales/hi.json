@@ -207,5 +207,6 @@
   "mandiNoListingsBuyerPrompt": "आपके मानदंडों से मेल खाने वाली कोई लिस्टिंग नहीं मिली।",
   "mandiNoListingsBuyerSuggestion": "अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें, या बाद में पुनः जांचें!",
   "mandiNoListingsSellerPrompt": "आपने अभी तक कोई वस्तु सूचीबद्ध नहीं की है।",
-  "mandiNoListingsSellerSuggestion": "मंडी में अपने उत्पाद या उपकरण जोड़ने के लिए 'नई वस्तु सूचीबद्ध करें' पर क्लिक करें।"
+  "mandiNoListingsSellerSuggestion": "मंडी में अपने उत्पाद या उपकरण जोड़ने के लिए 'नई वस्तु सूचीबद्ध करें' पर क्लिक करें।",
+  "myListingsButton": "मेरी लिस्टिंग"
 }

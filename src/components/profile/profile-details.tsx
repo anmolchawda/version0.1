@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import type { User } from '@/types';
-import { MapPin, Leaf, Settings, UserPlus, MessageSquare } from 'lucide-react';
+import { MapPin, Leaf, Settings, UserPlus, MessageSquare, Store } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from '@/components/ui/separator';
-import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { useTranslations } from '@/hooks/useTranslations'; 
 
 interface ProfileDetailsProps {
   user: User;
@@ -27,7 +27,7 @@ interface ProfileDetailsProps {
 export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsProps) {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const avatarInitial = (user.name || user.username)?.charAt(0).toUpperCase() || 'U';
-  const { t } = useTranslations(); // Initialize the hook
+  const { t } = useTranslations(); 
 
   return (
     <>
@@ -121,21 +121,30 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
             </div>
           </div>
         
-        {/* Action Buttons Section */}
-        {!isCurrentUser && (
+          {/* Action Buttons Section */}
           <div className="pt-4 mt-4 border-t">
-            <div className="flex gap-2">
-                <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground flex-1">
-                    <UserPlus className="mr-1.5 h-4 w-4" /> {t('follow')}
+            {isCurrentUser ? (
+              <div className="flex gap-2">
+                <Button asChild variant="outline" size="sm" className="flex-1">
+                  <Link href="/mandi?view=seller">
+                    <Store className="mr-1.5 h-4 w-4" /> {t('myListingsButton')}
+                  </Link>
                 </Button>
-                <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={`/messages/${user.id}`}>
-                    <MessageSquare className="mr-1.5 h-4 w-4" /> {t('message')}
-                    </Link>
-                </Button>
-            </div>
+                 {/* Edit profile button is handled by settings icon, but if another primary action is needed, add here */}
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                  <Button size="sm" className="bg-accent hover:bg-accent/90 text-accent-foreground flex-1">
+                      <UserPlus className="mr-1.5 h-4 w-4" /> {t('follow')}
+                  </Button>
+                  <Button variant="outline" size="sm" asChild className="flex-1">
+                      <Link href={`/messages/${user.id}`}>
+                      <MessageSquare className="mr-1.5 h-4 w-4" /> {t('message')}
+                      </Link>
+                  </Button>
+              </div>
+            )}
           </div>
-        )}
         </div>
       </div>
     </>

@@ -200,5 +200,6 @@
   "mandiNoListingsBuyerPrompt": "আপনার মানদণ্ডের সাথে মিলে যাওয়া কোনো তালিকা পাওয়া যায়নি।",
   "mandiNoListingsBuyerSuggestion": "আপনার অনুসন্ধান বা ফিল্টার সমন্বয় করার চেষ্টা করুন, অথবা পরে আবার দেখুন!",
   "mandiNoListingsSellerPrompt": "আপনি এখনও কোনো আইটেম তালিকাভুক্ত করেননি।",
-  "mandiNoListingsSellerSuggestion": "আপনার পণ্য বা সরঞ্জাম মণ্ডিতে যোগ করতে 'নতুন আইটেম তালিকাভুক্ত করুন' এ ক্লিক করুন।"
+  "mandiNoListingsSellerSuggestion": "আপনার পণ্য বা সরঞ্জাম মণ্ডিতে যোগ করতে 'নতুন আইটেম তালিকাভুক্ত করুন' এ ক্লিক করুন。",
+  "myListingsButton": "আমার তালিকা"
 }

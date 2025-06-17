@@ -4,6 +4,7 @@
 import type { MandiListing } from '@/types';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,23 +22,29 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added Tabs
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Store, ListChecks, PlusCircle, RotateCcw } from 'lucide-react';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities, MOCK_USER_ID } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { useTranslations } from '@/hooks/useTranslations';
-import { useSidebarContext } from '@/contexts/SidebarContext'; // Added SidebarContext
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 
 export default function MandiPage() {
   const { t } = useTranslations();
-  const { authUserId } = useSidebarContext(); // Get current user ID
+  const { authUserId } = useSidebarContext();
+  const searchParams = useSearchParams(); // Get search params
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
   const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [availableCities, setAvailableCities] = useState<{ value: string; label: string }[]>([]);
-  const [viewMode, setViewMode] = useState<'buyer' | 'seller'>('buyer');
+  
+  // Initialize viewMode based on query parameter or default to 'buyer'
+  const [viewMode, setViewMode] = useState<'buyer' | 'seller'>(() => {
+    return searchParams.get('view') === 'seller' ? 'seller' : 'buyer';
+  });
 
   useEffect(() => {
     if (selectedState) {
@@ -78,8 +85,6 @@ export default function MandiPage() {
     
     let matchesViewMode = true;
     if (viewMode === 'seller') {
-      // In mock mode, authUserId from context will be MOCK_USER_ID if firebase.ts is in mock mode.
-      // If not in mock mode, authUserId will be the actual Firebase user ID.
       matchesViewMode = authUserId ? listing.seller.id === authUserId : false;
     }
     

@@ -52,7 +52,7 @@
   "postCreatedSuccessTitle": "ಪೋಸ್ಟ್ ರಚಿಸಲಾಗಿದೆ!",
   "postCreatedSuccessDescription": "ನಿಮ್ಮ ಪೋಸ್ಟ್ ಯಶಸ್ವಿಯಾಗಿ ಹಂಚಿಕೊಳ್ಳಲಾಗಿದೆ.",
   "suggestHashtagsButton": "ಹ್ಯಾಶ್​ಟ್ಯಾಗ್ ಸಲಹೆ ನೀಡಿ",
-  "suggestingHashtagsText": "ಹ್ಯಾಶ್​ಟ್ಯಾಗ್‌ಗಳನ್ನು ಸೂಚಿಸಲಾಗುತ್ತಿದೆ...",
+  "suggestingHashtagsText": "ಹ್ಯಾಶ್​ಟ్యಾಗ್‌ಗಳನ್ನು ಸೂಚಿಸಲಾಗುತ್ತಿದೆ...",
   "aiSuggestedHashtagsLabel": "AI ನಿಂದ ಸೂಚಿಸಲಾದ ಹ್ಯಾಶ್​ಟ್ಯಾಗ್‌ಗಳು:",
   "noSuggestionsFoundText": "ಯಾವುದೇ ಸಲಹೆಗಳು ಸಿಗಲಿಲ್ಲ. ಬೇರೆ ವಿಷಯ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸೇರಿಸಿ.",
   "posts": "ಪೋಸ್ಟ್‌ಗಳು",
@@ -185,7 +185,7 @@
   "toastNoNotificationsToClearDescription": "ನಿಮ್ಮ ಅಧಿಸೂಚನೆ ಪಟ್ಟಿ ಈಗಾಗಲೇ ಖಾಲಿಯಾಗಿದೆ.",
   "toastNotificationsClearedTitle": "ಅಧಿಸೂಚನೆಗಳನ್ನು ತೆರವುಗೊಳಿಸಲಾಗಿದೆ",
   "toastNotificationsClearedDescription": "ನಿಮ್ಮ ಎಲ್ಲಾ ಅಧಿಸೂಚನೆಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
-  "toastErrorClearingNotificationsTitle": "ಅಧಿಸೂಚನೆಗಳನ್ನು ತೆರವುಗೊಳಿಸುವಲ್ಲಿ ದೋಷ",
+  "toastErrorClearingNotificationsTitle": "ಅಧಿಸೂਚನೆಗಳನ್ನು ತೆರವುಗೊಳಿಸುವಲ್ಲಿ ದೋಷ",
   "toastErrorClearingNotificationsDescription": "ಎಲ್ಲಾ ಅಧಿಸೂಚನೆಗಳನ್ನು ತೆರವುಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
   "likedYourPostText": "ನಿಮ್ಮ ಪೋಸ್ಟ್ ಇಷ್ಟಪಟ್ಟಿದ್ದಾರೆ.",
   "commentedOnYourPostText": "ನಿಮ್ಮ ಪೋಸ್ಟ್‌ಗೆ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ:",
@@ -200,5 +200,6 @@
   "mandiNoListingsBuyerPrompt": "ನಿಮ್ಮ ಮಾನದಂಡಗಳಿಗೆ ಹೊಂದುವ ಯಾವುದೇ ಪಟ್ಟಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
   "mandiNoListingsBuyerSuggestion": "ನಿಮ್ಮ ಹುಡುಕಾಟ ಅಥವಾ ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಸರಿಹೊಂದಿಸಲು ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ನಂತರ ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ!",
   "mandiNoListingsSellerPrompt": "ನೀವು ಇನ್ನೂ ಯಾವುದೇ ವಸ್ತುಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿಲ್ಲ.",
-  "mandiNoListingsSellerSuggestion": "ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳು ಅಥವಾ ಉಪಕರಣಗಳನ್ನು ಮಂಡಿಗೆ ಸೇರಿಸಲು 'ಹೊಸ ಐಟಂ ಪಟ್ಟಿ ಮಾಡಿ' ಕ್ಲಿಕ್ ಮಾಡಿ."
+  "mandiNoListingsSellerSuggestion": "ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳು ಅಥವಾ ಉಪಕರಣಗಳನ್ನು ಮಂಡಿಗೆ ಸೇರಿಸಲು 'ಹೊಸ ಐಟಂ ಪಟ್ಟಿ ಮಾಡಿ' ಕ್ಲಿಕ್ ಮಾಡಿ.",
+  "myListingsButton": "ನನ್ನ ಪಟ್ಟಿಗಳು"
 }
