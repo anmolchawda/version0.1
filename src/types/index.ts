@@ -143,3 +143,14 @@ export interface DiscoverDisease {
   imageUrl?: string;
   aiHint?: string;
 }
+
+export interface BuyerRequirement {
+  id: string;
+  postedBy: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
+  itemName: string;
+  category: string; // Matches MandiListing categories for consistency
+  quantity: string;
+  preferredLocation?: string;
+  specifications?: string;
+  postedDate: string; // ISO date string
+}

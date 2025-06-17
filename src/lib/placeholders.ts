@@ -1,5 +1,5 @@
 
-import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation, Yojna, DiscoverDisease } from '@/types'; // Updated imports
+import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation, Yojna, DiscoverDisease, BuyerRequirement } from '@/types'; // Updated imports
 import { formatDistanceToNow } from 'date-fns';
 import type { Timestamp } from 'firebase/firestore'; // Import Firebase Timestamp
 // Removed NotebookText import as icon field is removed from Yojna
@@ -380,5 +380,38 @@ export const placeholderDiscoverDiseases: DiscoverDisease[] = [
     imageUrl: 'https://placehold.co/100x100.png?text=Corn+Rust',
     aiHint: 'corn rust disease',
   }
+];
+
+export const placeholderBuyerRequirements: BuyerRequirement[] = [
+  {
+    id: 'req1',
+    postedBy: placeholderUsers[2], // UrbanHarvester
+    itemName: 'Fresh Basil',
+    category: 'Crops',
+    quantity: '5 kg weekly',
+    preferredLocation: 'Metro City, NY',
+    specifications: 'Looking for locally grown, organic basil for restaurant supply. Regular weekly order.',
+    postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'req2',
+    postedBy: placeholderUsers[0], // FarmerJohn
+    itemName: 'Wheat Seeds (High-Yield Variety)',
+    category: 'Seeds',
+    quantity: '200 kg',
+    preferredLocation: 'Anywhere in CA, willing to arrange pickup.',
+    specifications: 'Certified seeds, good germination rate, suitable for California climate. Needed before next planting season.',
+    postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'req3',
+    postedBy: placeholderUsers[1], // GreenThumbSarah
+    itemName: 'Small Tractor for Orchard',
+    category: 'Tractors',
+    quantity: '1 unit',
+    preferredLocation: 'Green Valley, OR or nearby',
+    specifications: 'Compact, 20-30 HP, good turning radius. Used in good condition preferred.',
+    postedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
 ];
 

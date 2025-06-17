@@ -1,10 +1,11 @@
+
 // src/app/(app)/mandi/page.tsx
 'use client';
 
-import type { MandiListing } from '@/types';
-import { useState, useEffect } from 'react';
+import type { MandiListing, BuyerRequirement } from '@/types';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,18 +23,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase } from 'lucide-react';
-import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities, MOCK_USER_ID } from '@/lib/placeholders';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase, ClipboardList, PackageSearch } from 'lucide-react';
+import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities, placeholderBuyerRequirements, MOCK_USER_ID } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
+import { BuyerRequirementCard } from '@/components/mandi/buyer-requirement-card';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
+
+type MandiViewMode = 'market' | 'requests' | 'my-products';
 
 
 export default function MandiPage() {
   const { t } = useTranslations();
   const { authUserId } = useSidebarContext();
-  const searchParams = useSearchParams(); // Get search params
+  const searchParams = useSearchParams();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
@@ -41,10 +45,16 @@ export default function MandiPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [availableCities, setAvailableCities] = useState<{ value: string; label: string }[]>([]);
   
-  // Initialize viewMode based on query parameter or default to 'buyer'
-  const [viewMode, setViewMode] = useState<'buyer' | 'seller'>(() => {
-    return searchParams.get('view') === 'seller' ? 'seller' : 'buyer';
+  const [viewMode, setViewMode] = useState<MandiViewMode>(() => {
+    const queryView = searchParams.get('view');
+    if (queryView === 'my-products' || queryView === 'seller') return 'my-products'; // seller is legacy
+    if (queryView === 'requests') return 'requests';
+    return 'market'; // Default view
   });
+
+  // Local state for buyer requirements to simulate deletion
+  const [displayedBuyerRequirements, setDisplayedBuyerRequirements] = useState<BuyerRequirement[]>(placeholderBuyerRequirements);
+
 
   useEffect(() => {
     if (selectedState) {
@@ -56,7 +66,7 @@ export default function MandiPage() {
     }
   }, [selectedState]);
 
-  const filteredListings = placeholderListings.filter(listing => {
+  const filteredMarketListings = useMemo(() => placeholderListings.filter(listing => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = listing.name.toLowerCase().includes(searchLower) ||
                           (listing.description && listing.description.toLowerCase().includes(searchLower)) ||
@@ -82,14 +92,68 @@ export default function MandiPage() {
     }
     
     const matchesCategory = selectedCategory === 'all' || listing.category.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesLocation && matchesCategory;
+  }), [searchTerm, selectedState, selectedCity, selectedCategory]);
+
+  const filteredMyProducts = useMemo(() => placeholderListings.filter(listing => {
+     const matchesUser = authUserId ? listing.seller.id === authUserId : false;
+     if (!matchesUser) return false;
+
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = listing.name.toLowerCase().includes(searchLower) ||
+                          (listing.description && listing.description.toLowerCase().includes(searchLower)) ||
+                          listing.category.toLowerCase().includes(searchLower) ||
+                          listing.location.toLowerCase().includes(searchLower);
     
-    let matchesViewMode = true;
-    if (viewMode === 'seller') {
-      matchesViewMode = authUserId ? listing.seller.id === authUserId : false;
+    const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
+    const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
+
+    let matchesLocation = true;
+    if (selectedState) {
+        if (cityLabel) {
+            matchesLocation = listing.location.toLowerCase().includes(cityLabel);
+        } else if (stateLabel) {
+             const stateObj = placeholderStates.find(s => s.value === selectedState);
+             if (stateObj) {
+                matchesLocation = listing.location.toLowerCase().includes(stateObj.label.toLowerCase()) || listing.location.toUpperCase().includes(`, ${stateObj.value.toUpperCase()}`);
+             } else {
+                matchesLocation = false;
+             }
+        }
     }
+    const matchesCategory = selectedCategory === 'all' || listing.category.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesLocation && matchesCategory;
+  }), [searchTerm, selectedState, selectedCity, selectedCategory, authUserId]);
+
+
+  const filteredBuyerRequests = useMemo(() => displayedBuyerRequirements.filter(req => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = req.itemName.toLowerCase().includes(searchLower) ||
+                          req.category.toLowerCase().includes(searchLower) ||
+                          (req.preferredLocation && req.preferredLocation.toLowerCase().includes(searchLower)) ||
+                          (req.specifications && req.specifications.toLowerCase().includes(searchLower)) ||
+                          req.postedBy.username.toLowerCase().includes(searchLower);
     
-    return matchesSearch && matchesLocation && matchesCategory && matchesViewMode;
-  });
+    const stateLabel = selectedState ? placeholderStates.find(s => s.value === selectedState)?.label.toLowerCase() : undefined;
+    const cityLabel = selectedCity && selectedState ? (placeholderCities[selectedState as keyof typeof placeholderCities] || []).find(c => c.value === selectedCity)?.label.toLowerCase() : undefined;
+
+    let matchesLocation = true;
+    if (selectedState && req.preferredLocation) {
+        if (cityLabel) {
+            matchesLocation = req.preferredLocation.toLowerCase().includes(cityLabel);
+        } else if (stateLabel) {
+             const stateObj = placeholderStates.find(s => s.value === selectedState);
+             if (stateObj && req.preferredLocation) {
+                matchesLocation = req.preferredLocation.toLowerCase().includes(stateObj.label.toLowerCase()) || req.preferredLocation.toUpperCase().includes(`, ${stateObj.value.toUpperCase()}`);
+             } else {
+                matchesLocation = false;
+             }
+        }
+    }
+    const matchesCategory = selectedCategory === 'all' || req.category.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesLocation && matchesCategory;
+  }), [searchTerm, selectedState, selectedCity, selectedCategory, displayedBuyerRequirements]);
+
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -101,6 +165,12 @@ export default function MandiPage() {
 
   const areFiltersActive = () => {
     return searchTerm !== '' || selectedState !== undefined || selectedCity !== undefined || selectedCategory !== 'all';
+  };
+
+  const handleDeleteRequirement = (requirementId: string) => {
+    // Simulate deletion for placeholder data
+    setDisplayedBuyerRequirements(prev => prev.filter(req => req.id !== requirementId));
+    // In a real app, you would call an API to delete from the backend
   };
 
 
@@ -119,10 +189,11 @@ export default function MandiPage() {
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1 scrollbar-none">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'buyer' | 'seller')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="buyer">{t('mandiViewAsBuyer')}</TabsTrigger>
-              <TabsTrigger value="seller">{t('mandiViewAsSeller')}</TabsTrigger>
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as MandiViewMode)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="market">{t('mandiMarketplaceTab')}</TabsTrigger>
+              <TabsTrigger value="requests">{t('mandiBuyerRequestsTab')}</TabsTrigger>
+              <TabsTrigger value="my-products">{t('mandiMyProductsTab')}</TabsTrigger>
             </TabsList>
           </Tabs>
           
@@ -131,7 +202,7 @@ export default function MandiPage() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search products, categories, sellers..."
+                placeholder={t('mandiSearchPlaceholder')}
                 className="w-full pl-12 py-3 rounded-lg text-sm sm:text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -140,7 +211,7 @@ export default function MandiPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
-                  <SelectValue placeholder="Filter by Category" />
+                  <SelectValue placeholder={t('mandiFilterByCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {placeholderCategories.map(cat => (
@@ -150,7 +221,7 @@ export default function MandiPage() {
               </Select>
               <Select value={selectedState} onValueChange={setSelectedState}>
                 <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
-                  <SelectValue placeholder="Filter by State" />
+                  <SelectValue placeholder={t('mandiFilterByState')} />
                 </SelectTrigger>
                 <SelectContent>
                   {placeholderStates.map(state => (
@@ -160,12 +231,12 @@ export default function MandiPage() {
               </Select>
               <Select value={selectedCity} onValueChange={setSelectedCity} disabled={!selectedState || availableCities.length === 0}>
                 <SelectTrigger className="w-full py-3 rounded-lg text-sm sm:text-base">
-                  <SelectValue placeholder="Filter by City" />
+                  <SelectValue placeholder={t('mandiFilterByCity')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableCities.length > 0 ? availableCities.map(city => (
                     <SelectItem key={city.value} value={city.value}>{city.label}</SelectItem>
-                  )) : <SelectItem value="no-cities" disabled>{!selectedState ? "Select a state first" : "No cities listed/select state"}</SelectItem>}
+                  )) : <SelectItem value="no-cities" disabled>{!selectedState ? t('mandiSelectStateFirst') : t('mandiNoCitiesForState')}</SelectItem>}
                 </SelectContent>
               </Select>
             </div>
@@ -173,64 +244,105 @@ export default function MandiPage() {
               <div className="mt-4 flex justify-end">
                 <Button variant="outline" onClick={handleResetFilters} size="sm">
                   <RotateCcw className="mr-2 h-4 w-4" />
-                  Reset Filters
+                  {t('mandiResetFiltersButton')}
                 </Button>
               </div>
             )}
           </div>
-
-          <section>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
-                <ListChecks className="mr-3 h-7 w-7"/>
-                {viewMode === 'buyer' ? t('mandiMarketplaceListings') : t('mandiYourListingsTitle')}
-              </h2>
-              {viewMode === 'buyer' && (
-                <Button
-                  asChild
-                  variant="default"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                >
+          
+          {/* Tab Content */}
+          {viewMode === 'market' && (
+            <section>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
+                  <PackageSearch className="mr-3 h-7 w-7"/>
+                  {t('mandiMarketplaceListings')}
+                </h2>
+                <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                   <Link href="/mandi/add-requirement"> 
                     <Briefcase className="mr-2 h-4 w-4" /> {t('mandiListRequirementButton')}
                   </Link>
                 </Button>
+              </div>
+              {filteredMarketListings.length > 0 ? (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredMarketListings.map((listing) => (
+                    <MandiItemCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+                  <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsBuyerPrompt')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsBuyerSuggestion')}</p>
+                </div>
               )}
-              {viewMode === 'seller' && (
-                <Button
-                  asChild
-                  variant="default"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                >
+            </section>
+          )}
+
+          {viewMode === 'requests' && (
+            <section>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
+                  <ClipboardList className="mr-3 h-7 w-7"/>
+                  {t('mandiBuyerRequestsTitle')}
+                </h2>
+                 <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                  <Link href="/mandi/add-requirement"> 
+                    <PlusCircle className="mr-2 h-4 w-4" /> {t('mandiPostNewRequirementButton')}
+                  </Link>
+                </Button>
+              </div>
+              {filteredBuyerRequests.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredBuyerRequests.map((req) => (
+                    <BuyerRequirementCard 
+                      key={req.id} 
+                      requirement={req} 
+                      currentUserId={authUserId}
+                      onDeleteRequirement={handleDeleteRequirement}
+                    />
+                  ))}
+                </div>
+              ) : (
+                 <div className="text-center py-16">
+                  <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+                  <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoBuyerRequestsPrompt')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoBuyerRequestsSuggestion')}</p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {viewMode === 'my-products' && (
+            <section>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
+                  <PackageSearch className="mr-3 h-7 w-7"/>
+                   {t('mandiMyProductsForSaleTitle')}
+                </h2>
+                <Button asChild variant="default" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                   <Link href="/mandi/add-crop">
                     <PlusCircle className="mr-2 h-5 w-5" /> {t('mandiListNewItem')}
                   </Link>
                 </Button>
+              </div>
+              {filteredMyProducts.length > 0 ? (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredMyProducts.map((listing) => (
+                    <MandiItemCard key={listing.id} listing={listing} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+                   <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsSellerPrompt')}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsSellerSuggestion')}</p>
+                </div>
               )}
-            </div>
-            {filteredListings.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredListings.map((listing) => (
-                  <MandiItemCard key={listing.id} listing={listing} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-                {viewMode === 'buyer' ? (
-                  <>
-                    <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsBuyerPrompt')}</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsBuyerSuggestion')}</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsSellerPrompt')}</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsSellerSuggestion')}</p>
-                  </>
-                )}
-              </div>
-            )}
-          </section>
+            </section>
+          )}
+          
         </CardContent>
       </Card>
     </div>

@@ -81,11 +81,14 @@ export type TranslationKey =
   | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription'
   | 'likedYourPostText' | 'commentedOnYourPostText' | 'onYourPostText' | 'startedFollowingYouText' | 'newNotificationText'
   | 'loadingFeedText'
-  | 'mandiViewAsBuyer' | 'mandiViewAsSeller' 
-  | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' 
+  | 'mandiViewAsBuyer' | 'mandiViewAsSeller' // Deprecated, replaced by specific tab labels
+  | 'mandiMarketplaceTab' | 'mandiBuyerRequestsTab' | 'mandiMyProductsTab' // New tab labels
+  | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' // Deprecated page titles, now more dynamic
+  | 'mandiBuyerRequestsTitle' | 'mandiMyProductsForSaleTitle' // New page titles
   | 'mandiListNewItem' | 'mandiListRequirementButton'
   | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' 
   | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'
+  | 'mandiNoBuyerRequestsPrompt' | 'mandiNoBuyerRequestsSuggestion' | 'mandiPostNewRequirementButton'
   | 'myListingsButton'
   | 'backToMandiButton' | 'mandiAddRequirementTitle' | 'mandiAddRequirementDescription'
   | 'mandiAddRequirementItemNameLabel' | 'mandiAddRequirementItemNamePlaceholder'
@@ -95,7 +98,12 @@ export type TranslationKey =
   | 'mandiAddRequirementSpecsLabel' | 'mandiAddRequirementSpecsPlaceholder'
   | 'mandiAddRequirementNote' | 'mandiAddRequirementSubmitButton' | 'mandiAddRequirementSubmittingButton'
   | 'mandiAddRequirementMissingInfoTitle' | 'mandiAddRequirementMissingInfoDesc'
-  | 'mandiAddRequirementSuccessTitle' | 'mandiAddRequirementSuccessDesc';
+  | 'mandiAddRequirementSuccessTitle' | 'mandiAddRequirementSuccessDesc'
+  | 'mandiSearchPlaceholder' | 'mandiFilterByCategory' | 'mandiFilterByState' | 'mandiFilterByCity'
+  | 'mandiSelectStateFirst' | 'mandiNoCitiesForState' | 'mandiResetFiltersButton'
+  | 'mandiRequirementPostedOn' | 'mandiContactBuyerButton' | 'mandiDeleteRequirementButton'
+  | 'mandiDeleteConfirmTitle' | 'mandiDeleteConfirmDesc' | 'mandiDeleteButtonConfirm'
+  | 'mandiRequirementDeletedTitle' | 'mandiRequirementDeletedDesc';
 
 type Translations = Record<TranslationKey, string>;
 
@@ -118,9 +126,9 @@ async function loadTranslations(lang: string): Promise<Translations> {
       translations = (await import(`../locales/tg.json`)).default;
     } else if (lang === 'gu') {
       translations = (await import(`../locales/gu.json`)).default;
-    } else if (lang === 'pa') {
+    } else if (lang === 'pa' || lang === 'pu') { // Added 'pu' as an alias for Punjabi
       translations = (await import(`../locales/pu.json`)).default;
-    } else if (lang === 'ml') {
+    } else if (lang === 'ml' || lang === 'ma') { // Added 'ma' as an alias for Malayalam
       translations = (await import(`../locales/ma.json`)).default;
     } else if (lang === 'or') {
       translations = (await import(`../locales/or.json`)).default;
@@ -175,12 +183,14 @@ export function useTranslations() {
 
   const t = useCallback((key: TranslationKey, params?: Record<string, string | number>): string => {
     if (isLoading || !translations) {
-      return key; // Or a loading indicator string
+      // Fallback to a more descriptive placeholder during loading or if translations are missing
+      const paramString = params ? ` (${JSON.stringify(params)})` : '';
+      return `[${key}${paramString}]`;
     }
-    let translation = translations[key] || key; // Fallback to key if not found
+    let translation = translations[key] || `[Missing: ${key}]`; // Fallback to key if not found
     if (params) {
       Object.keys(params).forEach(paramKey => {
-        translation = translation.replace(`{${paramKey}}`, String(params[paramKey]));
+        translation = translation.replace(new RegExp(`{${paramKey}}`, 'g'), String(params[paramKey]));
       });
     }
     return translation;
