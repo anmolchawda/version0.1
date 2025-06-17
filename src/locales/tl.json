@@ -124,8 +124,8 @@
     "bioPlaceholder": "உங்கள் விவசாயம் பற்றி கூறுங்கள்",
     "locationLabel": "இடம் (நகரம், மாநிலம்)",
     "locationPlaceholder": "உதா., சேலம், தமிழ்நாடு",
-    "produceLabel": "முக்கிய உற்பத்தி (கமா கொண்டு பிரிக்கவும்)",
-    "producePlaceholder": "உதா., தக்காளி, சோளம், ஆப்பிள்",
+    "produceLabel": "நிபுணத்துவம்",
+    "producePlaceholder": "உதா., தக்காளி, சோளம், ஆப்பிள் (கமா கொண்டு பிரிக்கவும்)",
     "savingChangesButton": "மாற்றங்களை சேமிக்கிறது...",
     "saveChangesButton": "மாற்றங்களை சேமி",
     "toastNotAuthenticatedTitle": "உள்நுழையவில்லை",
@@ -197,8 +197,10 @@
     "mandiMarketplaceListings": "சந்தை பட்டியல்கள்",
     "mandiYourListingsTitle": "உங்கள் பட்டியல்கள்",
     "mandiListNewItem": "புதிய பொருளைப் பட்டியலிடு",
+    "mandiListRequirementButton": "தேவையைப் பட்டியலிடுங்கள்",
     "mandiNoListingsBuyerPrompt": "உங்கள் நிபந்தனைகளுக்குப் பொருந்தும் பட்டியல்கள் எதுவும் கிடைக்கவில்லை.",
     "mandiNoListingsBuyerSuggestion": "உங்கள் தேடல் அல்லது வடிப்பான்களை சரிசெய்ய முயற்சிக்கவும், அல்லது பின்னர் மீண்டும் சரிபார்க்கவும்!",
     "mandiNoListingsSellerPrompt": "நீங்கள் இன்னும் எந்தப் பொருட்களையும் பட்டியலிடவில்லை.",
-    "mandiNoListingsSellerSuggestion": "உங்கள் தயாரிப்புகள் அல்லது உபகரணங்களை மந்திக்குச் சேர்க்க 'புதிய பொருளைப் பட்டியலிடு' என்பதைக் கிளிக் செய்யவும்."
+    "mandiNoListingsSellerSuggestion": "உங்கள் தயாரிப்புகள் அல்லது உபகரணங்களை மந்திக்குச் சேர்க்க 'புதிய பொருளைப் பட்டியலிடு' என்பதைக் கிளிக் செய்யவும்.",
+    "myListingsButton": "எனது பட்டியல்கள்"
 }

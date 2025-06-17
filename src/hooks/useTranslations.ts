@@ -82,10 +82,10 @@ export type TranslationKey =
   | 'loadingFeedText'
   | 'mandiViewAsBuyer' | 'mandiViewAsSeller' 
   | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' 
-  | 'mandiListNewItem' 
+  | 'mandiListNewItem' | 'mandiListRequirementButton'
   | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' 
   | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'
-  | 'myListingsButton'; // Added new key
+  | 'myListingsButton';
 
 type Translations = Record<TranslationKey, string>;
 

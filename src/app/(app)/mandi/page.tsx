@@ -23,7 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Store, ListChecks, PlusCircle, RotateCcw } from 'lucide-react';
+import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase } from 'lucide-react';
 import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities, MOCK_USER_ID } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -185,6 +185,17 @@ export default function MandiPage() {
                 <ListChecks className="mr-3 h-7 w-7"/>
                 {viewMode === 'buyer' ? t('mandiMarketplaceListings') : t('mandiYourListingsTitle')}
               </h2>
+              {viewMode === 'buyer' && (
+                <Button
+                  asChild
+                  variant="default"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  <Link href="/mandi/add-requirement"> 
+                    <Briefcase className="mr-2 h-4 w-4" /> {t('mandiListRequirementButton')}
+                  </Link>
+                </Button>
+              )}
               {viewMode === 'seller' && (
                 <Button
                   asChild

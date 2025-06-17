@@ -197,9 +197,10 @@
   "mandiMarketplaceListings": "मंडी के लिस्टिंग",
   "mandiYourListingsTitle": "राउर लिस्टिंग",
   "mandiListNewItem": "नया आइटम जोड़ीं",
+  "mandiListRequirementButton": "जरूरत सूचीबद्ध करीं",
   "mandiNoListingsBuyerPrompt": "राउर खोज से मेल खात कौनो लिस्टिंग नइखे।",
   "mandiNoListingsBuyerSuggestion": "आपन खोज या फ़िल्टर बदलीं, या कुछ देर बाद फेर देखीं!",
   "mandiNoListingsSellerPrompt": "आपने अभी तक कोई आइटम सूचीबद्ध नहीं किया है।",
   "mandiNoListingsSellerSuggestion": "मंडी में अपने उत्पाद या उपकरण जोड़ने के लिए 'नया आइटम जोड़ीं' पर क्लिक करें।",
-  "myListingsButton": "हमर लिस्टिंग"
+  "myListingsButton": "मोर लिस्टिंग"
 }
