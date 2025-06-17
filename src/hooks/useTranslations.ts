@@ -79,7 +79,12 @@ export type TranslationKey =
   | 'toastNotificationsClearedTitle' | 'toastNotificationsClearedDescription'
   | 'toastErrorClearingNotificationsTitle' | 'toastErrorClearingNotificationsDescription'
   | 'likedYourPostText' | 'commentedOnYourPostText' | 'onYourPostText' | 'startedFollowingYouText' | 'newNotificationText'
-  | 'loadingFeedText'; // New key added
+  | 'loadingFeedText'
+  | 'mandiViewAsBuyer' | 'mandiViewAsSeller' // New keys for Mandi toggle
+  | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' // New keys for Mandi titles
+  | 'mandiListNewItem' // New key for list new item button
+  | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' // New keys for no listings buyer view
+  | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'; // New keys for no listings seller view
 
 type Translations = Record<TranslationKey, string>;
 

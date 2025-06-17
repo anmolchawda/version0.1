@@ -197,5 +197,14 @@
   "onYourPostText": "आपकी पोस्ट पर।",
   "startedFollowingYouText": "ने आपको फ़ॉलो करना शुरू कर दिया है।",
   "newNotificationText": "नई सूचना।",
-  "loadingFeedText": "फीड लोड होवत हे..."
+  "loadingFeedText": "फीड लोड होवत हे...",
+  "mandiViewAsBuyer": "खरीदार दृश्य",
+  "mandiViewAsSeller": "विक्रेता दृश्य",
+  "mandiMarketplaceListings": "बाजार सूची",
+  "mandiYourListingsTitle": "आपकी सूची",
+  "mandiListNewItem": "नवा आइटम सूची",
+  "mandiNoListingsBuyerPrompt": "आपके मानदंड से मेल खाने वाला कोई सूची नहीं मिला।",
+  "mandiNoListingsBuyerSuggestion": "अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें, या बाद में फिर से जाँच करें!",
+  "mandiNoListingsSellerPrompt": "आपने अभी तक कोई आइटम सूचीबद्ध नहीं किया है।",
+  "mandiNoListingsSellerSuggestion": "मंडी में अपने उत्पाद या उपकरण जोड़ने के लिए 'नवा आइटम सूची' पर क्लिक करें।"
 }

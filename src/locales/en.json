@@ -198,5 +198,14 @@
   "onYourPostText": "on your post.",
   "startedFollowingYouText": "started following you.",
   "newNotificationText": "New notification.",
-  "loadingFeedText": "Loading feed..."
+  "loadingFeedText": "Loading feed...",
+  "mandiViewAsBuyer": "Buyer View",
+  "mandiViewAsSeller": "Seller View",
+  "mandiMarketplaceListings": "Marketplace Listings",
+  "mandiYourListingsTitle": "Your Listings",
+  "mandiListNewItem": "List New Item",
+  "mandiNoListingsBuyerPrompt": "No listings found matching your criteria.",
+  "mandiNoListingsBuyerSuggestion": "Try adjusting your search or filters, or check back later!",
+  "mandiNoListingsSellerPrompt": "You haven't listed any items yet.",
+  "mandiNoListingsSellerSuggestion": "Click 'List New Item' to add your products or equipment to the Mandi."
 }

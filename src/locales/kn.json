@@ -191,5 +191,14 @@
   "commentedOnYourPostText": "ನಿಮ್ಮ ಪೋಸ್ಟ್‌ಗೆ ಕಾಮೆಂಟ್ ಮಾಡಿದ್ದಾರೆ:",
   "onYourPostText": "ನಿಮ್ಮ ಪೋಸ್ಟ್‌ನಲ್ಲಿ.",
   "startedFollowingYouText": "ನಿಮ್ಮನ್ನು ಅನುಸರಿಸಲು ಪ್ರಾರಂಭಿಸಿದ್ದಾರೆ.",
-  "newNotificationText": "ಹೊಸ ಅಧಿಸೂಚನೆ."
+  "newNotificationText": "ಹೊಸ ಅಧಿಸೂಚನೆ.",
+  "mandiViewAsBuyer": "ಖರೀದಿದಾರರ ನೋಟ",
+  "mandiViewAsSeller": "ಮಾರಾಟಗಾರರ ನೋಟ",
+  "mandiMarketplaceListings": "ಮಾರುಕಟ್ಟೆ ಪಟ್ಟಿಗಳು",
+  "mandiYourListingsTitle": "ನಿಮ್ಮ ಪಟ್ಟಿಗಳು",
+  "mandiListNewItem": "ಹೊಸ ಐಟಂ ಪಟ್ಟಿ ಮಾಡಿ",
+  "mandiNoListingsBuyerPrompt": "ನಿಮ್ಮ ಮಾನದಂಡಗಳಿಗೆ ಹೊಂದುವ ಯಾವುದೇ ಪಟ್ಟಿಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+  "mandiNoListingsBuyerSuggestion": "ನಿಮ್ಮ ಹುಡುಕಾಟ ಅಥವಾ ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಸರಿಹೊಂದಿಸಲು ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ನಂತರ ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ!",
+  "mandiNoListingsSellerPrompt": "ನೀವು ಇನ್ನೂ ಯಾವುದೇ ವಸ್ತುಗಳನ್ನು ಪಟ್ಟಿ ಮಾಡಿಲ್ಲ.",
+  "mandiNoListingsSellerSuggestion": "ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳು ಅಥವಾ ಉಪಕರಣಗಳನ್ನು ಮಂಡಿಗೆ ಸೇರಿಸಲು 'ಹೊಸ ಐಟಂ ಪಟ್ಟಿ ಮಾಡಿ' ಕ್ಲಿಕ್ ಮಾಡಿ."
 }

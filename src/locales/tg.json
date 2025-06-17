@@ -191,5 +191,14 @@
     "commentedOnYourPostText": "మీ పోస్ట్‌పై వ్యాఖ్యానించారు:",
     "onYourPostText": "మీ పోస్ట్‌పై.",
     "startedFollowingYouText": "మిమ్మల్ని అనుసరించడం ప్రారంభించారు.",
-    "newNotificationText": "కొత్త నోటిఫికేషన్."
+    "newNotificationText": "కొత్త నోటిఫికేషన్.",
+    "mandiViewAsBuyer": "కొనుగోలుదారు వీక్షణ",
+    "mandiViewAsSeller": "విక్రేత వీక్షణ",
+    "mandiMarketplaceListings": "మార్కెట్ప్లేస్ జాబితాలు",
+    "mandiYourListingsTitle": "మీ జాబితాలు",
+    "mandiListNewItem": "కొత్త వస్తువును జాబితా చేయండి",
+    "mandiNoListingsBuyerPrompt": "మీ ప్రమాణాలకు సరిపోయే జాబితాలు ఏవీ కనుగొనబడలేదు.",
+    "mandiNoListingsBuyerSuggestion": "మీ శోధన లేదా ఫిల్టర్‌లను సర్దుబాటు చేయడానికి ప్రయత్నించండి లేదా తర్వాత మళ్ళీ తనిఖీ చేయండి!",
+    "mandiNoListingsSellerPrompt": "మీరు ఇంకా ఏ వస్తువులను జాబితా చేయలేదు.",
+    "mandiNoListingsSellerSuggestion": "మీ ఉత్పత్తులు లేదా పరికరాలను మండికి జోడించడానికి 'కొత్త వస్తువును జాబితా చేయండి' క్లిక్ చేయండి."
 }

@@ -191,5 +191,14 @@
   "commentedOnYourPostText": "আপনার পোস্টে মন্তব্য করেছেন:",
   "onYourPostText": "আপনার পোস্টে।",
   "startedFollowingYouText": "আপনাকে অনুসরণ করা শুরু করেছেন।",
-  "newNotificationText": "নতুন বিজ্ঞপ্তি।"
+  "newNotificationText": "নতুন বিজ্ঞপ্তি।",
+  "mandiViewAsBuyer": "ক্রেতা ভিউ",
+  "mandiViewAsSeller": "বিক্রেতা ভিউ",
+  "mandiMarketplaceListings": "মার্কেটপ্লেস তালিকা",
+  "mandiYourListingsTitle": "আপনার তালিকা",
+  "mandiListNewItem": "নতুন আইটেম তালিকাভুক্ত করুন",
+  "mandiNoListingsBuyerPrompt": "আপনার মানদণ্ডের সাথে মিলে যাওয়া কোনো তালিকা পাওয়া যায়নি।",
+  "mandiNoListingsBuyerSuggestion": "আপনার অনুসন্ধান বা ফিল্টার সমন্বয় করার চেষ্টা করুন, অথবা পরে আবার দেখুন!",
+  "mandiNoListingsSellerPrompt": "আপনি এখনও কোনো আইটেম তালিকাভুক্ত করেননি।",
+  "mandiNoListingsSellerSuggestion": "আপনার পণ্য বা সরঞ্জাম মণ্ডিতে যোগ করতে 'নতুন আইটেম তালিকাভুক্ত করুন' এ ক্লিক করুন।"
 }

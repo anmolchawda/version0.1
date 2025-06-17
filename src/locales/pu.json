@@ -191,5 +191,14 @@
     "commentedOnYourPostText": "ਤੁਹਾਡੀ ਪੋਸਟ 'ਤੇ ਟਿੱਪਣੀ ਕੀਤੀ:",
     "onYourPostText": "ਤੁਹਾਡੀ ਪੋਸਟ 'ਤੇ।",
     "startedFollowingYouText": "ਤੁਹਾਨੂੰ ਫਾਲੋ ਕਰਨਾ ਸ਼ੁਰੂ ਕਰ ਦਿੱਤਾ ਹੈ।",
-    "newNotificationText": "ਨਵੀਂ ਸੂਚਨਾ।"
+    "newNotificationText": "ਨਵੀਂ ਸੂਚਨਾ。",
+    "mandiViewAsBuyer": "ਖਰੀਦਦਾਰ ਦ੍ਰਿਸ਼",
+    "mandiViewAsSeller": "ਵਿਕਰੇਤਾ ਦ੍ਰਿਸ਼",
+    "mandiMarketplaceListings": "ਬਾਜ਼ਾਰ ਸੂਚੀਆਂ",
+    "mandiYourListingsTitle": "ਤੁਹਾਡੀਆਂ ਸੂਚੀਆਂ",
+    "mandiListNewItem": "ਨਵੀਂ ਆਈਟਮ ਸੂਚੀਬੱਧ ਕਰੋ",
+    "mandiNoListingsBuyerPrompt": "ਤੁਹਾਡੇ ਮਾਪਦੰਡਾਂ ਨਾਲ ਮੇਲ ਖਾਂਦੀ ਕੋਈ ਸੂਚੀ ਨਹੀਂ ਮਿਲੀ।",
+    "mandiNoListingsBuyerSuggestion": "ਆਪਣੀ ਖੋਜ ਜਾਂ ਫਿਲਟਰਾਂ ਨੂੰ ਵਿਵਸਥਿਤ ਕਰਨ ਦੀ ਕੋਸ਼ਿਸ਼ ਕਰੋ, ਜਾਂ ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਜਾਂਚ ਕਰੋ!",
+    "mandiNoListingsSellerPrompt": "ਤੁਸੀਂ ਅਜੇ ਤੱਕ ਕੋਈ ਆਈਟਮ ਸੂਚੀਬੱਧ ਨਹੀਂ ਕੀਤੀ ਹੈ।",
+    "mandiNoListingsSellerSuggestion": "ਆਪਣੇ ਉਤਪਾਦਾਂ ਜਾਂ ਉਪਕਰਣਾਂ ਨੂੰ ਮੰਡੀ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ 'ਨਵੀਂ ਆਈਟਮ ਸੂਚੀਬੱਧ ਕਰੋ' 'ਤੇ ਕਲਿੱਕ ਕਰੋ।"
 }

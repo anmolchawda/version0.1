@@ -191,5 +191,14 @@
   "commentedOnYourPostText": "ଆପଣଙ୍କ ପୋଷ୍ଟରେ ମନ୍ତବ୍ୟ ଦେଲେ:",
   "onYourPostText": "ଆପଣଙ୍କ ପୋଷ୍ଟରେ।",
   "startedFollowingYouText": "ଆପଣଙ୍କୁ ଅନୁସରଣ କରିବା ଆରମ୍ଭ କଲେ।",
-  "newNotificationText": "ନୂଆ ସୂଚନା।"
+  "newNotificationText": "ନୂଆ ସୂଚନା。",
+  "mandiViewAsBuyer": "କ୍ରେତା ଦୃଶ୍ୟ",
+  "mandiViewAsSeller": "ବିକ୍ରେତା ଦୃଶ୍ୟ",
+  "mandiMarketplaceListings": "ବଜାର ତାଲିକା",
+  "mandiYourListingsTitle": "ଆପଣଙ୍କ ତାଲିକା",
+  "mandiListNewItem": "ନୂଆ ଆଇଟମ୍ ତାଲିକା କରନ୍ତୁ",
+  "mandiNoListingsBuyerPrompt": "ଆପଣଙ୍କ ମାନଦଣ୍ଡ ସହିତ ମେଳ ଖାଉଥିବା କୌଣସି ତାଲିକା ମିଳିଲା ନାହିଁ।",
+  "mandiNoListingsBuyerSuggestion": "ଆପଣଙ୍କ ସନ୍ଧାନ କିମ୍ବା ଫିଲ୍ଟର୍‌ଗୁଡ଼ିକୁ ସଜାଡ଼ିବାକୁ ଚେଷ୍ଟା କରନ୍ତୁ, କିମ୍ବା ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ!",
+  "mandiNoListingsSellerPrompt": "ଆପଣ ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଆଇଟମ୍ ତାଲିକାଭୁକ୍ତ କରିନାହାଁନ୍ତି।",
+  "mandiNoListingsSellerSuggestion": "ଆପଣଙ୍କ ଉତ୍ପାଦ କିମ୍ବା ଉପକରଣ ମଣ୍ଡିରେ ଯୋଡ଼ିବା ପାଇଁ 'ନୂଆ ଆଇଟମ୍ ତାଲିକା କରନ୍ତୁ' ଉପରେ କ୍ଲିକ୍ କରନ୍ତୁ।"
 }

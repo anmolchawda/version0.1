@@ -1,4 +1,3 @@
-
 // src/app/(app)/mandi/page.tsx
 'use client';
 
@@ -22,19 +21,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Added Tabs
 import { Search, Store, ListChecks, PlusCircle, RotateCcw } from 'lucide-react';
-import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
+import { placeholderListings, placeholderCategories, placeholderStates, placeholderCities, MOCK_USER_ID } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useSidebarContext } from '@/contexts/SidebarContext'; // Added SidebarContext
 
 
 export default function MandiPage() {
   const { t } = useTranslations();
+  const { authUserId } = useSidebarContext(); // Get current user ID
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedState, setSelectedState] = useState<string | undefined>(undefined);
   const [selectedCity, setSelectedCity] = useState<string | undefined>(undefined);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [availableCities, setAvailableCities] = useState<{ value: string; label: string }[]>([]);
+  const [viewMode, setViewMode] = useState<'buyer' | 'seller'>('buyer');
 
   useEffect(() => {
     if (selectedState) {
@@ -73,7 +76,14 @@ export default function MandiPage() {
     
     const matchesCategory = selectedCategory === 'all' || listing.category.toLowerCase() === selectedCategory.toLowerCase();
     
-    return matchesSearch && matchesLocation && matchesCategory;
+    let matchesViewMode = true;
+    if (viewMode === 'seller') {
+      // In mock mode, authUserId from context will be MOCK_USER_ID if firebase.ts is in mock mode.
+      // If not in mock mode, authUserId will be the actual Firebase user ID.
+      matchesViewMode = authUserId ? listing.seller.id === authUserId : false;
+    }
+    
+    return matchesSearch && matchesLocation && matchesCategory && matchesViewMode;
   });
 
   const handleResetFilters = () => {
@@ -90,7 +100,7 @@ export default function MandiPage() {
 
 
   return (
-    <div className="h-full flex flex-col"> {/* Ensures the root div can provide height to its children */}
+    <div className="h-full flex flex-col">
       <Card className="shadow-xl rounded-xl overflow-hidden flex flex-col flex-grow">
         <CardHeader className="bg-gradient-to-r from-primary/10 via-background to-accent/10 p-4 sm:p-6">
           <div className="flex items-center space-x-4 text-primary">
@@ -104,6 +114,13 @@ export default function MandiPage() {
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1 scrollbar-none">
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as 'buyer' | 'seller')} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="buyer">{t('mandiViewAsBuyer')}</TabsTrigger>
+              <TabsTrigger value="seller">{t('mandiViewAsSeller')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
           <div className="space-y-4 p-4 border rounded-lg shadow-sm bg-card">
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -160,17 +177,20 @@ export default function MandiPage() {
           <section>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
-                <ListChecks className="mr-3 h-7 w-7"/> Marketplace Listings
+                <ListChecks className="mr-3 h-7 w-7"/>
+                {viewMode === 'buyer' ? t('mandiMarketplaceListings') : t('mandiYourListingsTitle')}
               </h2>
-              <Button
-                asChild
-                variant="default"
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
-              >
-                <Link href="/mandi/add-crop">
-                  <PlusCircle className="mr-2 h-5 w-5" /> List New Item
-                </Link>
-              </Button>
+              {viewMode === 'seller' && (
+                <Button
+                  asChild
+                  variant="default"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  <Link href="/mandi/add-crop">
+                    <PlusCircle className="mr-2 h-5 w-5" /> {t('mandiListNewItem')}
+                  </Link>
+                </Button>
+              )}
             </div>
             {filteredListings.length > 0 ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -181,8 +201,17 @@ export default function MandiPage() {
             ) : (
               <div className="text-center py-16">
                 <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-                <p className="text-lg sm:text-xl font-semibold text-muted-foreground">No listings found matching your criteria.</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-2">Try adjusting your search or filters, or check back later!</p>
+                {viewMode === 'buyer' ? (
+                  <>
+                    <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsBuyerPrompt')}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsBuyerSuggestion')}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('mandiNoListingsSellerPrompt')}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('mandiNoListingsSellerSuggestion')}</p>
+                  </>
+                )}
               </div>
             )}
           </section>
@@ -191,4 +220,3 @@ export default function MandiPage() {
     </div>
   );
 }
-

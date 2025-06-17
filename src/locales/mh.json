@@ -191,5 +191,14 @@
   "discoverMatchingYojnasTitle": "जुळणाऱ्या योजना",
   "discoverMatchingCropsTitle": "जुळणारी पिके",
   "discoverInfoFooter": "सध्या शेतकरी, पोस्ट, मंडी आयटम, रोग, कार्यक्रम आणि योजना शोधल्या जात आहेत.",
-  "loadingFeedText": "फीड लोड होत आहे..."
+  "loadingFeedText": "फीड लोड होत आहे...",
+  "mandiViewAsBuyer": "खरेदीदार दृश्य",
+  "mandiViewAsSeller": "विक्रेता दृश्य",
+  "mandiMarketplaceListings": "बाजारपेठ सूची",
+  "mandiYourListingsTitle": "तुमच्या सूची",
+  "mandiListNewItem": "नवीन वस्तू सूचीबद्ध करा",
+  "mandiNoListingsBuyerPrompt": "तुमच्या निकषांशी जुळणारी कोणतीही सूची आढळली नाही.",
+  "mandiNoListingsBuyerSuggestion": "तुमची शोध किंवा फिल्टर समायोजित करण्याचा प्रयत्न करा, किंवा नंतर पुन्हा तपासा!",
+  "mandiNoListingsSellerPrompt": "तुम्ही अद्याप कोणतीही वस्तू सूचीबद्ध केली नाही.",
+  "mandiNoListingsSellerSuggestion": "तुमची उत्पादने किंवा उपकरणे मंडीमध्ये जोडण्यासाठी 'नवीन वस्तू सूचीबद्ध करा' वर क्लिक करा."
 }

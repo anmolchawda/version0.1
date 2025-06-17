@@ -191,5 +191,14 @@
   "commentedOnYourPostText": "ने आपकी पोस्ट पर टिप्पणी की:",
   "onYourPostText": "आपकी पोस्ट पर।",
   "startedFollowingYouText": "ने आपको फ़ॉलो करना शुरू कर दिया है।",
-  "newNotificationText": "नई सूचना।"
+  "newNotificationText": "नई सूचना।",
+  "mandiViewAsBuyer": "खरीददार मोड",
+  "mandiViewAsSeller": "विक्रेता मोड",
+  "mandiMarketplaceListings": "मंडी के लिस्टिंग",
+  "mandiYourListingsTitle": "राउर लिस्टिंग",
+  "mandiListNewItem": "नया आइटम जोड़ीं",
+  "mandiNoListingsBuyerPrompt": "राउर खोज से मेल खात कौनो लिस्टिंग नइखे।",
+  "mandiNoListingsBuyerSuggestion": "आपन खोज या फ़िल्टर बदलीं, या कुछ देर बाद फेर देखीं!",
+  "mandiNoListingsSellerPrompt": "आपने अभी तक कोई आइटम सूचीबद्ध नहीं किया है।",
+  "mandiNoListingsSellerSuggestion": "मंडी में अपने उत्पाद या उपकरण जोड़ने के लिए 'नया आइटम जोड़ीं' पर क्लिक करें।"
 }
