@@ -1,3 +1,4 @@
+
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -85,7 +86,16 @@ export type TranslationKey =
   | 'mandiListNewItem' | 'mandiListRequirementButton'
   | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' 
   | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'
-  | 'myListingsButton';
+  | 'myListingsButton'
+  | 'backToMandiButton' | 'mandiAddRequirementTitle' | 'mandiAddRequirementDescription'
+  | 'mandiAddRequirementItemNameLabel' | 'mandiAddRequirementItemNamePlaceholder'
+  | 'mandiAddRequirementCategoryLabel' | 'mandiAddRequirementCategoryPlaceholder'
+  | 'mandiAddRequirementQuantityLabel' | 'mandiAddRequirementQuantityPlaceholder'
+  | 'mandiAddRequirementLocationLabel' | 'mandiAddRequirementLocationPlaceholder'
+  | 'mandiAddRequirementSpecsLabel' | 'mandiAddRequirementSpecsPlaceholder'
+  | 'mandiAddRequirementNote' | 'mandiAddRequirementSubmitButton' | 'mandiAddRequirementSubmittingButton'
+  | 'mandiAddRequirementMissingInfoTitle' | 'mandiAddRequirementMissingInfoDesc'
+  | 'mandiAddRequirementSuccessTitle' | 'mandiAddRequirementSuccessDesc';
 
 type Translations = Record<TranslationKey, string>;
 
