@@ -2,32 +2,20 @@
 import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai'; // Use Google AI plugin
 
-// Attempt to read the API key from the environment variables.
-// The .env file should be loaded by src/ai/dev.ts for local Genkit development.
-const apiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
-
-if (!apiKey && process.env.NODE_ENV === 'development') {
-  // This console.warn will appear in the terminal where `npm run genkit:dev` or `npm run genkit:watch` is running.
-  console.warn(
-    `\n🔴🔴🔴 WARNING: Google AI API Key is Missing 🔴🔴🔴\n` +
-    `It seems the GOOGLE_API_KEY or GEMINI_API_KEY is not set in your environment.\n` +
-    `Please create or update the .env file in the root of your project with:\n\n` +
-    `  GOOGLE_API_KEY=YOUR_ACTUAL_API_KEY\n` +
-    `  OR\n` +
-    `  GEMINI_API_KEY=YOUR_ACTUAL_API_KEY\n\n` +
-    `You can obtain an API key from Google AI Studio: https://aistudio.google.com/app/apikey\n` +
-    `After adding the key to .env, remember to RESTART your Genkit development server (e.g., 'npm run genkit:dev').\n`
-  );
-}
+// Use the user-provided API key directly.
+const apiKey = "AIzaSyD0CsuilbchETSvOwpBHlcu4FjF6eE7sa0";
 
 export const ai = genkit({
   plugins: [
     googleAI({
-      // Explicitly pass the apiKey. If it's undefined, the plugin will
-      // throw an error, but we've provided a warning above for development.
+      // Explicitly pass the apiKey.
       apiKey: apiKey,
     }),
   ],
-  model: 'googleai/gemini-2.5-pro', // Default model for text generation
+  model: 'googleai/gemini-1.5-pro-latest', // Default model for text generation, changed from 2.5-pro to 1.5-pro-latest per previous request.
 });
 
+// Removed the previous logic that checked for GOOGLE_API_KEY or GEMINI_API_KEY in environment variables
+// and the associated console warning, as the API key is now hardcoded as per user request.
+// Ensure this key is secured if this code moves to a production environment.
+// For production, using environment variables is generally recommended.
