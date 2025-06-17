@@ -1,4 +1,3 @@
-
 // src/components/layout/sidebar.tsx
 'use client';
 
@@ -113,7 +112,7 @@ export function Sidebar() {
   const currentUserAvatar = currentUserDetails?.avatarUrl;
   const currentUserUsername = currentUserDetails?.username || 'krishix_user';
 
-  const userProfileLink = "/";
+  const userProfileLink = "/my-profile"; // Updated profile link
 
   const primaryNavLinks = useMemo((): NavLinkType[] => [], []);
 

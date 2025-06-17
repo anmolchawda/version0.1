@@ -1,4 +1,3 @@
-
 // src/components/layout/bottom-nav-bar.tsx
 'use client';
 
@@ -13,11 +12,11 @@ import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 const MOCK_USER_ID_FALLBACK = '1'; 
 
 const getBottomNavLinks = (t: (key: any) => string): NavLinkType[] => [ // Pass t function
-  { href: '/feed', label: t('feed'), icon: <Home className="h-5 w-5" /> },
+  { href: '/', label: t('feed'), icon: <Home className="h-5 w-5" /> }, // Changed href from /feed to /
   { href: '/ai-features', label: t('aiFeatures'), icon: <Cpu className="h-5 w-5" /> },
   { href: '/post/create', label: t('create'), icon: <PlusSquare className="h-5 w-5" /> },
   { href: '/mandi', label: t('mandi'), icon: <Store className="h-5 w-5" /> },
-  { href: `/`, label: t('profile'), icon: <UserIconLucide className="h-5 w-5" /> },
+  { href: `/my-profile`, label: t('profile'), icon: <UserIconLucide className="h-5 w-5" /> }, // Changed href to /my-profile
 ];
 
 interface BottomNavLinkItemProps {
@@ -65,13 +64,16 @@ export function BottomNavBar() {
       {links.map((link) => {
         let isActive = pathname === link.href;
         // Special handling for profile page if its href is just "/"
-        if (link.href === '/' && pathname === '/') {
+        // Removed the original special handling for profile page as its href is now specific
+        // and handling for feed page as its href is now "/"
+        if (link.href === '/' && pathname === '/') { // For Feed page at root
             isActive = true;
-        } else if (link.href !== '/' && link.href !== '/feed' && link.href.length > 1 && pathname.startsWith(link.href)) {
+        } else if (link.href !== '/' && link.href.length > 1 && pathname.startsWith(link.href)) {
+          // For other pages like /ai-features, /mandi, /my-profile, /post/create
           isActive = true;
         }
         
-        // Specific check for /ai-features
+        // Specific check for /ai-features (already covered by above, but kept for clarity if needed)
         if (link.href === '/ai-features' && pathname === '/ai-features') {
             isActive = true;
         }

@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 
@@ -48,8 +47,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         if (setContextAuthUserId) {
           setContextAuthUserId(mockFirebaseUser.uid);
         }
-        if (pathname === '/setup-profile' || (pathname === '/' && router.asPath === '/')) {
-          router.replace('/feed');
+        // If profile is complete (assumed in mock for simplicity here) and user is on setup page, redirect to new homepage (/)
+        if (pathname === '/setup-profile') {
+          router.replace('/');
         }
       } else {
         setError("Mock user data not found. Cannot proceed.");
@@ -80,8 +80,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
                 router.replace('/setup-profile');
               }
             } else { // Profile IS complete
-              if (pathname === '/setup-profile' || (pathname === '/' && router.asPath === '/')) {
-                router.replace('/feed');
+              // If on setup page, redirect to new homepage (/)
+              if (pathname === '/setup-profile') {
+                router.replace('/');
               }
             }
           } catch (profileError) {
