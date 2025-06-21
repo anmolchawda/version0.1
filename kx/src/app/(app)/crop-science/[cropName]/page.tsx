@@ -6,7 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Bug, ShieldAlert, Leaf, FlaskConical, Loader2 } from "lucide-react"; // Changed Virus to ShieldAlert and added Loader2
+import { ChevronLeft, Bug, ShieldAlert, Leaf, FlaskConical, Loader2 } from "lucide-react";
+import { useEffect, useState } from 'react';
 
 interface ManagementOption {
   title: string;
@@ -18,10 +19,20 @@ interface ManagementOption {
 export default function CropDetailPage() {
   const params = useParams();
   const router = useRouter();
-  
+  const [cropName, setCropName] = useState<string | null>(null);
   const cropNameParam = params.cropName;
 
-  if (!cropNameParam) {
+  useEffect(() => {
+    if (cropNameParam) {
+      const decodedName = decodeURIComponent(cropNameParam as string)
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      setCropName(decodedName);
+    }
+  }, [cropNameParam]);
+
+  if (!cropName) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -29,9 +40,6 @@ export default function CropDetailPage() {
       </div>
     );
   }
-  
-  // Decode and capitalize the crop name for display
-  const cropName = decodeURIComponent(cropNameParam as string).split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
   const managementOptions: ManagementOption[] = [
     {

@@ -6,7 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Bug, Loader2 } from "lucide-react"; // Changed BugAnt to Bug and added Loader2
+import { ChevronLeft, Bug, Loader2 } from "lucide-react";
+import { useEffect, useState } from 'react';
 
 interface Pest {
   id: string;
@@ -80,10 +81,19 @@ const getPestsForCrop = (cropSlug: string): Pest[] => {
 export default function PestsPage() {
   const params = useParams();
   const router = useRouter();
-  
   const cropNameParam = params.cropName;
+  
+  const [cropInfo, setCropInfo] = useState<{ slug: string; displayName: string } | null>(null);
 
-  if (!cropNameParam) {
+  useEffect(() => {
+    if (cropNameParam && typeof cropNameParam === 'string') {
+      const slug = cropNameParam;
+      const displayName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      setCropInfo({ slug, displayName });
+    }
+  }, [cropNameParam]);
+
+  if (!cropInfo) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -92,10 +102,7 @@ export default function PestsPage() {
     );
   }
 
-  const cropSlug = typeof cropNameParam === 'string' ? cropNameParam : '';
-  const cropDisplayName = cropSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-
-  const pests = getPestsForCrop(cropSlug);
+  const pests = getPestsForCrop(cropInfo.slug);
 
   return (
     <div className="space-y-6">
@@ -105,7 +112,7 @@ export default function PestsPage() {
         </Button>
         <h1 className="text-2xl sm:text-3xl font-bold text-primary flex items-center">
           <Bug className="mr-2 h-7 w-7 text-primary" /> 
-          Pests for {cropDisplayName}
+          Pests for {cropInfo.displayName}
         </h1>
       </div>
       
@@ -113,7 +120,7 @@ export default function PestsPage() {
         <CardHeader>
           <CardTitle>Common Pests</CardTitle>
           <CardDescription>
-            Learn about common pests affecting {cropDisplayName} and how to identify them.
+            Learn about common pests affecting {cropInfo.displayName} and how to identify them.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -143,7 +150,7 @@ export default function PestsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">No specific pest information available for {cropDisplayName} at this time.</p>
+            <p className="text-center text-muted-foreground py-8">No specific pest information available for {cropInfo.displayName} at this time.</p>
           )}
         </CardContent>
       </Card>

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Leaf, Loader2 } from "lucide-react";
+import { useEffect, useState } from 'react';
 
 interface Deficiency {
   id: string;
@@ -80,10 +81,19 @@ const getDeficienciesForCrop = (cropSlug: string): Deficiency[] => {
 export default function NutrientDeficienciesPage() {
   const params = useParams();
   const router = useRouter();
-  
   const cropNameParam = params.cropName;
+  
+  const [cropInfo, setCropInfo] = useState<{ slug: string; displayName: string } | null>(null);
 
-  if (!cropNameParam) {
+  useEffect(() => {
+    if (cropNameParam && typeof cropNameParam === 'string') {
+      const slug = cropNameParam;
+      const displayName = slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      setCropInfo({ slug, displayName });
+    }
+  }, [cropNameParam]);
+
+  if (!cropInfo) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -92,10 +102,7 @@ export default function NutrientDeficienciesPage() {
     );
   }
 
-  const cropSlug = typeof cropNameParam === 'string' ? cropNameParam : '';
-  const cropDisplayName = cropSlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-
-  const deficiencies = getDeficienciesForCrop(cropSlug);
+  const deficiencies = getDeficienciesForCrop(cropInfo.slug);
 
   return (
     <div className="space-y-6">
@@ -105,7 +112,7 @@ export default function NutrientDeficienciesPage() {
         </Button>
         <h1 className="text-2xl sm:text-3xl font-bold text-primary flex items-center">
           <Leaf className="mr-2 h-7 w-7 text-primary" /> 
-          Nutrient Deficiencies in {cropDisplayName}
+          Nutrient Deficiencies in {cropInfo.displayName}
         </h1>
       </div>
       
@@ -113,7 +120,7 @@ export default function NutrientDeficienciesPage() {
         <CardHeader>
           <CardTitle>Common Deficiencies</CardTitle>
           <CardDescription>
-            Identify common nutrient deficiencies affecting {cropDisplayName}.
+            Identify common nutrient deficiencies affecting {cropInfo.displayName}.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -145,7 +152,7 @@ export default function NutrientDeficienciesPage() {
               ))}
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-8">No specific nutrient deficiency information available for {cropDisplayName} at this time.</p>
+            <p className="text-center text-muted-foreground py-8">No specific nutrient deficiency information available for {cropInfo.displayName} at this time.</p>
           )}
         </CardContent>
       </Card>
