@@ -189,7 +189,6 @@ export default function AiFeaturesPage() {
                       disabled={isLoading}
                     />
                   </Label>
-                  {!imagePreviewUrl && <p className="pl-1">{t('aiDragAndDropText')}</p>}
                 </div>
                 {!imagePreviewUrl && <p className="text-xs text-muted-foreground">{t('aiImageFormatsAcceptedWithLimit')}</p>}
               </div>
