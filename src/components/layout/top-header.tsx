@@ -1,7 +1,7 @@
 // src/components/layout/top-header.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Added React
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db, doc, onSnapshot, setDoc, getDoc } from '@/lib/firebase'; // db can be null
 
-const TopHeaderComponent = () => { // Changed to named component
+const TopHeaderComponent = () => {
   const { toggleSidebar, setNotificationCount, authUserId } = useSidebarContext();
   const pathname = usePathname();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
@@ -27,8 +27,31 @@ const TopHeaderComponent = () => { // Changed to named component
   useEffect(() => {
     if (authUserId && db) { // Check if db is available
       const notificationDocRef = doc(db, 'notificationsMeta', authUserId);
+
+      // Define an inner async function to handle initial notification check/reset
+      const handleInitialNotificationState = async () => {
+        if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
+          try {
+            const currentDoc = await getDoc(notificationDocRef); // <-- Now correctly awaited
+            if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
+                // Await setDoc for consistent async flow within this function
+                await setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true });
+                setNotificationCount(0); // Also update context immediately
+            } else {
+              setNotificationCount(0); // Ensure context is 0 if Firestore is already 0
+            }
+          } catch (error) {
+            console.error("[TopHeader] Error during initial notification check/clear for user", authUserId, ":", error);
+            setNotificationCount(0); // Ensure context is reset even on error
+          }
+        }
+      };
+
+      // Call the async function immediately
+      handleInitialNotificationState();
       
-      const unsubscribe = onSnapshot(notificationDocRef, async (docSnap) => {
+      // Setup the real-time listener (onSnapshot)
+      const unsubscribe = onSnapshot(notificationDocRef, (docSnap) => {
         let count = 0;
         if (docSnap.exists()) {
           count = docSnap.data()?.unreadCount || 0;
@@ -47,25 +70,13 @@ const TopHeaderComponent = () => { // Changed to named component
         }
       });
       
-      // Initial check and reset if on notifications page & count > 0
-      // This ensures the badge is cleared if user directly lands on /notifications
-      if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
-        const currentDoc = await getDoc(notificationDocRef);
-        if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
-            setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
-            .then(() => setNotificationCount(0)) // Also update context immediately
-            .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
-        } else {
-          setNotificationCount(0); // Ensure context is 0 if Firestore is already 0
-        }
-      }
-
+      // Cleanup function for useEffect
       return () => unsubscribe();
     } else {
       setLocalNotificationCount(0);
       setNotificationCount(0); // Clear context if no user or mock mode
     }
-  }, [authUserId, db, setNotificationCount, pathname]);
+  }, [authUserId, db, setNotificationCount, pathname]); // Dependencies for useEffect
 
   // Determine display count for badge, ensuring it's 0 if on the notifications page
   const displayNotificationCount = (pathname === '/notifications' || pathname.startsWith('/notifications/'))
@@ -119,4 +130,4 @@ const TopHeaderComponent = () => { // Changed to named component
   );
 }
 
-export const TopHeader = React.memo(TopHeaderComponent); // Memoize
+export const TopHeader = React.memo(TopHeaderComponent);
