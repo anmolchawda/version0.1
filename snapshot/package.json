@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev kx",
-    "genkit:dev": "genkit start -- tsx kx/src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch kx/src/ai/dev.ts",
-    "build": "next build kx",
-    "start": "next start kx",
-    "lint": "next lint kx",
+    "dev": "next dev",
+    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -37,6 +37,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack-query-firebase/react": "^1.0.5",
     "@tanstack/react-query": "^5.66.0",
+    "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "csv-parser": "^3.0.0",
@@ -47,8 +48,9 @@
     "firebase-functions": "^4.0.0",
     "genkit": "1.8.0",
     "lucide-react": "^0.475.0",
-    "next": "15.3.4",
+    "next": "14.2.3",
     "patch-package": "^8.0.0",
+    "postcss": "^8",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -62,9 +64,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "autoprefixer": "^10.4.19",
     "genkit-cli": "1.8.0",
-    "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
