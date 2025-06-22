@@ -3,9 +3,9 @@ import type { Config } from "tailwindcss";
 export default {
     darkMode: ["class"],
     content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./kx/src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./kx/src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./kx/src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
   	extend: {
@@ -89,7 +89,7 @@ export default {
   			'accordion-up': 'accordion-up 0.2s ease-out'
   		},
       fontFamily: {
-        sans: ["var(--font-sans)"],
+        sans: ["var(--font-inter)"],
       },
   	}
   },
