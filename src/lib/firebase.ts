@@ -40,7 +40,7 @@ let db: Firestore | null = null;
 let authInstance: Auth | null = null;
 let storageInstance: FirebaseStorage | null = null;
 
-const USE_MOCK_DATA = true; // Master switch
+const USE_MOCK_DATA = false; // Master switch
 
 if (!USE_MOCK_DATA) {
   if (getApps().length === 0) {
