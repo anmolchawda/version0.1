@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev kx",
     "genkit:dev": "genkit start -- tsx kx/src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch kx/src/ai/dev.ts",
-    "build": "next build",
-    "start": "next start",
+    "build": "next build kx",
+    "start": "next start kx",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
@@ -47,7 +47,7 @@
     "firebase-functions": "^4.0.0",
     "genkit": "^1.8.0",
     "lucide-react": "^0.475.0",
-    "next": "14.2.3",
+    "next": "^15.0.0",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
