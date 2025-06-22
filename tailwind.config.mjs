@@ -1,11 +1,11 @@
-import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: ["class"],
   content: [
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-	],
+    './src/**/*.{ts,tsx,js,jsx}', // Correctly scoped to the src directory
+  ],
   prefix: "",
   theme: {
     container: {
