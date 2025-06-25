@@ -32,7 +32,8 @@ import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import type { User, ChatMessage, FirestoreMessage, FirestoreConversation } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, limit } from '@/lib/firebase'; // Firebase imports
+import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, limit } from '@/lib/firebase';
+import type { User as FirebaseUser } from 'firebase/auth';
 
 // Helper to generate a consistent conversation ID
 const getFirestoreConversationId = (uid1: string, uid2: string): string => {
@@ -48,6 +49,7 @@ export default function ChatPage() {
 
   const chatPartnerId = params.userId as string;
   const [chatPartner, setChatPartner] = useState<User | null>(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -58,52 +60,93 @@ export default function ChatPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
-  const currentAuthUser = auth.currentUser;
+  const currentAuthUser = auth?.currentUser;
 
   useEffect(() => {
     if (!currentAuthUser) {
-      // This should ideally be handled by the AppLayout auth listener
       router.push('/login');
       return;
     }
 
-    const partner = getPlaceholderUser(chatPartnerId);
-    setChatPartner(partner); // Still using placeholder for partner's full details for now
+    let unsubscribeMessages: (() => void) | null = null;
 
-    if (!partner) {
-        setError("Chat partner not found.");
+    const setupChat = async () => {
+      setIsLoadingMessages(true);
+      setError(null);
+      
+      if (!db) {
+        // Mock mode for environments where Firebase is not initialized
+        const partner = getPlaceholderUser(chatPartnerId);
+        const currentUser = getPlaceholderUser(currentAuthUser.uid);
+        setChatPartner(partner || null);
+        setCurrentUserProfile(currentUser || null);
+        if (!partner) setError("Chat partner not found.");
         setIsLoadingMessages(false);
         return;
-    }
+      }
 
-    const convId = getFirestoreConversationId(currentAuthUser.uid, chatPartnerId);
-    setConversationId(convId);
+      try {
+        // Fetch both partner and current user data in parallel
+        const [partnerDocSnap, currentUserDocSnap] = await Promise.all([
+          getDoc(doc(db, 'users', chatPartnerId)),
+          getDoc(doc(db, 'users', currentAuthUser.uid))
+        ]);
 
-    const messagesCollectionRef = collection(db, 'conversations', convId, 'messages');
-    const q = query(messagesCollectionRef, orderBy('timestamp', 'asc'));
+        if (!partnerDocSnap.exists()) {
+          throw new Error("Chat partner not found in database.");
+        }
+        if (!currentUserDocSnap.exists()) {
+          throw new Error("Current user profile not found. Please complete your profile setup.");
+        }
+        
+        const partnerData = { id: partnerDocSnap.id, ...partnerDocSnap.data() } as User;
+        const currentUserData = { id: currentUserDocSnap.id, ...currentUserDocSnap.data() } as User;
+        
+        setChatPartner(partnerData);
+        setCurrentUserProfile(currentUserData);
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const fetchedMessages: ChatMessage[] = [];
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data() as FirestoreMessage;
-        fetchedMessages.push({
-          id: docSnap.id,
-          senderId: data.senderId,
-          text: data.text,
-          timestamp: data.timestamp ? (data.timestamp as Timestamp).toDate().toISOString() : new Date().toISOString(),
-          mediaUrl: data.mediaUrl,
-          mediaType: data.mediaType,
+        const convId = getFirestoreConversationId(currentAuthUser.uid, chatPartnerId);
+        setConversationId(convId);
+
+        const messagesCollectionRef = collection(db, 'conversations', convId, 'messages');
+        const q = query(messagesCollectionRef, orderBy('timestamp', 'asc'));
+
+        unsubscribeMessages = onSnapshot(q, (querySnapshot) => {
+          const fetchedMessages: ChatMessage[] = [];
+          querySnapshot.forEach((docSnap) => {
+            const data = docSnap.data() as FirestoreMessage;
+            fetchedMessages.push({
+              id: docSnap.id,
+              senderId: data.senderId,
+              text: data.text,
+              timestamp: data.timestamp ? (data.timestamp as Timestamp).toDate().toISOString() : new Date().toISOString(),
+              mediaUrl: data.mediaUrl,
+              mediaType: data.mediaType,
+            });
+          });
+          setMessages(fetchedMessages);
+          setIsLoadingMessages(false);
+        }, (err) => {
+          console.error("Error fetching messages: ", err);
+          setError("Failed to load messages.");
+          setIsLoadingMessages(false);
         });
-      });
-      setMessages(fetchedMessages);
-      setIsLoadingMessages(false);
-    }, (err) => {
-      console.error("Error fetching messages: ", err);
-      setError("Failed to load messages.");
-      setIsLoadingMessages(false);
-    });
 
-    return () => unsubscribe();
+      } catch (e) {
+        console.error("Error setting up chat:", e);
+        setError(e instanceof Error ? e.message : "Could not start chat.");
+        setIsLoadingMessages(false);
+        setChatPartner(null);
+      }
+    };
+
+    setupChat();
+
+    return () => {
+      if (unsubscribeMessages) {
+        unsubscribeMessages();
+      }
+    };
   }, [chatPartnerId, currentAuthUser, router]);
 
 
@@ -119,8 +162,7 @@ export default function ChatPage() {
   const handleMediaFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-       // Basic validation (can be expanded)
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) { 
         toast({ title: "File Too Large", description: "Please select a file smaller than 5MB.", variant: "destructive" });
         return;
       }
@@ -129,7 +171,7 @@ export default function ChatPage() {
         video.preload = 'metadata';
         video.onloadedmetadata = () => {
           window.URL.revokeObjectURL(video.src);
-          if (video.duration > 30) { // 30 second video limit
+          if (video.duration > 30) { 
             toast({ title: 'Video Too Long', description: 'Please select a video 30 seconds or shorter.', variant: 'destructive'});
             clearSelectedMedia(); return;
           }
@@ -153,35 +195,26 @@ export default function ChatPage() {
 
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
-    if (!currentAuthUser || !conversationId) return;
+    if (!currentAuthUser || !conversationId || !currentUserProfile || !chatPartner || !db) return;
     if (!newMessage.trim() && !selectedFile) return;
 
     const messageData: Omit<FirestoreMessage, 'id'> = {
       senderId: currentAuthUser.uid,
       text: newMessage.trim(),
-      timestamp: serverTimestamp() as Timestamp, // Let Firestore set the server timestamp
+      timestamp: serverTimestamp() as Timestamp,
     };
 
-    // Placeholder for media upload - in a real app, upload file then get URL
     if (selectedFile) {
-      messageData.mediaUrl = `mock-upload-path/${selectedFile.name}`; // Placeholder
+      messageData.mediaUrl = `mock-upload-path/${selectedFile.name}`; 
       messageData.mediaType = selectedFile.type.startsWith('image/') ? 'image' : 'video';
-      // TODO: Implement actual file upload to Firebase Storage here
-      // const storageRef = ref(storage, `chatMedia/${conversationId}/${selectedFile.name}`);
-      // await uploadBytes(storageRef, selectedFile);
-      // messageData.mediaUrl = await getDownloadURL(storageRef);
-       toast({ title: "Media Upload (Simulated)", description: `${selectedFile.name} would be uploaded.`, duration: 2000 });
+      toast({ title: "Media Upload (Simulated)", description: `${selectedFile.name} would be uploaded.`, duration: 2000 });
     }
 
     try {
       const messagesCollectionRef = collection(db, 'conversations', conversationId, 'messages');
       await addDoc(messagesCollectionRef, messageData);
 
-      // Update conversation document
       const conversationDocRef = doc(db, 'conversations', conversationId);
-      const currentUserDetails = getPlaceholderUser(currentAuthUser.uid) || { id: currentAuthUser.uid, username: currentAuthUser.email?.split('@')[0] || 'User', avatarUrl: currentAuthUser.photoURL || undefined, name: currentAuthUser.displayName || undefined };
-      const chatPartnerDetails = chatPartner || { id: chatPartnerId, username: 'Partner', avatarUrl: undefined, name: 'Partner' };
-      
       const conversationUpdateData: Partial<FirestoreConversation> = {
         participants: [currentAuthUser.uid, chatPartnerId].sort(),
         lastMessageText: messageData.text || (messageData.mediaType ? `${messageData.mediaType.charAt(0).toUpperCase() + messageData.mediaType.slice(1)} sent` : "Media sent"),
@@ -189,16 +222,16 @@ export default function ChatPage() {
         lastMessageSenderId: currentAuthUser.uid,
         participantDetails: {
           [currentAuthUser.uid]: {
-            id: currentUserDetails.id,
-            username: currentUserDetails.username,
-            name: currentUserDetails.name,
-            avatarUrl: currentUserDetails.avatarUrl,
+            id: currentUserProfile.id,
+            username: currentUserProfile.username,
+            name: currentUserProfile.name,
+            avatarUrl: currentUserProfile.avatarUrl,
           },
           [chatPartnerId]: {
-            id: chatPartnerDetails.id,
-            username: chatPartnerDetails.username,
-            name: chatPartnerDetails.name,
-            avatarUrl: chatPartnerDetails.avatarUrl,
+            id: chatPartner.id,
+            username: chatPartner.username,
+            name: chatPartner.name,
+            avatarUrl: chatPartner.avatarUrl,
           }
         }
       };
@@ -213,11 +246,12 @@ export default function ChatPage() {
   };
 
 
-  if (!currentAuthUser) { // Should be caught by AppLayout
+  if (!currentAuthUser) { 
     return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2">Authenticating...</p></div>;
   }
-  if (!chatPartner && !isLoadingMessages && !error) { // Added !error here
-    return <div className="flex items-center justify-center h-full"><p>Chat partner not found.</p></div>;
+  
+  if (error && !isLoadingMessages) {
+     return <div className="flex items-center justify-center h-full p-4 text-center text-destructive">{error}</div>;
   }
 
   const handleDropdownAction = (action: string) => {
@@ -232,9 +266,6 @@ export default function ChatPage() {
       title: "Conversation Deleted (Simulated)",
       description: `Conversation with ${chatPartner?.name || chatPartner?.username} has been removed.`,
     });
-    // In a real app, you would call an API to delete the conversation here
-    // e.g., deleteDoc(doc(db, 'conversations', conversationId));
-    // This is a complex operation, as it might involve deleting all subcollection messages too.
     router.push('/messages');
   };
 
@@ -295,18 +326,14 @@ export default function ChatPage() {
             {isLoadingMessages && (
               <div className="flex items-center justify-center py-10"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
             )}
-            {!isLoadingMessages && error && (
-              <div className="text-center text-destructive py-10">{error}</div>
-            )}
-            {!isLoadingMessages && !error && messages.length === 0 && (
+            {!isLoadingMessages && messages.length === 0 && (
               <div className="text-center text-muted-foreground py-10">
                 No messages yet. Start the conversation!
               </div>
             )}
-            {!isLoadingMessages && !error && messages.map((msg) => {
+            {!isLoadingMessages && messages.map((msg) => {
               const isCurrentUserSender = msg.senderId === currentAuthUser.uid;
-              // For sender details, in a real app, fetch from a users collection. Using placeholder for now.
-              const senderDetails = isCurrentUserSender ? getPlaceholderUser(currentAuthUser.uid) : chatPartner;
+              const senderDetails = isCurrentUserSender ? currentUserProfile : chatPartner;
               return (
                 <div
                   key={msg.id}
@@ -323,6 +350,9 @@ export default function ChatPage() {
                           </Avatar>
                       </Link>
                   )}
+                   {isCurrentUserSender && !senderDetails && ( // Fallback for own message if profile hasn't loaded yet
+                      <div className="h-7 w-7 shrink-0" />
+                   )}
                   <div
                     className={cn(
                       "p-3 rounded-xl shadow-md",
@@ -365,7 +395,7 @@ export default function ChatPage() {
                 onChange={(e) => setNewMessage(e.target.value)}
                 className="flex-grow rounded-full py-2.5 px-4 h-auto text-sm"
                 autoComplete="off"
-                disabled={!conversationId}
+                disabled={!conversationId || isLoadingMessages}
               />
               <input
                 type="file"
@@ -373,7 +403,7 @@ export default function ChatPage() {
                 onChange={handleMediaFileChange}
                 className="hidden"
                 accept="image/*,video/*"
-                disabled={!conversationId}
+                disabled={!conversationId || isLoadingMessages}
               />
               <Button
                 type="button"
@@ -381,7 +411,7 @@ export default function ChatPage() {
                 size="icon"
                 className="rounded-full h-10 w-10"
                 onClick={() => mediaInputRef.current?.click()}
-                disabled={!conversationId}
+                disabled={!conversationId || isLoadingMessages}
               >
                 <Paperclip className="h-5 w-5" />
                 <span className="sr-only">Attach file</span>
@@ -390,7 +420,7 @@ export default function ChatPage() {
                 type="submit" 
                 size="icon" 
                 className="rounded-full h-10 w-10 bg-accent hover:bg-accent/80" 
-                disabled={(!newMessage.trim() && !selectedFile) || !conversationId}
+                disabled={(!newMessage.trim() && !selectedFile) || !conversationId || isLoadingMessages}
               >
                 <Send className="h-5 w-5" />
                 <span className="sr-only">Send message</span>

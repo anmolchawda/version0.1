@@ -1,7 +1,8 @@
+
 // src/components/message/new-message-modal.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dialog,
@@ -15,10 +16,13 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { placeholderUsers, MOCK_USER_ID } from '@/lib/placeholders';
+import { placeholderUsers } from '@/lib/placeholders';
 import type { User } from '@/types';
-import { Search, UserPlus, X } from 'lucide-react';
+import { Search, UserPlus, X, Loader2 } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
+import { useSidebarContext } from '@/contexts/SidebarContext';
+import { db, collection, query, getDocs } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
 
 interface NewMessageModalProps {
   isOpen: boolean;
@@ -27,12 +31,47 @@ interface NewMessageModalProps {
 
 export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const router = useRouter();
   const { t } = useTranslations();
+  const { authUserId } = useSidebarContext();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchUsers = async () => {
+      setIsLoadingUsers(true);
+      if (!db) {
+        // Fallback for mock mode
+        setAllUsers(placeholderUsers);
+        setIsLoadingUsers(false);
+        return;
+      }
+      try {
+        const usersCollectionRef = collection(db, 'users');
+        const q = query(usersCollectionRef);
+        const querySnapshot = await getDocs(q);
+        const fetchedUsers: User[] = [];
+        querySnapshot.forEach((doc) => {
+          fetchedUsers.push({ id: doc.id, ...doc.data() } as User);
+        });
+        setAllUsers(fetchedUsers);
+      } catch (error) {
+        console.error("Error fetching users for new message modal:", error);
+        toast({ title: t('errorToastTitle'), description: "Could not load users list.", variant: "destructive" });
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
+
+    fetchUsers();
+  }, [isOpen, toast, t]);
 
   const availableUsers = useMemo(() => {
-    return placeholderUsers.filter(user => user.id !== MOCK_USER_ID); // Exclude current user
-  }, []);
+    return allUsers.filter(user => user.id !== authUserId); // Exclude current user
+  }, [allUsers, authUserId]);
 
   const filteredUsers = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -77,7 +116,11 @@ export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) 
             />
           </div>
           <ScrollArea className="h-[300px] border rounded-md">
-            {filteredUsers.length > 0 ? (
+            {isLoadingUsers ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : filteredUsers.length > 0 ? (
               <div className="p-2 space-y-1">
                 {filteredUsers.map((user) => (
                   <Button
@@ -88,7 +131,7 @@ export function NewMessageModal({ isOpen, onOpenChange }: NewMessageModalProps) 
                   >
                     <Avatar className="h-9 w-9 mr-3 border">
                       <AvatarImage src={user.avatarUrl} alt={user.username} data-ai-hint="person user" />
-                      <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{(user.name || user.username).charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="text-left">
                       <p className="font-medium text-sm">{user.name || user.username}</p>

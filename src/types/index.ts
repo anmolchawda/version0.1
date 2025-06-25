@@ -79,7 +79,6 @@ export interface FirestoreConversation {
   lastMessageText?: string;
   lastMessageTimestamp?: FirebaseTimestamp;
   lastMessageSenderId?: string;
-  // unreadCounts for future: { [userId: string]: number };
 }
 
 // Structure for data in 'conversations/{convId}/messages' subcollection
@@ -98,7 +97,7 @@ export interface DisplayConversation {
   otherParticipant: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   lastMessage: string;
   lastMessageTime: string; // Formatted string e.g., "2h ago" or "10:30 AM"
-  unread?: boolean; // UI purposes, not fully backed by Firestore logic yet
+  unread?: boolean; 
 }
 
 // For Notifications
@@ -130,7 +129,6 @@ export interface Yojna {
   benefits: string;
   link?: string;
   department?: string;
-  // icon?: JSX.Element; // Removed to fix parsing error in .ts file
 }
 
 // For simplified disease display on Discover page
