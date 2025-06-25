@@ -47,7 +47,7 @@ const BottomNavLinkItemComponent: React.FC<BottomNavLinkItemProps> = ({ link, is
 const BottomNavLinkItem = React.memo(BottomNavLinkItemComponent);
 
 
-export function BottomNavBar() {
+function BottomNavBarComponent() {
   const pathname = usePathname();
   const { t, currentLanguage, isLoadingTranslations } = useTranslations(); // Use the hook
   const [links, setLinks] = useState(() => getBottomNavLinks(t));
@@ -90,3 +90,5 @@ export function BottomNavBar() {
     </nav>
   );
 }
+
+export const BottomNavBar = React.memo(BottomNavBarComponent);

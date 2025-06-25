@@ -99,7 +99,7 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
 };
 
 
-export function Sidebar() {
+function SidebarComponent() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
@@ -295,3 +295,5 @@ export function Sidebar() {
     </aside>
   );
 }
+
+export const Sidebar = React.memo(SidebarComponent);

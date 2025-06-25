@@ -28,6 +28,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
 
+  // Effect to subscribe to auth state changes. Runs only once.
   useEffect(() => {
     if (USE_MOCK_DATA) {
       console.log("[AppLayoutContent] Using MOCK_DATA mode for auth.");
@@ -47,64 +48,67 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         if (setContextAuthUserId) {
           setContextAuthUserId(mockFirebaseUser.uid);
         }
-        // If profile is complete (assumed in mock for simplicity here) and user is on setup page, redirect to new homepage (/)
-        if (pathname === '/setup-profile') {
-          router.replace('/');
-        }
       } else {
         setError("Mock user data not found. Cannot proceed.");
       }
       setIsLoadingAuth(false);
-    } else {
-      // Real Firebase Auth logic
-      const unsubscribe = auth.onAuthStateChanged(async (user) => {
-        setIsLoadingAuth(true); // Set loading true while checking profile
-        if (user) {
-          setCurrentUser(user);
-          if (setContextAuthUserId) setContextAuthUserId(user.uid);
-
-          if (!db) { // Safeguard if db is somehow null in non-mock mode
-            console.error("[AppLayoutContent] Critical: Firebase Auth user exists, but db instance is null.");
-            setError("Application configuration error. Cannot verify profile status.");
-            setIsLoadingAuth(false);
-            return;
-          }
-
-          try {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
-
-            if (!userProfile?.profileSetupComplete) {
-              if (pathname !== '/setup-profile' && !pathname.startsWith('/auth')) {
-                router.replace('/setup-profile');
-              }
-            } else { // Profile IS complete
-              // If on setup page, redirect to new homepage (/)
-              if (pathname === '/setup-profile') {
-                router.replace('/');
-              }
-            }
-          } catch (profileError) {
-            console.error("Error fetching user profile for redirection logic:", profileError);
-            setError("Could not verify profile status. Please try again.");
-            // Potentially redirect to an error page or login
-          } finally {
-            setIsLoadingAuth(false);
-          }
-        } else {
-          // Not logged in
-          setCurrentUser(null);
-          if (setContextAuthUserId) setContextAuthUserId(null);
-          if (!pathname.startsWith('/auth')) {
-            router.replace('/login');
-          }
-          setIsLoadingAuth(false);
-        }
-      });
-      return () => unsubscribe();
+      return;
     }
-  }, [router, setContextAuthUserId, pathname]);
+
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      if (setContextAuthUserId) {
+        setContextAuthUserId(user?.uid || null);
+      }
+      setIsLoadingAuth(false);
+    });
+    return () => unsubscribe();
+  }, [setContextAuthUserId]);
+
+  // Effect to handle redirection based on auth state and profile completeness.
+  // Runs when auth state is resolved or when path changes.
+  useEffect(() => {
+    if (isLoadingAuth) {
+      return; // Don't do anything while auth is loading
+    }
+
+    if (currentUser) {
+      // User is logged in, check profile status
+      if (!db) {
+         if (pathname === '/setup-profile') {
+            router.replace('/');
+          }
+        return;
+      }
+      
+      const checkProfileAndRedirect = async () => {
+        try {
+          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
+
+          if (!userProfile?.profileSetupComplete) {
+            if (pathname !== '/setup-profile' && !pathname.startsWith('/auth')) {
+              router.replace('/setup-profile');
+            }
+          } else {
+            if (pathname === '/setup-profile') {
+              router.replace('/');
+            }
+          }
+        } catch (profileError) {
+          console.error("Error fetching user profile for redirection logic:", profileError);
+          setError("Could not verify profile status. Please try again.");
+        }
+      };
+      checkProfileAndRedirect();
+    } else {
+      // User is not logged in
+      if (!pathname.startsWith('/auth') && pathname !== '/login' && pathname !== '/signup') {
+        router.replace('/login');
+      }
+    }
+  }, [currentUser, isLoadingAuth, pathname, router]);
 
   if (isLoadingAuth) {
     return (

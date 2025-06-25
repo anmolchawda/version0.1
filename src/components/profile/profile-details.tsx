@@ -2,7 +2,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import type { User } from '@/types';
@@ -24,7 +24,7 @@ interface ProfileDetailsProps {
   isCurrentUser?: boolean;
 }
 
-export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsProps) {
+function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetailsProps) {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const avatarInitial = (user.name || user.username)?.charAt(0).toUpperCase() || 'U';
   const { t } = useTranslations(); 
@@ -150,3 +150,5 @@ export function ProfileDetails({ user, isCurrentUser = false }: ProfileDetailsPr
     </>
   );
 }
+
+export const ProfileDetails = React.memo(ProfileDetailsComponent);
