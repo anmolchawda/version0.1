@@ -37,6 +37,9 @@ const itemCategories = [
   { value: 'mulching', label: 'Mulching' },
 ];
 
+const MIN_IMAGES = 3;
+const MAX_IMAGES = 5;
+
 export function AddCropForm() {
   const router = useRouter();
   const { toast } = useToast();
@@ -49,29 +52,43 @@ export function AddCropForm() {
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImageFile(null);
-      setImagePreviewUrl(null);
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      if (imageFiles.length + newFiles.length > MAX_IMAGES) {
+        toast({
+          title: 'Maximum Images Reached',
+          description: `You can upload a maximum of ${MAX_IMAGES} images.`,
+          variant: 'destructive',
+        });
+        return;
+      }
+      setImageFiles(prev => [...prev, ...newFiles]);
+
+      const newUrlPromises = newFiles.map(file => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      Promise.all(newUrlPromises).then(newUrls => {
+        setImagePreviewUrls(prev => [...prev, ...newUrls]);
+      });
     }
   };
 
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreviewUrl(null);
+  const removeImage = (indexToRemove: number) => {
+    setImageFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    setImagePreviewUrls(prev => prev.filter((_, index) => index !== indexToRemove));
     if (fileInputRef.current) {
+      // Best we can do is reset the input value. Re-selecting files is the only way to re-populate it.
       fileInputRef.current.value = '';
     }
   };
@@ -86,6 +103,14 @@ export function AddCropForm() {
       });
       return;
     }
+    if (imageFiles.length < MIN_IMAGES) {
+      toast({
+        title: 'More Images Required',
+        description: `Please upload at least ${MIN_IMAGES} images to list your item.`,
+        variant: 'destructive',
+      });
+      return;
+    }
     setIsSubmitting(true);
 
     const listingData = {
@@ -96,7 +121,7 @@ export function AddCropForm() {
       price,
       location,
       description,
-      imageFile, 
+      imageFiles, 
       listedDate: new Date().toISOString(),
     };
     console.log('Submitting listing:', listingData);
@@ -214,56 +239,70 @@ export function AddCropForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUploadField" className="text-base font-medium">Item Photo (Optional)</Label>
+            <Label htmlFor="imageUploadField" className="text-base font-medium">Item Photos (Min. {MIN_IMAGES}, Max. {MAX_IMAGES}) <span className="text-destructive">*</span></Label>
             <div className={`
               mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
               rounded-md group hover:border-primary transition-colors
-              ${imagePreviewUrl ? 'border-primary' : 'border-input'}
+              ${imagePreviewUrls.length > 0 ? 'border-primary' : 'border-input'}
             `}>
-              <div className="space-y-1 text-center">
-                {imagePreviewUrl ? (
-                  <div className="relative mx-auto mb-4 h-48 w-auto max-w-md group">
-                    <Image
-                      src={imagePreviewUrl}
-                      alt="Item preview"
-                      layout="fill"
-                      objectFit="contain"
-                      className="rounded-md"
-                      data-ai-hint="product item agriculture"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute -top-2 -right-2 opacity-80 group-hover:opacity-100 transition-opacity rounded-full h-7 w-7 z-10"
-                      onClick={removeImage}
-                      aria-label="Remove image"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="space-y-1 text-center w-full">
+                {imagePreviewUrls.length === 0 && (
+                  <>
+                    <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <div className="flex text-sm text-muted-foreground group-hover:text-primary transition-colors justify-center">
+                      <Label
+                        htmlFor="imageUpload"
+                        className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+                      >
+                        <span>Upload files</span>
+                        <Input
+                          id="imageUpload"
+                          name="imageUpload"
+                          type="file"
+                          accept="image/*"
+                          className="sr-only"
+                          onChange={handleImageChange}
+                          ref={fileInputRef}
+                          multiple
+                        />
+                      </Label>
+                      <p className="pl-1">or drag and drop</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">PNG, JPG up to 10MB</p>
+                  </>
                 )}
-                <div className="flex text-sm text-muted-foreground group-hover:text-primary transition-colors justify-center">
-                  <Label
-                    htmlFor="imageUpload"
-                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
-                  >
-                    <span>Upload a file</span>
-                    <Input
-                      id="imageUpload"
-                      name="imageUpload"
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={handleImageChange}
-                      ref={fileInputRef}
-                    />
-                  </Label>
-                  <p className="pl-1">or drag and drop</p>
-                </div>
-                <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                 {imagePreviewUrls.length > 0 && (
+                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                      {imagePreviewUrls.map((url, index) => (
+                        <div key={index} className="relative group aspect-square">
+                          <Image
+                            src={url}
+                            alt={`Item preview ${index + 1}`}
+                            layout="fill"
+                            objectFit="cover"
+                            className="rounded-md"
+                            data-ai-hint="product agriculture item"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-1.5 -right-1.5 opacity-0 group-hover:opacity-100 transition-opacity rounded-full h-6 w-6 z-10"
+                            onClick={() => removeImage(index)}
+                            aria-label={`Remove image ${index + 1}`}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      ))}
+                       {imageFiles.length < MAX_IMAGES && (
+                         <Label htmlFor="imageUpload" className="aspect-square flex flex-col items-center justify-center border-2 border-dashed rounded-md cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors text-muted-foreground hover:text-primary">
+                            <UploadCloud className="h-8 w-8"/>
+                            <span className="text-xs mt-1 text-center">Add more</span>
+                         </Label>
+                       )}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
