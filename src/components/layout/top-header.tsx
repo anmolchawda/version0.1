@@ -49,16 +49,20 @@ const TopHeaderComponent = () => { // Changed to named component
       
       // Initial check and reset if on notifications page & count > 0
       // This ensures the badge is cleared if user directly lands on /notifications
-      if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
-        const currentDoc = await getDoc(notificationDocRef);
-        if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
-            setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
-            .then(() => setNotificationCount(0)) // Also update context immediately
-            .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
-        } else {
-          setNotificationCount(0); // Ensure context is 0 if Firestore is already 0
+      const checkAndClearNotifications = async () => {
+        if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
+          const currentDoc = await getDoc(notificationDocRef);
+          if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
+              setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
+              .then(() => setNotificationCount(0)) // Also update context immediately
+              .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
+          } else {
+            setNotificationCount(0); // Ensure context is 0 if Firestore is already 0
+          }
         }
-      }
+      };
+
+      checkAndClearNotifications();
 
       return () => unsubscribe();
     } else {
