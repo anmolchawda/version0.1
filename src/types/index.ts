@@ -6,6 +6,7 @@ export interface User {
   username: string;
   name?: string;
   email?: string; // Added email
+  phoneNumber?: string;
   avatarUrl?: string;
   bio?: string;
   location?: string;

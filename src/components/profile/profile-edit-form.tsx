@@ -24,6 +24,7 @@ export function ProfileEditForm() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [produceInput, setProduceInput] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | undefined>('');
@@ -55,6 +56,7 @@ export function ProfileEditForm() {
         setName(mockProfile.name || '');
         setBio(mockProfile.bio || '');
         setLocation(mockProfile.location || '');
+        setPhoneNumber(mockProfile.phoneNumber || '');
         setProduceInput((mockProfile.produce || []).join(', '));
         setAvatarPreviewUrl(mockProfile.avatarUrl || '');
       } else {
@@ -86,6 +88,7 @@ export function ProfileEditForm() {
             setName(fetchedData.name || user.displayName || '');
             setBio(fetchedData.bio || '');
             setLocation(fetchedData.location || '');
+            setPhoneNumber(fetchedData.phoneNumber || '');
             setProduceInput((fetchedData.produce || []).join(', '));
             setAvatarPreviewUrl(fetchedData.avatarUrl || user.photoURL || '');
           } else {
@@ -157,6 +160,7 @@ setName(user.displayName || defaultUsername);
       email: firebaseUser.email || '', 
       bio: bio.trim(),
       location: location.trim(),
+      phoneNumber: phoneNumber.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
       avatarUrl: finalAvatarUrl,
       followersCount: profileData.followersCount || 0,
@@ -254,14 +258,26 @@ setName(user.displayName || defaultUsername);
         <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t('bioPlaceholder')} rows={3} className="resize-none" />
         </div>
 
-        <div className="space-y-2">
-            <Label htmlFor="location" className="text-base font-medium">{t('locationLabel')}</Label>
-            <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder={t('locationPlaceholder')}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+                <Label htmlFor="location" className="text-base font-medium">{t('locationLabel')}</Label>
+                <Input
+                    id="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder={t('locationPlaceholder')}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-base font-medium">{t('phoneNumberLabel')}</Label>
+                <Input
+                    id="phoneNumber"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder={t('phoneNumberPlaceholder')}
+                />
+            </div>
         </div>
 
         <div className="space-y-2">

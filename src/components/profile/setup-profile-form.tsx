@@ -17,6 +17,7 @@ import { auth, db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import type { User as FirebaseUserType } from 'firebase/auth';
 import type { User as AppUserType } from '@/types';
+import { useTranslations } from '@/hooks/useTranslations';
 
 export function SetupProfileForm() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export function SetupProfileForm() {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [produceInput, setProduceInput] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | undefined>(undefined);
@@ -36,6 +38,7 @@ export function SetupProfileForm() {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const { t } = useTranslations();
 
 
   useEffect(() => {
@@ -123,6 +126,7 @@ export function SetupProfileForm() {
       email: firebaseUser.email,
       bio: bio.trim(),
       location: location.trim(),
+      phoneNumber: phoneNumber.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
       avatarUrl: finalAvatarUrl,
       profileSetupComplete: true,
@@ -221,10 +225,16 @@ export function SetupProfileForm() {
             {formErrors.bio && <p className="text-xs text-destructive mt-1">{formErrors.bio}</p>}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="location" className="text-base font-medium">Location (City, State) <span className="text-destructive">*</span></Label>
-            <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g., Raipur, Chhattisgarh" />
-            {formErrors.location && <p className="text-xs text-destructive mt-1">{formErrors.location}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="space-y-2">
+                <Label htmlFor="location" className="text-base font-medium">Location (City, State) <span className="text-destructive">*</span></Label>
+                <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g., Raipur, Chhattisgarh" />
+                {formErrors.location && <p className="text-xs text-destructive mt-1">{formErrors.location}</p>}
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-base font-medium">{t('phoneNumberLabel')}</Label>
+                <Input id="phoneNumber" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder={t('phoneNumberPlaceholderOptional')} />
+            </div>
           </div>
 
           <div className="space-y-2">
