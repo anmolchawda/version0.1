@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ListPlus, Send } from "lucide-react";
+import { ChevronLeft, ListPlus, Send, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useToast } from "@/hooks/use-toast";
-import React, { useState, type FormEvent } from 'react'; // Ensure React is imported
+import React, { useState, type FormEvent } from 'react';
+import { useSidebarContext } from "@/contexts/SidebarContext";
+import { db, addDoc, collection, doc, getDoc, serverTimestamp } from "@/lib/firebase";
+import type { User } from '@/types';
 
 const itemCategories = [
   { value: 'crops', label: 'Crops' },
@@ -30,6 +33,7 @@ export default function AddRequirementPage() {
   const router = useRouter();
   const { t } = useTranslations();
   const { toast } = useToast();
+  const { authUserId } = useSidebarContext();
 
   const [itemName, setItemName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -41,6 +45,11 @@ export default function AddRequirementPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!authUserId || !db) {
+        toast({ title: 'Error', description: 'You must be logged in to post a requirement.', variant: 'destructive'});
+        return;
+    }
+
     if (!itemName || !selectedCategory || !quantity) {
       toast({
         title: t('mandiAddRequirementMissingInfoTitle'),
@@ -50,17 +59,53 @@ export default function AddRequirementPage() {
       return;
     }
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log("Buyer Requirement Submitted (Simulated):", {
-      itemName, selectedCategory, quantity, preferredLocation, specifications
-    });
-    toast({
-      title: t('mandiAddRequirementSuccessTitle'),
-      description: t('mandiAddRequirementSuccessDesc', { itemName }),
-    });
-    setIsSubmitting(false);
-    router.push('/mandi'); // Redirect back to Mandi page or a confirmation page
+    
+    try {
+      // 1. Get current user's profile for denormalization
+      const userDocRef = doc(db, 'users', authUserId);
+      const userDocSnap = await getDoc(userDocRef);
+      if (!userDocSnap.exists()) {
+          throw new Error("User profile not found. Please complete your profile setup.");
+      }
+      const userProfile = userDocSnap.data() as User;
+
+      // 2. Prepare the data for Firestore
+      const requirementData = {
+        postedById: authUserId,
+        postedBy: {
+          id: userProfile.id,
+          username: userProfile.username,
+          name: userProfile.name,
+          avatarUrl: userProfile.avatarUrl,
+        },
+        itemName,
+        category: selectedCategory,
+        quantity,
+        preferredLocation,
+        specifications,
+        createdAt: serverTimestamp(),
+      };
+
+      // 3. Add the document to the 'mandi_buyer_requests' collection
+      await addDoc(collection(db, 'mandi_buyer_requests'), requirementData);
+
+      toast({
+        title: t('mandiAddRequirementSuccessTitle'),
+        description: t('mandiAddRequirementSuccessDesc', { itemName }),
+      });
+      
+      router.push('/mandi?view=requests'); // Redirect to buyer requests tab
+
+    } catch (error) {
+      console.error("Error posting requirement:", error);
+      toast({
+        title: 'Submission Failed',
+        description: error instanceof Error ? error.message : 'Could not post your requirement. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
 

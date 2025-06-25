@@ -19,8 +19,10 @@ import {
   type Firestore,
   where,
   writeBatch,
+  addDoc,
+  deleteDoc,
 } from 'firebase/firestore';
-import { getStorage, type FirebaseStorage } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from "firebase/storage";
 import { getAuth, type Auth } from "firebase/auth";
 import { MOCK_USER_ID } from './placeholders'; // Import MOCK_USER_ID
 
@@ -40,7 +42,7 @@ let db: Firestore | null = null;
 let authInstance: Auth | null = null;
 let storageInstance: FirebaseStorage | null = null;
 
-const USE_MOCK_DATA = true; // Master switch
+const USE_MOCK_DATA = false; // Master switch, set to false to enable Firebase
 
 if (!USE_MOCK_DATA) {
   if (getApps().length === 0) {
@@ -112,5 +114,10 @@ export {
   writeBatch,
   increment,
   getDocs, // Restored getDocs export
-  enableNetwork
+  enableNetwork,
+  addDoc,
+  deleteDoc,
+  ref,
+  uploadBytes,
+  getDownloadURL,
 };

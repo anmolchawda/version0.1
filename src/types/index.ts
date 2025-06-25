@@ -51,16 +51,28 @@ export interface MandiListing {
   name: string;
   category: string;
   description?: string;
+  details?: string;
   quantity: string;
   price: string;
   imageUrls: string[];
   aiHint: string;
   seller: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
-  listedDate: string; // ISO date string
+  sellerId: string;
   location: string;
+  createdAt: FirebaseTimestamp;
 }
 
-// For UI display, keeping timestamp as string (ISO or formatted)
+// For UI display after fetching and converting timestamp
+export interface DisplayMandiListing extends Omit<MandiListing, 'createdAt'> {
+  listedDate: string; // Formatted date string
+}
+
+// For UI display after fetching and converting timestamp
+export interface DisplayBuyerRequirement extends Omit<BuyerRequirement, 'createdAt'> {
+  postedDate: string; // Formatted date string
+}
+
+
 export interface ChatMessage {
   id: string; // Firestore document ID
   senderId: string;
@@ -146,10 +158,11 @@ export interface DiscoverDisease {
 export interface BuyerRequirement {
   id: string;
   postedBy: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
+  postedById: string;
   itemName: string;
-  category: string; // Matches MandiListing categories for consistency
+  category: string;
   quantity: string;
   preferredLocation?: string;
   specifications?: string;
-  postedDate: string; // ISO date string
+  createdAt: FirebaseTimestamp;
 }

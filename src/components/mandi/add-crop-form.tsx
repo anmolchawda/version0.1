@@ -25,6 +25,9 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { UploadCloud, X, Save, Loader2, PackagePlus, ChevronLeft } from 'lucide-react';
+import { useSidebarContext } from '@/contexts/SidebarContext';
+import { db, storage, ref, uploadBytes, getDownloadURL, addDoc, collection, doc, getDoc, serverTimestamp } from '@/lib/firebase';
+import type { User } from '@/types';
 
 const itemCategories = [
   { value: 'crops', label: 'Crops' },
@@ -44,6 +47,7 @@ export function AddCropForm() {
   const router = useRouter();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { authUserId } = useSidebarContext();
 
   const [itemName, setItemName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -88,13 +92,17 @@ export function AddCropForm() {
     setImageFiles(prev => prev.filter((_, index) => index !== indexToRemove));
     setImagePreviewUrls(prev => prev.filter((_, index) => index !== indexToRemove));
     if (fileInputRef.current) {
-      // Best we can do is reset the input value. Re-selecting files is the only way to re-populate it.
       fileInputRef.current.value = '';
     }
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!authUserId || !db || !storage) {
+        toast({ title: 'Error', description: 'Cannot submit listing. Please try again later.', variant: 'destructive'});
+        return;
+    }
+
     if (!itemName || !selectedCategory || !quantity || !price || !location) {
       toast({
         title: 'Missing Information',
@@ -113,27 +121,64 @@ export function AddCropForm() {
     }
     setIsSubmitting(true);
 
-    const listingData = {
-      itemName,
-      category: selectedCategory,
-      details,
-      quantity,
-      price,
-      location,
-      description,
-      imageFiles, 
-      listedDate: new Date().toISOString(),
-    };
-    console.log('Submitting listing:', listingData);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+        // 1. Get current user's profile for denormalization
+        const userDocRef = doc(db, 'users', authUserId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+            throw new Error("User profile not found. Please complete your profile setup.");
+        }
+        const sellerProfile = userDocSnap.data() as User;
+        
+        // 2. Upload images to Firebase Storage
+        const imageUrls = await Promise.all(
+            imageFiles.map(async (file) => {
+                const storageRef = ref(storage, `mandi_listings/${authUserId}/${Date.now()}-${file.name}`);
+                await uploadBytes(storageRef, file);
+                return getDownloadURL(storageRef);
+            })
+        );
+        
+        // 3. Create the listing document in Firestore
+        const listingData = {
+          name: itemName,
+          category: selectedCategory,
+          details,
+          quantity,
+          price,
+          location,
+          description,
+          imageUrls,
+          sellerId: authUserId,
+          seller: {
+            id: sellerProfile.id,
+            username: sellerProfile.username,
+            name: sellerProfile.name,
+            avatarUrl: sellerProfile.avatarUrl,
+          },
+          createdAt: serverTimestamp(),
+          aiHint: `${selectedCategory} ${itemName}`, // Simple AI hint
+        };
 
-    toast({
-      title: 'Item Listed!',
-      description: `${itemName} has been successfully listed in the Mandi.`,
-    });
+        await addDoc(collection(db, 'mandi_listings'), listingData);
+        
+        toast({
+          title: 'Item Listed!',
+          description: `${itemName} has been successfully listed in the Mandi.`,
+        });
 
-    setIsSubmitting(false);
-    router.push('/mandi'); 
+        router.push('/mandi'); 
+
+    } catch(error) {
+        console.error("Error creating listing: ", error);
+        toast({
+            title: 'Listing Failed',
+            description: error instanceof Error ? error.message : 'Could not list your item. Please try again.',
+            variant: 'destructive',
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (

@@ -1,8 +1,9 @@
+
 // src/components/mandi/mandi-item-card.tsx
 'use client';
 
 import React from 'react'; // Added React import
-import type { MandiListing } from '@/types';
+import type { DisplayMandiListing } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -16,19 +17,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, CalendarDays, ShoppingCart } from 'lucide-react';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 
 interface MandiItemCardProps {
-  listing: MandiListing;
+  listing: DisplayMandiListing;
 }
 
 const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
+  const imageUrls = listing.imageUrls && listing.imageUrls.length > 0 ? listing.imageUrls : ['https://placehold.co/600x600.png'];
+
   return (
     <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
       <div className="relative w-full aspect-square bg-muted group">
         <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-none rounded-t-lg">
-            {listing.imageUrls.map((url, index) => (
+            {imageUrls.map((url, index) => (
                 <div key={index} className="relative w-full h-full flex-shrink-0 snap-center">
                     <Image
                         src={url}
@@ -41,9 +43,9 @@ const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
             ))}
         </div>
         
-        {listing.imageUrls.length > 1 && (
+        {imageUrls.length > 1 && (
             <div className="absolute bottom-2 left-0 right-0 flex justify-center items-center space-x-1.5 pointer-events-none">
-                {listing.imageUrls.map((_, i) => (
+                {imageUrls.map((_, i) => (
                 <div
                     key={i}
                     className="h-1.5 w-1.5 rounded-full bg-white opacity-50 shadow-md"
@@ -74,7 +76,7 @@ const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
         </div>
         <div className="flex items-center text-muted-foreground">
           <CalendarDays className="h-3.5 w-3.5 mr-1 text-primary" />
-          Listed: {format(new Date(listing.listedDate), "MMM d, yy")}
+          Listed: {listing.listedDate}
         </div>
         <div className="flex items-center pt-1.5">
           <Avatar className="h-6 w-6 mr-1.5 border">

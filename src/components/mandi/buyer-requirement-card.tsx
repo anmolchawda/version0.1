@@ -2,15 +2,13 @@
 // src/components/mandi/buyer-requirement-card.tsx
 'use client';
 
-import type { BuyerRequirement } from '@/types';
+import type { DisplayBuyerRequirement } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, CalendarDays, MessageSquare, Trash2, AlertTriangle } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { MapPin, CalendarDays, MessageSquare, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import {
   AlertDialog,
@@ -25,17 +23,16 @@ import {
 import { useTranslations } from '@/hooks/useTranslations';
 
 interface BuyerRequirementCardProps {
-  requirement: BuyerRequirement;
+  requirement: DisplayBuyerRequirement;
   currentUserId: string | null;
   onDeleteRequirement: (requirementId: string) => void;
 }
 
 export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequirement }: BuyerRequirementCardProps) {
-  const { toast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { t } = useTranslations();
 
-  const isOwnRequirement = currentUserId === requirement.postedBy.id;
+  const isOwnRequirement = currentUserId === requirement.postedById;
 
   const handleDeleteClick = () => {
     setShowDeleteConfirm(true);
@@ -43,10 +40,6 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
 
   const confirmDelete = () => {
     onDeleteRequirement(requirement.id);
-    toast({
-      title: t('mandiRequirementDeletedTitle'),
-      description: t('mandiRequirementDeletedDesc', { itemName: requirement.itemName }),
-    });
     setShowDeleteConfirm(false);
   };
 
@@ -83,7 +76,7 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
           )}
           <div className="flex items-center text-xs text-muted-foreground pt-1">
             <CalendarDays className="h-3.5 w-3.5 mr-1.5 text-primary" />
-            {t('mandiRequirementPostedOn')}: {format(parseISO(requirement.postedDate), "MMM d, yyyy")}
+            {t('mandiRequirementPostedOn')}: {requirement.postedDate}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-between gap-2 pt-2">

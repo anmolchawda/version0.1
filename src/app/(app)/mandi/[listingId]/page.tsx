@@ -1,20 +1,20 @@
+
 // src/app/(app)/mandi/[listingId]/page.tsx
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { placeholderListings, getPlaceholderUser } from '@/lib/placeholders';
-import type { MandiListing, User } from '@/types';
+import type { MandiListing, User, DisplayMandiListing } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ChevronLeft, Loader2, AlertTriangle, MapPin, Package, Phone, MessageSquare, Tag, Scale } from 'lucide-react';
+import { ChevronLeft, Loader2, AlertTriangle, MapPin, Phone, MessageSquare, Tag, Scale, Package, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { useTranslations } from '@/hooks/useTranslations';
-import { Calendar } from 'lucide-react';
+import { db, doc, getDoc, Timestamp } from '@/lib/firebase';
 
 export default function MandiDetailPage() {
   const params = useParams();
@@ -22,26 +22,51 @@ export default function MandiDetailPage() {
   const { t } = useTranslations();
   const listingId = params.listingId as string;
 
-  const [listing, setListing] = useState<MandiListing | null>(null);
+  const [listing, setListing] = useState<DisplayMandiListing | null>(null);
   const [seller, setSeller] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (listingId) {
-      const foundListing = placeholderListings.find(item => item.id === listingId);
-      if (foundListing) {
-        setListing(foundListing);
-        if (foundListing.imageUrls && foundListing.imageUrls.length > 0) {
-            setSelectedImageUrl(foundListing.imageUrls[0]);
-        }
-        const foundSeller = getPlaceholderUser(foundListing.seller.id);
-        if (foundSeller) {
-          setSeller(foundSeller);
-        }
-      }
+    if (!listingId || !db) {
+        setError('Listing ID is missing or database is not available.');
+        setIsLoading(false);
+        return;
     }
-    setIsLoading(false);
+
+    const fetchListing = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const listingDocRef = doc(db, 'mandi_listings', listingId);
+            const docSnap = await getDoc(listingDocRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data() as MandiListing;
+                const displayData: DisplayMandiListing = {
+                    ...data,
+                    id: docSnap.id,
+                    listedDate: format( (data.createdAt as Timestamp).toDate(), "PPP")
+                };
+                
+                setListing(displayData);
+                setSeller(data.seller as User); // Seller info is denormalized
+                if (data.imageUrls && data.imageUrls.length > 0) {
+                    setSelectedImageUrl(data.imageUrls[0]);
+                }
+            } else {
+                setError('Listing not found.');
+            }
+        } catch (err) {
+            console.error("Error fetching listing:", err);
+            setError('Failed to load listing details.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    fetchListing();
   }, [listingId]);
 
   if (isLoading) {
@@ -53,7 +78,7 @@ export default function MandiDetailPage() {
     );
   }
 
-  if (!listing || !seller) {
+  if (error || !listing || !seller) {
     return (
       <div className="space-y-6">
         <Button variant="ghost" onClick={() => router.back()} className="mb-4">
@@ -61,8 +86,8 @@ export default function MandiDetailPage() {
         </Button>
         <div className="flex flex-col items-center justify-center py-20 text-destructive">
           <AlertTriangle className="h-12 w-12 mb-4" />
-          <p className="text-lg font-semibold">Listing Not Found</p>
-          <p className="text-sm text-center">The requested item could not be found.</p>
+          <p className="text-lg font-semibold">{error || 'Listing Not Found'}</p>
+          <p className="text-sm text-center">The requested item could not be found or loaded.</p>
         </div>
       </div>
     );
@@ -132,7 +157,8 @@ export default function MandiDetailPage() {
                 <DetailItem icon={<Tag className="h-4 w-4" />} label="Category" value={listing.category} />
                 <DetailItem icon={<Scale className="h-4 w-4" />} label="Quantity" value={listing.quantity} />
                 <DetailItem icon={<MapPin className="h-4 w-4" />} label="Location" value={listing.location} />
-                <DetailItem icon={<Calendar className="h-4 w-4" />} label="Listed On" value={format(new Date(listing.listedDate), "PPP")} />
+                <DetailItem icon={<Package className="h-4 w-4" />} label="Specifications" value={listing.details} />
+                <DetailItem icon={<Calendar className="h-4 w-4" />} label="Listed On" value={listing.listedDate} />
             </div>
         </CardContent>
 
