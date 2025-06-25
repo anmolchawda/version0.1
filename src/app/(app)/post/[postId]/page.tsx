@@ -1,57 +1,72 @@
 
-// src/app/(app)/post/[postId]/page.tsx
-import { notFound } from 'next/navigation';
-import { getPlaceholderPostById, getPlaceholderCommentsForPost } from '@/lib/placeholders';
+'use client';
+
+import { useParams, notFound } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { PostDetailDisplay } from '@/components/post/post-detail-display';
 import { CommentSection } from '@/components/comment/comment-section';
-import type { Metadata, ResolvingMetadata } from 'next';
-import React from 'react'; // Ensure React is imported
+import { db, doc, getDoc, Timestamp } from '@/lib/firebase';
+import type { Post } from '@/types';
+import { Loader2 } from 'lucide-react';
 
-interface PostPageProps {
-  params: { postId: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
+export default function PostPage() {
+  const params = useParams();
+  const postId = params.postId as string;
 
-export async function generateMetadata(
-  { params: { postId }, searchParams }: PostPageProps, // Destructure postId directly
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const post = getPlaceholderPostById(postId);
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!post) {
-    return {
-      title: 'Post Not Found',
+  useEffect(() => {
+    if (!postId) return;
+    
+    const fetchPost = async () => {
+      if (!db) {
+        setError("Database not available.");
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const postDocRef = doc(db, 'posts', postId);
+        const docSnap = await getDoc(postDocRef);
+        if (docSnap.exists()) {
+          setPost({ id: docSnap.id, ...docSnap.data() } as Post);
+        } else {
+          setError('Post not found.');
+        }
+      } catch (err) {
+        console.error("Error fetching post:", err);
+        setError('Failed to load post.');
+      } finally {
+        setIsLoading(false);
+      }
     };
+    
+    fetchPost();
+  }, [postId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
-  const previousImages = (await parent).openGraph?.images || [];
-
-  return {
-    title: `Post by @${post.user.username}: ${post.caption.substring(0, 30)}... | KrishiX`,
-    description: post.caption.substring(0, 150),
-    openGraph: {
-      title: `Post by @${post.user.username}`,
-      description: post.caption,
-      images: post.imageUrl ? [{ url: post.imageUrl, width: 800, height: 600, alt: post.caption.substring(0,50) }, ...previousImages] : previousImages,
-    },
-  };
-}
-
-
-export default async function PostPage({ params: { postId }, searchParams }: PostPageProps) { // Destructure postId directly
-  const post = getPlaceholderPostById(postId);
-  
-  if (!post) {
+  if (error) {
+    // This will render a not found page for post not found, or an error message for other errors.
     notFound();
   }
 
-  const comments = getPlaceholderCommentsForPost(postId);
+  if (!post) {
+    return null; // Should be caught by error state, but as a safeguard.
+  }
 
   return (
     <div className="space-y-6">
       <PostDetailDisplay post={post} />
-      <CommentSection postId={post.id} initialComments={comments} />
+      <CommentSection postId={post.id} />
     </div>
   );
 }
-

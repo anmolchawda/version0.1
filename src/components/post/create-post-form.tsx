@@ -3,7 +3,7 @@
 
 import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,10 @@ import { Badge } from '@/components/ui/badge';
 import { HashtagSuggester } from './hashtag-suggester';
 import { ImageUp, Send, Tag, X, Loader2, Video } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { useTranslations } from '@/hooks/useTranslations';
+import { useSidebarContext } from '@/contexts/SidebarContext';
+import { db, storage, ref, uploadBytes, getDownloadURL, addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from '@/lib/firebase';
+import type { User } from '@/types';
 
 export function CreatePostForm() {
   const [caption, setCaption] = useState('');
@@ -26,8 +29,9 @@ export function CreatePostForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter(); // Initialize router
-  const { t } = useTranslations(); // Initialize the hook
+  const router = useRouter();
+  const { t } = useTranslations();
+  const { authUserId } = useSidebarContext();
 
   const handleMediaChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -49,7 +53,7 @@ export function CreatePostForm() {
           window.URL.revokeObjectURL(videoElement.src);
           if (videoElement.duration > 60) {
             toast({
-              title: t('videoDurationWarning'), // Using t() for toast title
+              title: t('videoDurationWarning'),
               description: "Please select a video that is 60 seconds or shorter.",
               variant: "destructive",
             });
@@ -60,7 +64,7 @@ export function CreatePostForm() {
       } else {
         setMediaType(null);
          toast({
-            title: "Unsupported File Type", // This could be translated too
+            title: "Unsupported File Type",
             description: "Please select an image or video file.",
             variant: "destructive",
           });
@@ -112,7 +116,7 @@ export function CreatePostForm() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!caption && !mediaFile) {
+    if (!caption.trim() && !mediaFile) {
       toast({
         title: t('emptyPostErrorTitle'),
         description: t('emptyPostErrorDescription'),
@@ -120,21 +124,62 @@ export function CreatePostForm() {
       });
       return;
     }
+    if (!authUserId || !db) {
+        toast({ title: 'Authentication Error', description: 'Could not create post. Please log in.', variant: 'destructive'});
+        return;
+    }
+
     setIsSubmitting(true);
-    console.log('Submitting post:', { caption, mediaFile, mediaType, hashtags, mediaDataUri });
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    toast({
-      title: t('postCreatedSuccessTitle'),
-      description: t('postCreatedSuccessDescription'),
-    });
+    try {
+        const userDocRef = doc(db, 'users', authUserId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (!userDocSnap.exists()) {
+            throw new Error("User profile not found.");
+        }
+        const currentUserData = userDocSnap.data() as User;
+        
+        let imageUrl: string | undefined;
+        if (mediaFile && storage) {
+            const mediaRef = ref(storage, `posts/${authUserId}/${Date.now()}-${mediaFile.name}`);
+            await uploadBytes(mediaRef, mediaFile);
+            imageUrl = await getDownloadURL(mediaRef);
+        }
 
-    setCaption('');
-    removeMedia();
-    setHashtags([]);
-    setCurrentHashtagInput('');
-    router.push('/'); // Redirect to feed page
-    setIsSubmitting(false);
+        const postData = {
+            userId: authUserId,
+            user: {
+                id: currentUserData.id,
+                username: currentUserData.username,
+                name: currentUserData.name,
+                avatarUrl: currentUserData.avatarUrl,
+                location: currentUserData.location,
+            },
+            caption: caption.trim(),
+            imageUrl,
+            hashtags,
+            likesCount: 0,
+            commentsCount: 0,
+            createdAt: serverTimestamp(),
+        };
+
+        const postCollectionRef = collection(db, 'posts');
+        await addDoc(postCollectionRef, postData);
+        await updateDoc(userDocRef, { postCount: (currentUserData.postCount || 0) + 1 });
+
+        toast({
+            title: t('postCreatedSuccessTitle'),
+            description: t('postCreatedSuccessDescription'),
+        });
+        
+        router.push('/');
+
+    } catch (error) {
+        console.error("Error creating post:", error);
+        toast({ title: 'Error', description: error instanceof Error ? error.message : 'Could not create post.', variant: 'destructive' });
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (

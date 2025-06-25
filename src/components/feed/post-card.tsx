@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Added React import
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,8 +14,7 @@ import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/firebase';
-import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { db, doc, updateDoc, getDoc, setDoc, deleteDoc, increment, serverTimestamp, writeBatch, Timestamp } from '@/lib/firebase';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
@@ -25,18 +24,18 @@ interface PostCardProps {
 }
 
 const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
-  const timeAgo = formatTimeAgo(post.createdAt);
+  const { t } = useTranslations();
+  const timeAgo = formatTimeAgo( (post.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString() );
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
   const { toast } = useToast();
-  const { t } = useTranslations();
   const { authUserId } = useSidebarContext();
 
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
-  const [isLoadingLike, setIsLoadingLike] = useState(true); // Start true to check initial state
-  const [isLoadingSave, setIsLoadingSave] = useState(true); // Start true to check initial state
+  const [isLoadingLike, setIsLoadingLike] = useState(true);
+  const [isLoadingSave, setIsLoadingSave] = useState(true);
 
   const isFirestoreAvailable = db !== null;
 
@@ -96,7 +95,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 
     try {
       if (newSavedState) {
-        await setDoc(savedDocRef, { savedAt: serverTimestamp() });
+        await setDoc(savedDocRef, { postId: post.id, savedAt: serverTimestamp() });
         toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
       } else {
         await deleteDoc(savedDocRef);
@@ -124,13 +123,16 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
     setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
     try {
+      const batch = writeBatch(db);
       if (newLikedState) {
-        await setDoc(likedDocRef, { likedAt: Timestamp.now() });
-        await updateDoc(postDocRef, { likesCount: increment(1) });
+        batch.set(likedDocRef, { likedAt: serverTimestamp() });
+        batch.update(postDocRef, { likesCount: increment(1) });
       } else {
-        await deleteDoc(likedDocRef);
-        await updateDoc(postDocRef, { likesCount: increment(-1) });
+        batch.delete(likedDocRef);
+        batch.update(postDocRef, { likesCount: increment(-1) });
       }
+       await batch.commit();
+
     } catch (error) {
       console.error("Error updating like status:", error);
       toast({ title: t('errorToastTitle'), description: t('likeUpdateErrorToastDescription'), variant: "destructive" });
@@ -153,7 +155,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
               <AvatarFallback>{post.user.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-sm font-semibold hover:underline">{post.user.username}</CardTitle>
+              <CardTitle className="text-sm font-semibold hover:underline">{post.user.name || post.user.username}</CardTitle>
               {post.user.location && <p className="text-xs text-muted-foreground">{post.user.location}</p>}
             </div>
           </Link>
@@ -176,7 +178,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike} disabled={isLoadingLike}>
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike} disabled={isLoadingLike || !authUserId}>
               {isLoadingLike ? <Loader2 className="h-6 w-6 animate-spin" /> : <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />}
               <span className="sr-only">{t('likeAction')}</span>
             </Button>
@@ -190,7 +192,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
               <Send className="h-6 w-6" />
               <span className="sr-only">{t('shareAction')}</span>
             </Button>
-            <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave} disabled={isLoadingSave}>
+            <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave} disabled={isLoadingSave || !authUserId}>
               {isLoadingSave ? <Loader2 className="h-6 w-6 animate-spin" /> : <Bookmark className={cn("h-6 w-6", isSaved ? "fill-primary text-primary" : "text-muted-foreground")} />}
               <span className="sr-only">{t('saveAction')}</span>
             </Button>

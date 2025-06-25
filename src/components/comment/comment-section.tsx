@@ -1,35 +1,62 @@
 
-// src/components/comment/comment-section.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import type { Comment as CommentType } from '@/types';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { Comment as CommentType, User } from '@/types';
 import { CommentItem } from './comment-item';
 import { CommentInput } from './comment-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageCircle } from 'lucide-react';
-import { useTranslations } from '@/hooks/useTranslations'; // Ensure this is imported
-
-// Mock current user for adding new comments
-const MOCK_CURRENT_USER_ID = '1';
-const MOCK_CURRENT_USER_USERNAME = 'FarmerJohn';
-const MOCK_CURRENT_USER_AVATAR = 'https://placehold.co/40x40.png?text=FJ';
+import { MessageCircle, Loader2 } from 'lucide-react';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useSidebarContext } from '@/contexts/SidebarContext';
+import { db, collection, query, orderBy, onSnapshot, addDoc, doc, getDoc, serverTimestamp, writeBatch, Timestamp, increment } from '@/lib/firebase';
+import { getPlaceholderUser } from '@/lib/placeholders';
 
 interface CommentSectionProps {
   postId: string;
-  initialComments: CommentType[]; // Now expects a tree structure
 }
 
-export function CommentSection({ postId, initialComments }: CommentSectionProps) {
-  const [comments, setComments] = useState<CommentType[]>(initialComments);
+const buildCommentTree = (comments: CommentType[], parentId: string | null = null): CommentType[] => {
+  return comments
+    .filter(comment => comment.parentId === parentId)
+    .map(comment => ({
+      ...comment,
+      replies: buildCommentTree(comments, comment.id),
+    })).sort((a, b) => new Date((a.createdAt as Timestamp).toDate()).getTime() - new Date((b.createdAt as Timestamp).toDate()).getTime());
+};
+
+export function CommentSection({ postId }: CommentSectionProps) {
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [replyingToUsername, setReplyingToUsername] = useState<string | null>(null);
   const commentInputRef = useRef<HTMLTextAreaElement>(null);
-  const { t } = useTranslations(); // Initialize the hook
+  const { t } = useTranslations();
+  const { authUserId } = useSidebarContext();
 
   useEffect(() => {
-    setComments(initialComments);
-  }, [initialComments]);
+    if (!db || !postId) return;
+
+    setIsLoading(true);
+    const commentsRef = collection(db, 'posts', postId, 'comments');
+    const q = query(commentsRef, orderBy('createdAt', 'asc'));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedComments = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      } as CommentType));
+      
+      const commentTree = buildCommentTree(fetchedComments);
+      setComments(commentTree);
+      setIsLoading(false);
+    }, (error) => {
+      console.error("Error fetching comments:", error);
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [postId]);
 
   const handleStartReply = (commentId: string, username: string) => {
     setReplyingToCommentId(commentId);
@@ -43,65 +70,56 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
     setReplyingToUsername(null);
   };
 
-  const addReplyToTree = (
-    nodes: CommentType[],
-    targetParentId: string,
-    replyToAdd: CommentType
-  ): CommentType[] => {
-    return nodes.map(node => {
-      if (node.id === targetParentId) {
-        return {
-          ...node,
-          replies: [...(node.replies || []), replyToAdd].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
-        };
-      }
-      if (node.replies && node.replies.length > 0) {
-        return {
-          ...node,
-          replies: addReplyToTree(node.replies, targetParentId, replyToAdd),
-        };
-      }
-      return node;
-    });
-  };
+  const handleCommentAdded = async (newCommentData: { text: string }) => {
+    if (!authUserId || !db) return;
 
-  const handleCommentAdded = (newCommentData: Omit<CommentType, 'id' | 'user' | 'createdAt' | 'replies'> & { text: string }) => {
-    const newCommentEntry: CommentType = {
-      ...newCommentData,
-      id: `c${Date.now()}`, // Mock ID
-      user: { 
-        id: MOCK_CURRENT_USER_ID, 
-        username: MOCK_CURRENT_USER_USERNAME,
-        avatarUrl: MOCK_CURRENT_USER_AVATAR,
-      },
-      createdAt: new Date().toISOString(),
-      parentId: replyingToCommentId, // Set parentId if it's a reply
-      replies: [], // New comments/replies don't have replies initially
-    };
+    try {
+        const userDoc = await getDoc(doc(db, 'users', authUserId));
+        if (!userDoc.exists()) {
+            throw new Error("User data not found.");
+        }
+        const userData = userDoc.data() as User;
 
-    if (replyingToCommentId) {
-      setComments(prevComments => addReplyToTree(prevComments, replyingToCommentId, newCommentEntry));
-    } else {
-      // Add as a top-level comment
-      setComments(prevComments => [...prevComments, newCommentEntry].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
+        const batch = writeBatch(db);
+        const postRef = doc(db, 'posts', postId);
+        const newCommentRef = doc(collection(db, 'posts', postId, 'comments'));
+        
+        const commentToAdd = {
+            user: {
+                id: authUserId,
+                username: userData.username,
+                name: userData.name,
+                avatarUrl: userData.avatarUrl,
+            },
+            postId: postId,
+            text: newCommentData.text,
+            createdAt: serverTimestamp(),
+            parentId: replyingToCommentId,
+        };
+
+        batch.set(newCommentRef, commentToAdd);
+        batch.update(postRef, { commentsCount: increment(1) });
+        
+        await batch.commit();
+
+    } catch (error) {
+        console.error("Error adding comment:", error);
     }
     
-    // Reset reply state
     handleCancelReply();
   };
   
   const countTotalComments = (commentList: CommentType[]): number => {
     let count = 0;
     for (const comment of commentList) {
-      count++; // Count the comment itself
+      count++;
       if (comment.replies && comment.replies.length > 0) {
-        count += countTotalComments(comment.replies); // Recursively count replies
+        count += countTotalComments(comment.replies);
       }
     }
     return count;
   };
   const totalCommentCount = countTotalComments(comments);
-
 
   return (
     <Card id="comments" className="mt-6 shadow-lg rounded-xl">
@@ -113,7 +131,11 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
       </CardHeader>
       <CardContent>
         <div className="max-h-[600px] overflow-y-auto pr-2 -mr-2 space-y-1">
-          {comments.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : comments.length > 0 ? (
             comments.map((comment) => (
               <CommentItem 
                 key={comment.id} 

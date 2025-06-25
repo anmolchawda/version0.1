@@ -1,3 +1,4 @@
+
 // src/components/comment/comment-item.tsx
 import React from 'react';
 import Link from 'next/link';
@@ -6,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { Comment as CommentType } from '@/types';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { useTranslations } from '@/hooks/useTranslations';
+import type { Timestamp } from 'firebase/firestore';
 
 interface CommentItemProps {
   comment: CommentType;
@@ -14,7 +16,7 @@ interface CommentItemProps {
 }
 
 const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps) => {
-  const timeAgo = formatTimeAgo(comment.createdAt);
+  const timeAgo = formatTimeAgo((comment.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString());
   const { t } = useTranslations();
 
   const handleReplyClick = () => {
@@ -37,7 +39,7 @@ const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps
         <div className="flex-1">
           <div className="text-sm bg-muted/30 p-2 rounded-md">
             <Link href={`/profile/${comment.user.id}`} className="font-semibold hover:underline">
-              {comment.user.username}
+              {comment.user.name || comment.user.username}
             </Link>
             <span className="ml-1.5 text-foreground">{comment.text}</span>
           </div>

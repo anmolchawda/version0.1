@@ -20,21 +20,22 @@ export interface User {
 
 export interface Post {
   id: string;
-  user: User;
+  userId: string; // For easier querying
+  user: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl' | 'location'>; // Denormalized user data
   imageUrl?: string;
   caption: string;
   hashtags?: string[];
   likesCount: number;
   commentsCount: number;
-  createdAt: string | FirebaseTimestamp; // Allow FirebaseTimestamp for Firestore interaction
+  createdAt: FirebaseTimestamp;
 }
 
 export interface Comment {
   id: string;
-  user: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  user: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   postId: string;
   text: string;
-  createdAt: string; // ISO date string
+  createdAt: FirebaseTimestamp;
   parentId?: string | null;
   replies?: Comment[];
 }
@@ -146,7 +147,7 @@ export interface Yojna {
 
 // For simplified disease display on Discover page
 export interface DiscoverDisease {
-  id: string;
+  id:string;
   name: string;
   cropName: string; // e.g., "Tomato"
   cropSlug: string; // e.g., "tomato"
