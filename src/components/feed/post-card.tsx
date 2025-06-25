@@ -9,19 +9,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
-import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Send, Bookmark, Loader2 } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
-import { MOCK_USER_ID } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/firebase'; // db can be null
-import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp } from 'firebase/firestore';
-import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, getDoc, setDoc, deleteDoc, increment, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { useTranslations } from '@/hooks/useTranslations';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 interface PostCardProps {
   post: Post;
-  priority?: boolean; // For image optimization
+  priority?: boolean;
 }
 
 const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
@@ -29,111 +29,114 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
   const { toast } = useToast();
-  const { t } = useTranslations(); // Initialize the hook
+  const { t } = useTranslations();
+  const { authUserId } = useSidebarContext();
 
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
-  const [isLoadingLike, setIsLoadingLike] = useState(false);
+  const [isLoadingLike, setIsLoadingLike] = useState(true); // Start true to check initial state
+  const [isLoadingSave, setIsLoadingSave] = useState(true); // Start true to check initial state
 
-  const isFirestoreAvailable = db !== null; // Check if db instance is available
+  const isFirestoreAvailable = db !== null;
 
   useEffect(() => {
-    if (!isFirestoreAvailable) {
+    if (!isFirestoreAvailable || !authUserId) {
       setIsLoadingLike(false);
-      // In mock mode, we can assume posts are not liked by default or read from a mock state if needed
-      setIsLiked(false); 
-      setLocalLikesCount(post.likesCount); // Use initial prop value for mock
+      setIsLoadingSave(false);
       return;
     }
 
-    // Firestore-dependent logic
-    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
-    const checkInitialLike = async () => {
-      setIsLoadingLike(true);
+    let isMounted = true;
+
+    const checkInitialStatus = async () => {
+      // Check Like Status
+      const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
       try {
-        const docSnap = await getDoc(likedDocRef);
-        setIsLiked(docSnap.exists());
+        const likeDocSnap = await getDoc(likedDocRef);
+        if (isMounted) setIsLiked(likeDocSnap.exists());
       } catch (error) {
         console.error("Error checking initial like status:", error);
-        // Don't toast here, could be noisy on initial load for many cards
       } finally {
-        setIsLoadingLike(false);
+        if (isMounted) setIsLoadingLike(false);
+      }
+
+      // Check Save/Bookmark Status
+      const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
+      try {
+        const saveDocSnap = await getDoc(savedDocRef);
+        if (isMounted) setIsSaved(saveDocSnap.exists());
+      } catch (error) {
+        console.error("Error checking initial save status:", error);
+      } finally {
+        if (isMounted) setIsLoadingSave(false);
       }
     };
-    checkInitialLike();
-    setLocalLikesCount(post.likesCount); // Sync with prop on initial load or post change
-  }, [post.id, post.likesCount, isFirestoreAvailable]); 
 
-  const getSavedPostsFromStorage = (): string[] => {
-    if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
-    return saved ? JSON.parse(saved) : [];
-  };
+    checkInitialStatus();
+    setLocalLikesCount(post.likesCount);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [post.id, post.likesCount, isFirestoreAvailable, authUserId]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setPostFullUrl(`${window.location.origin}/post/${post.id}`);
-      const savedPosts = getSavedPostsFromStorage();
-      setIsSaved(savedPosts.includes(post.id));
     }
   }, [post.id]);
 
-  const handleToggleSave = () => {
-    const savedPosts = getSavedPostsFromStorage();
-    let updatedSavedPosts: string[];
+  const handleToggleSave = async () => {
+    if (isLoadingSave || !authUserId || !isFirestoreAvailable) return;
+    setIsLoadingSave(true);
 
-    if (isSaved) {
-      updatedSavedPosts = savedPosts.filter(id => id !== post.id);
-      toast({ title: t('postUnsavedToastTitle'), description: t('postUnsavedToastDescription') });
-    } else {
-      updatedSavedPosts = [...savedPosts, post.id];
-      toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
+    const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
+    const newSavedState = !isSaved;
+
+    try {
+      if (newSavedState) {
+        await setDoc(savedDocRef, { savedAt: serverTimestamp() });
+        toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
+      } else {
+        await deleteDoc(savedDocRef);
+        toast({ title: t('postUnsavedToastTitle'), description: t('postUnsavedToastDescription') });
+      }
+      setIsSaved(newSavedState);
+    } catch (error) {
+      console.error("Error updating save status:", error);
+      toast({ title: t('errorToastTitle'), description: "Could not update save status.", variant: "destructive" });
+    } finally {
+      setIsLoadingSave(false);
     }
-    localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
-    setIsSaved(!isSaved);
   };
 
   const handleToggleLike = async () => {
-    if (isLoadingLike) return;
+    if (isLoadingLike || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingLike(true);
 
     const newLikedState = !isLiked;
-
-    if (!isFirestoreAvailable) {
-      // Mock mode: simulate like toggle
-      setIsLiked(newLikedState);
-      setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
-      toast({ title: newLikedState ? t('postLikedMockToastTitle') : t('postUnlikedMockToastTitle') });
-      setIsLoadingLike(false);
-      return;
-    }
-
-    // Firestore mode
-    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', MOCK_USER_ID);
+    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
     const postDocRef = doc(db, 'posts', post.id);
+    
+    // Optimistic UI update
+    setIsLiked(newLikedState);
+    setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
     try {
       if (newLikedState) {
         await setDoc(likedDocRef, { likedAt: Timestamp.now() });
-        await updateDoc(postDocRef, {
-          likesCount: increment(1)
-        });
-        setLocalLikesCount(prev => prev + 1);
+        await updateDoc(postDocRef, { likesCount: increment(1) });
       } else {
         await deleteDoc(likedDocRef);
-        await updateDoc(postDocRef, {
-          likesCount: increment(-1)
-        });
-        setLocalLikesCount(prev => Math.max(0, prev - 1));
+        await updateDoc(postDocRef, { likesCount: increment(-1) });
       }
-      setIsLiked(newLikedState);
     } catch (error) {
       console.error("Error updating like status:", error);
       toast({ title: t('errorToastTitle'), description: t('likeUpdateErrorToastDescription'), variant: "destructive" });
-      // Revert optimistic updates if Firestore fails
-      setLocalLikesCount(post.likesCount); 
-      setIsLiked(!newLikedState); 
+      // Revert optimistic updates
+      setIsLiked(!newLikedState);
+      setLocalLikesCount(post.likesCount);
     } finally {
       setIsLoadingLike(false);
     }
@@ -174,7 +177,7 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon" className="rounded-full" onClick={handleToggleLike} disabled={isLoadingLike}>
-              <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />
+              {isLoadingLike ? <Loader2 className="h-6 w-6 animate-spin" /> : <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />}
               <span className="sr-only">{t('likeAction')}</span>
             </Button>
             <Link href={`/post/${post.id}#comments`}>
@@ -187,8 +190,8 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
               <Send className="h-6 w-6" />
               <span className="sr-only">{t('shareAction')}</span>
             </Button>
-            <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave}>
-              <Bookmark className={`h-6 w-6 ${isSaved ? "fill-primary text-primary" : "text-muted-foreground"}`} />
+            <Button variant="ghost" size="icon" className="ml-auto rounded-full" onClick={handleToggleSave} disabled={isLoadingSave}>
+              {isLoadingSave ? <Loader2 className="h-6 w-6 animate-spin" /> : <Bookmark className={cn("h-6 w-6", isSaved ? "fill-primary text-primary" : "text-muted-foreground")} />}
               <span className="sr-only">{t('saveAction')}</span>
             </Button>
           </div>
@@ -236,4 +239,3 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
 }
 
 export const PostCard = React.memo(PostCardComponent);
-
