@@ -1,3 +1,4 @@
+
 // src/app/(app)/notifications/page.tsx
 'use client';
 
@@ -110,7 +111,8 @@ export default function NotificationsPage() {
     }
 
     setIsLoading(true);
-    const notificationsRef = collection(db, 'users', authUserId, 'notifications');
+    // Updated path to reflect notifications/{userId}/items/{notificationId}
+    const notificationsRef = collection(db, 'notifications', authUserId, 'items');
     const q = query(notificationsRef, orderBy('timestamp', 'desc'));
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
@@ -132,7 +134,8 @@ export default function NotificationsPage() {
       if (unreadNotificationIds.length > 0) {
         const batch = writeBatch(db);
         unreadNotificationIds.forEach(id => {
-          const notifDocRef = doc(db, 'users', authUserId, 'notifications', id);
+          // Updated path for marking as read
+          const notifDocRef = doc(db, 'notifications', authUserId, 'items', id);
           batch.update(notifDocRef, { read: true });
         });
         
@@ -179,7 +182,8 @@ export default function NotificationsPage() {
     }
 
     try {
-      const notificationsRef = collection(db, 'users', authUserId, 'notifications');
+      // Updated path for clearing notifications
+      const notificationsRef = collection(db, 'notifications', authUserId, 'items');
       const querySnapshot = await getDocs(notificationsRef);
       
       if (querySnapshot.empty) {
