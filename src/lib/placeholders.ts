@@ -241,7 +241,11 @@ export const placeholderListings: MandiListing[] = [
     description: 'Heirloom Blend, juicy and ripe.',
     quantity: '120 lbs',
     price: '₹210/kg',
-    imageUrl: 'https://placehold.co/300x200.png?text=Tomatoes',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+      'https://placehold.co/602x602.png',
+    ],
     aiHint: 'tomatoes vegetable',
     seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
@@ -254,7 +258,11 @@ export const placeholderListings: MandiListing[] = [
     description: 'High yield, disease-resistant variety. Germination rate: 95%.',
     quantity: '50 kg bags',
     price: '₹1500/bag',
-    imageUrl: 'https://placehold.co/300x200.png?text=Corn+Seeds',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+      'https://placehold.co/602x602.png',
+    ],
     aiHint: 'corn seeds',
     seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -267,7 +275,11 @@ export const placeholderListings: MandiListing[] = [
     description: '55 HP, 2018 model, well-maintained. 1200 hours run.',
     quantity: '1 unit',
     price: '₹3,50,000',
-    imageUrl: 'https://placehold.co/300x200.png?text=Tractor',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+      'https://placehold.co/602x602.png',
+    ],
     aiHint: 'tractor farm',
     seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
@@ -280,7 +292,10 @@ export const placeholderListings: MandiListing[] = [
     description: 'NPK rich, suitable for all vegetables. Compost based.',
     quantity: '25 kg bags',
     price: '₹800/bag',
-    imageUrl: 'https://placehold.co/300x200.png?text=Fertilizer',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+    ],
     aiHint: 'fertilizer organic',
     seller: { id: '3', name: 'Mike Chen', username: 'UrbanHarvester', avatarUrl: 'https://images.unsplash.com/photo-1528693404014-b13ebe6e723e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
@@ -293,7 +308,12 @@ export const placeholderListings: MandiListing[] = [
     description: 'Brand Y, 8 HP, Petrol Engine. Good for small to medium farms.',
     quantity: '1 unit',
     price: '₹45,000',
-    imageUrl: 'https://placehold.co/300x200.png?text=Power+Tiller',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+      'https://placehold.co/602x602.png',
+      'https://placehold.co/603x603.png',
+    ],
     aiHint: 'tiller equipment',
     seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -306,7 +326,11 @@ export const placeholderListings: MandiListing[] = [
     description: 'Organic, cold-pressed neem oil. Effective against common pests.',
     quantity: '5 Liters',
     price: '₹1200/can',
-    imageUrl: 'https://placehold.co/300x200.png?text=Pesticide',
+    imageUrls: [
+      'https://placehold.co/600x600.png',
+      'https://placehold.co/601x601.png',
+      'https://placehold.co/602x602.png',
+    ],
     aiHint: 'neem oil',
     seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
     listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
@@ -359,7 +383,7 @@ export const placeholderDiscoverDiseases: DiscoverDisease[] = [
     cropName: 'Potato',
     cropSlug: 'potato',
     symptomsSummary: 'Water-soaked lesions on leaves and stems, white mold on undersides.',
-    imageUrl: 'https://placehold.co/100x100.png?text=Potato+Blight',
+    imageUrl: 'https://placehold.co/100x100.png',
     aiHint: 'potato blight',
   },
   {
@@ -377,7 +401,7 @@ export const placeholderDiscoverDiseases: DiscoverDisease[] = [
     cropName: 'Corn',
     cropSlug: 'corn',
     symptomsSummary: 'Small, cinnamon-brown pustules on both leaf surfaces.',
-    imageUrl: 'https://placehold.co/100x100.png?text=Corn+Rust',
+    imageUrl: 'https://placehold.co/100x100.png',
     aiHint: 'corn rust disease',
   }
 ];
@@ -414,4 +438,3 @@ export const placeholderBuyerRequirements: BuyerRequirement[] = [
     postedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];
-

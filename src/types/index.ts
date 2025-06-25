@@ -53,7 +53,7 @@ export interface MandiListing {
   description?: string;
   quantity: string;
   price: string;
-  imageUrl: string;
+  imageUrls: string[];
   aiHint: string;
   seller: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   listedDate: string; // ISO date string

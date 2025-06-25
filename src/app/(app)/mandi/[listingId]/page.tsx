@@ -25,12 +25,16 @@ export default function MandiDetailPage() {
   const [listing, setListing] = useState<MandiListing | null>(null);
   const [seller, setSeller] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (listingId) {
       const foundListing = placeholderListings.find(item => item.id === listingId);
       if (foundListing) {
         setListing(foundListing);
+        if (foundListing.imageUrls && foundListing.imageUrls.length > 0) {
+            setSelectedImageUrl(foundListing.imageUrls[0]);
+        }
         const foundSeller = getPlaceholderUser(foundListing.seller.id);
         if (foundSeller) {
           setSeller(foundSeller);
@@ -83,15 +87,38 @@ export default function MandiDetailPage() {
 
       <Card className="shadow-xl rounded-xl overflow-hidden">
         <div className="relative w-full aspect-video bg-muted">
-          <Image
-            src={listing.imageUrl}
-            alt={listing.name}
-            fill
-            style={{ objectFit: "cover" }}
-            data-ai-hint={listing.aiHint}
-            priority
-          />
+          {selectedImageUrl && (
+              <Image
+                src={selectedImageUrl}
+                alt={listing.name}
+                fill
+                style={{ objectFit: "cover" }}
+                data-ai-hint={listing.aiHint}
+                priority
+              />
+          )}
         </div>
+
+        {listing.imageUrls && listing.imageUrls.length > 1 && (
+            <div className="grid grid-cols-5 gap-2 p-2 bg-muted/20">
+                {listing.imageUrls.map((url, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setSelectedImageUrl(url)}
+                        className={`relative aspect-square rounded-md overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+                            ${selectedImageUrl === url ? 'border-primary scale-105' : 'border-transparent hover:opacity-80'}`}
+                    >
+                        <Image
+                            src={url}
+                            alt={`Thumbnail ${index + 1}`}
+                            layout="fill"
+                            objectFit="cover"
+                        />
+                    </button>
+                ))}
+            </div>
+        )}
+
         <CardHeader>
           <div className="flex justify-between items-start">
               <CardTitle className="text-2xl font-bold text-primary">{listing.name}</CardTitle>

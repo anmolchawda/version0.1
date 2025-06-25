@@ -26,14 +26,32 @@ interface MandiItemCardProps {
 const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
   return (
     <Card key={listing.id} className="shadow-md rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col">
-      <div className="relative w-full aspect-square bg-muted">
-        <Image
-          src={listing.imageUrl}
-          alt={listing.name}
-          layout="fill"
-          objectFit="cover"
-          data-ai-hint={listing.aiHint}
-        />
+      <div className="relative w-full aspect-square bg-muted group">
+        <div className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-none rounded-t-lg">
+            {listing.imageUrls.map((url, index) => (
+                <div key={index} className="relative w-full h-full flex-shrink-0 snap-center">
+                    <Image
+                        src={url}
+                        alt={`${listing.name} image ${index + 1}`}
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint={listing.aiHint}
+                    />
+                </div>
+            ))}
+        </div>
+        
+        {listing.imageUrls.length > 1 && (
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center items-center space-x-1.5 pointer-events-none">
+                {listing.imageUrls.map((_, i) => (
+                <div
+                    key={i}
+                    className="h-1.5 w-1.5 rounded-full bg-white opacity-50 shadow-md"
+                />
+                ))}
+            </div>
+        )}
+
         <div className="absolute top-2 left-2 right-2 flex justify-between items-center space-x-1">
           <Badge variant="default" className="bg-primary/80 text-primary-foreground text-xs px-1.5 py-0.5 truncate">
             {listing.price}
