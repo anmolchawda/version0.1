@@ -1,4 +1,3 @@
-
 // src/components/mandi/mandi-item-card.tsx
 'use client';
 
@@ -46,7 +45,7 @@ const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
       </div>
       <CardHeader className="pb-2 pt-3 px-3">
         <CardTitle className="text-sm sm:text-base font-semibold text-primary hover:underline line-clamp-1">
-          <Link href={`#`}>{listing.name}</Link> {/* Placeholder link */}
+          <Link href={`/mandi/${listing.id}`}>{listing.name}</Link>
         </CardTitle>
         {listing.description && <CardDescription className="text-xs line-clamp-2">{listing.description}</CardDescription>}
       </CardHeader>
@@ -72,8 +71,10 @@ const MandiItemCardComponent = ({ listing }: MandiItemCardProps) => {
         </div>
       </CardContent>
       <CardFooter className="p-3 mt-auto">
-        <Button size="sm" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-xs">
-          <ShoppingCart className="mr-1.5 h-3.5 w-3.5" /> View & Contact
+        <Button asChild size="sm" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-xs">
+          <Link href={`/mandi/${listing.id}`}>
+            <ShoppingCart className="mr-1.5 h-3.5 w-3.5" /> View & Contact
+          </Link>
         </Button>
       </CardFooter>
     </Card>
