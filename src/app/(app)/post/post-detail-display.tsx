@@ -1,5 +1,5 @@
 
-// src/app/(app)/post/post-detail-display.tsx
+// src/components/post/post-detail-display.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
