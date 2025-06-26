@@ -1,4 +1,3 @@
-
 // src/components/post/post-detail-display.tsx
 'use client';
 
@@ -34,7 +33,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
 
   const getSavedPostsFromStorage = (): string[] => {
     if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem(`farmdocc_saved_posts_${MOCK_USER_ID}`);
+    const saved = localStorage.getItem(`krishix_saved_posts_${MOCK_USER_ID}`);
     return saved ? JSON.parse(saved) : [];
   };
 
@@ -57,7 +56,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
       updatedSavedPosts = [...savedPosts, post.id];
       toast({ title: t('toastPostSavedTitle'), description: t('toastPostSavedDescription') });
     }
-    localStorage.setItem(`farmdocc_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
+    localStorage.setItem(`krishix_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
   };
 
