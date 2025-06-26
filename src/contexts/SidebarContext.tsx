@@ -31,7 +31,6 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     // A more robust way would be a shared constant or env variable.
     // For this exercise, we'll directly use MOCK_USER_ID if no Firebase auth happens.
     if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' || !authUserId) { // Fallback if auth flow is bypassed
-      setAuthUserId(MOCK_USER_ID);
       console.log("[SidebarContext] Mock mode: Setting authUserId to MOCK_USER_ID:", MOCK_USER_ID);
     }
   }, [authUserId]); // Re-evaluate if authUserId changes externally (though less likely in full mock)

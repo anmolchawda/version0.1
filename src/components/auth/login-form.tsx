@@ -10,10 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
-// import { auth } from '@/lib/firebase'; // Firebase Auth not used in mock mode
-// import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type AuthError } from 'firebase/auth';
-
-const USE_MOCK_DATA = true; // Master switch
+import { auth } from '@/lib/firebase';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -38,36 +36,54 @@ export function LoginForm() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    if (USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
+    if (!auth) {
+      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       toast({
-        title: 'Login Successful (Mock)!',
+        title: 'Login Successful!',
         description: 'Welcome back!',
       });
-      router.push('/feed'); // Redirect to feed or main app page
-    } else {
-      // Original Firebase login logic would go here
-      toast({ title: "Login Disabled", description: "Firebase login is currently disabled in mock mode.", variant: "destructive"});
+      router.push('/');
+    } catch (error: any) {
+      console.error('Login error:', error.code, error.message);
+      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    if (USE_MOCK_DATA) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      toast({
-        title: 'Login Successful (Mock Google)!',
-        description: 'Welcome via Google!',
-      });
-      router.push('/feed');
-    } else {
-      // Original Google login logic
-       toast({ title: "Login Disabled", description: "Google login is currently disabled in mock mode.", variant: "destructive"});
+    if (!auth) {
+      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
+      setIsGoogleLoading(false);
+      return;
     }
-    setIsGoogleLoading(false);
-  };
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log('Signed in with Google:', user.email);
 
+      toast({
+        title: 'Login Successful!',
+        description: `Welcome, ${user.displayName || user.email}!`,
+      });
+      router.push('/');
+    } catch (error: any) {
+      console.error('Google Sign-in error:', error.code, error.message);
+      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+  
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
@@ -86,7 +102,7 @@ export function LoginForm() {
           ) : (
             <GoogleLogo />
           )}
-          {isGoogleLoading ? 'Signing in...' : 'Log in with Google'}
+          <span className="ml-2">{isGoogleLoading ? 'Signing in...' : 'Log in with Google'}</span>
         </Button>
 
         <div className="relative my-4">

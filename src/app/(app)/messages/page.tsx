@@ -11,10 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquareText, Search, Edit3, Users, Loader2 } from 'lucide-react';
-import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
+import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders'; // Keep formatTimeAgo if needed
 import type { DisplayConversation, FirestoreConversation, User } from '@/types';
 import { NewMessageModal } from '@/components/message/new-message-modal';
-import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp } from '@/lib/firebase'; // db can be null
+import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp, doc, getDoc } from '@/lib/firebase'; // Import doc and getDoc, db can be null
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { useTranslations } from '@/hooks/useTranslations';
 

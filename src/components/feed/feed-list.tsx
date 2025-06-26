@@ -6,9 +6,9 @@ import type { Post as PostType, User } from '@/types';
 import { PostCard } from './post-card';
 import { getPlaceholderUser, placeholderPosts as mockPlaceholderPosts } from '@/lib/placeholders'; // Renamed import
 import { RefreshCw, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, handleFirestoreError } from '@/lib/utils';
 import { db } from '@/lib/firebase'; // db can be null
-import { collection, getDocs, query, orderBy, Timestamp, type DocumentData } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, Timestamp, type DocumentData, doc, getDoc } from 'firebase/firestore';
 import { useTranslations } from '@/hooks/useTranslations';
 
 const PULL_THRESHOLD = 70;

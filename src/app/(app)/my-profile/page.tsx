@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, doc, getDoc } from '@/lib/firebase';
+import { db, doc, getDoc, collection, query, where, getDocs } from '@/lib/firebase'; // Import necessary Firestore functions
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
@@ -45,9 +45,18 @@ export default function MyProfilePage() {
         
         if (userDocSnap.exists()) {
           const fetchedData = { id: authUserId, ...userDocSnap.data() } as User;
-          // Use placeholder posts for now
-          const postsForUser = getPlaceholderPostsForUser(authUserId);
+
+          // Fetch user's actual posts from Firestore
+          const postsCollectionRef = collection(db, 'posts');
+          const userPostsQuery = query(postsCollectionRef, where('userId', '==', authUserId));
+          const userPostsSnapshot = await getDocs(userPostsQuery);
+
+          const postsForUser: Post[] = userPostsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          })) as Post[]; // Cast to Post[] type
           setUserPosts(postsForUser);
+
           setProfileData({ ...fetchedData, postCount: postsForUser.length });
         } else {
           // This case should be handled by the main layout redirecting to /setup-profile
