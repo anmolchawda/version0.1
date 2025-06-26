@@ -18,14 +18,14 @@ const AppLogoComponent = ({ className, textClassName, iconClassName }: AppLogoPr
       <div className={cn("relative", iconClassName)}> {/* This div receives h-12 w-12 etc. */}
         <Image
           src={logoUrl}
-          alt="KrishiX Logo"
+          alt="FieldVerse Logo"
           fill
           sizes="(max-width: 768px) 48px, (max-width: 1200px) 48px, 48px" // Adjust sizes as needed based on iconClassName
           style={{ objectFit: "contain" }}
           unoptimized={true} // Keep unoptimized for GCS/Firebase URLs if optimization causes issues
         />
       </div>
-      <span className={cn(textClassName)}>KrishiX</span>
+      <span className={cn(textClassName)}>FieldVerse</span>
     </Link>
   );
 }

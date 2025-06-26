@@ -29,8 +29,8 @@ export function ShareModal({ isOpen, onOpenChange, postUrl, postCaption }: Share
   const [followedUsers, setFollowedUsers] = useState<User[]>([]);
 
   const whatsAppText = postCaption
-    ? `Check out this post on FARMDOCC: ${postCaption.substring(0, 100)}... ${postUrl}`
-    : `Check out this post on FARMDOCC: ${postUrl}`;
+    ? `Check out this post on FieldVerse: ${postCaption.substring(0, 100)}... ${postUrl}`
+    : `Check out this post on FieldVerse: ${postUrl}`;
   const whatsAppUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsAppText)}`;
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
 

@@ -20,7 +20,7 @@ export default function HelpSettingsPage() {
             Help & Support
           </CardTitle>
           <CardDescription>
-            Find answers to your questions and get support for FARMDOCC.
+            Find answers to your questions and get support for FieldVerse.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -31,7 +31,7 @@ export default function HelpSettingsPage() {
             </p>
           </div>
           <div className="mt-6 text-center">
-            <p className="text-sm">For immediate assistance, you can also check our community forums (link to be added) or contact us at <a href="mailto:support@example.com" className="text-accent hover:underline">support@farmdocc.example.com</a> (placeholder).</p>
+            <p className="text-sm">For immediate assistance, you can also check our community forums (link to be added) or contact us at <a href="mailto:support@example.com" className="text-accent hover:underline">support@fieldverse.example.com</a> (placeholder).</p>
           </div>
         </CardContent>
       </Card>

@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -15,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'FARMDOCC',
-  description: 'Connect with farmers on FARMDOCC',
+  title: 'FieldVerse',
+  description: 'Connect with farmers on FieldVerse',
 };
 
 export default function RootLayout({

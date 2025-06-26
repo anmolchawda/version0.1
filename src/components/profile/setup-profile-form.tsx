@@ -149,7 +149,7 @@ export function SetupProfileForm() {
       
       toast({
         title: 'Profile Setup Complete!',
-        description: 'Welcome to FARMDOCC! Redirecting to your feed...',
+        description: 'Welcome to FieldVerse! Redirecting to your feed...',
       });
       router.push('/feed');
     } catch (error) {
@@ -176,7 +176,7 @@ export function SetupProfileForm() {
       <CardHeader className="text-center">
         <UserCheck className="mx-auto h-12 w-12 text-primary mb-2" />
         <CardTitle className="text-2xl sm:text-3xl font-bold text-primary">Setup Your Profile</CardTitle>
-        <CardDescription>Complete your profile to join the KrishiX community. Fields marked with <span className="text-destructive">*</span> are required.</CardDescription>
+        <CardDescription>Complete your profile to join the FieldVerse community. Fields marked with <span className="text-destructive">*</span> are required.</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-5 p-4 sm:p-6">

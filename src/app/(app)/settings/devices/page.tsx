@@ -20,7 +20,7 @@ export default function DevicesSettingsPage() {
             Connected Devices
           </CardTitle>
           <CardDescription>
-            Manage devices linked to your FARMDOCC account.
+            Manage devices linked to your FieldVerse account.
           </CardDescription>
         </CardHeader>
         <CardContent>
