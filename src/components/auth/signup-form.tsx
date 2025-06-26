@@ -56,7 +56,7 @@ export function SignupForm() {
       await createUserWithEmailAndPassword(auth, email, password);
       toast({
         title: 'Signup Successful!',
-        description: `Welcome to FieldVerse, ${username}! Please set up your profile.`,
+        description: `Welcome to KrishiX, ${username}! Please set up your profile.`,
       });
       router.push('/setup-profile');
     } catch (error: any) {
@@ -82,7 +82,7 @@ export function SignupForm() {
 
       toast({
         title: 'Signup Successful!',
-        description: `Welcome to FieldVerse, ${user.displayName || user.email}!`,
+        description: `Welcome to KrishiX, ${user.displayName || user.email}!`,
       });
       router.push('/feed'); // The layout will redirect to /setup-profile if needed.
     } catch (error: any) {
@@ -96,7 +96,7 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary">Join FieldVerse</CardTitle>
+        <CardTitle className="text-3xl font-bold text-primary">Join KrishiX</CardTitle>
         <CardDescription>Create your account and connect with farmers.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

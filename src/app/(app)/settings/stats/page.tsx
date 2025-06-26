@@ -20,7 +20,7 @@ export default function StatsSettingsPage() {
             Account Statistics
           </CardTitle>
           <CardDescription>
-            View your activity and engagement statistics on FARMDOCC.
+            View your activity and engagement statistics on KrishiX.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -16,7 +16,7 @@ export default function AuthLayout({
       </main>
       
        <footer className="w-full text-center text-sm text-muted-foreground py-4">
-        © {new Date().getFullYear()} FARMDOCC. Connect & Grow.
+        © {new Date().getFullYear()} KrishiX. Connect & Grow.
       </footer>
     </div>
   );

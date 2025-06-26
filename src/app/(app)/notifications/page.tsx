@@ -268,7 +268,7 @@ export default function NotificationsPage() {
                 {t('notificationsTitle')}
               </CardTitle>
               <CardDescription>
-                {t('notificationsDescription')}
+                Your new updates and alerts from KrishiX.
               </CardDescription>
             </div>
             {notifications.length > 0 && (

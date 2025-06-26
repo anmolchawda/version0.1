@@ -11,7 +11,7 @@ export default function SetupProfilePage() {
       </div>
       <SetupProfileForm />
        <footer className="w-full text-center text-xs sm:text-sm text-muted-foreground py-4 mt-8">
-        © {new Date().getFullYear()} FARMDOCC. Complete your profile to connect & grow.
+        © {new Date().getFullYear()} KrishiX. Complete your profile to connect & grow.
       </footer>
     </div>
   );

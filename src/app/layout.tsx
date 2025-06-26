@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'FieldVerse',
-  description: 'Connect with farmers on FieldVerse',
+  title: 'KrishiX',
+  description: 'Connect with farmers on KrishiX',
 };
 
 export default function RootLayout({

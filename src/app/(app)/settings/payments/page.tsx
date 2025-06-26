@@ -24,7 +24,7 @@ export default function PaymentsSettingsPage() {
             Payment Methods
           </CardTitle>
           <CardDescription>
-            Manage your payment methods for FARMDOCC services or marketplace transactions.
+            Manage your payment methods for KrishiX services or marketplace transactions.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -75,11 +75,10 @@ export default function PaymentsSettingsPage() {
         </CardContent>
          <CardFooter>
           <p className="text-xs text-muted-foreground">
-            FARMDOCC does not store your full card details. All payment processing is handled by secure third-party providers.
+            KrishiX does not store your full card details. All payment processing is handled by secure third-party providers.
           </p>
         </CardFooter>
       </Card>
     </div>
   );
 }
-
