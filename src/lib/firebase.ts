@@ -2,10 +2,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
-  initializeFirestore,
-  persistentLocalCache,
-  memoryLocalCache,
-  enableNetwork,
   collection,
   doc,
   getDoc,
@@ -38,45 +34,16 @@ const firebaseConfig = {
     measurementId: "G-FVS7PM8WTB"
 };
 
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-let storage: FirebaseStorage;
+// A more stable way to initialize for Next.js App Router.
+// This prevents re-initialization and works on both server and client.
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// This check ensures we only initialize the app once,
-// which is important for client-side navigation in Next.js.
-if (!getApps().length) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
-}
+const auth: Auth = getAuth(app);
+const db: Firestore = getFirestore(app);
+const storage: FirebaseStorage = getStorage(app);
 
-auth = getAuth(app);
-storage = getStorage(app);
-
-// Firestore initialization with offline persistence handling
-// This needs to be handled carefully because it can only run on the client.
-if (typeof window !== 'undefined') {
-  try {
-    // initializeFirestore can be called multiple times, it will return the same instance.
-    db = initializeFirestore(app, {
-      localCache: persistentLocalCache({})
-    });
-    // Explicitly re-enable the network to ensure connection on subsequent visits.
-    enableNetwork(db).catch((err) => {
-        console.error("Firebase: Network enable failed, maybe already online.", err);
-    });
-  } catch (error) {
-    console.error("Firebase: Could not initialize Firestore with persistent cache, falling back to memory cache.", error);
-    db = initializeFirestore(app, {
-      localCache: memoryLocalCache()
-    });
-  }
-} else {
-  // For server-side rendering, use a simpler Firestore instance.
-  db = getFirestore(app);
-}
-
+// The offline persistence logic is now handled in FirebaseProvider.tsx
+// This keeps this file clean and avoids client/server initialization conflicts.
 
 export {
   db,
