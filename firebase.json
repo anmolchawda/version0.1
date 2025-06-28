@@ -7,62 +7,7 @@
   },
   "apphosting": [
     {
-      "backendId": "krishixwebapp",
-      "rootDir": "/home/user/studio/firestore.indexes.json",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "functions"
-      ]
-    },
-    {
-      "backendId": "krishixapphosting",
-      "rootDir": "/home/user/studio/firebase.json",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "functions"
-      ]
-    },
-    {
-      "backendId": "krishixwebapp",
-      "rootDir": ".",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "functions"
-      ]
-    },
-    {
-      "backendId": "krishixwebapp",
-      "rootDir": ".",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "functions"
-      ]
-    },
-    {
-      "backendId": "krishixwebapp",
-      "rootDir": ".",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "functions"
-      ]
-    },
-    {
-      "backendId": "krishixwebapp",
+      "backendId": "apphosting",
       "rootDir": ".",
       "ignore": [
         "node_modules",
@@ -83,7 +28,7 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "krishixapphosting",
+          "serviceId": "apphosting",
           "region": "us-central1"
         }
       }
