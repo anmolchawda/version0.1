@@ -1,4 +1,3 @@
-toml
-    [[build.env]]
-    name = "GOOGLE_NODE_VERSION"
-    value = "20.x"
+[[build.env]]
+        name = "GOOGLE_NODE_VERSION"
+        value = "20.x"
