@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -11,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
 import { auth } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -69,13 +68,25 @@ export function LoginForm() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log('Signed in with Google:', user.email);
 
-      toast({
-        title: 'Login Successful!',
-        description: `Welcome, ${user.displayName || user.email}!`,
-      });
-      router.push('/');
+      // Check if it's a new user
+      const additionalInfo = getAdditionalUserInfo(result);
+
+      if (additionalInfo?.isNewUser) {
+        // This is a first-time sign-in with Google
+        toast({
+          title: 'Welcome to KrishiX!',
+          description: `Let's get your profile set up, ${user.displayName || user.email}!`,
+        });
+        router.push('/setup-profile');
+      } else {
+        // This is a returning user
+        toast({
+          title: 'Login Successful!',
+          description: `Welcome back, ${user.displayName || user.email}!`,
+        });
+        router.push('/');
+      }
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });

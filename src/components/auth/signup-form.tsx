@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -11,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus } from 'lucide-react';
 import { auth } from '@/lib/firebase'; // Firebase Auth
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, getAdditionalUserInfo } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -78,13 +77,22 @@ export function SignupForm() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("Signed up with Google:", user.email);
+      
+      const additionalInfo = getAdditionalUserInfo(result);
 
-      toast({
-        title: 'Signup Successful!',
-        description: `Welcome to KrishiX, ${user.displayName || user.email}!`,
-      });
-      router.push('/feed'); // The layout will redirect to /setup-profile if needed.
+      if (additionalInfo?.isNewUser) {
+        toast({
+          title: 'Welcome to KrishiX!',
+          description: `Let's get your profile set up, ${user.displayName || user.email}!`,
+        });
+        router.push('/setup-profile');
+      } else {
+        toast({
+          title: 'Welcome Back!',
+          description: `Signed in as ${user.displayName || user.email}!`,
+        });
+        router.push('/'); // Existing user, go to feed
+      }
     } catch (error: any) {
         console.error('Google Sign-up error:', error.code, error.message);
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
