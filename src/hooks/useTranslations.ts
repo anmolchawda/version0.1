@@ -1,4 +1,3 @@
-
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -6,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 // Define a type for your translation keys
 // This can be expanded as you add more translations
-export type TranslationKey = 
+export type TranslationKey =
   | 'feed' | 'discover' | 'create' | 'mandi' | 'profile'
   | 'cropScience' | 'weather' | 'yojna' | 'events'
   | 'fungicides' | 'insecticides' | 'iracCode' | 'fracCode'
@@ -40,6 +39,7 @@ export type TranslationKey =
   | 'aiAnalysisDetailDiseaseTitle' | 'aiAnalysisDetailNutrientTitle' | 'aiAnalysisDetailInsectTitle' | 'aiAnalysisDetailWeedTitle'
   | 'aiAnalysisDetailNoIssueDetected' | 'aiOverallAssessmentTitle' | 'aiSuggestionsTitle'
   | 'toastImageTooLargeTitle' | 'toastImageTooLargeDescription'
+  | 'aiDragAndDropText'
   | 'toastNoImageSelectedTitle' | 'toastNoImageSelectedDescription'
   | 'toastAnalysisFailedTitle' | 'toastAnalysisFailedDescription'
   | 'likeCountSingular' | 'likeCountPlural'
@@ -53,6 +53,7 @@ export type TranslationKey =
   | 'usernameLabel' | 'usernamePlaceholder' | 'fullNameLabel' | 'fullNamePlaceholder'
   | 'bioLabel' | 'bioPlaceholder' | 'locationLabel' | 'locationPlaceholder'
   | 'produceLabel' | 'producePlaceholder' | 'savingChangesButton' | 'saveChangesButton'
+  | 'phoneNumberLabel' | 'phoneNumberPlaceholder' | 'phoneNumberPlaceholderOptional'
   | 'toastNotAuthenticatedTitle' | 'toastNotAuthenticatedDescription'
   | 'toastProfileUpdatedMockTitle' | 'toastProfileUpdatedMockDescription'
   | 'toastProfileUpdatedTitle' | 'toastProfileUpdatedDescription'
@@ -86,7 +87,7 @@ export type TranslationKey =
   | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' // Deprecated page titles, now more dynamic
   | 'mandiBuyerRequestsTitle' | 'mandiMyProductsForSaleTitle' // New page titles
   | 'mandiListNewItem' | 'mandiListRequirementButton'
-  | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion' 
+  | 'mandiNoListingsBuyerPrompt' | 'mandiNoListingsBuyerSuggestion'
   | 'mandiNoListingsSellerPrompt' | 'mandiNoListingsSellerSuggestion'
   | 'mandiNoBuyerRequestsPrompt' | 'mandiNoBuyerRequestsSuggestion' | 'mandiPostNewRequirementButton'
   | 'myListingsButton'
@@ -103,7 +104,15 @@ export type TranslationKey =
   | 'mandiSelectStateFirst' | 'mandiNoCitiesForState' | 'mandiResetFiltersButton'
   | 'mandiRequirementPostedOn' | 'mandiContactBuyerButton' | 'mandiDeleteRequirementButton'
   | 'mandiDeleteConfirmTitle' | 'mandiDeleteConfirmDesc' | 'mandiDeleteButtonConfirm'
-  | 'mandiRequirementDeletedTitle' | 'mandiRequirementDeletedDesc';
+  | 'mandiRequirementDeletedTitle' | 'mandiRequirementDeletedDesc'
+  // Added keys for YojnaPage:
+  | 'databaseNotAvailableError'
+  | 'yojnasTitle'
+  | 'failedToLoadYojnasError'
+  | 'learnMoreButton'
+  | 'noYojnasFoundTitle'
+  | 'noYojnasFoundDescription';
+
 
 type Translations = Record<TranslationKey, string>;
 
@@ -114,14 +123,14 @@ async function loadTranslations(lang: string): Promise<Translations> {
     let translations;
     if (lang === 'hi') {
       translations = (await import(`../locales/hi.json`)).default;
-    } else if (lang === 'hne') { 
+    } else if (lang === 'hne') {
       translations = (await import(`../locales/cg.json`)).default;
-    } else if (lang === 'mr') { 
+    } else if (lang === 'mr') {
       translations = (await import(`../locales/mh.json`)).default;
-    } else if (lang === 'kn') { 
+    } else if (lang === 'kn') {
       translations = (await import(`../locales/kn.json`)).default;
     } else if (lang === 'ta') {
-      translations = (await import(`../locales/tl.json`)).default; 
+      translations = (await import(`../locales/ta.json`)).default;
     } else if (lang === 'te') {
       translations = (await import(`../locales/tg.json`)).default;
     } else if (lang === 'gu') {
@@ -164,7 +173,7 @@ export function useTranslations() {
       setIsLoading(false);
     };
     fetchTranslations();
-    
+
     const handleStorageChange = async (event: StorageEvent) => {
       if (event.key === 'selectedAppLanguage' && event.newValue) {
         setLanguage(event.newValue);

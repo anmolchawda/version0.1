@@ -6,7 +6,7 @@ import type { Post as PostType, User } from '@/types';
 import { PostCard } from './post-card';
 import { getPlaceholderUser, placeholderPosts as mockPlaceholderPosts } from '@/lib/placeholders'; // Renamed import
 import { RefreshCw, Loader2 } from 'lucide-react';
-import { cn, handleFirestoreError } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase'; // db can be null
 import { collection, getDocs, query, orderBy, Timestamp, type DocumentData, doc, getDoc } from 'firebase/firestore';
 import { useTranslations } from '@/hooks/useTranslations';
@@ -49,6 +49,7 @@ export function FeedList() {
 
         if (user) {
           fetchedPosts.push({
+            userId: data.userId,
             id: docSnap.id,
             user: user, // Use the fetched/placeholder user
             imageUrl: data.imageUrl,
@@ -56,7 +57,7 @@ export function FeedList() {
             hashtags: data.hashtags || [],
             likesCount: data.likesCount || 0,
             commentsCount: data.commentsCount || 0,
-            createdAt: (data.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
+            createdAt: data.createdAt as Timestamp || Timestamp.fromDate(new Date()),
           });
         } else {
           // Handle case where user might not be found, though ideally all posts have valid users

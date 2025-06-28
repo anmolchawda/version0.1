@@ -2,8 +2,9 @@
 import { promises as fsPromises } from 'fs';
 import * as fs from 'fs'; // For createReadStream
 import path from 'path';
-import { parse } from 'csv-parser';
-import { type NextRequest, NextResponse } from 'next/server';
+import csvParser from 'csv-parser';
+import { NextRequest } from 'next/dist/server/web/spec-extension/request';
+import { NextResponse } from 'next/dist/server/web/spec-extension/response';
 
 export async function GET(req: NextRequest) {
   const csvFilePath = path.join(process.cwd(), 'public', 'crop-data.csv');
@@ -17,9 +18,8 @@ export async function GET(req: NextRequest) {
     
     await new Promise<void>((resolve, reject) => {
       console.log('[API /api/crop-data] Starting CSV stream parsing...');
-      fs.createReadStream(csvFilePath)
-        .pipe(parse({ headers: true })) // Ensure headers: true to use header names as keys
-        .on('data', (data) => {
+      fs.createReadStream(csvFilePath).pipe(csvParser({ headers: true })) // Ensure headers: true to use header names as keys
+        .on('data', (data: any) => {
           results.push(data);
         })
         .on('end', () => {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
           }
           resolve();
         })
-        .on('error', (streamError) => {
+        .on('error', (streamError: { message: any; }) => {
           console.error('[API /api/crop-data] Error during CSV stream parsing:', streamError);
           reject(new Error(`Error parsing CSV stream: ${streamError.message}`)); 
         });

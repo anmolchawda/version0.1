@@ -133,6 +133,10 @@ export function AddCropForm() {
         // 2. Upload images to Firebase Storage
         const imageUrls = await Promise.all(
             imageFiles.map(async (file) => {
+              if (!storage) {
+                alert("Firebase Storage is not initialized.");
+                return;
+              }
                 const storageRef = ref(storage, `mandi_listings/${authUserId}/${Date.now()}-${file.name}`);
                 await uploadBytes(storageRef, file);
                 return getDownloadURL(storageRef);

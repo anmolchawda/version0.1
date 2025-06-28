@@ -35,7 +35,6 @@ export default function YojnaPage() {
         const fetchedYojnas: Yojna[] = [];
         querySnapshot.forEach((doc) => {
           fetchedYojnas.push({
-            id: doc.id,
             ...doc.data() as Yojna
           });
         });

@@ -39,7 +39,7 @@ export default function MandiDetailPage() {
         setIsLoading(true);
         setError(null);
         try {
-            const listingDocRef = doc(db, 'mandi_listings', listingId);
+            const listingDocRef = doc(db!, 'mandi_listings', listingId);
             const docSnap = await getDoc(listingDocRef);
 
             if (docSnap.exists()) {

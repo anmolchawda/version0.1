@@ -49,7 +49,7 @@ export default function FavoritesPage() {
         const resolvedPosts = savedPostIds
           .map(id => getPlaceholderPostById(id))
           .filter((post): post is Post => post !== undefined)
-          .sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          .sort((a,b) => new Date(b.createdAt.toDate()).getTime() - new Date(a.createdAt.toDate()).getTime());
 
         setFavoritePosts(resolvedPosts);
       } catch (e) {

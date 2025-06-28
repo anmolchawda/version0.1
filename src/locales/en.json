@@ -1,4 +1,3 @@
-
 {
   "feed": "Feed",
   "discover": "Discover",
@@ -76,6 +75,7 @@
   "aiUploadCropImageLabel": "Upload Crop Image",
   "aiChangeImageButton": "Change image",
   "aiUploadAnImageButton": "Upload an image",
+  "aiDragAndDropText": "Drag and drop your image here",
   "aiImageFormatsAcceptedWithLimit": "PNG, JPG, JPEG up to 4MB",
   "aiAnalyzingButton": "Analyzing...",
   "aiAnalyzeImageButton": "Analyze Image",
@@ -255,5 +255,11 @@
   "mandiDeleteConfirmDesc": "Are you sure you want to delete your requirement for \"{itemName}\"? This action cannot be undone.",
   "mandiDeleteButtonConfirm": "Delete",
   "mandiRequirementDeletedTitle": "Requirement Deleted",
-  "mandiRequirementDeletedDesc": "Your requirement for \"{itemName}\" has been deleted."
+  "mandiRequirementDeletedDesc": "Your requirement for \"{itemName}\" has been deleted.",
+  "databaseNotAvailableError": "Database is not available.",
+  "yojnasTitle": "Yojnas (Schemes)",
+      "failedToLoadYojnasError": "Failed to load schemes.",
+      "learnMoreButton": "Learn More",
+      "noYojnasFoundTitle": "No Schemes Found",
+      "noYojnasFoundDescription": "There are no schemes available at the moment."
 }

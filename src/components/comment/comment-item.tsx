@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { Comment as CommentType } from '@/types';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { useTranslations } from '@/hooks/useTranslations';
-import type { Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 interface CommentItemProps {
   comment: CommentType;
@@ -16,7 +16,7 @@ interface CommentItemProps {
 }
 
 const CommentItemComponent = ({ comment, onStartReply, depth }: CommentItemProps) => {
-  const timeAgo = formatTimeAgo((comment.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString());
+  const timeAgo = comment.createdAt instanceof Timestamp ? formatTimeAgo(comment.createdAt) : 'Invalid date';
   const { t } = useTranslations();
 
   const handleReplyClick = () => {

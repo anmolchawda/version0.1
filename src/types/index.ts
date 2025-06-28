@@ -1,6 +1,6 @@
 
-import type { Timestamp as FirebaseTimestamp } from 'firebase/firestore';
-
+import type { Timestamp as FirebaseTimestamp } from 'firebase/firestore'; // Use type import for Timestamp
+import { FieldValue } from 'firebase/firestore'; // Use regular import for FieldValue
 export interface User {
   id: string;
   username: string;
@@ -15,7 +15,7 @@ export interface User {
   followingCount?: number;
   postCount?: number;
   profileSetupComplete?: boolean; // Added for profile setup flow
-  createdAt?: FirebaseTimestamp; // Added for user creation tracking
+  createdAt?: FirebaseTimestamp | FieldValue | undefined; // Added for user creation tracking, allows serverTimestamp()
 }
 
 export interface Post {
@@ -78,7 +78,7 @@ export interface ChatMessage {
   id: string; // Firestore document ID
   senderId: string;
   text: string;
-  timestamp: string; // ISO Date string or formatted time string for display
+  timestamp: FirebaseTimestamp | string | undefined; // Firestore Timestamp, ISO Date string or formatted time string for display
   mediaUrl?: string;
   mediaType?: 'image' | 'video';
 }

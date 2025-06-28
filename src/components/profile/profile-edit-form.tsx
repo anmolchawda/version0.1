@@ -47,6 +47,7 @@ export function ProfileEditForm() {
           displayName: mockProfile.name || mockProfile.username,
           photoURL: mockProfile.avatarUrl || null,
           emailVerified: true, isAnonymous: false, metadata: {}, providerData: [], providerId: 'mock',
+ phoneNumber: '', // Added missing phoneNumber
           refreshToken: '', tenantId: null, delete: async () => {}, getIdToken: async () => '',
           getIdTokenResult: async () => ({} as any), reload: async () => {}, toJSON: () => ({}),
         };

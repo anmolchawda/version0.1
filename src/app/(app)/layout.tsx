@@ -15,7 +15,7 @@ import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders';
 import { Button } from '@/components/ui/button';
 
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
-  setContextAuthUserId?: (uid: string | null) => void;
+  setContextAuthUserId: (uid: string | null) => void;
 }
 
 const USE_MOCK_DATA = auth === null; // Determine mock mode based on auth instance
@@ -40,9 +40,10 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
           displayName: mockUserData.name || mockUserData.username,
           photoURL: mockUserData.avatarUrl || null,
           emailVerified: true, isAnonymous: false, metadata: {}, providerData: [],
-          providerId: 'mock', refreshToken: '', tenantId: null, delete: async () => {},
+          providerId: 'mock', refreshToken: '', tenantId: null, delete: async () => { },
           getIdToken: async () => '', getIdTokenResult: async () => ({} as any),
-          reload: async () => {}, toJSON: () => ({}),
+          reload: async () => { }, toJSON: () => ({}),
+          phoneNumber: null
         };
         setCurrentUser(mockFirebaseUser);
         if (setContextAuthUserId) {
@@ -55,7 +56,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth!.onAuthStateChanged((user) => {
       setCurrentUser(user);
       if (setContextAuthUserId) {
         setContextAuthUserId(user?.uid || null);
@@ -83,7 +84,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       
       const checkProfileAndRedirect = async () => {
         try {
-          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDocRef = doc(db!, 'users', currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
           const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
 

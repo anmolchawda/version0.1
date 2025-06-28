@@ -51,7 +51,7 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
             <div>
               <CardTitle className="text-lg font-semibold text-primary">{requirement.itemName}</CardTitle>
               <CardDescription className="text-xs text-muted-foreground">
-                {t('mandiRequirementCategoryLabel')}: <Badge variant="secondary" className="ml-1">{requirement.category}</Badge>
+                {t('mandiAddRequirementCategoryLabel')}: <Badge variant="secondary" className="ml-1">{requirement.category}</Badge>
               </CardDescription>
             </div>
             {isOwnRequirement && (
@@ -63,7 +63,7 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
           </div>
         </CardHeader>
         <CardContent className="space-y-2 text-sm pb-3">
-          <p><strong className="text-foreground">{t('mandiRequirementQuantityLabel')}:</strong> {requirement.quantity}</p>
+          <p><strong className="text-foreground">{t('mandiAddRequirementQuantityLabel')}:</strong> {requirement.quantity}</p>
           {requirement.preferredLocation && (
             <div className="flex items-center text-muted-foreground">
               <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {requirement.preferredLocation}
@@ -71,7 +71,7 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
           )}
           {requirement.specifications && (
             <p className="text-muted-foreground italic line-clamp-2" title={requirement.specifications}>
-              <strong className="text-foreground not-italic">{t('mandiRequirementSpecsLabel')}:</strong> {requirement.specifications}
+              <strong className="text-foreground not-italic">{t('mandiAddRequirementSpecsLabel')}:</strong> {requirement.specifications}
             </p>
           )}
           <div className="flex items-center text-xs text-muted-foreground pt-1">

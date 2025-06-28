@@ -15,8 +15,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Facebook, MessageSquare, Link as LinkIcon, MessageSquarePlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { placeholderUsers, MOCK_USER_ID, type User } from '@/lib/placeholders';
-
+import { placeholderUsers, MOCK_USER_ID } from '@/lib/placeholders';
+   import type { User } from '@/types';
+   
 interface ShareModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;

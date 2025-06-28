@@ -11,14 +11,24 @@ import type { User as FirebaseUser } from 'firebase/auth';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import type { User, Post } from '@/types';
 
-export default function UserProfilePage({ params: { userId } }: { params: { userId: string } }) {
+// Attempt to satisfy the unusual type expectation by adding Promise properties
+interface ParamsWithPromise extends Promise<any> {
+  userId: string;
+}
+
+interface PageProps {
+  params: ParamsWithPromise;
+}
+
+export default function UserProfilePage({ params }: PageProps) {
+  const { userId } = params;
   const [viewedUser, setViewedUser] = useState<User | null | 'not-found'>(null);
-  const [isCurrentUserProfile, setIsCurrentUserProfile] = useState<boolean | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [isCurrentUserProfile, setIsCurrentUserProfile] = useState(false);
 
   useEffect(() => {
-    let isMounted = true; // To prevent state updates on unmounted component
+    let isMounted = true;
 
     const fetchProfileData = async () => {
       if (!userId) {
@@ -31,7 +41,7 @@ export default function UserProfilePage({ params: { userId } }: { params: { user
 
       setIsLoading(true);
       try {
-        const userDocRef = doc(db, 'users', userId);
+        const userDocRef = doc(db!, 'users', userId);
         const userDocSnap = await getDoc(userDocRef);
 
         if (!isMounted) return;
@@ -49,17 +59,15 @@ export default function UserProfilePage({ params: { userId } }: { params: { user
         if (isMounted) {
           setViewedUser('not-found');
         }
-      } finally {
-        // The auth check will set isLoading to false
       }
     };
 
     fetchProfileData();
 
-    const unsubscribeAuth = auth.onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
+    const unsubscribeAuth = auth!.onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
       if (isMounted) {
         setIsCurrentUserProfile(firebaseUser ? userId === firebaseUser.uid : false);
-        setIsLoading(false); // Final loading state set after auth check
+        setIsLoading(false);
       }
     });
 
@@ -79,12 +87,10 @@ export default function UserProfilePage({ params: { userId } }: { params: { user
   }
 
   if (viewedUser === 'not-found') {
-    notFound(); // Trigger Next.js 404 page
+    notFound();
   }
-  
+
   if (!viewedUser) {
-    // This case handles errors or unexpected states not leading to 'not-found'
-    // but where viewedUser is still null after loading.
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center text-destructive">
         <AlertTriangle className="h-12 w-12 mb-4" />

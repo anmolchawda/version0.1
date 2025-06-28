@@ -11,9 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
-import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft } from 'lucide-react'; // Added ChevronLeft
+import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
-import { ShareModal } from './share-modal';
+import { ShareModal } from '@/components/post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
@@ -24,7 +24,7 @@ interface PostDetailDisplayProps {
 const MOCK_USER_ID = '1'; // Simulate a logged-in user
 
 export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
-  const timeAgo = formatTimeAgo(post.createdAt);
+  const timeAgo = formatTimeAgo((post.createdAt as any)?.toDate()?.toISOString() || new Date().toISOString()); // Convert Timestamp to string
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [currentPostUrl, setCurrentPostUrl] = useState('');
   const { toast } = useToast();
@@ -52,10 +52,10 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
 
     if (savedPosts.includes(post.id)) {
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
-      toast({ title: t('toastPostUnsavedTitle'), description: t('toastPostUnsavedDescription') });
+      toast({ title: t('postUnsavedToastTitle'), description: t('postUnsavedToastDescription') });
     } else {
       updatedSavedPosts = [...savedPosts, post.id];
-      toast({ title: t('toastPostSavedTitle'), description: t('toastPostSavedDescription') });
+      toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
     }
     localStorage.setItem(`krishix_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
@@ -105,9 +105,9 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
         <CardContent className="p-4 space-y-3">
           <p className="text-sm">{post.caption}</p>
 
-          {post.hashtags.length > 0 && (
+          {(post.hashtags?.length ?? 0) > 0 && ( // Use nullish coalescing here
             <div className="flex flex-wrap gap-1.5">
-              {post.hashtags.map((tag) => (
+              {post.hashtags?.map((tag) => (
                 <Link href={`/discover?tag=${tag.replace('#', '')}`} key={tag}>
                   <Badge variant="secondary" className="text-primary hover:bg-primary/10 cursor-pointer py-1 px-2.5">
                     {tag}

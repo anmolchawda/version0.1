@@ -42,7 +42,7 @@ export function SetupProfileForm() {
 
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = auth!.onAuthStateChanged(async (user) => {
       if (user) {
         setFirebaseUser(user);
         // Pre-fill with any existing auth data
@@ -123,7 +123,7 @@ export function SetupProfileForm() {
       id: firebaseUser.uid,
       username: username.trim(),
       name: name.trim() || username.trim(),
-      email: firebaseUser.email,
+      email: firebaseUser.email ?? undefined,
       bio: bio.trim(),
       location: location.trim(),
       phoneNumber: phoneNumber.trim(),

@@ -35,13 +35,13 @@ export default function FollowingPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const user = getPlaceholderUser(userId) || (await getDoc(doc(db, 'users', userId))).data() as User;
+        const user = getPlaceholderUser(userId) || (await getDoc(doc(db!, 'users', userId))).data() as User;
         if (!user) {
           throw new Error("Profile user not found.");
         }
         setProfileUser(user);
 
-        const followingRef = collection(db, 'users', userId, 'following');
+        const followingRef = collection(db!, 'users', userId, 'following');
         const q = query(followingRef);
         const querySnapshot = await getDocs(q);
         const followingIds = querySnapshot.docs.map(d => d.id);
@@ -49,7 +49,7 @@ export default function FollowingPage() {
         if (followingIds.length > 0) {
           // Fetch details for each followed user
           // Note: This makes multiple DB calls. For large lists, consider denormalization.
-          const followedUsersPromises = followingIds.map(id => getDoc(doc(db, 'users', id)));
+          const followedUsersPromises = followingIds.map(id => getDoc(doc(db!, 'users', id)));
           const followedUsersDocs = await Promise.all(followedUsersPromises);
           
           const followedUsersList = followedUsersDocs

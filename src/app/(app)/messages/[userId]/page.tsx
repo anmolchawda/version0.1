@@ -32,7 +32,7 @@ import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import type { User, ChatMessage, FirestoreMessage, FirestoreConversation } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, limit } from '@/lib/firebase';
+import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, getDoc } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 // Helper to generate a consistent conversation ID
@@ -119,7 +119,7 @@ export default function ChatPage() {
               id: docSnap.id,
               senderId: data.senderId,
               text: data.text,
-              timestamp: data.timestamp ? (data.timestamp as Timestamp).toDate().toISOString() : new Date().toISOString(),
+              timestamp: data.timestamp,
               mediaUrl: data.mediaUrl,
               mediaType: data.mediaType,
             });
@@ -369,7 +369,11 @@ export default function ChatPage() {
                       <video src={msg.mediaUrl} controls className="mt-2 rounded-md max-w-xs max-h-48" data-ai-hint="chat media video" />
                     )}
                     <p className={cn("text-xs mt-1", isCurrentUserSender ? "text-primary-foreground/70" : "text-muted-foreground/70", isCurrentUserSender ? "text-right" : "text-left")}>
-                      {formatTimeAgo(msg.timestamp)}
+ {msg.timestamp instanceof Timestamp
+ ? formatTimeAgo(msg.timestamp)
+ : msg.timestamp
+ ? formatTimeAgo(new Date(msg.timestamp as string) as any) // Attempt conversion if not Timestamp
+ : 'Invalid date'}
                     </p>
                   </div>
                 </div>

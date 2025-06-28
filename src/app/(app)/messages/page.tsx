@@ -84,7 +84,7 @@ export default function MessagesPage() {
             id: docSnap.id,
             otherParticipant: otherParticipantDetails,
             lastMessage: data.lastMessageText || 'No messages yet',
-            lastMessageTime: data.lastMessageTimestamp ? formatTimeAgo((data.lastMessageTimestamp as Timestamp).toDate().toISOString()) : '',
+            lastMessageTime: data.lastMessageTimestamp ? formatTimeAgo(data.lastMessageTimestamp as Timestamp) : '',
             unread: false, 
           });
         }

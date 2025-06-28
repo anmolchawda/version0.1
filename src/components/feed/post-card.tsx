@@ -25,7 +25,7 @@ interface PostCardProps {
 
 const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   const { t } = useTranslations();
-  const timeAgo = formatTimeAgo( (post.createdAt as Timestamp)?.toDate().toISOString() || new Date().toISOString() );
+  const timeAgo = post.createdAt instanceof Timestamp ? formatTimeAgo(post.createdAt) : 'Invalid date';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [postFullUrl, setPostFullUrl] = useState('');
   const { toast } = useToast();
@@ -49,6 +49,10 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
     let isMounted = true;
 
     const checkInitialStatus = async () => {
+      if (!db) {
+        console.error("Firestore is not initialized.");
+        return; // Return early if db is null
+      }
       // Check Like Status
       const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
       try {
@@ -87,6 +91,10 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   }, [post.id]);
 
   const handleToggleSave = async () => {
+ if (!db) {
+ console.error("Firestore is not initialized.");
+ return; // Return early if db is null
+ }
     if (isLoadingSave || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingSave(true);
 
@@ -111,6 +119,10 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   };
 
   const handleToggleLike = async () => {
+    if (!db) {
+      console.error("Firestore is not initialized.");
+      return; // Return early if db is null
+    }
     if (isLoadingLike || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingLike(true);
 

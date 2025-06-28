@@ -31,8 +31,8 @@ import { useTranslations } from '@/hooks/useTranslations';
 function NotificationItem({ notification }: { notification: NotificationType }) {
   const { t } = useTranslations();
   const { actor, type, postImageUrl, postId, commentText, timestamp, read } = notification;
-  const dateToFormat = timestamp instanceof Timestamp ? timestamp.toDate() : new Date(timestamp as unknown as string);
-  const timeAgo = formatTimeAgo(dateToFormat.toISOString());
+  // Ensure timestamp is a Timestamp object before passing to formatTimeAgo
+  const timeAgo = timestamp instanceof Timestamp ? formatTimeAgo(timestamp) : 'Invalid date';
 
   const actorDetails = getPlaceholderUser(actor.id) || actor;
 
@@ -132,10 +132,15 @@ export default function NotificationsPage() {
       setIsLoading(false);
 
       if (unreadNotificationIds.length > 0) {
-        const batch = writeBatch(db);
+ if (!db) {
+ console.error("[NotificationsPage] Firestore is not initialized when trying to mark as read.");
+ return;
+ }
+        
+ const batch = writeBatch(db);
         unreadNotificationIds.forEach(id => {
           // Updated path for marking as read
-          const notifDocRef = doc(db, 'notifications', authUserId, 'items', id);
+          const notifDocRef = doc(db!, 'notifications', authUserId, 'items', id);
           batch.update(notifDocRef, { read: true });
         });
         
@@ -148,6 +153,10 @@ export default function NotificationsPage() {
           console.error("Error marking notifications as read or updating meta:", e);
         }
       } else if (fetchedNotifications.length > 0) {
+ if (!db) {
+ console.error("[NotificationsPage] Firestore is not initialized when trying to update meta count.");
+ return;
+ }
          const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
          const docSnap = await getDoc(userNotificationsMetaRef);
          if(docSnap.exists() && docSnap.data()?.unreadCount !== 0) {

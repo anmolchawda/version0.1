@@ -15,6 +15,7 @@ import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from './share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { Timestamp } from 'firebase/firestore'; // Import Timestamp
 
 interface PostDetailDisplayProps {
   post: Post;
@@ -23,7 +24,7 @@ interface PostDetailDisplayProps {
 const MOCK_USER_ID = '1'; // Simulate a logged-in user
 
 export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
-  const timeAgo = formatTimeAgo(post.createdAt);
+  const timeAgo = post.createdAt instanceof Timestamp ? formatTimeAgo(post.createdAt) : 'Invalid date';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [currentPostUrl, setCurrentPostUrl] = useState('');
   const { toast } = useToast();
@@ -51,10 +52,12 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
 
     if (savedPosts.includes(post.id)) {
       updatedSavedPosts = savedPosts.filter(id => id !== post.id);
-      toast({ title: t('toastPostUnsavedTitle'), description: t('toastPostUnsavedDescription') });
+      // Corrected translation keys here
+      toast({ title: t('postUnsavedToastTitle'), description: t('postUnsavedToastDescription') });
     } else {
       updatedSavedPosts = [...savedPosts, post.id];
-      toast({ title: t('toastPostSavedTitle'), description: t('toastPostSavedDescription') });
+      // Corrected translation keys here
+      toast({ title: t('postSavedToastTitle'), description: t('postSavedToastDescription') });
     }
     localStorage.setItem(`krishix_saved_posts_${MOCK_USER_ID}`, JSON.stringify(updatedSavedPosts));
     setIsSaved(!isSaved);
@@ -72,7 +75,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
             className="h-9 w-9 sm:h-10 sm:w-10"
             aria-label={t('backButton')}
           >
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 w-6" />
           </Button>
           <Link href={`/profile/${post.user.id}`} className="flex items-center space-x-2 sm:space-x-3 flex-grow">
             <Avatar className="h-9 w-9 sm:h-11 sm:w-11 border-2 border-primary">
@@ -104,7 +107,7 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
         <CardContent className="p-4 space-y-3">
           <p className="text-sm">{post.caption}</p>
 
-          {post.hashtags.length > 0 && (
+          {(post.hashtags && post.hashtags.length > 0) && (
             <div className="flex flex-wrap gap-1.5">
               {post.hashtags.map((tag) => (
                 <Link href={`/discover?tag=${tag.replace('#', '')}`} key={tag}>

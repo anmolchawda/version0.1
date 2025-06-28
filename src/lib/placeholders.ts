@@ -1,7 +1,6 @@
-
 import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation, Yojna, DiscoverDisease, BuyerRequirement } from '@/types'; // Updated imports
 import { formatDistanceToNow } from 'date-fns';
-import type { Timestamp } from 'firebase/firestore'; // Import Firebase Timestamp
+import { Timestamp } from 'firebase/firestore'; // Import Firebase Timestamp
 // Removed NotebookText import as icon field is removed from Yojna
 // import { NotebookText, ShieldAlert, CalendarDays as CalendarIconLucide } from 'lucide-react';
 
@@ -49,42 +48,46 @@ export const placeholderUsers: User[] = [
 export const placeholderPosts: Post[] = [
   {
     id: 'p1',
+    userId: '1', // Added userId
     user: placeholderUsers[0],
     imageUrl: 'https://images.unsplash.com/reserve/22gQ9dqRziaAoZeBpZVY_kornmark-01.png?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'Beautiful sunrise over the cornfields today! Feeling blessed. 🌽☀️ #farminglife #sunrise #cornfield',
     hashtags: ['#farminglife', '#sunrise', '#cornfield', '#organic'],
     likesCount: 152,
     commentsCount: 3,
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 2 * 60 * 60 * 1000)),
   },
   {
     id: 'p2',
+    userId: '2', // Added userId
     user: placeholderUsers[1],
     imageUrl: 'https://images.unsplash.com/photo-1465378295786-5cb1fca555ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'Harvesting our first batch of organic tomatoes. They are looking juicy! 🍅😋 #organic #harvest #tomatoes #farmtotable',
     hashtags: ['#organic', '#harvest', '#tomatoes', '#farmtotable', '#growyourown'],
     likesCount: 230,
     commentsCount: 1,
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 5 * 60 * 60 * 1000)),
   },
   {
     id: 'p3',
+    userId: '1', // Added userId
     user: placeholderUsers[0],
     caption: 'Just finished planting the new batch of pumpkin seeds. Can\'t wait for Halloween! 🎃 #pumpkins #plantingseason #fallharvest',
     hashtags: ['#pumpkins', '#plantingseason', '#fallharvest'],
     likesCount: 98,
     commentsCount: 0,
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 24 * 60 * 60 * 1000)),
   },
   {
     id: 'p4',
+    userId: '3', // Added userId
     user: placeholderUsers[2],
     imageUrl: 'https://images.unsplash.com/photo-1422651973727-50f085c0b26f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmYXJtJTIwZmllbGQlMjBjcm9wfGVufDB8fHx8MTc0ODgxMjI4Mnww&ixlib=rb-4.1.0&q=80&w=1080',
     caption: 'My rooftop microgreens are thriving! So much flavor in these tiny plants. 🌱 #urbanfarming #microgreens #rooftopgarden #cityfarmer',
     hashtags: ['#urbanfarming', '#microgreens', '#rooftopgarden', '#cityfarmer'],
     likesCount: 120,
     commentsCount: 0,
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)),
   },
 ];
 
@@ -94,7 +97,7 @@ export const placeholderCommentsData: Comment[] = [
     postId: 'p1',
     user: placeholderUsers[1],
     text: 'Absolutely stunning view, John!',
-    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 1 * 60 * 60 * 1000)),
     parentId: null,
   },
   {
@@ -102,7 +105,7 @@ export const placeholderCommentsData: Comment[] = [
     postId: 'p1',
     user: placeholderUsers[2],
     text: 'Makes me miss the countryside. Great shot!',
-    createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 30 * 60 * 1000)),
     parentId: null,
   },
   {
@@ -110,7 +113,7 @@ export const placeholderCommentsData: Comment[] = [
     postId: 'p2',
     user: placeholderUsers[0],
     text: 'Those tomatoes look delicious, Sarah! Well done.',
-    createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 4 * 60 * 60 * 1000)),
     parentId: null,
   },
   {
@@ -118,7 +121,7 @@ export const placeholderCommentsData: Comment[] = [
     postId: 'p1',
     user: placeholderUsers[0],
     text: 'Thanks Sarah! The early bird gets the worm, or in this case, the view! 😉',
-    createdAt: new Date(Date.now() - 50 * 60 * 1000).toISOString(),
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 50 * 60 * 1000)),
     parentId: 'c1',
   },
 ];
@@ -128,8 +131,8 @@ const buildCommentTree = (comments: Comment[], parentId: string | null = null): 
     .filter(comment => comment.parentId === parentId)
     .map(comment => ({
       ...comment,
-      replies: buildCommentTree(comments, comment.id).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
-    })).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      replies: buildCommentTree(comments, comment.id).sort((a,b) => new Date(a.createdAt.toDate()).getTime() - new Date(b.createdAt.toDate()).getTime()),
+    })).sort((a,b) => new Date(a.createdAt.toDate()).getTime() - new Date(b.createdAt.toDate()).getTime());
 };
 
 export function getPlaceholderUser(userId: string): User | undefined {
@@ -149,12 +152,12 @@ export function getPlaceholderCommentsForPost(postId: string): Comment[] {
   return buildCommentTree(flatComments);
 }
 
-export function formatTimeAgo(dateString: string): string {
-  if (!dateString) return '';
+export function formatTimeAgo(date: Timestamp): string { // Changed parameter type to Timestamp
+  if (!date) return '';
   try {
-    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    return formatDistanceToNow(date.toDate(), { addSuffix: true }); // Convert Timestamp to Date
   } catch (error) {
-    console.warn("Error formatting date string:", dateString, error);
+    console.warn("Error formatting date:", date, error); // Log the Timestamp object
     return 'Invalid date';
   }
 }
@@ -247,9 +250,10 @@ export const placeholderListings: MandiListing[] = [
       'https://placehold.co/602x602.png',
     ],
     aiHint: 'tomatoes vegetable',
-    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    location: 'Mumbai, MH'
+    seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4NDEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
+    sellerId: '1',
+    location: 'Mumbai, MH',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 1 * 24 * 60 * 60 * 1000))
   },
   {
     id: 'item2',
@@ -264,9 +268,10 @@ export const placeholderListings: MandiListing[] = [
       'https://placehold.co/602x602.png',
     ],
     aiHint: 'corn seeds',
-    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    location: 'New Delhi, DL'
+    seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4NDE5OTgxfDA&ixlib=rb-4.1.0&q=80&w=1080' },
+    sellerId: '2',
+    location: 'New Delhi, DL',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))
   },
   {
     id: 'item3',
@@ -282,8 +287,9 @@ export const placeholderListings: MandiListing[] = [
     ],
     aiHint: 'tractor farm',
     seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-    location: 'Pune, MH'
+    sellerId: '1',
+    location: 'Pune, MH',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 12 * 60 * 60 * 1000))
   },
   {
     id: 'item4',
@@ -298,8 +304,9 @@ export const placeholderListings: MandiListing[] = [
     ],
     aiHint: 'fertilizer organic',
     seller: { id: '3', name: 'Mike Chen', username: 'UrbanHarvester', avatarUrl: 'https://images.unsplash.com/photo-1528693404014-b13ebe6e723e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    location: 'South Delhi, DL'
+    sellerId: '3',
+    location: 'South Delhi, DL',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000))
   },
   {
     id: 'item5',
@@ -316,8 +323,9 @@ export const placeholderListings: MandiListing[] = [
     ],
     aiHint: 'tiller equipment',
     seller: { id: '2', name: 'Sarah Green', username: 'GreenThumbSarah', avatarUrl: 'https://images.unsplash.com/photo-1495812911089-ac29f92223d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    location: 'Bengaluru, KA'
+    sellerId: '2',
+    location: 'Bengaluru, KA',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 5 * 24 * 60 * 60 * 1000))
   },
   {
     id: 'item6',
@@ -333,108 +341,8 @@ export const placeholderListings: MandiListing[] = [
     ],
     aiHint: 'neem oil',
     seller: { id: '1', name: 'John Appleseed', username: 'FarmerJohn', avatarUrl: 'https://images.unsplash.com/photo-1543257605-17af419e3124?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBmYXJtZXJ8ZW58MHx8fHwxNzQ4ODEyMjgzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-    listedDate: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
-    location: 'Ludhiana, PB'
-  },
-];
-
-export const placeholderYojnas: Yojna[] = [
-  {
-    id: 'yojna1',
-    name: 'Pradhan Mantri Fasal Bima Yojana (PMFBY)',
-    description: 'A crop insurance scheme to provide financial support to farmers suffering crop loss/damage arising out of unforeseen events.',
-    eligibility: 'All farmers including sharecroppers and tenant farmers growing notified crops in the notified areas are eligible for coverage.',
-    benefits: 'Provides insurance coverage and financial support in case of crop failure. Stabilizes income of farmers.',
-    link: 'https://pmfby.gov.in/',
-    department: 'Ministry of Agriculture & Farmers Welfare',
-  },
-  {
-    id: 'yojna2',
-    name: 'Kisan Credit Card (KCC) Scheme',
-    description: 'Provides farmers with timely access to credit for their cultivation and other needs.',
-    eligibility: 'All farmers - individuals/joint borrowers who are owner cultivators; Tenant farmers, oral lessees & sharecroppers; SHGs or JLGs of farmers.',
-    benefits: 'Adequate and timely credit support for agricultural needs, simplified loan procedures, flexibility in drawing cash.',
-    department: 'Department of Financial Services, Ministry of Finance',
-  },
-  {
-    id: 'yojna3',
-    name: 'Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)',
-    description: 'Aims to enhance physical access of water on farm and expand cultivable area under assured irrigation, improve on-farm water use efficiency to reduce wastage of water.',
-    benefits: 'Improved water availability and efficiency, leading to increased agricultural productivity and better water resource management.',
-    link: 'https://pmksy.gov.in/',
-    department: 'Ministry of Jal Shakti & Ministry of Agriculture',
+    sellerId: '1',
+    location: 'Ludhiana, PB',
+    createdAt: Timestamp.fromDate(new Date(Date.now() - 10 * 60 * 60 * 1000))
   }
-];
-
-// Simplified list of diseases for Discover page search
-export const placeholderDiscoverDiseases: DiscoverDisease[] = [
-  {
-    id: 'disease-tomato-early-blight',
-    name: 'Early Blight',
-    cropName: 'Tomato',
-    cropSlug: 'tomato',
-    symptomsSummary: 'Dark, concentric lesions on lower leaves; yellowing.',
-    imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight.JPG?alt=media&token=6000b4ec-c6e4-4798-995f-1dc37859a6ab',
-    aiHint: 'tomato blight',
-  },
-  {
-    id: 'disease-potato-late-blight',
-    name: 'Late Blight',
-    cropName: 'Potato',
-    cropSlug: 'potato',
-    symptomsSummary: 'Water-soaked lesions on leaves and stems, white mold on undersides.',
-    imageUrl: 'https://placehold.co/100x100.png',
-    aiHint: 'potato blight',
-  },
-  {
-    id: 'disease-tomato-late-blight',
-    name: 'Late Blight',
-    cropName: 'Tomato',
-    cropSlug: 'tomato',
-    symptomsSummary: 'Dark, water-soaked lesions on leaves, stems, and fruits. White mold may appear.',
-    imageUrl: 'https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/Tomato%20Diseases%2FTomato%20Disease%20images%2FE%26L%20Blight%202.JPG?alt=media&token=55816d31-ddd3-45dc-85ac-571fceba877f', // Using an existing relevant tomato image for late blight
-    aiHint: 'tomato blight disease',
-  },
-  {
-    id: 'disease-corn-rust',
-    name: 'Common Rust',
-    cropName: 'Corn',
-    cropSlug: 'corn',
-    symptomsSummary: 'Small, cinnamon-brown pustules on both leaf surfaces.',
-    imageUrl: 'https://placehold.co/100x100.png',
-    aiHint: 'corn rust disease',
-  }
-];
-
-export const placeholderBuyerRequirements: BuyerRequirement[] = [
-  {
-    id: 'req1',
-    postedBy: placeholderUsers[2], // UrbanHarvester
-    itemName: 'Fresh Basil',
-    category: 'Crops',
-    quantity: '5 kg weekly',
-    preferredLocation: 'Metro City, NY',
-    specifications: 'Looking for locally grown, organic basil for restaurant supply. Regular weekly order.',
-    postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'req2',
-    postedBy: placeholderUsers[0], // FarmerJohn
-    itemName: 'Wheat Seeds (High-Yield Variety)',
-    category: 'Seeds',
-    quantity: '200 kg',
-    preferredLocation: 'Anywhere in CA, willing to arrange pickup.',
-    specifications: 'Certified seeds, good germination rate, suitable for California climate. Needed before next planting season.',
-    postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: 'req3',
-    postedBy: placeholderUsers[1], // GreenThumbSarah
-    itemName: 'Small Tractor for Orchard',
-    category: 'Tractors',
-    quantity: '1 unit',
-    preferredLocation: 'Green Valley, OR or nearby',
-    specifications: 'Compact, 20-30 HP, good turning radius. Used in good condition preferred.',
-    postedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-  },
 ];

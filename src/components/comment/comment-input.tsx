@@ -38,7 +38,12 @@ export function CommentInput({ postId, onCommentAdded, replyingToUsername, onCan
           setCurrentUser({ id: userDoc.id, ...userDoc.data() } as User);
         } else {
           // Fallback to placeholder if profile fetch fails, though unlikely
-          setCurrentUser(getPlaceholderUser(authUserId));
+          const placeholderUser = getPlaceholderUser(authUserId);
+ if (placeholderUser) {
+ setCurrentUser(placeholderUser);
+ } else {
+ setCurrentUser(null);
+ }
         }
       } else {
          setCurrentUser(null);

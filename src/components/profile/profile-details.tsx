@@ -40,6 +40,10 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
     }
     const checkFollowStatus = async () => {
       setFollowLoading(true);
+ if (!db) {
+ setFollowLoading(false);
+ return;
+ }
       const followDocRef = doc(db, 'users', authUserId, 'following', user.id);
       try {
         const docSnap = await getDoc(followDocRef);
@@ -55,7 +59,11 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
   }, [authUserId, user.id, isCurrentUser, user.followersCount]);
 
   const handleToggleFollow = async () => {
-    if (!authUserId || !db || followLoading) return;
+ if (!db || !authUserId || followLoading) {
+ setFollowLoading(false);
+ return;
+ }
+
     setFollowLoading(true);
 
     const newFollowState = !isFollowing;

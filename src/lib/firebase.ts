@@ -19,6 +19,7 @@ import {
   type Firestore,
   where,
   writeBatch,
+  updateDoc,
   addDoc,
   deleteDoc,
 } from 'firebase/firestore';
@@ -117,6 +118,7 @@ export {
   enableNetwork,
   addDoc,
   deleteDoc,
+  updateDoc,
   ref,
   uploadBytes,
   getDownloadURL,

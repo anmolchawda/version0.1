@@ -4,20 +4,37 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { ProfileCard } from '@/components/profile/profile-card';
-import { placeholderUsers, placeholderPosts, placeholderListings, placeholderYojnas, placeholderDiscoverDiseases, formatTimeAgo } from '@/lib/placeholders';
+import { placeholderUsers, placeholderPosts, placeholderListings, formatTimeAgo } from '@/lib/placeholders';
 import { PostCard } from '@/components/feed/post-card';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { Search, Users, Image as ImageIcon, Store, ListChecks, Tractor, Info, NotebookText, ShieldAlert as DiseaseIcon, CalendarDays } from 'lucide-react';
 import type { User, Post, MandiListing, Yojna, DiscoverDisease } from '@/types';
-import { mockEventsData } from '@/app/(app)/events/page'; // Importing mock events
-import type { MockEvent } from '@/app/(app)/events/page'; // Importing type for events
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { mockEventsData } from '@/data/events'; // Importing mock events
 import { useTranslations } from '@/hooks/useTranslations';
 import { format, isSameDay, addDays, startOfMonth } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+// For UI display after fetching and converting timestamp
+// Assuming this type is not globally defined or needs to be here for clarity
+interface DisplayMandiListing extends Omit<MandiListing, 'createdAt'> {
+  listedDate: string; // Formatted date string
+}
+
+// Helper function to format Firebase Timestamp (assuming you have one or need a basic one)
+// Replace this with your actual timestamp formatting logic if available elsewhere
+const formatFirebaseTimestamp = (timestamp: any): string => {
+  if (timestamp && timestamp.toDate) {
+    // Example formatting using date-fns: "Jan 20, 2023"
+    // Make sure you have date-fns installed: npm install date-fns or yarn add date-fns
+    // And import format from 'date-fns' at the top of the file if not already
+    return format(timestamp.toDate(), "PPP");
+  }
+  return 'Invalid Date'; // Or a placeholder like '-'
+};
+
 
 export default function DiscoverPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,51 +58,27 @@ export default function DiscoverPage() {
     return placeholderPosts.filter(post =>
       post.caption.toLowerCase().includes(searchLower) ||
       post.user.username.toLowerCase().includes(searchLower) ||
-      post.hashtags.some(tag => tag.toLowerCase().includes(searchLower))
+      (post.hashtags && post.hashtags.some(tag => tag.toLowerCase().includes(searchLower)))
     );
   }, [searchLower]);
 
-  const filteredMandiListings = useMemo(() => {
+  const displayMandiListings = useMemo(() => {
     if (!searchLower) return [];
-    return placeholderListings.filter(listing =>
+    const filtered = placeholderListings.filter(listing =>
       listing.name.toLowerCase().includes(searchLower) ||
       listing.category.toLowerCase().includes(searchLower) ||
       (listing.description && listing.description.toLowerCase().includes(searchLower)) ||
       listing.location.toLowerCase().includes(searchLower) ||
       listing.seller.username.toLowerCase().includes(searchLower)
     );
+    // Map to DisplayMandiListing
+    return filtered.map(listing => ({
+      ...listing, // Copy existing properties from MandiListing
+      listedDate: formatFirebaseTimestamp(listing.createdAt), // Convert and add listedDate
+    })) as DisplayMandiListing[]; // Cast to ensure correct type
   }, [searchLower]);
 
-  const filteredDiseases = useMemo(() => {
-    if (!searchLower) return [];
-    return placeholderDiscoverDiseases.filter(disease =>
-      disease.name.toLowerCase().includes(searchLower) ||
-      disease.cropName.toLowerCase().includes(searchLower) ||
-      disease.symptomsSummary.toLowerCase().includes(searchLower)
-    );
-  }, [searchLower]);
-
-  const filteredEvents = useMemo(() => {
-    if (!searchLower) return [];
-    return mockEventsData.filter(event =>
-      event.title.toLowerCase().includes(searchLower) ||
-      (event.description && event.description.toLowerCase().includes(searchLower)) ||
-      (event.location && event.location.toLowerCase().includes(searchLower))
-    );
-  }, [searchLower]);
-
-  const filteredYojnas = useMemo(() => {
-    if (!searchLower) return [];
-    return placeholderYojnas.filter(yojna =>
-      yojna.name.toLowerCase().includes(searchLower) ||
-      yojna.description.toLowerCase().includes(searchLower) ||
-      (yojna.department && yojna.department.toLowerCase().includes(searchLower)) ||
-      (yojna.benefits && yojna.benefits.toLowerCase().includes(searchLower))
-    );
-  }, [searchLower]);
-
-  const hasResults = filteredUsers.length > 0 || filteredPosts.length > 0 || filteredMandiListings.length > 0 || filteredDiseases.length > 0 || filteredEvents.length > 0 || filteredYojnas.length > 0;
-
+  const hasResults = filteredUsers.length > 0 || filteredPosts.length > 0 || displayMandiListings.length > 0;
   return (
     <div className="space-y-8">
       <Card className="shadow-xl rounded-xl">
@@ -148,68 +141,30 @@ export default function DiscoverPage() {
             </section>
           )}
 
-          {filteredMandiListings.length > 0 && (
+          {displayMandiListings.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold mb-3 text-primary flex items-center"><Store className="mr-2 h-6 w-6"/> {t('discoverMatchingMandiTitle')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filteredMandiListings.map((listing) => (
+                {displayMandiListings.map((listing) => (
                   <MandiItemCard key={listing.id} listing={listing} />
                 ))}
               </div>
             </section>
           )}
 
-          {filteredDiseases.length > 0 && (
-            <section>
-              <h2 className="text-xl font-semibold mb-3 text-primary flex items-center"><DiseaseIcon className="mr-2 h-6 w-6"/> {t('discoverMatchingDiseasesTitle')}</h2>
-              <div className="space-y-3">
-                {filteredDiseases.map((disease) => (
-                  <Link key={disease.id} href={`/crop-science/${disease.cropSlug}/diseases/${encodeURIComponent(disease.name)}`} passHref>
-                    <Card className="p-3 hover:bg-muted/50 cursor-pointer rounded-lg shadow-sm flex items-center space-x-3">
-                      {disease.imageUrl && (
-                        <div className="relative w-12 h-12 bg-muted rounded-md overflow-hidden shrink-0">
-                          <Image src={disease.imageUrl} alt={disease.name} layout="fill" objectFit="cover" data-ai-hint={disease.aiHint || 'disease'} />
-                        </div>
-                      )}
-                      <div className="flex-grow">
-                        <p className="font-medium text-foreground">{disease.name} <span className="text-xs text-muted-foreground">({disease.cropName})</span></p>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{disease.symptomsSummary}</p>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          )}
 
-          {filteredEvents.length > 0 && (
+          {mockEventsData.length > 0 && (
             <section>
               <h2 className="text-xl font-semibold mb-3 text-primary flex items-center"><CalendarDays className="mr-2 h-6 w-6"/> {t('discoverMatchingEventsTitle')}</h2>
               <div className="space-y-3">
                 {mockEventsData.filter(event => event.title.toLowerCase().includes(searchLower) || (event.description && event.description.toLowerCase().includes(searchLower))).map((event) => (
-                  <Link key={event.id} href="/events" passHref>
+ <Link key={event.id} href="/events" passHref>
                     <Card className="p-3 hover:bg-muted/50 cursor-pointer rounded-lg shadow-sm">
                       <p className="font-medium text-foreground">{event.title}</p>
                       <p className="text-xs text-muted-foreground">{format(event.date, "PPP")} - {event.location}</p>
                       {event.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{event.description}</p>}
                     </Card>
                   </Link>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {filteredYojnas.length > 0 && (
-            <section>
-              <h2 className="text-xl font-semibold mb-3 text-primary flex items-center"><NotebookText className="mr-2 h-6 w-6"/> {t('discoverMatchingYojnasTitle')}</h2>
-              <div className="space-y-3">
-                {filteredYojnas.map((yojna) => (
-                  <Card key={yojna.id} className="p-3 hover:bg-muted/50 rounded-lg shadow-sm">
-                    <p className="font-medium text-foreground">{yojna.name}</p>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{yojna.description}</p>
-                    {yojna.department && <Badge variant="outline" className="mt-1 text-xs">{yojna.department}</Badge>}
-                     {yojna.link && <a href={yojna.link} target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline block mt-1">Learn More</a>}
-                  </Card>
                 ))}
               </div>
             </section>

@@ -224,7 +224,7 @@ function SidebarComponent() {
                 key={link.href}
                 href={link.href}
                 label={link.label}
-                icon={link.icon}
+                icon={link.icon || <span></span>}
                 isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
                 isSidebarOpen={isSidebarOpen}
                 ariaLabel={link.label}
@@ -239,7 +239,7 @@ function SidebarComponent() {
             key={link.href}
             href={link.href}
             label={link.label}
-            icon={link.icon}
+            icon={link.icon || <span></span>}
             isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
             isSidebarOpen={isSidebarOpen}
             ariaLabel={link.label}
