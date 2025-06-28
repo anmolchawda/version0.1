@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CalendarDays, MapPin } from "lucide-react";
 import { format, isSameDay, addDays, startOfMonth, startOfDay } from 'date-fns';
 
-import { MockEvent, mockEventsData } from '@/data/events';
+import * as eventsData from '@/data/events';
 
 
 const today = new Date();
@@ -18,11 +18,11 @@ const monthStart = startOfMonth(today);
 
 export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
-  const [eventsForSelectedDate, setEventsForSelectedDate] = useState<MockEvent[]>([]);
+  const [eventsForSelectedDate, setEventsForSelectedDate] = useState<eventsData.MockEvent[]>([]);
 
   useEffect(() => {
     if (selectedDate) {
-      const filtered = mockEventsData.filter(event => isSameDay(event.date, selectedDate));
+      const filtered = eventsData.mockEventsData.filter(event => isSameDay(event.date, selectedDate));
       setEventsForSelectedDate(filtered);
     } else {
       setEventsForSelectedDate([]);
@@ -30,7 +30,7 @@ export default function EventsPage() {
   }, [selectedDate]);
 
   const eventDays = useMemo(() => {
-    const dates = mockEventsData.map(event => startOfDay(event.date));
+    const dates = eventsData.mockEventsData.map(event => startOfDay(event.date));
     // Return unique dates
     return dates.filter((date, index, self) =>
       index === self.findIndex((d) => isSameDay(d, date))
@@ -77,7 +77,7 @@ export default function EventsPage() {
                 <div className="space-y-3">
                   {eventsForSelectedDate.map(event => (
                     <Card key={event.id} className="p-4 shadow-sm hover:shadow-md transition-shadow bg-muted/30">
-                      <div className="flex items-start space-x-3">import React from 'react'; // Ensure React is imported if not already
+                      <div className="flex items-start space-x-3">import React from 'react';  // Ensure React is imported if not already
                         {event.icon && <div className="mt-1">{event.icon}</div>}
                         <div>
                           <h4 className="font-semibold text-primary">{event.title}</h4>

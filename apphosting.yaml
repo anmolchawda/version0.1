@@ -1,50 +1,23 @@
-# Settings for Cloud Run
+# Settings for Backend (on Cloud Run).
+# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
-  maxInstances: 1
+  minInstances: 0
+  # maxInstances: 100
+  # concurrency: 80
+  # cpu: 1
+  # memoryMiB: 512
 
-# Environment variables and secrets for Firebase client-side SDKs
-# These variables should match your Firebase Web App's configuration object.
-# Find them in Firebase Console -> Project settings (gear icon) -> Your apps -> Web app -> "Config" option
-env:
-  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    value: AIzaSyDWF0xqZ7EPCZdfAXZfDoVmT6Tf4WaN3kY # Your actual Firebase API Key
-    availability:
-      - BUILD
-      - RUNTIME
+# Environment variables and secrets.
+# env:
+  # Configure environment variables.
+  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
+  # - variable: MESSAGE
+  #   value: Hello world!
+  #   availability:
+  #     - BUILD
+  #     - RUNTIME
 
-  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    value: fieldverse-m99ip.firebaseapp.com # Your Auth Domain (e.g., your-project-id.firebaseapp.com)
-    availability:
-      - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    value: fieldverse-m99ip # Your Firebase Project ID (e.g., your-project-id)
-    availability:
-      - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
-    value: fieldverse-m99ip.firebasestorage.app # Your Cloud Storage Bucket (e.g., your-project-id.appspot.com)
-    availability:
-      - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    value: 1084327516741 # Your Messaging Sender ID (a number)
-    availability:
-      - BUILD
-      - RUNTIME
-
-  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    value: 1:1084327516741:web:0eb1efac54766dc625612c # Your App ID (a long string)
-    availability:
-      - BUILD
-      - RUNTIME
-
-  # If you are using Firebase Analytics, you'll also need this:
-  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: G-FVS7PM8WTB # Your Analytics Measurement ID (e.g., G-XXXXXXXXXX)
-    availability:
-      - BUILD
-      - RUNTIME
+  # Grant access to secrets in Cloud Secret Manager.
+  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
+  # - variable: MY_SECRET
+  #   secret: mySecretRef
