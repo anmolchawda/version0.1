@@ -23,6 +23,9 @@ import {
   addDoc,
   deleteDoc,
 } from 'firebase/firestore';
+
+export { updateDoc };
+
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from "firebase/storage";
 import { getAuth, type Auth } from "firebase/auth";
 import { MOCK_USER_ID } from './placeholders'; // Import MOCK_USER_ID
@@ -118,7 +121,6 @@ export {
   enableNetwork,
   addDoc,
   deleteDoc,
-  updateDoc,
   ref,
   uploadBytes,
   getDownloadURL,
