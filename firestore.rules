@@ -1,9 +1,64 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+
+    match /users/{userId} {
+      allow read;
+      allow create: if request.auth.uid != null;
+      allow update: if request.auth.uid == userId;
+
+      match /bookmarks/{postId} {
+        allow read, write: if request.auth.uid == userId;
+      }
     }
+
+    match /posts/{postId} {
+      allow read;
+      allow create: if request.auth.uid != null;
+      allow update: if request.auth.uid == resource.data.userId;
+      allow delete: if request.auth.uid == resource.data.userId;
+
+      match /comments/{commentId} {
+        allow read;
+        allow create: if request.auth.uid != null;
+      }
+
+      match /likedByUsers/{userId} {
+        allow read;
+        allow write: if request.auth.uid == userId;
+      }
+    }
+    
+    match /yojna/{yojnaId} {
+      allow read;
+    }
+
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth.uid in resource.data.participants;
+      match /messages/{messageId} {
+        allow read, write: if request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+      }
+    }
+    
+    match /notifications/{userId}/items/{notificationId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    match /notificationsMeta/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    match /mandi_listings/{listingId} {
+      allow read;
+      allow create: if request.auth.uid != null;
+      allow update, delete: if request.auth.uid == resource.data.sellerId;
+    }
+    
+    match /mandi_buyer_requests/{requestId} {
+      allow read;
+      allow create: if request.auth.uid != null;
+      allow delete: if request.auth.uid == resource.data.postedById;
+    }
+
   }
 }

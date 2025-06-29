@@ -5,14 +5,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
-import { getPlaceholderPostById } from '@/lib/placeholders';
 import type { Post } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bookmark, ListChecks, ChevronLeft, Loader2, AlertTriangle } from 'lucide-react';
-import { useSidebarContext } from '@/contexts/SidebarContext';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { useSidebarContext } from '@/hooks/useSidebarContext';
+import { db, doc, getDoc, collection, getDocs, query, Timestamp } from '@/lib/firebase';
 
 export default function FavoritesPage() {
   const [favoritePosts, setFavoritePosts] = useState<Post[]>([]);
@@ -29,9 +27,7 @@ export default function FavoritesPage() {
         return;
       }
       if (!db) {
-        // Fallback for mock mode or if Firebase isn't initialized
-        console.log("FavoritesPage: Firestore not available. Using local mock data.");
-        setFavoritePosts([]); 
+        setError("Database not available.");
         setIsLoading(false);
         return;
       }
@@ -44,14 +40,20 @@ export default function FavoritesPage() {
         const querySnapshot = await getDocs(q);
         const savedPostIds = querySnapshot.docs.map(doc => doc.id);
         
-        // Note: This still relies on placeholder data for post details.
-        // A full implementation would fetch each post from a 'posts' collection.
-        const resolvedPosts = savedPostIds
-          .map(id => getPlaceholderPostById(id))
-          .filter((post): post is Post => post !== undefined)
-          .sort((a,b) => new Date(b.createdAt.toDate()).getTime() - new Date(a.createdAt.toDate()).getTime());
+        if (savedPostIds.length > 0) {
+            const postPromises = savedPostIds.map(id => getDoc(doc(db, 'posts', id)));
+            const postDocs = await Promise.all(postPromises);
 
-        setFavoritePosts(resolvedPosts);
+            const resolvedPosts = postDocs
+                .filter(docSnap => docSnap.exists())
+                .map(docSnap => ({ id: docSnap.id, ...docSnap.data() } as Post))
+                .sort((a, b) => (b.createdAt as Timestamp).toMillis() - (a.createdAt as Timestamp).toMillis());
+            
+            setFavoritePosts(resolvedPosts);
+        } else {
+           setFavoritePosts([]);
+        }
+
       } catch (e) {
         console.error("Error fetching favorite posts:", e);
         setError("Could not load your favorite posts. Please try again later.");

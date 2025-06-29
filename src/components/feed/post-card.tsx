@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { db, doc, updateDoc, getDoc, setDoc, deleteDoc, increment, serverTimestamp, writeBatch, Timestamp } from '@/lib/firebase';
 import { useTranslations } from '@/hooks/useTranslations';
-import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useSidebarContext } from '@/hooks/useSidebarContext';
 
 interface PostCardProps {
   post: Post;
@@ -49,30 +49,28 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
     let isMounted = true;
 
     const checkInitialStatus = async () => {
-      if (!db) {
-        console.error("Firestore is not initialized.");
-        return; // Return early if db is null
-      }
+      if (!db || !isMounted) return;
+
       // Check Like Status
       const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
-      try {
-        const likeDocSnap = await getDoc(likedDocRef);
-        if (isMounted) setIsLiked(likeDocSnap.exists());
-      } catch (error) {
-        console.error("Error checking initial like status:", error);
-      } finally {
-        if (isMounted) setIsLoadingLike(false);
-      }
-
-      // Check Save/Bookmark Status
       const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
+
       try {
-        const saveDocSnap = await getDoc(savedDocRef);
-        if (isMounted) setIsSaved(saveDocSnap.exists());
+        const [likeDocSnap, saveDocSnap] = await Promise.all([
+            getDoc(likedDocRef),
+            getDoc(savedDocRef)
+        ]);
+        if (isMounted) {
+            setIsLiked(likeDocSnap.exists());
+            setIsSaved(saveDocSnap.exists());
+        }
       } catch (error) {
-        console.error("Error checking initial save status:", error);
+        console.error("Error checking initial post status:", error);
       } finally {
-        if (isMounted) setIsLoadingSave(false);
+        if (isMounted) {
+            setIsLoadingLike(false);
+            setIsLoadingSave(false);
+        }
       }
     };
 
@@ -91,10 +89,6 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   }, [post.id]);
 
   const handleToggleSave = async () => {
- if (!db) {
- console.error("Firestore is not initialized.");
- return; // Return early if db is null
- }
     if (isLoadingSave || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingSave(true);
 
@@ -119,10 +113,6 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
   };
 
   const handleToggleLike = async () => {
-    if (!db) {
-      console.error("Firestore is not initialized.");
-      return; // Return early if db is null
-    }
     if (isLoadingLike || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingLike(true);
 
