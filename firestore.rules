@@ -1,68 +1,11 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read access to most collections for viewing content
+    // This is a permissive rule suitable for development.
+    // It allows any authenticated user to read and write all data.
+    // For production, you should implement more granular rules.
     match /{document=**} {
-      allow read: if true;
-    }
-
-    // Secure user data: only the user can read or write their own document
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Secure user subcollections (e.g., bookmarks)
-    match /users/{userId}/{collection}/{docId} {
-        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Posts: Logged-in users can create. Only the author can update/delete.
-    match /posts/{postId} {
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-
-    // Comments: Logged-in users can create. Only the author can update/delete.
-    match /posts/{postId}/comments/{commentId} {
-        allow create: if request.auth != null;
-        allow update, delete: if request.auth != null && resource.data.user.id == request.auth.uid;
-    }
-    
-    // Likes: Logged-in users can like/unlike posts.
-    match /posts/{postId}/likedByUsers/{userId} {
-        allow create, delete: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Mandi Listings: Logged-in users can create. Only seller can update/delete.
-    match /mandi_listings/{listingId} {
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
-    }
-
-    // Mandi Buyer Requests: Logged-in users can create. Only buyer can delete.
-    match /mandi_buyer_requests/{requestId} {
-      allow create: if request.auth != null;
-      allow delete: if request.auth != null && resource.data.postedById == request.auth.uid;
-    }
-
-    // Conversations & Messages
-    match /conversations/{conversationId} {
-      allow read, write: if request.auth != null && request.auth.uid in resource.data.participants;
-    }
-    
-    match /conversations/{conversationId}/messages/{messageId} {
-      allow read, create: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
-    }
-
-    // Notifications: Only target user can read/write their notifications meta.
-    match /notificationsMeta/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Notification Items: Only target user can read/write their notification items.
-    match /notifications/{userId}/items/{notificationId} {
-        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null;
     }
   }
 }
