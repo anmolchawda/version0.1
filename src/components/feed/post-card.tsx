@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -16,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { db, doc, updateDoc, getDoc, setDoc, deleteDoc, increment, serverTimestamp, writeBatch, Timestamp } from '@/lib/firebase';
 import { useTranslations } from '@/hooks/useTranslations';
-import { useSidebarContext } from '@/hooks/useSidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 interface PostCardProps {
   post: Post;
