@@ -1,4 +1,3 @@
-
 // src/components/profile/profile-details.tsx
 'use client';
 
@@ -40,10 +39,10 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
     }
     const checkFollowStatus = async () => {
       setFollowLoading(true);
- if (!db) {
- setFollowLoading(false);
- return;
- }
+      if (!db) {
+        setFollowLoading(false);
+        return;
+      }
       const followDocRef = doc(db, 'users', authUserId, 'following', user.id);
       try {
         const docSnap = await getDoc(followDocRef);
@@ -59,10 +58,10 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
   }, [authUserId, user.id, isCurrentUser, user.followersCount]);
 
   const handleToggleFollow = async () => {
- if (!db || !authUserId || followLoading) {
- setFollowLoading(false);
- return;
- }
+    if (!db || !authUserId || followLoading) {
+      setFollowLoading(false);
+      return;
+    }
 
     setFollowLoading(true);
 
@@ -139,7 +138,7 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
 
             <div className="flex flex-1 justify-around items-center text-center w-full sm:w-auto sm:pt-2">
               <div className="px-2"><p className="text-lg font-semibold text-foreground">{user.postCount ?? 0}</p><p className="text-xs text-muted-foreground">{t('posts')}</p></div>
-              <div className="px-2"><p className="text-lg font-semibold text-foreground">{localFollowersCount}</p><p className="text-xs text-muted-foreground">{t('followers')}</p></div>
+              <Link href={`/profile/${user.id}/followers`} className="hover:opacity-80 transition-opacity px-2"><p className="text-lg font-semibold text-foreground">{localFollowersCount}</p><p className="text-xs text-muted-foreground">{t('followers')}</p></Link>
               <Link href={`/profile/${user.id}/following`} className="hover:opacity-80 transition-opacity px-2"><p className="text-lg font-semibold text-foreground">{user.followingCount ?? 0}</p><p className="text-xs text-muted-foreground">{t('following')}</p></Link>
             </div>
           </div>
