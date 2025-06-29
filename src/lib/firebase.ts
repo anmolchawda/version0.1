@@ -18,6 +18,8 @@ import {
   writeBatch,
   increment,
   Timestamp,
+  initializeFirestore,
+  persistentLocalCache,
   type Firestore,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from 'firebase/storage';
@@ -35,15 +37,23 @@ const firebaseConfig = {
 };
 
 // A more stable way to initialize for Next.js App Router.
-// This prevents re-initialization and works on both server and client.
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth: Auth = getAuth(app);
-const db: Firestore = getFirestore(app);
 const storage: FirebaseStorage = getStorage(app);
 
-// The offline persistence logic is now handled in FirebaseProvider.tsx
-// This keeps this file clean and avoids client/server initialization conflicts.
+// To fix "client is offline" errors, we must initialize Firestore with
+// persistence enabled on the client. This will fail on the server,
+// so we use a try-catch block to fall back to the standard initialization.
+let db: Firestore;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({}),
+  });
+} catch (e) {
+  console.warn("Firebase: Could not initialize Firestore with persistent cache. Falling back to default. Error:", e);
+  db = getFirestore(app);
+}
 
 export {
   db,
