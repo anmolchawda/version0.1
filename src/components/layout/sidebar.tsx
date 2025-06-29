@@ -7,7 +7,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import type { NavLink as NavLinkType } from '@/types'; // Renamed to avoid conflict
+import type { User, NavLink as NavLinkType } from '@/types';
 import {
   FlaskConical,
   SprayCan,
@@ -22,11 +22,11 @@ import {
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { auth } from '@/lib/firebase'; // auth can be null in mock mode
+import { auth, db, doc, getDoc } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-import { getPlaceholderUser } from '@/lib/placeholders'; // Import for mock user data
-import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { useTranslations } from '@/hooks/useTranslations';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface NavLinkItemProps {
   href: string;
@@ -98,21 +98,48 @@ const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, 
   return linkElement;
 };
 
-
 function SidebarComponent() {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
   const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
-  const { t } = useTranslations(); // Use the translation hook
+  const { t } = useTranslations();
   
-  const currentUserDetails = authUserId ? getPlaceholderUser(authUserId) : null;
+  const [currentUserDetails, setCurrentUserDetails] = useState<User | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    if (!authUserId || !db) {
+      setIsLoadingProfile(false);
+      return;
+    }
+
+    const fetchUserProfile = async () => {
+      setIsLoadingProfile(true);
+      try {
+        const userDocRef = doc(db, 'users', authUserId);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          setCurrentUserDetails({ id: userDocSnap.id, ...userDocSnap.data() } as User);
+        } else {
+          setCurrentUserDetails(null);
+        }
+      } catch (error) {
+        console.error("Error fetching user profile for sidebar:", error);
+        setCurrentUserDetails(null);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [authUserId]);
 
   const currentUserName = currentUserDetails?.name || currentUserDetails?.username || 'User';
   const currentUserAvatar = currentUserDetails?.avatarUrl;
   const currentUserUsername = currentUserDetails?.username || 'krishix_user';
 
-  const userProfileLink = "/my-profile"; // Updated profile link
+  const userProfileLink = "/my-profile";
 
   const primaryNavLinks = useMemo((): NavLinkType[] => [], []);
 
@@ -134,12 +161,11 @@ function SidebarComponent() {
   
   const handleLogout = async () => {
     closeSidebar();
-    if (!auth) { // auth instance is null in mock mode
+    if (!auth) {
       toast({ title: 'Logged Out (Mock)', description: 'You have been successfully logged out.' });
       router.push('/login');
       return;
     }
-    // Real Firebase logout
     try {
       await signOut(auth);
       toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
@@ -184,28 +210,48 @@ function SidebarComponent() {
       </Button>
   );
 
-  const userProfileElement = (
-    <Link
-      href={userProfileLink}
-      className={cn(
-        "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
-        !isSidebarOpen && "justify-center"
-      )}
-      onClick={closeSidebar}
-      aria-label={!isSidebarOpen ? `${currentUserName} Profile` : undefined}
-    >
-      <Avatar className="h-9 w-9 border">
-        <AvatarImage src={currentUserAvatar || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={currentUserName} data-ai-hint="person farmer"/>
-        <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-      </Avatar>
-      {isSidebarOpen && (
-        <div className="flex flex-col overflow-hidden">
-          <span className="text-sm font-medium group-hover:text-primary truncate">{currentUserName}</span>
-          <span className="text-xs text-muted-foreground truncate">@{currentUserUsername}</span>
+  const renderUserProfile = () => {
+    if (isLoadingProfile) {
+      return (
+        <div className={cn("flex items-center gap-3 p-2", !isSidebarOpen && "justify-center")}>
+          <Skeleton className="h-9 w-9 rounded-full" />
+          {isSidebarOpen && (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[100px]" />
+              <Skeleton className="h-3 w-[70px]" />
+            </div>
+          )}
         </div>
-      )}
-    </Link>
-  );
+      );
+    }
+
+    if (!currentUserDetails) return null; // Don't show anything if profile doesn't exist
+
+    return (
+      <Link
+        href={userProfileLink}
+        className={cn(
+          "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
+          !isSidebarOpen && "justify-center"
+        )}
+        onClick={closeSidebar}
+        aria-label={!isSidebarOpen ? `${currentUserName} Profile` : undefined}
+      >
+        <Avatar className="h-9 w-9 border">
+          <AvatarImage src={currentUserAvatar || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={currentUserName} data-ai-hint="person farmer"/>
+          <AvatarFallback>{userAvatarFallback}</AvatarFallback>
+        </Avatar>
+        {isSidebarOpen && (
+          <div className="flex flex-col overflow-hidden">
+            <span className="text-sm font-medium group-hover:text-primary truncate">{currentUserName}</span>
+            <span className="text-xs text-muted-foreground truncate">@{currentUserUsername}</span>
+          </div>
+        )}
+      </Link>
+    );
+  };
+
+  const userProfileElement = renderUserProfile();
 
   return (
     <aside
