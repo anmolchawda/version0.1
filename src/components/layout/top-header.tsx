@@ -8,73 +8,45 @@ import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/core/app-logo';
 import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { db, doc, onSnapshot, setDoc, getDoc } from '@/lib/firebase'; // db can be null
+import { db, collection, query, where, onSnapshot } from '@/lib/firebase'; // db can be null
 
 const TopHeaderComponent = () => { // Changed to named component
-  const { toggleSidebar, setNotificationCount, authUserId } = useSidebarContext();
+  const { toggleSidebar, notificationCount, setNotificationCount, authUserId } = useSidebarContext();
   const pathname = usePathname();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-  const [localNotificationCount, setLocalNotificationCount] = useState(0);
 
   useEffect(() => {
-    if (pathname === '/messages' || pathname.startsWith('/messages/')) {
+    if (pathname.startsWith('/messages')) {
       setUnreadMessageCount(0);
     }
-    // Notification count reset is handled by the notifications page itself now
-    // or via the listener below when on the page.
+    // Notification count is now handled by the listener below
+    // and cleared on the notifications page itself.
   }, [pathname]);
 
+  // New listener for unread notifications count
   useEffect(() => {
-    if (authUserId && db) { // Check if db is available
-      const notificationDocRef = doc(db, 'notificationsMeta', authUserId);
-      
-      const unsubscribe = onSnapshot(notificationDocRef, async (docSnap) => {
-        let count = 0;
-        if (docSnap.exists()) {
-          count = docSnap.data()?.unreadCount || 0;
-        }
-        
-        setLocalNotificationCount(count);
-        // Update context only if not on notifications page, as page itself clears it
-        if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
-          setNotificationCount(count);
-        }
-      }, (error) => {
-        console.error("[TopHeader] Error fetching notification count for user", authUserId, ":", error);
-        setLocalNotificationCount(0);
-        if (!(pathname === '/notifications' || pathname.startsWith('/notifications/'))) {
-          setNotificationCount(0);
-        }
-      });
-      
-      // Initial check and reset if on notifications page & count > 0
-      // This ensures the badge is cleared if user directly lands on /notifications
-      const checkAndClearNotifications = async () => {
-        if (pathname === '/notifications' || pathname.startsWith('/notifications/')) {
-          const currentDoc = await getDoc(notificationDocRef);
-          if(currentDoc.exists() && currentDoc.data()?.unreadCount !== 0) {
-              setDoc(notificationDocRef, { unreadCount: 0 }, { merge: true })
-              .then(() => setNotificationCount(0)) // Also update context immediately
-              .catch(error => console.error("[TopHeader] Error clearing notification count in Firestore for user", authUserId, ":", error));
-          } else {
-            setNotificationCount(0); // Ensure context is 0 if Firestore is already 0
-          }
-        }
-      };
-
-      checkAndClearNotifications();
-
-      return () => unsubscribe();
-    } else {
-      setLocalNotificationCount(0);
-      setNotificationCount(0); // Clear context if no user or mock mode
+    if (!authUserId || !db) {
+      setNotificationCount(0);
+      return;
     }
-  }, [authUserId, db, setNotificationCount, pathname]);
 
-  // Determine display count for badge, ensuring it's 0 if on the notifications page
-  const displayNotificationCount = (pathname === '/notifications' || pathname.startsWith('/notifications/'))
-                                     ? 0
-                                     : localNotificationCount;
+    const notificationsRef = collection(db, 'notifications', authUserId, 'items');
+    const q = query(notificationsRef, where('read', '==', false));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const unreadCount = snapshot.size;
+      setNotificationCount(unreadCount);
+    }, (error) => {
+      console.error("[TopHeader] Error fetching notification count:", error);
+      setNotificationCount(0); // Reset on error
+    });
+
+    return () => unsubscribe();
+  }, [authUserId, db, setNotificationCount]);
+
+
+  // Determine display count for badge.
+  const displayNotificationCount = notificationCount > 0 && !pathname.startsWith('/notifications') ? notificationCount : 0;
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-50 shadow-sm">

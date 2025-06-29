@@ -1,88 +1,98 @@
-{
-  "rules": {
-    "users": {
-      "{userId}": {
-        "allow read": true,
-        "allow write": "if request.auth.uid == userId",
-        "bookmarks": {
-          "{postId}": {
-            "allow read, write, delete": "if request.auth.uid == userId"
-          }
-        },
-        "followers": {
-          "{followerId}": {
-            "allow read": true,
-            "allow write": "if request.auth.uid == followerId"
-          }
-        },
-        "following": {
-          "{followingId}": {
-            "allow read": true,
-            "allow write, delete": "if request.auth.uid == userId"
-          }
-        }
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users Collection
+    // - Allow users to read any profile (for viewing profiles)
+    // - Allow users to create their own profile document
+    // - Allow users to update ONLY their own profile document
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId;
+      
+      // Sub-collections for follows/bookmarks
+      // Users can only modify their own follow/bookmark lists
+      match /followers/{followerId} {
+        allow read, write: if request.auth.uid == userId || request.auth.uid == followerId;
       }
-    },
-    "posts": {
-      "{postId}": {
-        "allow read": true,
-        "allow create, update, delete": "if request.auth.uid == resource.data.userId",
-        "comments": {
-          "{commentId}": {
-            "allow read": true,
-            "allow create": "if request.auth != null && request.auth.uid == request.resource.data.user.id"
-          }
-        },
-        "likedByUsers": {
-          "{userId}": {
-            "allow read, write, delete": "if request.auth.uid == userId"
-          }
-        }
+      match /following/{followingId} {
+        allow read, write: if request.auth.uid == userId;
       }
-    },
-    "conversations": {
-      "{conversationId}": {
-        "allow read, write": "if request.auth.uid in resource.data.participants",
-        "messages": {
-          "{messageId}": {
-            "allow read, create": "if request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants"
-          }
-        }
+      match /bookmarks/{postId} {
+        allow read, write: if request.auth.uid == userId;
       }
-    },
-    "notifications": {
-      "{userId}": {
-        "items": {
-          "{notificationId}": {
-            "allow read, write, delete": "if request.auth.uid == userId"
-          }
-        }
+    }
+
+    // Posts Collection
+    // - Allow any authenticated user to read posts
+    // - Allow users to create posts for themselves
+    // - Allow users to update/delete ONLY their own posts
+    match /posts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth.uid == resource.data.userId;
+
+      // Comments Sub-collection
+      // - Allow any authenticated user to read comments
+      // - Allow authenticated users to create comments
+      match /comments/{commentId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth.uid == request.resource.data.user.id;
+        // Comment deletion/updating can be added later if needed
       }
-    },
-    "notificationsMeta": {
-      "{userId}": {
-        "allow read": "if request.auth != null",
-        "allow write": "if request.auth.uid == userId"
+
+      // Likes Sub-collection
+      // - Users can only like/unlike for themselves
+       match /likedByUsers/{userId} {
+        allow read, write: if request.auth.uid == userId;
       }
-    },
-    "mandi_listings": {
-      "{listingId}": {
-        "allow read": true,
-        "allow create": "if request.auth.uid == request.resource.data.sellerId",
-        "allow update, delete": "if request.auth.uid == resource.data.sellerId"
+    }
+
+    // Conversations & Messages
+    // - Allow read/write on a conversation doc if user is a participant
+    // - Allow read/write on messages if user is a participant in the parent conversation
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth.uid in resource.data.participants;
+      
+      match /messages/{messageId} {
+         allow read, write: if request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
       }
-    },
-    "mandi_buyer_requests": {
-      "{requestId}": {
-        "allow read": true,
-        "allow create": "if request.auth.uid == request.resource.data.postedById",
-        "allow update, delete": "if request.auth.uid == resource.data.postedById"
-      }
-    },
-    "yojna": {
-      "{yojnaId}": {
-        "allow read": true
-      }
+    }
+
+    // Notifications
+    // - Users can only access their own notification documents and sub-collections
+    match /notifications/{userId}/{document=**} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Mandi Listings (Seller products)
+    // - Allow any authenticated user to read listings
+    // - Allow users to create listings for themselves
+    // - Allow users to update/delete ONLY their own listings
+    match /mandi_listings/{listingId} {
+       allow read: if request.auth != null;
+       allow create: if request.auth.uid == request.resource.data.sellerId;
+       allow update, delete: if request.auth.uid == resource.data.sellerId;
+    }
+
+    // Mandi Buyer Requests
+    // - Allow any authenticated user to read requests
+    // - Allow users to create requests for themselves
+    // - Allow users to update/delete ONLY their own requests
+    match /mandi_buyer_requests/{requestId} {
+       allow read: if request.auth != null;
+       allow create: if request.auth.uid == request.resource.data.postedById;
+       allow update, delete: if request.auth.uid == resource.data.postedById;
+    }
+
+    // Yojna (Schemes) Collection
+    // - Allow any authenticated user to read government schemes
+    // - Restrict writes to admin/backend processes (no client writes)
+    match /yojna/{yojnaId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Or specify admin access rules
     }
   }
 }

@@ -1,4 +1,3 @@
-
 // src/app/(app)/notifications/page.tsx
 'use client';
 
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight, Trash2, AlertTriangle } from "lucide-react";
-import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, setDoc, getDoc, getDocs } from '@/lib/firebase';
+import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, getDocs } from '@/lib/firebase';
 import type { Notification as NotificationType, ActorInfo } from '@/types';
 import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import { cn } from '@/lib/utils';
@@ -58,8 +57,6 @@ function NotificationItem({ notification }: { notification: NotificationType }) 
     default:
       message = t('newNotificationText') || 'New notification.';
   }
-  // Placeholder keys for the above, assuming they will be added:
-  // likedYourPostText, commentedOnYourPostText, onYourPostText, startedFollowingYouText, newNotificationText
 
   return (
     <Link href={link} passHref>
@@ -111,7 +108,6 @@ export default function NotificationsPage() {
     }
 
     setIsLoading(true);
-    // Updated path to reflect notifications/{userId}/items/{notificationId}
     const notificationsRef = collection(db, 'notifications', authUserId, 'items');
     const q = query(notificationsRef, orderBy('timestamp', 'desc'));
 
@@ -131,39 +127,24 @@ export default function NotificationsPage() {
       setNotifications(fetchedNotifications);
       setIsLoading(false);
 
+      // If there are unread notifications, mark them as read in a batch
       if (unreadNotificationIds.length > 0) {
- if (!db) {
- console.error("[NotificationsPage] Firestore is not initialized when trying to mark as read.");
- return;
- }
-        
- const batch = writeBatch(db);
+        const batch = writeBatch(db);
         unreadNotificationIds.forEach(id => {
-          // Updated path for marking as read
-          const notifDocRef = doc(db!, 'notifications', authUserId, 'items', id);
+          const notifDocRef = doc(db, 'notifications', authUserId, 'items', id);
           batch.update(notifDocRef, { read: true });
         });
         
         try {
           await batch.commit();
-          const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
-          await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
-          setNotificationCount(0);
+          // The listener in TopHeader will automatically update the count
         } catch (e) {
-          console.error("Error marking notifications as read or updating meta:", e);
+          console.error("Error marking notifications as read:", e);
         }
-      } else if (fetchedNotifications.length > 0) {
- if (!db) {
- console.error("[NotificationsPage] Firestore is not initialized when trying to update meta count.");
- return;
- }
-         const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
-         const docSnap = await getDoc(userNotificationsMetaRef);
-         if(docSnap.exists() && docSnap.data()?.unreadCount !== 0) {
-            await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
-         }
-         setNotificationCount(0);
       }
+      
+      // Also ensure context count is zero since we are on the page
+      setNotificationCount(0);
 
     }, (err) => {
       console.error("Error fetching notifications:", err);
@@ -181,7 +162,6 @@ export default function NotificationsPage() {
     setIsClearing(true);
 
     if (!db || !authUserId) {
-      // Mock mode or no auth
       setNotifications([]);
       setNotificationCount(0);
       toast({ title: t('toastNotificationsClearedMockTitle'), description: t('toastNotificationsClearedMockDescription') });
@@ -191,7 +171,6 @@ export default function NotificationsPage() {
     }
 
     try {
-      // Updated path for clearing notifications
       const notificationsRef = collection(db, 'notifications', authUserId, 'items');
       const querySnapshot = await getDocs(notificationsRef);
       
@@ -207,13 +186,9 @@ export default function NotificationsPage() {
         batch.delete(docSnap.ref);
       });
       await batch.commit();
-
-      // Update meta count
-      const userNotificationsMetaRef = doc(db, 'notificationsMeta', authUserId);
-      await setDoc(userNotificationsMetaRef, { unreadCount: 0 }, { merge: true });
       
-      setNotifications([]); // Clear local state
-      setNotificationCount(0); // Update context
+      setNotifications([]); 
+      setNotificationCount(0);
       toast({ title: t('toastNotificationsClearedTitle'), description: t('toastNotificationsClearedDescription') });
 
     } catch (e) {
