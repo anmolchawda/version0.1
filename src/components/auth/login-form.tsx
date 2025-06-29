@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -81,7 +80,7 @@ export function LoginForm() {
         });
       } else {
         // Email is verified. The main app layout will handle redirection.
-        router.push('/');
+        router.push('/feed');
       }
 
     } catch (error: any) {
@@ -103,7 +102,7 @@ export function LoginForm() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       // Let the app layout's auth state listener and gatekeeper handle redirection.
-      router.push('/');
+      router.push('/feed');
 
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);

@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -14,7 +13,7 @@ const AppLogoComponent = ({ className, textClassName, iconClassName }: AppLogoPr
   const logoUrl = "https://firebasestorage.googleapis.com/v0/b/fieldverse-m99ip.firebasestorage.app/o/KrishiX%20logo%2FKrishiX%20PNG%20Logo.png?alt=media&token=f1b5520f-83f5-4665-81d8-45c8d2fb4d72";
 
   return (
-    <Link href="/" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
+    <Link href="/feed" className={cn("flex items-center gap-2 text-2xl font-bold text-primary", className)}>
       <div className={cn("relative", iconClassName)}> {/* This div receives h-12 w-12 etc. */}
         <Image
           src={logoUrl}

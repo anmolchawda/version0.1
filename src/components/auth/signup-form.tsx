@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -78,7 +77,7 @@ export function SignupForm() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       // Let the app layout's auth state listener and gatekeeper handle redirection.
-      router.push('/');
+      router.push('/feed');
     } catch (error: any) {
         console.error('Google Sign-up error:', error.code, error.message);
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });

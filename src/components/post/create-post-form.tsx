@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useRef, type ChangeEvent, type FormEvent } from 'react';
@@ -172,7 +171,7 @@ export function CreatePostForm() {
             description: t('postCreatedSuccessDescription'),
         });
         
-        router.push('/');
+        router.push('/feed');
 
     } catch (error) {
         console.error("Error creating post:", error);

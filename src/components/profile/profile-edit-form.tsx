@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent, useEffect, type ChangeEvent } from 'react';
@@ -154,7 +153,7 @@ export function ProfileEditForm() {
         title: t('toastProfileUpdatedTitle'),
         description: isNewUser ? 'Welcome to KrishiX! You can now explore the app.' : t('toastProfileUpdatedDescription'),
       });
-      router.push('/'); // Redirect to feed after successful setup/update
+      router.push('/feed'); // Redirect to feed after successful setup/update
     } catch (error) {
       console.error("Error updating profile in Firestore:", error);
       toast({ title: t('toastUpdateFailedTitle'), description: error instanceof Error ? error.message : t('toastUpdateFailedDescription'), variant: "destructive" });
