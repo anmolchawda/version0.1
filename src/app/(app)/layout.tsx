@@ -11,7 +11,6 @@ import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
 import { auth, db, doc, getDoc } from '@/lib/firebase';
-import type { User as FirebaseUser } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
@@ -21,75 +20,54 @@ interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [isProfileComplete, setIsProfileComplete] = useState(true); // Assume complete to avoid flicker
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
+  const [error, setError] = useState<string | null>(null);
 
-  // Effect 1: Handle Auth State - runs once on mount
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-      if (setContextAuthUserId) {
-        setContextAuthUserId(user?.uid || null);
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      setContextAuthUserId(user?.uid || null);
+      if (!user) {
+        setAuthStatus('unauthenticated');
+        return;
       }
-      // Don't stop loading here; let the profile verification step do that.
+      if (!db) {
+        setError("Database connection error. Please try again later.");
+        setAuthStatus('loading');
+        return;
+      }
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
+          setAuthStatus('authenticated_ready');
+        } else {
+          setAuthStatus('authenticated_needs_profile');
+        }
+      } catch (profileError) {
+        console.error("Error fetching user profile:", profileError);
+        setError("Could not verify your profile status. Please try refreshing.");
+        setAuthStatus('loading');
+      }
     });
     return () => unsubscribe();
   }, [setContextAuthUserId]);
 
-  // Effect 2: Verify Profile and Redirect - runs when auth state or navigation changes
   useEffect(() => {
-    // If auth state hasn't been determined yet, do nothing.
-    if (auth.currentUser === undefined) {
-        setIsLoading(true);
-        return;
-    }
-    
-    // If there's no logged-in user, redirect to login page.
-    if (!currentUser) {
+    if (authStatus === 'unauthenticated') {
       const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
       if (!isAuthPage) {
         router.replace('/login');
       }
-      setIsLoading(false); // No user, so loading is finished.
-      return;
+    } else if (authStatus === 'authenticated_needs_profile') {
+      const isSetupPage = pathname === '/settings/account';
+      if (!isSetupPage) {
+        router.replace('/settings/account');
+      }
     }
-    
-    // User is logged in, check their profile status
-    const verifyProfile = async () => {
-      if (!db) {
-        setError("Database connection error. Please try again later.");
-        setIsLoading(false);
-        return;
-      }
-      try {
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        const profileIsComplete = userDocSnap.exists() && !!userDocSnap.data()?.profileSetupComplete;
-        
-        setIsProfileComplete(profileIsComplete);
+  }, [authStatus, pathname, router]);
 
-        const isSetupPage = pathname === '/settings/account';
-        if (!profileIsComplete && !isSetupPage) {
-          router.replace('/settings/account');
-        }
-      } catch (profileError) {
-        console.error("Error fetching user profile:", profileError);
-        setError("Could not verify profile status. Please try again.");
-        setIsProfileComplete(false); // Assume incomplete on error
-      } finally {
-        setIsLoading(false); // Verification finished, stop loading.
-      }
-    };
-
-    verifyProfile();
-
-  }, [currentUser, pathname, router]);
-
-
-  if (isLoading) {
+  if (authStatus === 'loading') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -111,18 +89,16 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
-  // This state is hit while the redirect to /login is in progress
-  if (!currentUser) {
-    return (
+  if (authStatus === 'unauthenticated' && !pathname.startsWith('/login')) {
+     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
       </div>
     );
   }
-
-  // Gatekeeper check: if profile is incomplete AND user is trying to access a protected page, show a loader
-  if (!isProfileComplete && pathname !== '/settings/account') {
+  
+  if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -131,31 +107,35 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <>
-      <TopHeader />
-      <div className="flex min-h-screen pt-16">
-        <Sidebar />
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20" 
-            onClick={closeSidebar}
-            aria-hidden="true"
-          />
-        )}
-        <main
-          className={cn(
-            `flex-1 py-6 overflow-y-auto mb-16` 
+  if (authStatus === 'authenticated_ready' || (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account')) {
+    return (
+      <>
+        <TopHeader />
+        <div className="flex min-h-screen pt-16">
+          <Sidebar />
+          {isSidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20" 
+              onClick={closeSidebar}
+              aria-hidden="true"
+            />
           )}
-        >
-          <div className="max-w-2xl mx-auto px-4 h-full"> 
-           {children}
-          </div>
-        </main>
-      </div>
-      <BottomNavBar />
-    </>
-  );
+          <main
+            className={cn(
+              `flex-1 py-6 overflow-y-auto mb-16` 
+            )}
+          >
+            <div className="max-w-2xl mx-auto px-4 h-full"> 
+            {children}
+            </div>
+          </main>
+        </div>
+        <BottomNavBar />
+      </>
+    );
+  }
+
+  return null;
 }
 
 export default function AppPagesLayout({

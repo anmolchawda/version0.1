@@ -1,3 +1,4 @@
+
 // src/app/(app)/my-profile/page.tsx
 'use client';
 
@@ -22,17 +23,15 @@ export default function MyProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!authUserId) {
+        // This case is now handled by the main app layout, which will redirect to login.
+        // We can simply show a loading state or nothing at all.
         setIsLoading(false);
-        // This case should be handled by the layout redirecting to login,
-        // but we'll add a check here as a safeguard.
-        setError("You must be logged in to view your profile.");
         return;
       }
 
       setIsLoading(true);
       setError(null);
       
-      // Use Firestore to get the user's profile data
       if (!db) {
         setError("Database connection is not available.");
         setIsLoading(false);
@@ -54,16 +53,15 @@ export default function MyProfilePage() {
           const postsForUser: Post[] = userPostsSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-          })) as Post[]; // Cast to Post[] type
+          })) as Post[];
           setUserPosts(postsForUser);
 
           setProfileData({ ...fetchedData, postCount: postsForUser.length });
         } else {
-          // This case should be handled by the main layout redirecting to /setup-profile
-          // If we get here, it's an inconsistent state.
-          console.warn(`Firestore document for user ${authUserId} not found. Redirecting to profile setup.`);
-          router.replace('/setup-profile');
-          return; // Stop further execution
+          // This case is handled by the main layout redirecting to /settings/account
+          // If we somehow get here, it's an inconsistent state.
+          console.error(`User document for ${authUserId} not found, but layout guard passed.`);
+          setError("Your profile data could not be found.");
         }
       } catch (e) {
         console.error("Error fetching user profile from Firestore:", e);
@@ -95,8 +93,7 @@ export default function MyProfilePage() {
   }
 
   if (!profileData) {
-    // This state should ideally not be reached if the logic above is correct
-    // (either loading, error, or redirected).
+    // This state should ideally not be reached if the logic above is correct.
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
