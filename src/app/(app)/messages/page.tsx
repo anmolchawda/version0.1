@@ -93,7 +93,7 @@ export default function MessagesPage() {
       setIsLoading(false);
       setError(null);
     }, (err) => {
-      console.error("Error fetching conversations: ", err);
+      console.error("Firestore error fetching conversations:", err);
       setError(t('failedToLoadConversationsError'));
       setIsLoading(false);
     });

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, doc, getDoc, collection, query, where, getDocs } from '@/lib/firebase'; // Import necessary Firestore functions
+import { db, doc, getDoc, collection, query, where, getDocs, orderBy } from '@/lib/firebase'; // Import orderBy
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
@@ -43,9 +43,9 @@ export default function MyProfilePage() {
         if (userDocSnap.exists()) {
           const fetchedData = { id: authUserId, ...userDocSnap.data() } as User;
 
-          // Fetch user's actual posts from Firestore
+          // Fetch user's actual posts from Firestore, ordered by creation date
           const postsCollectionRef = collection(db, 'posts');
-          const userPostsQuery = query(postsCollectionRef, where('userId', '==', authUserId));
+          const userPostsQuery = query(postsCollectionRef, where('userId', '==', authUserId), orderBy('createdAt', 'desc'));
           const userPostsSnapshot = await getDocs(userPostsQuery);
 
           const postsForUser: Post[] = userPostsSnapshot.docs.map(doc => ({
@@ -66,6 +66,8 @@ export default function MyProfilePage() {
         let detailedError = "Could not load profile data. Please try refreshing the page.";
         if (e.code === 'permission-denied') {
           detailedError = "Permission Denied: Your security rules are blocking access to your profile data.";
+        } else if (e.code === 'failed-precondition' && e.message.includes('index')) {
+          detailedError = "Database Index Missing: A required Firestore index is missing. Please check the browser console for a link to create it.";
         } else if (e.message) {
           detailedError = `An unexpected error occurred: ${e.message}`;
         }

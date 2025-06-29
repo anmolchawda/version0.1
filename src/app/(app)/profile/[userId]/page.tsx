@@ -5,7 +5,7 @@ import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { auth, db, doc, getDoc, collection, query, where, getDocs } from '@/lib/firebase';
+import { auth, db, doc, getDoc, collection, query, where, getDocs, orderBy } from '@/lib/firebase'; // Add orderBy
 import type { User as FirebaseUser } from 'firebase/auth';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import type { User, Post } from '@/types';
@@ -24,7 +24,7 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     // Wait for the auth context to provide the current user's ID.
-    // The main layout shows a loading spinner until this is available.
+    // The main layout's loader should cover this, but this is a fallback.
     if (!authUserId) {
         setIsLoading(false); // Stop loading if auth state is not resolved yet
         return;
@@ -50,9 +50,9 @@ export default function UserProfilePage() {
         if (userDocSnap.exists()) {
           const fetchedData = { id: userId, ...userDocSnap.data() } as User;
 
-          // Fetch real posts from Firestore
+          // Fetch real posts from Firestore, ordered by creation date
           const postsCollectionRef = collection(db, 'posts');
-          const userPostsQuery = query(postsCollectionRef, where('userId', '==', userId));
+          const userPostsQuery = query(postsCollectionRef, where('userId', '==', userId), orderBy('createdAt', 'desc'));
           const postsSnapshot = await getDocs(userPostsQuery);
 
           const posts = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Post[];
@@ -66,7 +66,7 @@ export default function UserProfilePage() {
         console.error("Error fetching profile:", e);
         let detailedError = "Could not load profile data. Please try again later.";
         if (e.code === 'permission-denied') {
-          detailedError = "Permission Denied: Your security rules are blocking access to profile data.";
+          detailedError = "Permission Denied: Your security rules are blocking access to your profile data.";
         } else if (e.code === 'failed-precondition' && e.message.includes('index')) {
           detailedError = "Database Index Missing: A required Firestore index is missing. Please check the browser console for a link to create it.";
         } else if (e.message) {
