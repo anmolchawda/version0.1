@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -44,10 +45,8 @@ export function LoginForm() {
     
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast({
-        title: 'Login Successful!',
-        description: 'Welcome back!',
-      });
+      // The main app layout will handle redirection based on profile status.
+      // We no longer need to toast here, as the layout might redirect again.
       router.push('/');
     } catch (error: any) {
       console.error('Login error:', error.code, error.message);
@@ -69,22 +68,18 @@ export function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if it's a new user
+      // Check if it's a new user to redirect to profile setup
       const additionalInfo = getAdditionalUserInfo(result);
 
       if (additionalInfo?.isNewUser) {
-        // This is a first-time sign-in with Google
         toast({
           title: 'Welcome to KrishiX!',
           description: `Let's get your profile set up, ${user.displayName || user.email}!`,
         });
         router.push('/setup-profile');
       } else {
-        // This is a returning user
-        toast({
-          title: 'Login Successful!',
-          description: `Welcome back, ${user.displayName || user.email}!`,
-        });
+        // For existing users, redirect to home. The main layout will handle
+        // the case where a user exists in auth but hasn't completed their profile.
         router.push('/');
       }
     } catch (error: any) {

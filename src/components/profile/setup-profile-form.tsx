@@ -57,8 +57,9 @@ export function SetupProfileForm() {
         }
         const userDocRef = doc(db, 'users', user.uid);
         const userDocSnap = await getDoc(userDocRef);
+        // This check prevents existing users from seeing the setup page
         if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
-          router.replace('/feed'); 
+          router.replace('/'); 
         }
       } else {
         router.replace('/login'); 
@@ -119,17 +120,17 @@ export function SetupProfileForm() {
       finalAvatarUrl = avatarPreviewUrl || ''; 
     }
 
-    const profileDataToSave: Partial<AppUserType> = {
+    const profileDataToSave: AppUserType = {
       id: firebaseUser.uid,
       username: username.trim(),
       name: name.trim() || username.trim(),
-      email: firebaseUser.email ?? undefined,
+      email: firebaseUser.email ?? '',
       bio: bio.trim(),
       location: location.trim(),
       phoneNumber: phoneNumber.trim(),
       produce: produceInput.split(',').map(p => p.trim()).filter(p => p),
       avatarUrl: finalAvatarUrl,
-      profileSetupComplete: true,
+      profileSetupComplete: true, // This is the crucial flag
       createdAt: serverTimestamp(),
       followersCount: 0,
       followingCount: 0,
@@ -151,7 +152,7 @@ export function SetupProfileForm() {
         title: 'Profile Setup Complete!',
         description: 'Welcome to KrishiX! Redirecting to your feed...',
       });
-      router.push('/feed');
+      router.push('/');
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({ title: "Setup Failed", description: "Could not save profile. Please try again.", variant: "destructive" });

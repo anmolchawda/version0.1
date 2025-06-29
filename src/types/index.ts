@@ -5,7 +5,7 @@ export interface User {
   id: string;
   username: string;
   name?: string;
-  email?: string; // Added email
+  email?: string;
   phoneNumber?: string;
   avatarUrl?: string;
   bio?: string;
@@ -14,8 +14,8 @@ export interface User {
   followersCount?: number;
   followingCount?: number;
   postCount?: number;
-  profileSetupComplete?: boolean; // Added for profile setup flow
-  createdAt?: FirebaseTimestamp | FieldValue | undefined; // Added for user creation tracking, allows serverTimestamp()
+  profileSetupComplete?: boolean;
+  createdAt?: FirebaseTimestamp | FieldValue | undefined;
 }
 
 export interface Post {

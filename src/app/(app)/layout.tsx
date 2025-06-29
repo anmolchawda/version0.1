@@ -1,3 +1,4 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 
@@ -9,16 +10,13 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-import { auth, db, doc, getDoc } from '@/lib/firebase'; // db can be null
+import { auth, db, doc, getDoc } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
-import { MOCK_USER_ID, getPlaceholderUser } from '@/lib/placeholders';
 import { Button } from '@/components/ui/button';
 
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
   setContextAuthUserId: (uid: string | null) => void;
 }
-
-const USE_MOCK_DATA = auth === null; // Determine mock mode based on auth instance
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -30,33 +28,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
 
   // Effect to subscribe to auth state changes. Runs only once.
   useEffect(() => {
-    if (USE_MOCK_DATA) {
-      console.log("[AppLayoutContent] Using MOCK_DATA mode for auth.");
-      const mockUserData = getPlaceholderUser(MOCK_USER_ID);
-      if (mockUserData) {
-        const mockFirebaseUser: FirebaseUser = {
-          uid: mockUserData.id,
-          email: mockUserData.email || `${mockUserData.username}@example.com`,
-          displayName: mockUserData.name || mockUserData.username,
-          photoURL: mockUserData.avatarUrl || null,
-          emailVerified: true, isAnonymous: false, metadata: {}, providerData: [],
-          providerId: 'mock', refreshToken: '', tenantId: null, delete: async () => { },
-          getIdToken: async () => '', getIdTokenResult: async () => ({} as any),
-          reload: async () => { }, toJSON: () => ({}),
-          phoneNumber: null
-        };
-        setCurrentUser(mockFirebaseUser);
-        if (setContextAuthUserId) {
-          setContextAuthUserId(mockFirebaseUser.uid);
-        }
-      } else {
-        setError("Mock user data not found. Cannot proceed.");
-      }
-      setIsLoadingAuth(false);
-      return;
-    }
-
-    const unsubscribe = auth!.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       if (setContextAuthUserId) {
         setContextAuthUserId(user?.uid || null);
@@ -76,23 +48,23 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     if (currentUser) {
       // User is logged in, check profile status
       if (!db) {
-         if (pathname === '/setup-profile') {
-            router.replace('/');
-          }
+        console.error("Firebase DB is not available. Cannot verify profile status.");
+        setError("Database connection error. Please try again later.");
         return;
       }
       
       const checkProfileAndRedirect = async () => {
         try {
-          const userDocRef = doc(db!, 'users', currentUser.uid);
+          const userDocRef = doc(db, 'users', currentUser.uid);
           const userDocSnap = await getDoc(userDocRef);
-          const userProfile = userDocSnap.exists() ? userDocSnap.data() : null;
-
-          if (!userProfile?.profileSetupComplete) {
-            if (pathname !== '/setup-profile' && !pathname.startsWith('/auth')) {
+          
+          if (!userDocSnap.exists() || !userDocSnap.data()?.profileSetupComplete) {
+            // If profile doesn't exist or is incomplete, redirect to setup
+            if (pathname !== '/setup-profile') {
               router.replace('/setup-profile');
             }
           } else {
+            // If profile IS complete, but user tries to access setup, redirect to home
             if (pathname === '/setup-profile') {
               router.replace('/');
             }
@@ -104,8 +76,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       };
       checkProfileAndRedirect();
     } else {
-      // User is not logged in
-      if (!pathname.startsWith('/auth') && pathname !== '/login' && pathname !== '/signup') {
+      // User is not logged in, redirect to login page if they aren't on an auth page
+      const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+      if (!isAuthPage) {
         router.replace('/login');
       }
     }
@@ -133,39 +106,21 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  if (USE_MOCK_DATA && !currentUser) {
-     return <div className="flex min-h-screen flex-col items-center justify-center bg-background"><p>Error: Mock user could not be loaded.</p></div>;
-  }
-  
-  // If not in mock mode, and no current user, and not on auth pages (already handled by useEffect, but as a safeguard)
-  if (!USE_MOCK_DATA && !currentUser && !pathname.startsWith('/auth') && pathname !=='/setup-profile') {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
-      </div>
-    );
-  }
-  
-  // Allow access to login/signup pages
-  if (!USE_MOCK_DATA && !currentUser && (pathname.startsWith('/login') || pathname.startsWith('/signup'))) {
-     return <>{children}</>;
-  }
-
-  // Specific handling for setup-profile page if logic above hasn't redirected yet
-  // (e.g., user is authenticated but profile isn't complete)
-  if (pathname === '/setup-profile') {
-    // Ensure user is authenticated for this page if not in mock mode
-    if (!USE_MOCK_DATA && !currentUser) {
-       router.replace('/login'); 
-       return  <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <p className="mt-4 text-muted-foreground">Redirecting...</p>
-                </div>;
+  // If we are on an auth-related page (login, signup, setup-profile)
+  // render it without the main app layout (Sidebar, TopHeader etc.)
+  if (!currentUser || pathname === '/setup-profile') {
+    // Show a loader while redirecting
+    if (currentUser && pathname !== '/setup-profile') {
+         return (
+          <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <p className="mt-4 text-muted-foreground">Verifying profile...</p>
+          </div>
+        );
     }
-    return <>{children}</>; // Allow access to setup-profile page
+    // Render the children directly (which would be the login, signup, or setup-profile page)
+    return <>{children}</>;
   }
-
 
   return (
     <>
