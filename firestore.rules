@@ -1,68 +1,97 @@
+{
+  "rules": {
+    "users": {
+      "{userId}": {
+        // A user can create their own document, and update/delete it.
+        "allow create, update, delete": "request.auth.uid == userId",
+        // Any authenticated user can read any single profile.
+        "allow get": "request.auth != null",
 
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // Allow public read access to user profiles, but only the user can write to their own document.
-    match /users/{userId} {
-      allow read: if true;
-      allow write: if request.auth.uid == userId;
-    }
-
-    // Users can manage their own subcollections like bookmarks, followers, etc.
-    match /users/{userId}/{collection}/{docId} {
-      allow read, write: if request.auth.uid == userId;
-    }
-    
-    // Allow public read on posts, but only the owner can modify.
-    // Any authenticated user can create a post.
-    match /posts/{postId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth.uid == resource.data.userId;
-    }
-
-    // Allow public read on comments, any authenticated user can create.
-    match /posts/{postId}/comments/{commentId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-    }
-
-    // Users can only like/unlike for themselves.
-    match /posts/{postId}/likedByUsers/{userId} {
-      allow read: if true;
-      allow write, delete: if request.auth.uid == userId;
-    }
-
-    // Mandi listings are public to read.
-    // Only authenticated users can create. Only owner can modify.
-    match /mandi_listings/{listingId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow update, delete: if request.auth.uid == resource.data.sellerId;
-    }
-    
-    // Buyer requests are public to read.
-    // Only authenticated users can create. Only owner can delete.
-    match /mandi_buyer_requests/{requestId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow delete: if request.auth.uid == resource.data.postedById;
-    }
-
-    // Notifications are private.
-    match /notifications/{userId}/{collection}/{docId} {
-      allow read, write: if request.auth.uid == userId;
-    }
-
-    // Notification metadata is private.
-    match /notificationsMeta/{userId} {
-       allow read, write: if request.auth.uid == userId;
-    }
-    
-    // Yojna data is public.
-    match /yojna/{yojnaId} {
-      allow read: if true;
+        // Rules for user-specific subcollections
+        "bookmarks": {
+          // A user can only manage their own bookmarks.
+          // path: /users/{userId}/bookmarks/{postId}
+          "allow read, write, delete": "request.auth.uid == userId"
+        },
+        "followers": {
+          // Anyone can read who follows a user.
+          "allow read": "request.auth != null",
+          // Only the follower can add/remove themselves from a user's followers list.
+          // path: /users/{userId}/followers/{followerId}
+          "{followerId}": {
+            "allow write, delete": "request.auth.uid == followerId"
+          }
+        },
+        "following": {
+          // A user can only manage their own 'following' list.
+          // path: /users/{userId}/following/{followedUserId}
+          "allow read, write, delete": "request.auth.uid == userId"
+        }
+      }
+    },
+    "posts": {
+      // Anyone can read posts.
+      "allow read": true,
+      // Logged-in users can create posts.
+      "allow create": "request.auth != null",
+      "{postId}": {
+        // The owner of a post can update or delete it.
+        "allow update, delete": "request.auth.uid == resource.data.userId",
+        "likedByUsers": {
+          // A user can only like/unlike for themselves.
+          "{userId}": {
+            "allow read, write": "request.auth.uid == userId"
+          }
+        },
+        "comments": {
+          // Anyone can read comments, but only logged-in users can create them.
+          "allow read": true,
+          "allow create": "request.auth != null"
+        }
+      }
+    },
+    "mandi_listings": {
+      "allow read": true,
+      "allow create": "request.auth != null",
+      "{listingId}": {
+         "allow update, delete": "request.auth.uid == resource.data.sellerId"
+      }
+    },
+     "mandi_buyer_requests": {
+      "allow read": true,
+      "allow create": "request.auth != null",
+      "{requestId}": {
+         "allow delete": "request.auth.uid == resource.data.postedById"
+      }
+    },
+    "conversations": {
+       "{conversationId}": {
+          // A user must be a participant to read/write to a conversation document.
+          "allow read, write": "request.auth.uid in resource.data.participants",
+          "messages": {
+              // A user must be a participant in the parent conversation to read/create messages.
+              "allow read, create": "get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAny([request.auth.uid])"
+          }
+       }
+    },
+    "notifications": {
+      "{userId}": {
+        "allow read, write, delete": "request.auth.uid == userId",
+        // Allow access to the 'items' subcollection within a user's notification document
+        "items": {
+           "allow read, write, delete": "request.auth.uid == userId"
+        }
+      }
+    },
+     "notificationsMeta": {
+      "{userId}": {
+         // A user can only access their own notification metadata.
+         "allow read, write": "request.auth.uid == userId"
+      }
+    },
+    "yojna": {
+      // Schemes are public to all users.
+      "allow read": true
     }
   }
 }
