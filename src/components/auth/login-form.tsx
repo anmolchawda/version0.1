@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -11,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
 import { auth } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification, signOut, type User as FirebaseUser } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -33,6 +32,24 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
+  const handleResendVerification = async (user: FirebaseUser) => {
+    if (!user) return;
+    try {
+      await sendEmailVerification(user);
+      toast({
+        title: "Verification Email Sent",
+        description: `A new verification link has been sent to ${user.email}.`,
+      });
+    } catch (error: any) {
+      console.error("Error resending verification email:", error);
+      toast({
+        title: "Error Sending Email",
+        description: "Could not send verification email. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -44,10 +61,29 @@ export function LoginForm() {
     }
     
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      // The main app layout will handle redirection based on profile status.
-      // We no longer need to toast here, as the layout might redirect again.
-      router.push('/');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      if (!userCredential.user.emailVerified) {
+        const userToVerify = userCredential.user;
+        await signOut(auth); // Sign out the unverified user
+        
+        toast({
+          title: 'Email Not Verified',
+          description: 'Please check your inbox and verify your email address to continue.',
+          variant: 'destructive',
+          duration: 10000,
+          action: (
+            <Button variant="secondary" size="sm" onClick={() => handleResendVerification(userToVerify)}>
+              Resend Email
+            </Button>
+          ),
+        });
+      } else {
+        // Email is verified. The main app layout will handle redirection
+        // to profile setup if needed, or to the feed.
+        router.push('/');
+      }
+
     } catch (error: any) {
       console.error('Login error:', error.code, error.message);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
@@ -68,7 +104,6 @@ export function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if it's a new user to redirect to profile setup
       const additionalInfo = getAdditionalUserInfo(result);
 
       if (additionalInfo?.isNewUser) {

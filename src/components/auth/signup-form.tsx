@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -9,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, UserPlus } from 'lucide-react';
+import { Loader2, UserPlus, MailCheck } from 'lucide-react';
 import { auth } from '@/lib/firebase'; // Firebase Auth
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, getAdditionalUserInfo } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification } from 'firebase/auth';
 
 // Simple Google G logo SVG
 const GoogleLogo = () => (
@@ -32,6 +31,7 @@ export function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -53,12 +53,11 @@ export function SignupForm() {
     }
     
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      toast({
-        title: 'Signup Successful!',
-        description: `Welcome to KrishiX, ${username}! Please set up your profile.`,
-      });
-      router.push('/settings/account');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      
+      setSignupSuccess(true); // Update UI to show verification message
+
     } catch (error: any) {
       console.error('Signup error:', error.code, error.message);
       toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
@@ -101,6 +100,30 @@ export function SignupForm() {
         setIsGoogleLoading(false);
     }
   };
+
+  if (signupSuccess) {
+    return (
+       <Card className="w-full max-w-md shadow-2xl rounded-xl">
+        <CardHeader className="text-center">
+            <MailCheck className="mx-auto h-12 w-12 text-primary mb-4" />
+            <CardTitle className="text-2xl font-bold text-primary">Verify Your Email</CardTitle>
+            <CardDescription>
+                We've sent a verification link to <span className="font-semibold text-foreground">{email}</span>. Please click the link to activate your account.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-center text-muted-foreground">
+            Once you've verified, you can log in. You may need to check your spam folder.
+          </p>
+        </CardContent>
+        <CardFooter>
+            <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Link href="/login">Go to Login Page</Link>
+            </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
