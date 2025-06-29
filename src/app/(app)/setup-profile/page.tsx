@@ -1,3 +1,4 @@
+
 // src/app/(app)/setup-profile/page.tsx
 'use client';
 

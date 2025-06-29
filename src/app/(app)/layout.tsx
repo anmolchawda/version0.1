@@ -1,3 +1,4 @@
+
 // src/app/(app)/layout.tsx
 'use client';
 
@@ -33,22 +34,26 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       if (setContextAuthUserId) {
         setContextAuthUserId(user?.uid || null);
       }
-      setIsLoading(false); // Auth state is resolved, stop initial loading.
+      // Don't stop loading here; let the profile verification step do that.
     });
     return () => unsubscribe();
   }, [setContextAuthUserId]);
 
   // Effect 2: Verify Profile and Redirect - runs when auth state or navigation changes
   useEffect(() => {
-    if (isLoading) {
-      return; // Wait for auth to be checked first
+    // If auth state hasn't been determined yet, do nothing.
+    if (auth.currentUser === undefined) {
+        setIsLoading(true);
+        return;
     }
-
+    
+    // If there's no logged-in user, redirect to login page.
     if (!currentUser) {
       const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
       if (!isAuthPage) {
         router.replace('/login');
       }
+      setIsLoading(false); // No user, so loading is finished.
       return;
     }
     
@@ -56,6 +61,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     const verifyProfile = async () => {
       if (!db) {
         setError("Database connection error. Please try again later.");
+        setIsLoading(false);
         return;
       }
       try {
@@ -63,22 +69,25 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         const userDocSnap = await getDoc(userDocRef);
         const profileIsComplete = userDocSnap.exists() && !!userDocSnap.data()?.profileSetupComplete;
         
-        setIsProfileComplete(profileIsComplete); // Update the state
+        setIsProfileComplete(profileIsComplete);
 
-        const isAllowedPath = pathname.startsWith('/settings') || pathname === '/setup-profile';
-        if (!profileIsComplete && !isAllowedPath) {
+        const isSetupPage = pathname === '/settings/account';
+        if (!profileIsComplete && !isSetupPage) {
           router.replace('/settings/account');
         }
       } catch (profileError) {
         console.error("Error fetching user profile:", profileError);
         setError("Could not verify profile status. Please try again.");
         setIsProfileComplete(false); // Assume incomplete on error
+      } finally {
+        setIsLoading(false); // Verification finished, stop loading.
       }
     };
 
     verifyProfile();
 
-  }, [currentUser, isLoading, pathname, router]);
+  }, [currentUser, pathname, router]);
+
 
   if (isLoading) {
     return (
@@ -102,8 +111,8 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
+  // This state is hit while the redirect to /login is in progress
   if (!currentUser) {
-    // This state is hit while the redirect to /login is in progress
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -113,8 +122,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   }
 
   // Gatekeeper check: if profile is incomplete AND user is trying to access a protected page, show a loader
-  const isAllowedPathForIncompleteProfile = pathname.startsWith('/settings') || pathname === '/setup-profile';
-  if (!isProfileComplete && !isAllowedPathForIncompleteProfile) {
+  if (!isProfileComplete && pathname !== '/settings/account') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />

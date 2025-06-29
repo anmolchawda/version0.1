@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -75,24 +76,9 @@ export function SignupForm() {
     }
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      
-      const additionalInfo = getAdditionalUserInfo(result);
-
-      if (additionalInfo?.isNewUser) {
-        toast({
-          title: 'Welcome to KrishiX!',
-          description: `Let's get your profile set up, ${user.displayName || user.email}!`,
-        });
-        router.push('/settings/account');
-      } else {
-        toast({
-          title: 'Welcome Back!',
-          description: `Signed in as ${user.displayName || user.email}!`,
-        });
-        router.push('/'); // Existing user, go to feed
-      }
+      await signInWithPopup(auth, provider);
+      // Let the app layout's auth state listener and gatekeeper handle redirection.
+      router.push('/');
     } catch (error: any) {
         console.error('Google Sign-up error:', error.code, error.message);
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });

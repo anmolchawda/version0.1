@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -79,8 +80,7 @@ export function LoginForm() {
           ),
         });
       } else {
-        // Email is verified. The main app layout will handle redirection
-        // to profile setup if needed, or to the feed.
+        // Email is verified. The main app layout will handle redirection.
         router.push('/');
       }
 
@@ -101,22 +101,10 @@ export function LoginForm() {
     }
     try {
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      await signInWithPopup(auth, provider);
+      // Let the app layout's auth state listener and gatekeeper handle redirection.
+      router.push('/');
 
-      const additionalInfo = getAdditionalUserInfo(result);
-
-      if (additionalInfo?.isNewUser) {
-        toast({
-          title: 'Welcome to KrishiX!',
-          description: `Let's get your profile set up, ${user.displayName || user.email}!`,
-        });
-        router.push('/settings/account');
-      } else {
-        // For existing users, redirect to home. The main layout will handle
-        // the case where a user exists in auth but hasn't completed their profile.
-        router.push('/');
-      }
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
