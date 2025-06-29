@@ -18,8 +18,6 @@ import {
   writeBatch,
   increment,
   Timestamp,
-  initializeFirestore,
-  persistentLocalCache,
   type Firestore,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from 'firebase/storage';
@@ -40,26 +38,8 @@ const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseCon
 
 const auth: Auth = getAuth(app);
 const storage: FirebaseStorage = getStorage(app);
-let db: Firestore;
-
-// Safely initialize Firestore with offline persistence
-// This check ensures we only run this code in the browser.
-if (typeof window !== 'undefined') {
-  try {
-    db = initializeFirestore(app, {
-      localCache: persistentLocalCache({})
-    });
-  } catch (e: any) {
-    // This can happen if the app is already initialized,
-    // which is common with Next.js's fast refresh.
-    // It can also happen with multiple tabs open.
-    console.warn(`Firebase: (Code: ${e.code}) Could not enable offline persistence. Getting standard instance.`);
-    db = getFirestore(app);
-  }
-} else {
-  // For server-side rendering, initialize a standard instance
-  db = getFirestore(app);
-}
+// Simplified, more robust Firestore initialization
+const db: Firestore = getFirestore(app);
 
 
 export {
