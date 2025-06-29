@@ -3,18 +3,22 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-  
-    // Allow public read access to all files by default.
-    // This is simple for development but you might want to restrict it later.
-    match /{allPaths=**} {
+    // Allow public read access to shared asset folders.
+    match /Crop images/{allPaths=**} {
+      allow read: if true;
+    }
+    match /Tomato Diseases/{allPaths=**} {
+      allow read: if true;
+    }
+     match /KrishiX logo/{allPaths=**} {
       allow read: if true;
     }
 
-    // Allow authenticated users to write files to user-specific folders.
-    // This covers avatars, post images/videos, and mandi listing images.
-    match /{folder}/{userId}/{fileName} {
-      allow write: if request.auth != null && request.auth.uid == userId
-                   && (folder == 'avatars' || folder == 'posts' || folder == 'mandi_listings');
+    // Users can only write to their own folder in storage.
+    // This covers profile pictures and post images/videos.
+    match /{path}/{userId}/{allPaths=**} {
+      allow read: if true; // Allow public read of user-uploaded content
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
