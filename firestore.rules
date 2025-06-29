@@ -1,82 +1,95 @@
-
-rules_version = '2';
-
-service cloud.firestore {
-  match /databases/{database}/documents {
-
-    // Users can read anyone's profile, but only write to their own.
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Users can manage their own bookmarks, followers, and following lists.
-    match /users/{userId}/bookmarks/{postId} {
-        allow read, write, delete: if request.auth != null && request.auth.uid == userId;
-    }
-    match /users/{userId}/followers/{followerId} {
-        allow read: if request.auth != null;
-        allow write, delete: if request.auth != null && (request.auth.uid == userId || request.auth.uid == followerId);
-    }
-    match /users/{userId}/following/{followingId} {
-        allow read: if request.auth != null;
-        allow write, delete: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Authenticated users can read and create posts. Only owners can update/delete.
-    match /posts/{postId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
-
-    // Authenticated users can read and create comments.
-    match /posts/{postId}/comments/{commentId} {
-      allow read, create: if request.auth != null;
-    }
-
-    // Authenticated users can manage their own likes.
-    match /posts/{postId}/likedByUsers/{userId} {
-      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Users can only access their own notifications.
-    match /notifications/{userId}/items/{notificationId} {
-      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Users can only read/write their own notification metadata.
-    match /notificationsMeta/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Conversations can be read/written by participants.
-    match /conversations/{conversationId} {
-      allow read, write: if request.auth != null && request.auth.uid in resource.data.participants;
-    }
-
-    match /conversations/{conversationId}/messages/{messageId} {
-       allow read, create: if request.auth != null && get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants[0] == request.auth.uid || get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants[1] == request.auth.uid;
-    }
-    
-    // Mandi listings can be read by anyone, created by authenticated users, and updated/deleted by the owner.
-    match /mandi_listings/{listingId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
-    }
-
-    // Mandi buyer requests can be read by anyone, created by authenticated users, and updated/deleted by the owner.
-    match /mandi_buyer_requests/{requestId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.postedById == request.auth.uid;
-    }
-
-    // Yojna data is public read-only for now.
-    match /yojna/{yojnaId} {
-      allow read: if true;
-      allow write: if false; // Can only be written from the Firebase console
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "request.auth != null",
+        ".write": "request.auth.uid == $uid",
+        "bookmarks": {
+          "$postId": {
+            ".read": "request.auth.uid == $uid",
+            ".write": "request.auth.uid == $uid"
+          }
+        },
+        "followers": {
+          "$followerId": {
+            ".read": "request.auth.uid == $uid",
+            ".write": "request.auth.uid == $followerId"
+          }
+        },
+        "following": {
+          "$followedId": {
+            ".read": "request.auth != null",
+            ".write": "request.auth.uid == $uid"
+          }
+        }
+      }
+    },
+    "posts": {
+      "$postId": {
+        ".read": "request.auth != null",
+        ".update": "resource.data.userId == request.auth.uid",
+        ".delete": "resource.data.userId == request.auth.uid",
+        ".create": "request.auth != null && request.resource.data.userId == request.auth.uid",
+        "comments": {
+          "$commentId": {
+            ".read": "request.auth != null",
+            ".create": "request.auth != null && request.resource.data.user.id == request.auth.uid"
+          }
+        },
+        "likedByUsers": {
+          "$uid": {
+            ".read": "request.auth != null",
+            ".write": "request.auth.uid == $uid"
+          }
+        }
+      }
+    },
+    "conversations": {
+      "$conversationId": {
+        ".read": "request.auth.uid in resource.data.participants",
+        ".write": "request.auth.uid in resource.data.participants",
+        "messages": {
+          "$messageId": {
+            ".read": "request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants",
+            ".create": "request.auth.uid == request.resource.data.senderId && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants"
+          }
+        }
+      }
+    },
+    "notifications": {
+      "$userId": {
+        "items": {
+          "$notificationId": {
+            ".read, .write, .delete": "request.auth.uid == $userId"
+          }
+        }
+      }
+    },
+    "notificationsMeta": {
+      "$userId": {
+        ".read, .write": "request.auth.uid == $userId"
+      }
+    },
+    "mandi_listings": {
+      "$listingId": {
+        ".read": "request.auth != null",
+        ".create": "request.auth != null && request.resource.data.sellerId == request.auth.uid",
+        ".update": "resource.data.sellerId == request.auth.uid",
+        ".delete": "resource.data.sellerId == request.auth.uid"
+      }
+    },
+    "mandi_buyer_requests": {
+      "$requestId": {
+        ".read": "request.auth != null",
+        ".create": "request.auth != null && request.resource.data.postedById == request.auth.uid",
+        ".delete": "resource.data.postedById == request.auth.uid"
+      }
+    },
+    "yojna": {
+      "$yojnaId": {
+        ".read": "request.auth != null",
+        ".write": false
+      }
     }
   }
 }
