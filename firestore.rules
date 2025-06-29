@@ -1,92 +1,68 @@
-rules_version = '2';
 
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Allow public read of posts, but only authenticated users can create/update/delete their own posts
+    // Allow public read access to user profiles, but only the user can write to their own document.
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth.uid == userId;
+    }
+
+    // Users can manage their own subcollections like bookmarks, followers, etc.
+    match /users/{userId}/{collection}/{docId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Allow public read on posts, but only the owner can modify.
+    // Any authenticated user can create a post.
     match /posts/{postId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-
-      // Rules for comments subcollection
-      match /comments/{commentId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow delete: if request.auth != null && resource.data.user.id == request.auth.uid;
-      }
-      
-      // Rules for likedByUsers subcollection
-      match /likedByUsers/{userId} {
-        allow read: if true;
-        allow create, delete: if request.auth != null && request.auth.uid == userId;
-      }
+      allow update, delete: if request.auth.uid == resource.data.userId;
     }
 
-    // Allow public read of user profiles
-    // Users can only create/update/delete their own profile
-    match /users/{userId} {
+    // Allow public read on comments, any authenticated user can create.
+    match /posts/{postId}/comments/{commentId} {
       allow read: if true;
-      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
-      
-      // Users can manage their own `following` list
-      match /following/{followedId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == userId;
-      }
-
-      // Users can be added/removed from another user's `followers` list
-      // Only the follower themself can initiate this action (via following)
-      match /followers/{followerId} {
-        allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == followerId;
-      }
-
-      // Bookmarks are private to the user
-      match /bookmarks/{postId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
+      allow create: if request.auth != null;
     }
-    
-    // Mandi listings are public to read, but only owner can write/delete
+
+    // Users can only like/unlike for themselves.
+    match /posts/{postId}/likedByUsers/{userId} {
+      allow read: if true;
+      allow write, delete: if request.auth.uid == userId;
+    }
+
+    // Mandi listings are public to read.
+    // Only authenticated users can create. Only owner can modify.
     match /mandi_listings/{listingId} {
         allow read: if true;
         allow create: if request.auth != null;
-        allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+        allow update, delete: if request.auth.uid == resource.data.sellerId;
     }
     
-    // Mandi buyer requests are public to read, but only owner can write/delete
+    // Buyer requests are public to read.
+    // Only authenticated users can create. Only owner can delete.
     match /mandi_buyer_requests/{requestId} {
         allow read: if true;
         allow create: if request.auth != null;
-        allow update, delete: if request.auth != null && resource.data.postedById == request.auth.uid;
+        allow delete: if request.auth.uid == resource.data.postedById;
     }
 
-    // Conversations can only be accessed by participants
-    match /conversations/{conversationId} {
-      allow read, write: if request.auth != null && request.auth.uid in resource.data.participants;
-      
-      // Messages within a conversation can also only be accessed by participants
-      match /messages/{messageId} {
-        allow read, write: if request.auth != null && get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAny([request.auth.uid]);
-      }
+    // Notifications are private.
+    match /notifications/{userId}/{collection}/{docId} {
+      allow read, write: if request.auth.uid == userId;
     }
 
-    // Notifications meta document can only be read/written by the target user
+    // Notification metadata is private.
     match /notificationsMeta/{userId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+       allow read, write: if request.auth.uid == userId;
     }
     
-    // Notifications subcollection items can only be read/written by the target user
-    match /notifications/{userId}/items/{notificationId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Yojna (schemes) are public read-only
+    // Yojna data is public.
     match /yojna/{yojnaId} {
-        allow read: if true;
-        allow write: if false; // No one can write directly
+      allow read: if true;
     }
-
   }
 }
