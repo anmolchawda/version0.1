@@ -1,9 +1,10 @@
 
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
     // For development, allow any authenticated user to read and write files.
-    // For production, you should restrict write access to specific paths and users.
+    // For production, you should restrict this further to specific paths and file types.
     match /{allPaths=**} {
       allow read, write: if request.auth != null;
     }
