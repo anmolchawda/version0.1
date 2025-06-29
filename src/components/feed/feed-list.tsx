@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Post as PostType, User } from '@/types';
 import { PostCard } from './post-card';
 import { getPlaceholderUser, placeholderPosts as mockPlaceholderPosts } from '@/lib/placeholders'; // Renamed import
-import { RefreshCw, Loader2 } from 'lucide-react';
+import { RefreshCw, Loader2, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase'; // db can be null
 import { collection, getDocs, query, orderBy, Timestamp, type DocumentData, doc, getDoc } from 'firebase/firestore';
@@ -268,10 +268,12 @@ export function FeedList() {
       >
         {posts.length === 0 && !isLoading && (
           <div
-            className="text-center py-10"
-            style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(2.5, pullDeltaY * 0.3 / 16)}rem` : '2.5rem' }}
+            className="text-center py-16"
+            style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(4, pullDeltaY * 0.3 / 16)}rem` : '4rem' }}
           >
-            <p className="text-xl text-muted-foreground">No posts yet. Follow some farmers to see their updates!</p>
+            <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+            <p className="text-xl font-semibold text-muted-foreground">No Posts Yet</p>
+            <p className="text-sm text-muted-foreground mt-2">Follow other farmers to see their updates here.</p>
           </div>
         )}
 
