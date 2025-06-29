@@ -1,4 +1,3 @@
-
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
@@ -36,22 +35,39 @@ const firebaseConfig = {
     measurementId: "G-FVS7PM8WTB"
 };
 
-// A more stable way to initialize for Next.js App Router.
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 const auth: Auth = getAuth(app);
 const storage: FirebaseStorage = getStorage(app);
 
-// To fix "client is offline" errors, we must initialize Firestore with
-// persistence enabled on the client. This will fail on the server,
-// so we use a try-catch block to fall back to the standard initialization.
+// Firestore instance
 let db: Firestore;
-try {
-  db = initializeFirestore(app, {
-    localCache: persistentLocalCache({}),
-  });
-} catch (e) {
-  console.warn("Firebase: Could not initialize Firestore with persistent cache. Falling back to default. Error:", e);
+
+// This check ensures we only run this code in the browser.
+// On the server, a standard instance will be used.
+if (typeof window !== 'undefined') {
+  try {
+    // Initialize Firestore with offline persistence.
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({}),
+    });
+  } catch (e: any) {
+    if (e.code === 'failed-precondition') {
+        // This can happen with multiple tabs open.
+        console.warn("Firebase: Multiple tabs open, persistence can only be enabled in one. Getting standard instance.");
+        db = getFirestore(app);
+    } else if (e.code === 'unimplemented') {
+        // The browser doesn't support all of the features required for persistence.
+        console.warn("Firebase: Browser does not support all features for persistence. Getting standard instance.");
+        db = getFirestore(app);
+    } else {
+        // If it's already initialized, just get the instance. This can happen with Next.js fast refresh.
+        console.warn("Firebase: Getting existing Firestore instance.");
+        db = getFirestore(app);
+    }
+  }
+} else {
+  // For server-side rendering, initialize a standard instance
   db = getFirestore(app);
 }
 
