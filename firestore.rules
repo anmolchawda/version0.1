@@ -1,94 +1,87 @@
 {
   "rules": {
     "users": {
-      "$uid": {
-        ".read": "request.auth != null",
-        ".write": "request.auth.uid == $uid",
+      "{userId}": {
+        "allow read": true,
+        "allow write": "if request.auth.uid == userId",
         "bookmarks": {
-          "$postId": {
-            ".read": "request.auth.uid == $uid",
-            ".write": "request.auth.uid == $uid"
+          "{postId}": {
+            "allow read, write, delete": "if request.auth.uid == userId"
           }
         },
         "followers": {
-          "$followerId": {
-            ".read": "request.auth.uid == $uid",
-            ".write": "request.auth.uid == $followerId"
+          "{followerId}": {
+            "allow read": true,
+            "allow write": "if request.auth.uid == followerId"
           }
         },
         "following": {
-          "$followedId": {
-            ".read": "request.auth != null",
-            ".write": "request.auth.uid == $uid"
+          "{followingId}": {
+            "allow read": true,
+            "allow write, delete": "if request.auth.uid == userId"
           }
         }
       }
     },
     "posts": {
-      "$postId": {
-        ".read": "request.auth != null",
-        ".update": "resource.data.userId == request.auth.uid",
-        ".delete": "resource.data.userId == request.auth.uid",
-        ".create": "request.auth != null && request.resource.data.userId == request.auth.uid",
+      "{postId}": {
+        "allow read": true,
+        "allow create, update, delete": "if request.auth.uid == resource.data.userId",
         "comments": {
-          "$commentId": {
-            ".read": "request.auth != null",
-            ".create": "request.auth != null && request.resource.data.user.id == request.auth.uid"
+          "{commentId}": {
+            "allow read": true,
+            "allow create": "if request.auth != null && request.auth.uid == request.resource.data.user.id"
           }
         },
         "likedByUsers": {
-          "$uid": {
-            ".read": "request.auth != null",
-            ".write": "request.auth.uid == $uid"
+          "{userId}": {
+            "allow read, write, delete": "if request.auth.uid == userId"
           }
         }
       }
     },
     "conversations": {
-      "$conversationId": {
-        ".read": "request.auth.uid in resource.data.participants",
-        ".write": "request.auth.uid in resource.data.participants",
+      "{conversationId}": {
+        "allow read, write": "if request.auth.uid in resource.data.participants",
         "messages": {
-          "$messageId": {
-            ".read": "request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants",
-            ".create": "request.auth.uid == request.resource.data.senderId && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants"
+          "{messageId}": {
+            "allow read, create": "if request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants"
           }
         }
       }
     },
     "notifications": {
-      "$userId": {
+      "{userId}": {
         "items": {
-          "$notificationId": {
-            ".read, .write, .delete": "request.auth.uid == $userId"
+          "{notificationId}": {
+            "allow read, write, delete": "if request.auth.uid == userId"
           }
         }
       }
     },
     "notificationsMeta": {
-      "$userId": {
-        ".read, .write": "request.auth.uid == $userId"
+      "{userId}": {
+        "allow read": "if request.auth != null",
+        "allow write": "if request.auth.uid == userId"
       }
     },
     "mandi_listings": {
-      "$listingId": {
-        ".read": "request.auth != null",
-        ".create": "request.auth != null && request.resource.data.sellerId == request.auth.uid",
-        ".update": "resource.data.sellerId == request.auth.uid",
-        ".delete": "resource.data.sellerId == request.auth.uid"
+      "{listingId}": {
+        "allow read": true,
+        "allow create": "if request.auth.uid == request.resource.data.sellerId",
+        "allow update, delete": "if request.auth.uid == resource.data.sellerId"
       }
     },
     "mandi_buyer_requests": {
-      "$requestId": {
-        ".read": "request.auth != null",
-        ".create": "request.auth != null && request.resource.data.postedById == request.auth.uid",
-        ".delete": "resource.data.postedById == request.auth.uid"
+      "{requestId}": {
+        "allow read": true,
+        "allow create": "if request.auth.uid == request.resource.data.postedById",
+        "allow update, delete": "if request.auth.uid == resource.data.postedById"
       }
     },
     "yojna": {
-      "$yojnaId": {
-        ".read": "request.auth != null",
-        ".write": false
+      "{yojnaId}": {
+        "allow read": true
       }
     }
   }
