@@ -1,57 +1,92 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users: Can read any profile, but can only write to their own.
+    // Users: Authenticated users can read all profiles, but only write to their own.
     match /users/{userId} {
-      allow read: if true; // Publicly readable profiles
+      allow read: if request.auth != null;
       allow write: if request.auth.uid == userId;
 
-      // Subcollections for user-specific data
+      // Sub-collections for user-specific data
       match /bookmarks/{postId} {
+        // Only the user can access their own bookmarks.
         allow read, write, delete: if request.auth.uid == userId;
       }
       match /followers/{followerId} {
-        allow read: if true;
-        allow write, delete: if request.auth.uid == userId || request.auth.uid == followerId;
+        // Anyone authenticated can read who follows a user.
+        // Only the follower can create/delete their own entry.
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth.uid == followerId;
       }
       match /following/{followingId} {
-        allow read: if true;
-        allow write, delete: if request.auth.uid == userId;
+        // Anyone authenticated can read who a user is following.
+        // Only the user can modify their own following list.
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth.uid == userId;
       }
     }
 
-    // Posts: Make posts readable by anyone to fix the permission issue.
-    // Create/Update/Delete actions are still protected.
+    // Posts: Authenticated users can read all posts.
+    // Only authenticated users can create posts.
+    // Only the author can update or delete their own posts.
     match /posts/{postId} {
-      allow read: if true; // Allow public read access to all posts
-      allow create, update, delete: if request.auth.uid == resource.data.userId;
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth.uid == resource.data.userId;
 
-      // Subcollections for post-specific data
+      // Comments sub-collection
       match /comments/{commentId} {
-        allow read: if true; // Allow public read access to comments
-        allow create: if request.auth.uid != null;
+        allow read: if request.auth != null;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth.uid == resource.data.user.id;
       }
+
+      // Likes sub-collection
       match /likedByUsers/{userId} {
-        allow read, create, delete: if request.auth.uid == userId;
+        allow read: if request.auth != null;
+        allow create, delete: if request.auth.uid == userId;
       }
     }
 
     // Conversations & Messages
     match /conversations/{conversationId} {
-      // Allow read/write only if the user is a participant
+      // Users can only access conversations they are part of.
       allow read, write: if request.auth.uid in resource.data.participants;
       
       match /messages/{messageId} {
+        // Users can only read/create messages in conversations they are part of.
         allow read, create: if request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+        // Disallow updates/deletes for now to maintain chat integrity
+        allow update, delete: if false;
       }
     }
     
-    // Notifications: Can only be read and written by the target user.
-    match /notifications/{userId}/{notificationType}/{notificationId} {
-      allow read, write, delete: if request.auth.uid == userId;
+    // Notifications: Users can only access their own notifications.
+    match /notifications/{userId}/{path=**} {
+        allow read, write, delete: if request.auth.uid == userId;
+    }
+
+    // Mandi Listings
+    match /mandi_listings/{listingId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth.uid == resource.data.sellerId;
+    }
+
+    // Buyer Requests
+    match /mandi_buyer_requests/{requestId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth.uid == request.resource.data.postedById;
+        allow delete: if request.auth.uid == resource.data.postedById;
+        allow update: if request.auth.uid == resource.data.postedById;
+    }
+
+    // Yojnas (Schemes)
+    match /yojna/{yojnaId} {
+        allow read: if request.auth != null;
+        // Make read-only for clients
+        allow write: if false;
     }
   }
 }
