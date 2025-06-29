@@ -21,57 +21,70 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Combined loading state
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [isProfileComplete, setIsProfileComplete] = useState(true); // Assume complete to avoid flicker
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
 
+  // Effect 1: Handle Auth State - runs once on mount
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       if (setContextAuthUserId) {
         setContextAuthUserId(user?.uid || null);
       }
-
-      if (user) {
-        if (!db) {
-          console.error("Firebase DB is not available. Cannot verify profile status.");
-          setError("Database connection error. Please try again later.");
-          setIsLoading(false);
-          return;
-        }
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          const profileComplete = userDocSnap.exists() && !!userDocSnap.data()?.profileSetupComplete;
-          setIsProfileComplete(profileComplete);
-
-          // If profile is incomplete, and we are not on a settings page or the deprecated setup page, redirect.
-          const isAllowedPath = pathname.startsWith('/settings') || pathname === '/setup-profile';
-          if (!profileComplete && !isAllowedPath) {
-            router.replace('/settings/account');
-          }
-        } catch (profileError) {
-          console.error("Error fetching user profile:", profileError);
-          setError("Could not verify profile status. Please try again.");
-        }
-      } else {
-        // No user, redirect to login if not on an auth page
-        const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-        if (!isAuthPage) {
-          router.replace('/login');
-        }
-      }
-      setIsLoading(false);
+      setIsLoading(false); // Auth state is resolved, stop initial loading.
     });
     return () => unsubscribe();
-  }, [pathname, router, setContextAuthUserId]); // Pathname dependency ensures re-check on navigation
+  }, [setContextAuthUserId]);
+
+  // Effect 2: Verify Profile and Redirect - runs when auth state or navigation changes
+  useEffect(() => {
+    if (isLoading) {
+      return; // Wait for auth to be checked first
+    }
+
+    if (!currentUser) {
+      const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+      if (!isAuthPage) {
+        router.replace('/login');
+      }
+      return;
+    }
+    
+    // User is logged in, check their profile status
+    const verifyProfile = async () => {
+      if (!db) {
+        setError("Database connection error. Please try again later.");
+        return;
+      }
+      try {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        const profileIsComplete = userDocSnap.exists() && !!userDocSnap.data()?.profileSetupComplete;
+        
+        setIsProfileComplete(profileIsComplete); // Update the state
+
+        const isAllowedPath = pathname.startsWith('/settings') || pathname === '/setup-profile';
+        if (!profileIsComplete && !isAllowedPath) {
+          router.replace('/settings/account');
+        }
+      } catch (profileError) {
+        console.error("Error fetching user profile:", profileError);
+        setError("Could not verify profile status. Please try again.");
+        setIsProfileComplete(false); // Assume incomplete on error
+      }
+    };
+
+    verifyProfile();
+
+  }, [currentUser, isLoading, pathname, router]);
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Verifying profile...</p>
+        <p className="mt-4 text-muted-foreground">Authenticating...</p>
       </div>
     );
   }
@@ -89,10 +102,8 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
-  // If user is not logged in, auth pages have their own layout. 
-  // The redirect in useEffect will handle unauthenticated users trying to access app pages.
-  // While redirecting, the loader above will show.
   if (!currentUser) {
+    // This state is hit while the redirect to /login is in progress
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -100,10 +111,10 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  
-  // If profile is not complete, but user is trying to access a non-settings page, show a loader while redirecting.
-  // The useEffect handles the actual redirection logic.
-  if (!isProfileComplete && !pathname.startsWith('/settings') && pathname !== '/setup-profile') {
+
+  // Gatekeeper check: if profile is incomplete AND user is trying to access a protected page, show a loader
+  const isAllowedPathForIncompleteProfile = pathname.startsWith('/settings') || pathname === '/setup-profile';
+  if (!isProfileComplete && !isAllowedPathForIncompleteProfile) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
