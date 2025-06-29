@@ -58,7 +58,7 @@ export function SignupForm() {
         title: 'Signup Successful!',
         description: `Welcome to KrishiX, ${username}! Please set up your profile.`,
       });
-      router.push('/setup-profile');
+      router.push('/settings/account');
     } catch (error: any) {
       console.error('Signup error:', error.code, error.message);
       toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
@@ -86,7 +86,7 @@ export function SignupForm() {
           title: 'Welcome to KrishiX!',
           description: `Let's get your profile set up, ${user.displayName || user.email}!`,
         });
-        router.push('/setup-profile');
+        router.push('/settings/account');
       } else {
         toast({
           title: 'Welcome Back!',

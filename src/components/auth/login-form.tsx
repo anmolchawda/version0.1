@@ -76,7 +76,7 @@ export function LoginForm() {
           title: 'Welcome to KrishiX!',
           description: `Let's get your profile set up, ${user.displayName || user.email}!`,
         });
-        router.push('/setup-profile');
+        router.push('/settings/account');
       } else {
         // For existing users, redirect to home. The main layout will handle
         // the case where a user exists in auth but hasn't completed their profile.

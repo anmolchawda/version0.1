@@ -1,4 +1,3 @@
-
 // src/app/(app)/layout.tsx
 'use client';
 
@@ -22,73 +21,57 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Combined loading state
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
 
-  // Effect to subscribe to auth state changes. Runs only once.
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
       if (setContextAuthUserId) {
         setContextAuthUserId(user?.uid || null);
       }
-      setIsLoadingAuth(false);
-    });
-    return () => unsubscribe();
-  }, [setContextAuthUserId]);
 
-  // Effect to handle redirection based on auth state and profile completeness.
-  // Runs when auth state is resolved or when path changes.
-  useEffect(() => {
-    if (isLoadingAuth) {
-      return; // Don't do anything while auth is loading
-    }
-
-    if (currentUser) {
-      // User is logged in, check profile status
-      if (!db) {
-        console.error("Firebase DB is not available. Cannot verify profile status.");
-        setError("Database connection error. Please try again later.");
-        return;
-      }
-      
-      const checkProfileAndRedirect = async () => {
+      if (user) {
+        if (!db) {
+          console.error("Firebase DB is not available. Cannot verify profile status.");
+          setError("Database connection error. Please try again later.");
+          setIsLoading(false);
+          return;
+        }
         try {
-          const userDocRef = doc(db, 'users', currentUser.uid);
+          const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
-          
-          if (!userDocSnap.exists() || !userDocSnap.data()?.profileSetupComplete) {
-            // If profile doesn't exist or is incomplete, redirect to setup
-            if (pathname !== '/setup-profile') {
-              router.replace('/setup-profile');
-            }
-          } else {
-            // If profile IS complete, but user tries to access setup, redirect to home
-            if (pathname === '/setup-profile') {
-              router.replace('/');
-            }
+          const profileComplete = userDocSnap.exists() && !!userDocSnap.data()?.profileSetupComplete;
+          setIsProfileComplete(profileComplete);
+
+          // If profile is incomplete, and we are not on a settings page or the deprecated setup page, redirect.
+          const isAllowedPath = pathname.startsWith('/settings') || pathname === '/setup-profile';
+          if (!profileComplete && !isAllowedPath) {
+            router.replace('/settings/account');
           }
         } catch (profileError) {
-          console.error("Error fetching user profile for redirection logic:", profileError);
+          console.error("Error fetching user profile:", profileError);
           setError("Could not verify profile status. Please try again.");
         }
-      };
-      checkProfileAndRedirect();
-    } else {
-      // User is not logged in, redirect to login page if they aren't on an auth page
-      const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-      if (!isAuthPage) {
-        router.replace('/login');
+      } else {
+        // No user, redirect to login if not on an auth page
+        const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+        if (!isAuthPage) {
+          router.replace('/login');
+        }
       }
-    }
-  }, [currentUser, isLoadingAuth, pathname, router]);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, [pathname, router, setContextAuthUserId]); // Pathname dependency ensures re-check on navigation
 
-  if (isLoadingAuth) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Loading application...</p>
+        <p className="mt-4 text-muted-foreground">Verifying profile...</p>
       </div>
     );
   }
@@ -105,21 +88,28 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  // If we are on an auth-related page (login, signup, setup-profile)
-  // render it without the main app layout (Sidebar, TopHeader etc.)
-  if (!currentUser || pathname === '/setup-profile') {
-    // Show a loader while redirecting
-    if (currentUser && pathname !== '/setup-profile') {
-         return (
-          <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-4 text-muted-foreground">Verifying profile...</p>
-          </div>
-        );
-    }
-    // Render the children directly (which would be the login, signup, or setup-profile page)
-    return <>{children}</>;
+  
+  // If user is not logged in, auth pages have their own layout. 
+  // The redirect in useEffect will handle unauthenticated users trying to access app pages.
+  // While redirecting, the loader above will show.
+  if (!currentUser) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
+      </div>
+    );
+  }
+  
+  // If profile is not complete, but user is trying to access a non-settings page, show a loader while redirecting.
+  // The useEffect handles the actual redirection logic.
+  if (!isProfileComplete && !pathname.startsWith('/settings') && pathname !== '/setup-profile') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Redirecting to profile setup...</p>
+      </div>
+    );
   }
 
   return (
