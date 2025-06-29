@@ -1,3 +1,4 @@
+
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app';
 import {
   getFirestore,
@@ -39,37 +40,27 @@ const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseCon
 
 const auth: Auth = getAuth(app);
 const storage: FirebaseStorage = getStorage(app);
-
-// Firestore instance
 let db: Firestore;
 
+// Safely initialize Firestore with offline persistence
 // This check ensures we only run this code in the browser.
-// On the server, a standard instance will be used.
 if (typeof window !== 'undefined') {
   try {
-    // Initialize Firestore with offline persistence.
     db = initializeFirestore(app, {
-      localCache: persistentLocalCache({}),
+      localCache: persistentLocalCache({})
     });
   } catch (e: any) {
-    if (e.code === 'failed-precondition') {
-        // This can happen with multiple tabs open.
-        console.warn("Firebase: Multiple tabs open, persistence can only be enabled in one. Getting standard instance.");
-        db = getFirestore(app);
-    } else if (e.code === 'unimplemented') {
-        // The browser doesn't support all of the features required for persistence.
-        console.warn("Firebase: Browser does not support all features for persistence. Getting standard instance.");
-        db = getFirestore(app);
-    } else {
-        // If it's already initialized, just get the instance. This can happen with Next.js fast refresh.
-        console.warn("Firebase: Getting existing Firestore instance.");
-        db = getFirestore(app);
-    }
+    // This can happen if the app is already initialized,
+    // which is common with Next.js's fast refresh.
+    // It can also happen with multiple tabs open.
+    console.warn(`Firebase: (Code: ${e.code}) Could not enable offline persistence. Getting standard instance.`);
+    db = getFirestore(app);
   }
 } else {
   // For server-side rendering, initialize a standard instance
   db = getFirestore(app);
 }
+
 
 export {
   db,

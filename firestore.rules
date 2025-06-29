@@ -1,11 +1,94 @@
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // This is a permissive rule suitable for development.
-    // It allows any authenticated user to read and write all data.
-    // For production, you should implement more granular rules.
+    // Default deny all reads and writes
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
+    }
+
+    // Allow public read access to non-sensitive collections
+    match /posts/{postId} {
+      allow read: if true;
+    }
+    match /users/{userId} {
+      allow read: if true;
+    }
+    match /mandi_listings/{listingId} {
+      allow read: if true;
+    }
+    match /mandi_buyer_requests/{requestId} {
+      allow read: if true;
+    }
+    match /yojna/{yojnaId} {
+        allow read: if true;
+    }
+
+
+    // Allow authenticated users to create content
+    match /posts/{postId} {
+      allow create: if request.auth != null;
+      // Allow users to update/delete their own posts
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    match /mandi_listings/{listingId} {
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+    }
+    
+    match /mandi_buyer_requests/{requestId} {
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.postedById == request.auth.uid;
+    }
+
+    // Users can only write to their own user document
+    match /users/{userId} {
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Rules for subcollections (likes, comments, etc.)
+    match /posts/{postId}/comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth.uid == resource.data.user.id;
+    }
+
+    match /posts/{postId}/likedByUsers/{userId} {
+      allow read: if true;
+      allow create, delete: if request.auth.uid == userId;
+    }
+    
+    match /users/{userId}/following/{followedId} {
+      allow read: if true;
+      allow create, delete: if request.auth.uid == userId;
+    }
+    
+    match /users/{userId}/followers/{followerId} {
+      allow read: if true;
+      allow create, delete: if request.auth.uid == followerId;
+    }
+
+    match /users/{userId}/bookmarks/{postId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    
+    // Conversation rules
+    match /conversations/{conversationId} {
+        allow read, write: if request.auth != null && request.auth.uid in resource.data.participants;
+    }
+
+    match /conversations/{conversationId}/messages/{messageId} {
+        allow read, write: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+    }
+    
+    // Notification rules
+    match /notifications/{userId}/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /notificationsMeta/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
