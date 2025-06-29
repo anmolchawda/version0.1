@@ -2,22 +2,22 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow avatar uploads for logged-in users to their own folder
+    // Avatars: Users can only write their own avatar. Anyone can read.
     match /avatars/{userId}/{fileName} {
       allow read;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Allow post image uploads for logged-in users to their own folder
+    // Posts: Users can only write to their own post media folder. Anyone can read.
     match /posts/{userId}/{fileName} {
       allow read;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Allow Mandi listing image uploads for logged-in users to their own folder
+
+    // Mandi Listings: Users can only write to their own mandi listings folder. Anyone can read.
     match /mandi_listings/{userId}/{fileName} {
-      allow read;
-      allow write: if request.auth != null && request.auth.uid == userId;
+        allow read;
+        allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
