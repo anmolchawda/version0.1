@@ -9,10 +9,12 @@ import { auth, db, doc, getDoc, collection, query, where, getDocs } from '@/lib/
 import type { User as FirebaseUser } from 'firebase/auth';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import type { User, Post } from '@/types';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 export default function UserProfilePage() {
   const params = useParams();
   const userId = params.userId as string;
+  const { authUserId } = useSidebarContext();
 
   const [viewedUser, setViewedUser] = useState<User | null | 'not-found'>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,15 +23,21 @@ export default function UserProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    // Wait for the auth context to provide the current user's ID.
+    // The main layout shows a loading spinner until this is available.
+    if (!authUserId) {
+        setIsLoading(false); // Stop loading if auth state is not resolved yet
+        return;
+    }
 
     const fetchProfileData = async () => {
       if (!userId) {
-        if (isMounted) setViewedUser('not-found');
+        setViewedUser('not-found');
         return;
       }
       if (!db) {
-        if (isMounted) setError("Database not available.");
+        setError("Database not available.");
+        setIsLoading(false);
         return;
       }
 
@@ -39,8 +47,6 @@ export default function UserProfilePage() {
         const userDocRef = doc(db, 'users', userId);
         const userDocSnap = await getDoc(userDocRef);
 
-        if (!isMounted) return;
-
         if (userDocSnap.exists()) {
           const fetchedData = { id: userId, ...userDocSnap.data() } as User;
 
@@ -49,7 +55,6 @@ export default function UserProfilePage() {
           const userPostsQuery = query(postsCollectionRef, where('userId', '==', userId));
           const postsSnapshot = await getDocs(userPostsQuery);
 
-          if (!isMounted) return;
           const posts = postsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Post[];
           
           setUserPosts(posts);
@@ -57,27 +62,28 @@ export default function UserProfilePage() {
         } else {
           setViewedUser('not-found');
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Error fetching profile:", e);
-        if (isMounted) setError("Could not load profile data. Please try again later.");
+        let detailedError = "Could not load profile data. Please try again later.";
+        if (e.code === 'permission-denied') {
+          detailedError = "Permission Denied: Your security rules are blocking access to profile data.";
+        } else if (e.code === 'failed-precondition' && e.message.includes('index')) {
+          detailedError = "Database Index Missing: A required Firestore index is missing. Please check the browser console for a link to create it.";
+        } else if (e.message) {
+          detailedError = `An unexpected error occurred: ${e.message}`;
+        }
+        setError(detailedError);
       } finally {
-        if (isMounted) setIsLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchProfileData();
 
-    const unsubscribeAuth = auth!.onAuthStateChanged((firebaseUser: FirebaseUser | null) => {
-      if (isMounted) {
-        setIsCurrentUserProfile(firebaseUser ? userId === firebaseUser.uid : false);
-      }
-    });
+    // Also check if the viewed profile is the current user's profile
+    setIsCurrentUserProfile(authUserId === userId);
 
-    return () => {
-      isMounted = false;
-      unsubscribeAuth();
-    };
-  }, [userId]);
+  }, [userId, authUserId]); // Depend on both the viewed user ID and the authenticated user ID
 
   if (isLoading) {
     return (
@@ -96,17 +102,19 @@ export default function UserProfilePage() {
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center text-destructive p-4 text-center">
         <AlertTriangle className="h-12 w-12 mb-4" />
-        <p className="mt-4 text-lg">{error}</p>
+        <p className="mt-4 text-lg font-semibold">Error Loading Profile</p>
+        <p className="text-sm">{error}</p>
       </div>
     );
   }
 
   if (!viewedUser) {
-    // This case is unlikely if the logic above is correct, but acts as a safeguard.
+    // This state can be reached if authUserId is not yet available.
+    // The parent layout's loader should cover this, but this is a fallback.
     return (
-        <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center text-destructive p-4 text-center">
-          <AlertTriangle className="h-12 w-12 mb-4" />
-          <p className="mt-4 text-lg">Profile could not be loaded.</p>
+        <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="mt-4 text-muted-foreground">Authenticating...</p>
         </div>
       );
   }

@@ -1,4 +1,3 @@
-
 // src/app/(app)/my-profile/page.tsx
 'use client';
 
@@ -8,7 +7,6 @@ import { db, doc, getDoc, collection, query, where, getDocs } from '@/lib/fireba
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
-import { getPlaceholderPostsForUser } from '@/lib/placeholders';
 import type { User, Post } from '@/types';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
@@ -21,14 +19,14 @@ export default function MyProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!authUserId) {
-        // This case is now handled by the main app layout, which will redirect to login.
-        // We can simply show a loading state or nothing at all.
-        setIsLoading(false);
-        return;
-      }
+    // Don't start fetching until we know who the user is.
+    // The parent layout handles the loading state before authUserId is available.
+    if (!authUserId) {
+      setIsLoading(false); // Stop loading if authId disappears for any reason
+      return;
+    }
 
+    const fetchProfileData = async () => {
       setIsLoading(true);
       setError(null);
       
@@ -63,16 +61,22 @@ export default function MyProfilePage() {
           console.error(`User document for ${authUserId} not found, but layout guard passed.`);
           setError("Your profile data could not be found.");
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Error fetching user profile from Firestore:", e);
-        setError("Could not load profile data. Please try refreshing the page.");
+        let detailedError = "Could not load profile data. Please try refreshing the page.";
+        if (e.code === 'permission-denied') {
+          detailedError = "Permission Denied: Your security rules are blocking access to your profile data.";
+        } else if (e.message) {
+          detailedError = `An unexpected error occurred: ${e.message}`;
+        }
+        setError(detailedError);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProfileData();
-  }, [authUserId, router]);
+  }, [authUserId]);
 
   if (isLoading) {
     return (
@@ -87,13 +91,15 @@ export default function MyProfilePage() {
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center text-destructive p-4 text-center">
         <AlertTriangle className="h-12 w-12 mb-4" />
-        <p className="mt-4 text-lg">{error}</p>
+        <p className="mt-4 text-lg font-semibold">Error Loading Profile</p>
+        <p className="text-sm">{error}</p>
       </div>
     );
   }
 
   if (!profileData) {
-    // This state should ideally not be reached if the logic above is correct.
+    // This can happen briefly while authUserId is resolved or if the user truly doesn't exist.
+    // The layout guard should prevent non-existent users from reaching here, but this is a fallback.
     return (
       <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
