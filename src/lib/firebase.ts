@@ -38,8 +38,8 @@ const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseCon
 
 const auth: Auth = getAuth(app);
 const storage: FirebaseStorage = getStorage(app);
-// Simplified, more robust Firestore initialization
-const db: Firestore = getFirestore(app);
+// Connect to the specific Firestore database instance.
+const db: Firestore = getFirestore(app, "krishix3090");
 
 
 export {
