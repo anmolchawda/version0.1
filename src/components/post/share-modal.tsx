@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogDescription,
   DialogTitle,
   DialogOverlay,
 } from '@/components/ui/dialog';
@@ -79,7 +80,9 @@ export function ShareModal({ isOpen, onOpenChange, postUrl, postCaption }: Share
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl text-primary">Share Post</DialogTitle>
-          {/* DialogDescription removed for more space */}
+          <DialogDescription className="sr-only">
+            Share this post with others or send it as a message.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 py-4">
           <Button

@@ -1,4 +1,3 @@
-
 // src/components/post/post-detail-display.tsx
 'use client';
 
@@ -18,7 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
 import { Timestamp } from 'firebase/firestore';
 import { useSidebarContext } from '@/hooks/useSidebarContext';
-import { db, doc, getDoc, setDoc, deleteDoc, serverTimestamp } from '@/lib/firebase';
+import { db, doc, getDoc, setDoc, deleteDoc, serverTimestamp, writeBatch, increment } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 
 interface PostDetailDisplayProps {
@@ -37,33 +36,60 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [isLoadingSave, setIsLoadingSave] = useState(true);
 
+  // New state for likes
+  const [isLiked, setIsLiked] = useState(false);
+  const [localLikesCount, setLocalLikesCount] = useState(post.likesCount);
+  const [isLoadingLike, setIsLoadingLike] = useState(true);
+
+  const isFirestoreAvailable = db !== null;
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setCurrentPostUrl(window.location.href);
     }
     
-    if (!authUserId || !db) {
+    if (!authUserId || !isFirestoreAvailable) {
         setIsLoadingSave(false);
+        setIsLoadingLike(false);
         return;
     }
 
-    const checkSaveStatus = async () => {
+    let isMounted = true;
+
+    const checkStatus = async () => {
+        if (!db || !isMounted) return;
         setIsLoadingSave(true);
+        setIsLoadingLike(true);
+
         const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
+        const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
+
         try {
-            const docSnap = await getDoc(savedDocRef);
-            setIsSaved(docSnap.exists());
+            const [saveDocSnap, likeDocSnap] = await Promise.all([
+                getDoc(savedDocRef),
+                getDoc(likedDocRef),
+            ]);
+            if (isMounted) {
+                setIsSaved(saveDocSnap.exists());
+                setIsLiked(likeDocSnap.exists());
+            }
         } catch (e) {
-            console.error("Error checking save status", e);
+            console.error("Error checking post status", e);
         } finally {
-            setIsLoadingSave(false);
+            if (isMounted) {
+                setIsLoadingSave(false);
+                setIsLoadingLike(false);
+            }
         }
     };
-    checkSaveStatus();
-  }, [post.id, authUserId]);
+    checkStatus();
+    setLocalLikesCount(post.likesCount);
+
+    return () => { isMounted = false; };
+  }, [post.id, post.likesCount, authUserId, isFirestoreAvailable]);
 
   const handleToggleSave = async () => {
-    if (isLoadingSave || !authUserId || !db) return;
+    if (isLoadingSave || !authUserId || !isFirestoreAvailable) return;
     setIsLoadingSave(true);
 
     const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
@@ -83,6 +109,39 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
       toast({ title: "Error", description: "Could not update save status.", variant: "destructive" });
     } finally {
       setIsLoadingSave(false);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (isLoadingLike || !authUserId || !isFirestoreAvailable) return;
+    setIsLoadingLike(true);
+
+    const newLikedState = !isLiked;
+    const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
+    const postDocRef = doc(db, 'posts', post.id);
+    
+    // Optimistic UI update
+    setIsLiked(newLikedState);
+    setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
+
+    try {
+      const batch = writeBatch(db);
+      if (newLikedState) {
+        batch.set(likedDocRef, { likedAt: serverTimestamp() });
+        batch.update(postDocRef, { likesCount: increment(1) });
+      } else {
+        batch.delete(likedDocRef);
+        batch.update(postDocRef, { likesCount: increment(-1) });
+      }
+      await batch.commit();
+    } catch (error) {
+      console.error("Error updating like status:", error);
+      toast({ title: t('errorToastTitle'), description: t('likeUpdateErrorToastDescription'), variant: "destructive" });
+      // Revert optimistic updates
+      setIsLiked(!newLikedState);
+      setLocalLikesCount(post.likesCount);
+    } finally {
+      setIsLoadingLike(false);
     }
   };
 
@@ -149,8 +208,8 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
 
         <CardFooter className="p-4 border-t flex flex-col items-start space-y-3">
           <div className="flex items-center space-x-2 w-full">
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20">
-              <Heart className="h-6 w-6" />
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20" onClick={handleToggleLike} disabled={isLoadingLike || !authUserId}>
+               {isLoadingLike ? <Loader2 className="h-6 w-6 animate-spin" /> : <Heart className={cn("h-6 w-6", isLiked ? "text-red-500 fill-red-500" : "text-muted-foreground")} />}
               <span className="sr-only">{t('likeAction')}</span>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full hover:bg-accent/20">
@@ -167,8 +226,8 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
             </Button>
           </div>
           
-          {post.likesCount > 0 && (
-            <p className="text-sm font-semibold">{post.likesCount} {post.likesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}</p>
+          {localLikesCount > 0 && (
+            <p className="text-sm font-semibold">{localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}</p>
           )}
         </CardFooter>
       </Card>

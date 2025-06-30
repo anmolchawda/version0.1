@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogOverlay,
   DialogHeader, 
+  DialogDescription,
   DialogTitle as RadixDialogTitle, 
 } from "@/components/ui/dialog";
 
@@ -404,6 +405,9 @@ export default function DiseaseDetailPage() {
             <DialogHeader className="sr-only">
                 <RadixDialogTitle>Enlarged image for {nameForDisplay || 'disease'}</RadixDialogTitle>
             </DialogHeader>
+ <DialogDescription className="sr-only">
+ Enlarged image of {nameForDisplay || 'disease'}.
+ </DialogDescription>
             <div className="relative aspect-auto max-h-[85vh] max-w-[85vw]">
               <Image
                 src={modalImageUrl}

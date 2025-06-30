@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import type { User } from '@/types';
 import { MapPin, Leaf, Settings, UserPlus, MessageSquare, Store, Loader2, Check } from 'lucide-react';
 import Link from 'next/link';
-import { Dialog, DialogContent, DialogOverlay, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogOverlay, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db } from '@/lib/firebase';
@@ -119,17 +119,22 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
             <Dialog open={isAvatarModalOpen} onOpenChange={setIsAvatarModalOpen}>
               <DialogTrigger asChild>
                 <button type="button" className="rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card transition-transform hover:scale-105 flex-shrink-0" aria-label="View profile picture">
+                  {/* Avatar display */}
                   <Avatar className="h-20 w-20 sm:h-24 border-2 border-primary shadow-md bg-muted">
                     <AvatarImage src={user.avatarUrl || `https://placehold.co/96x96.png?text=${avatarInitial}`} alt={user.name || user.username} data-ai-hint="person farmer" />
                     <AvatarFallback className="text-3xl sm:text-4xl">{avatarInitial}</AvatarFallback>
                   </Avatar>
                 </button>
               </DialogTrigger>
-              {user.avatarUrl ? <DialogOverlay className="bg-black/50 backdrop-blur-sm fixed inset-0 z-[51]" /> : null}
+              {/* Conditionally render DialogOverlay if avatarUrl exists */}
+              {user.avatarUrl && <DialogOverlay className="bg-black/50 backdrop-blur-sm fixed inset-0 z-[51]" />}
+              {/* Dialog Content for enlarged avatar */}
               <DialogContent className="p-0 max-w-md w-auto bg-transparent border-none shadow-none flex items-center justify-center z-[52]">
                 <DialogHeader className="sr-only"><DialogTitle>Enlarged Profile Picture of {user.name || user.username}</DialogTitle></DialogHeader>
-                {user.avatarUrl ? (
-                  <Image src={user.avatarUrl} alt={`${user.name || user.username}'s profile picture`} width={400} height={400} className="rounded-lg object-contain max-h-[80vh] max-w-[80vw]" data-ai-hint="person farmer large" />
+                {/* Always render DialogDescription for accessibility */}
+                <DialogDescription className="sr-only">Enlarged profile picture of {user.name || user.username}.</DialogDescription>
+ {user.avatarUrl ? (
+                  <Image  src={user.avatarUrl} alt={`${user.name || user.username}'s profile picture`} width={400} height={400} className="rounded-lg object-contain max-h-[80vh] max-w-[80vw]" data-ai-hint="person farmer large" />
                 ) : (
                   <div className="h-64 w-64 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-4xl">{avatarInitial}</div>
                 )}
