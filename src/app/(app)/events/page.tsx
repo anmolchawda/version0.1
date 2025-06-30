@@ -1,3 +1,4 @@
+
 // src/app/(app)/events/page.tsx
 'use client';
 
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, MapPin } from "lucide-react";
+import { CalendarDays, MapPin, ListChecks } from "lucide-react";
 import { format, isSameDay } from 'date-fns';
 import { mockEventsData } from '@/data/events';
 import type { MockEvent } from '@/data/events';
@@ -64,21 +65,23 @@ export default function EventsPage() {
             Discover upcoming agricultural events, workshops, and exhibitions. Click on a date to see events.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-8 p-4">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            initialFocus
-            className="rounded-md border shadow-sm bg-card"
-            modifiers={{ hasEvent: eventDates }}
-            modifiersClassNames={{ hasEvent: 'has-event-dot' }}
-          />
-          <div className="w-full max-w-md space-y-3">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4 items-start">
+          <div className="w-full flex justify-center md:justify-start">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              initialFocus
+              className="rounded-md border shadow-sm bg-card"
+              modifiers={{ hasEvent: eventDates }}
+              modifiersClassNames={{ hasEvent: 'has-event-dot' }}
+            />
+          </div>
+          <div className="w-full space-y-3">
              <h2 className="text-lg font-semibold text-foreground border-b pb-2">
                 Events for: {selectedDate ? format(selectedDate, "PPP") : 'No date selected'}
              </h2>
-             <ScrollArea className="h-64 pr-3">
+             <ScrollArea className="h-72 pr-3">
                 {eventsForSelectedDate.length > 0 ? (
                     <div className="space-y-3">
                         {eventsForSelectedDate.map(event => (
@@ -103,7 +106,8 @@ export default function EventsPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center text-muted-foreground pt-10">
+                    <div className="text-center text-muted-foreground pt-10 flex flex-col items-center">
+                        <ListChecks className="h-12 w-12 mb-4 text-gray-400" />
                         <p>No events scheduled for {selectedDate ? format(selectedDate, "MMMM d, yyyy") : 'this day'}.</p>
                     </div>
                 )}
@@ -135,3 +139,4 @@ export default function EventsPage() {
     </div>
   );
 }
+    
