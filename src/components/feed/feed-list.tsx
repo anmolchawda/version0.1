@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Post as PostType, User } from '@/types';
-import { PostCard } from './post-card';
+import { PostCard } from '@/components/feed/post-card'; // Use absolute path
 import { getPlaceholderUser, placeholderPosts as mockPlaceholderPosts } from '@/lib/placeholders'; // Renamed import
 import { RefreshCw, Loader2, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,48 +32,59 @@ export function FeedList() {
   const fetchPostsFromFirestore = useCallback(async () => {
     console.log("[FeedList] Attempting to fetch posts from Firestore.");
     setIsLoading(true);
+
     try {
-      if (!db) { // Should not happen if COMPONENT_USE_MOCK_DATA is false, but as a safeguard
+      if (!db) {
         throw new Error("Firestore db instance is not available.");
       }
       const postsCollectionRef = collection(db, 'posts');
       const q = query(postsCollectionRef, orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       const fetchedPosts: PostType[] = [];
+      const userCache: { [key: string]: User } = {}; // Cache for users
 
-      querySnapshot.forEach((docSnap) => {
+      for (const docSnap of querySnapshot.docs) {
         const data = docSnap.data() as DocumentData;
-        // Assuming user data is denormalized or you fetch it separately
-        // For now, using placeholder for user if ID exists
-        const user = getPlaceholderUser(data.userId) as User;
+        const userId = data.userId;
 
-        if (user) {
-          fetchedPosts.push({
-            userId: data.userId,
-            id: docSnap.id,
-            user: user, // Use the fetched/placeholder user
-            imageUrl: data.imageUrl,
-            caption: data.caption || data.text || '', // Handle potential variations in field name
-            hashtags: data.hashtags || [],
-            likesCount: data.likesCount || 0,
-            commentsCount: data.commentsCount || 0,
-            createdAt: data.createdAt as Timestamp || Timestamp.fromDate(new Date()),
-          });
-        } else {
-          // Handle case where user might not be found, though ideally all posts have valid users
-          console.warn(`User with ID ${data.userId} not found for post ${docSnap.id}`);
+        // Fetch user from cache or Firestore
+        let user = userCache[userId];
+
+        if (!user) {
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+          if (userDocSnap.exists()) {
+            user = { id: userDocSnap.id, ...userDocSnap.data() as any };
+            userCache[userId] = user;
+          } else {
+            console.warn(`User with ID ${userId} not found for post ${docSnap.id}. Skipping post.`);
+            continue; // Skip post if user not found
+          }
         }
-      });
+
+        // At this point, user is guaranteed to be a User object
+        fetchedPosts.push({
+          userId: data.userId,
+          id: docSnap.id,
+          user: user, // TypeScript should now infer 'user' as User
+          imageUrl: data.imageUrl,
+          caption: data.caption || data.text || '',
+          hashtags: data.hashtags || [],
+          likesCount: data.likesCount || 0,
+          commentsCount: data.commentsCount || 0,
+          createdAt: data.createdAt as Timestamp || Timestamp.fromDate(new Date()),
+        });
+      }
+
       setPosts(fetchedPosts);
       console.log("[FeedList] Successfully fetched posts from Firestore:", fetchedPosts.length);
     } catch (error) {
       console.error("Error fetching posts from Firestore:", error);
-      // setPosts([]); // Optionally clear posts or show stale data
     } finally {
       setIsLoading(false);
       setPullDeltaY(0);
     }
-  }, []);
+  }, [db]); // Dependency array
 
   const loadMockPosts = useCallback(() => {
     console.log("[FeedList] Loading mock posts.");
@@ -109,7 +120,7 @@ export function FeedList() {
   }, [COMPONENT_USE_MOCK_DATA, fetchPostsFromFirestore, loadMockPosts]);
 
 
-  const handleRefresh = useCallback(async () => {
+  const handleRefresh = useCallback(async () => { // Moved up the dependency array
     if (isLoading) return;
     if (COMPONENT_USE_MOCK_DATA) {
       loadMockPosts();
@@ -117,10 +128,9 @@ export function FeedList() {
       await fetchPostsFromFirestore();
     }
   }, [isLoading, COMPONENT_USE_MOCK_DATA, fetchPostsFromFirestore, loadMockPosts]);
-
   // Touch Events
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isLoading || !isEligibleToPull || e.touches.length === 0) {
+    if (isLoading || !isEligibleToPull || e.touches.length === 0) { // Check against state variables
       setPullStartY(null);
       return;
     }
@@ -129,9 +139,9 @@ export function FeedList() {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (pullStartY === null || isLoading || e.touches.length === 0) return;
+    if (pullStartY === null || isLoading || e.touches.length === 0) return; // Check against state variables
     const currentY = e.touches[0].clientY;
-    let delta = currentY - pullStartY;
+    let delta = currentY - pullStartY; // Use the state variable
     // Only allow positive delta (pulling down)
     if (delta < 0) delta = 0;
     setPullDeltaY(Math.min(delta, MAX_PULL_VISUAL_EFFECT_DISTANCE + 50)); // Cap visual effect
@@ -214,7 +224,7 @@ export function FeedList() {
     }
   };
 
-  if (isLoading && posts.length === 0 && pullDeltaY === 0) { // Don't show if already pulling to refresh
+  if (isLoading && posts.length === 0 && pullDeltaY === 0) { // Check against state variables
      return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -284,3 +294,4 @@ export function FeedList() {
     </div>
   );
 }
+
