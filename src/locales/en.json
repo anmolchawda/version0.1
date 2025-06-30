@@ -1,3 +1,4 @@
+
 {
   "feed": "Feed",
   "discover": "Discover",
@@ -168,6 +169,8 @@
   "searchMessagesPlaceholder": "Search messages or users...",
   "noMessagesYetTitle": "No Messages Yet",
   "noMessagesYetDescription": "Start a new conversation to see your messages here.",
+  "noPostsYetTitle": "No Posts Yet",
+  "noPostsYetDescription": "Follow other farmers to see their updates here.",
   "startNewChatButton": "Start New Chat",
   "userNotAuthenticatedError": "User not authenticated. Please log in.",
   "failedToLoadConversationsError": "Failed to load conversations.",

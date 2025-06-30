@@ -1,3 +1,4 @@
+
 {
   "feed": "फीड",
   "discover": "खोजीं",
@@ -168,6 +169,8 @@
   "searchMessagesPlaceholder": "मैसेज या यूजर खोजीं...",
   "noMessagesYetTitle": "अभी तक कोनो मैसेज नइ हव",
   "noMessagesYetDescription": "नया बातचीत शुरू करीं, मैसेज एहिजा देखी पाईं।",
+  "noPostsYetTitle": "अभी तक कोनो पोस्ट नइ हव",
+  "noPostsYetDescription": "अउरी किसान मन के फॉलो करीं, ओकर अपडेट एहिजा देखे बर।",
   "startNewChatButton": "नया चैट शुरू करीं",
   "userNotAuthenticatedError": "यूजर लॉगिन नइ बा। लॉगिन करीं।",
   "failedToLoadConversationsError": "बातचीत लोड नइ हो पायिस।",

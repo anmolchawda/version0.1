@@ -272,8 +272,8 @@ export function FeedList() {
             style={{ paddingTop: pullDeltaY > 0 ? `${Math.max(4, pullDeltaY * 0.3 / 16)}rem` : '4rem' }}
           >
             <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
-            <p className="text-xl font-semibold text-muted-foreground">No Posts Yet</p>
-            <p className="text-sm text-muted-foreground mt-2">Follow other farmers to see their updates here.</p>
+            <p className="text-xl font-semibold text-muted-foreground">{t('noPostsYetTitle')}</p>
+            <p className="text-sm text-muted-foreground mt-2">{t('noPostsYetDescription')}</p>
           </div>
         )}
 

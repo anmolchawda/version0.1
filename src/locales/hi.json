@@ -1,3 +1,4 @@
+
 {
   "feed": "फ़ीड",
   "discover": "खोजें",
@@ -168,9 +169,11 @@
   "searchMessagesPlaceholder": "संदेश या उपयोगकर्ता खोजें...",
   "noMessagesYetTitle": "अभी तक कोई संदेश नहीं",
   "noMessagesYetDescription": "यहाँ संदेश देखने के लिए नई बातचीत शुरू करें।",
+  "noPostsYetTitle": "अभी तक कोई पोस्ट नहीं",
+  "noPostsYetDescription": "अन्य किसानों को फॉलो करें ताकि आप उनके अपडेट यहां देख सकें।",
   "startNewChatButton": "नई चैट शुरू करें",
   "userNotAuthenticatedError": "उपयोगकर्ता प्रमाणित नहीं है। कृपया लॉगिन करें।",
-  "failedToLoadConversationsError": "बातचीत लोड करने में विफल。",
+  "failedToLoadConversationsError": "बातचीत लोड करने में विफल।",
   "newMessageModalTitle": "नया संदेश",
   "newMessageModalDescription": "बातचीत शुरू करने के लिए उपयोगकर्ता खोजें।",
   "searchUsersPlaceholder": "उपयोगकर्ता खोजें...",

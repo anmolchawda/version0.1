@@ -1,3 +1,4 @@
+
 {
     "feed": "ஊட்டம்",
     "discover": "கண்டறியவும்",
@@ -168,6 +169,8 @@
     "searchMessagesPlaceholder": "செய்திகள் அல்லது பயனர்களைத் தேடுங்கள்...",
     "noMessagesYetTitle": "இதுவரை செய்திகள் இல்லை",
     "noMessagesYetDescription": "உங்கள் செய்திகளை இங்கே பார்க்க புதிய உரையாடலைத் தொடங்கவும்.",
+    "noPostsYetTitle": "இதுவரை பதிவுகள் இல்லை",
+    "noPostsYetDescription": "பிற விவசாயிகளைப் பின்தொடர்ந்து அவர்களின் புதுப்பிப்புகளை இங்கே பார்க்கவும்.",
     "startNewChatButton": "புதிய உரையாடலைத் தொடங்கவும்",
     "userNotAuthenticatedError": "பயனர் அங்கீகரிக்கப்படவில்லை. தயவுசெய்து உள்நுழையவும்.",
     "failedToLoadConversationsError": "உரையாடல்களை ஏற்ற முடியவில்லை.",

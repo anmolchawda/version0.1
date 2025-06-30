@@ -1,3 +1,4 @@
+
 {
     "feed": "ഫീഡ്",
     "discover": "കണ്ടെത്തുക",
@@ -168,6 +169,8 @@
     "searchMessagesPlaceholder": "സന്ദേശങ്ങളോ ഉപയോക്താക്കളോ തിരയുക...",
     "noMessagesYetTitle": "ഇതുവരെ സന്ദേശങ്ങളൊന്നുമില്ല",
     "noMessagesYetDescription": "നിങ്ങളുടെ സന്ദേശങ്ങൾ ഇവിടെ കാണുന്നതിന് ഒരു പുതിയ സംഭാഷണം ആരംഭിക്കുക.",
+    "noPostsYetTitle": "ഇതുവരെ പോസ്റ്റുകളൊന്നുമില്ല",
+    "noPostsYetDescription": "മറ്റ് കർഷകരെ പിന്തുടരുക, അവരുടെ അപ്ഡേറ്റുകൾ ഇവിടെ കാണാൻ.",
     "startNewChatButton": "പുതിയ ചാറ്റ് ആരംഭിക്കുക",
     "userNotAuthenticatedError": "ഉപയോക്താവ് ഓഥെന്റിക്കേറ്റ് ചെയ്തിട്ടില്ല. ദയവായി ലോഗിൻ ചെയ്യുക.",
     "failedToLoadConversationsError": "സംഭാഷണങ്ങൾ ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല.",

@@ -1,3 +1,4 @@
+
 {
   "feed": "ଫିଡ୍",
   "discover": "ଆବିଷ୍କାର କରନ୍ତୁ",
@@ -154,7 +155,7 @@
   "discoverInitialSearchPromptTitle": "କୃଷିX ସନ୍ଧାନ କରନ୍ତୁ",
   "discoverInitialSearchPromptDescription": "କୃଷକ, ପୋଷ୍ଟ, ମଣ୍ଡି ଆଇଟମ, ଫସଲ ସୂଚନା, ରୋଗ, ଯୋଜନା, ଏବଂ ଅଧିକ ଖୋଜନ୍ତୁ |",
   "discoverNoResultsFound": "\"{searchTerm}\" ପାଇଁ କୌଣସି ଫଳାଫଳ ମିଳିଲା ନାହିଁ |",
-  "discoverNoResultsSuggestion": "ଏକ ଭିନ୍ନ ସନ୍ଧାନ ଶବ୍ଦ ଚେଷ୍ଟା କରନ୍ତୁ କିମ୍ବା ସ୍ପେଲିଂ ଯାଞ୍ଚ କରନ୍ତୁ |",
+  "discoverNoResultsSuggestion": "ଏକ ଭିନ୍ନ ସନ୍ଧାନ ଶବ୍ଦ ଚେଷ୍ଟా କରନ୍ତୁ କିମ୍ବା ସ୍ପେଲିଂ ଯାଞ୍ଚ କରନ୍ତୁ |",
   "discoverMatchingFarmersTitle": "ମେଳ ଖାଉଥିବା କୃଷକଗଣ",
   "discoverMatchingPostsTitle": "ମେଳ ଖାଉଥିବା ପୋଷ୍ଟଗୁଡିକ",
   "discoverMatchingMandiTitle": "ମେଳ ଖାଉଥିବା ମଣ୍ଡି ଆଇଟମ୍",
@@ -168,6 +169,8 @@
   "searchMessagesPlaceholder": "ବାର୍ତ୍ତା କିମ୍ବା ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ସନ୍ଧାନ କରନ୍ତୁ...",
   "noMessagesYetTitle": "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ବାର୍ତ୍ତା ନାହିଁ",
   "noMessagesYetDescription": "ଆପଣଙ୍କ ବାର୍ତ୍ତା ଏଠାରେ ଦେଖିବା ପାଇଁ ଏକ ନୂତନ କଥୋପକଥନ ଆରମ୍ଭ କରନ୍ତୁ |",
+  "noPostsYetTitle": "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ପୋଷ୍ଟ୍ ନାହିଁ",
+  "noPostsYetDescription": "ଅନ୍ୟ କୃଷକମାନଙ୍କୁ ଅନୁସରଣ କରନ୍ତୁ ଏବଂ ସେମାନଙ୍କ ଅଦ୍ୟତନ ଏଠାରେ ଦେଖନ୍ତୁ |",
   "startNewChatButton": "ନୂତନ ଚାଟ୍ ଆରମ୍ଭ କରନ୍ତୁ",
   "userNotAuthenticatedError": "ଉପଯୋଗକର୍ତ୍ତା ପ୍ରାମାଣିକ ନୁହେଁ | ଦୟାକରି ଲଗଇନ୍ କରନ୍ତୁ |",
   "failedToLoadConversationsError": "କଥୋପକଥନଗୁଡିକ ଲୋଡ୍ କରିବାରେ ବିଫଳ ହେଲା |",
@@ -195,7 +198,7 @@
   "toastNotificationsClearedTitle": "ବିଜ୍ଞପ୍ତିଗୁଡିକ ପରିଷ୍କାର ହୋଇଛି",
   "toastNotificationsClearedDescription": "ଆପଣଙ୍କର ସମସ୍ତ ବିଜ୍ଞପ୍ତି ଅପସାରିତ ହୋଇଛି |",
   "toastErrorClearingNotificationsTitle": "ବିଜ୍ଞପ୍ତି ପରିଷ୍କାର କରିବାରେ ତ୍ରୁଟି",
-  "toastErrorClearingNotificationsDescription": "ସମସ୍ତ ବିଜ୍ଞପ୍ତି ପରିଷ୍କାର କରିପାରିଲା ନାହିଁ | ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ |",
+  "toastErrorClearingNotificationsDescription": "ସମସ୍ਤ ବିଜ୍ଞପ୍ତି ପରିଷ୍କାର କରିପାରିଲା ନାହିଁ | ଦୟାକରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ |",
   "likedYourPostText": "ଆପଣଙ୍କ ପୋଷ୍ଟ୍ ପସନ୍ଦ କରିଛନ୍ତି |",
   "commentedOnYourPostText": "ଆପଣଙ୍କ ପୋଷ୍ଟ୍ରେ ମନ୍ତବ୍ୟ ଦେଇଛନ୍ତି:",
   "onYourPostText": "ଆପଣଙ୍କ ପୋଷ୍ଟ୍ରେ |",

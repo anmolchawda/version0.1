@@ -1,3 +1,4 @@
+
 {
     "feed": "ਫੀਡ",
     "discover": "ਖੋਜੋ",
@@ -168,6 +169,8 @@
     "searchMessagesPlaceholder": "ਮੈਸੇਜ ਜਾਂ ਯੂਜ਼ਰ ਖੋਜੋ...",
     "noMessagesYetTitle": "ਅਜੇ ਕੋਈ ਮੈਸੇਜ ਨਹੀਂ",
     "noMessagesYetDescription": "ਆਪਣੇ ਮੈਸੇਜ ਇੱਥੇ ਦੇਖਣ ਲਈ ਨਵੀਂ ਗੱਲਬਾਤ ਸ਼ੁਰੂ ਕਰੋ।",
+    "noPostsYetTitle": "ਅਜੇ ਤੱਕ ਕੋਈ ਪੋਸਟ ਨਹੀਂ",
+    "noPostsYetDescription": "ਹੋਰ ਕਿਸਾਨਾਂ ਨੂੰ ਉਹਨਾਂ ਦੇ ਅਪਡੇਟਸ ਇੱਥੇ ਦੇਖਣ ਲਈ ਫਾਲੋ ਕਰੋ।",
     "startNewChatButton": "ਨਵੀਂ ਚੈਟ ਸ਼ੁਰੂ ਕਰੋ",
     "userNotAuthenticatedError": "ਯੂਜ਼ਰ ਪ੍ਰਮਾਣਿਤ ਨਹੀਂ। ਕਿਰਪਾ ਕਰਕੇ ਲੌਗਇਨ ਕਰੋ।",
     "failedToLoadConversationsError": "ਗੱਲਬਾਤਾਂ ਲੋਡ ਕਰਨ ਵਿੱਚ ਅਸਫਲ।",

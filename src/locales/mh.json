@@ -1,3 +1,4 @@
+
 {
   "feed": "फीड",
   "discover": "शोधा",
@@ -168,6 +169,8 @@
   "searchMessagesPlaceholder": "मेसेजेस किंवा वापरकर्ते शोधा...",
   "noMessagesYetTitle": "अद्याप मेसेजेस नाहीत",
   "noMessagesYetDescription": "तुमचे मेसेजेस इथे पाहण्यासाठी नवीन संभाषण सुरू करा.",
+  "noPostsYetTitle": "अद्याप पोस्ट नाहीत",
+  "noPostsYetDescription": "इतर शेतकऱ्यांना फॉलो करा जेणेकरून तुम्हाला त्यांचे अपडेट्स इथे पाहता येतील.",
   "startNewChatButton": "नवीन चॅट सुरू करा",
   "userNotAuthenticatedError": "वापरकर्ता प्रमाणित नाही. कृपया लॉग इन करा.",
   "failedToLoadConversationsError": "संभाषणे लोड करण्यात अयशस्वी.",

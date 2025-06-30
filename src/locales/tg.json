@@ -1,3 +1,4 @@
+
 {
     "feed": "ఫీడ్",
     "discover": "కనుగొనండి",
@@ -162,12 +163,14 @@
     "discoverMatchingEventsTitle": "సరిపోలే ఈవెంట్‌లు",
     "discoverMatchingYojnasTitle": "సరిపోలే పథకాలు",
     "discoverMatchingCropsTitle": "సరిపోలే పంటలు",
-    "discoverInfoFooter": "ప్రస్తుతం రైతులు, పోస్ట్‌లు, మార్కెట్ వస్తువులు, వ్యాధులు, ఈవెంట్‌లు మరియు పథకాలలో శోధిస్తోంది.",
+    "discoverInfoFooter": "ప్రస్తుతం రైతులు, పోస్ట్‌లు, మార్కెట్ వస్తువులు, వ్యాధులు, ఈవెంట్‌లు మరియు పథకాలలో శोధిస్తోంది.",
     "messagesTitle": "సందేశాలు",
     "newMessageAriaLabel": "కొత్త సందేశం",
     "searchMessagesPlaceholder": "సందేశాలు లేదా వినియోగదారులను శోధించండి...",
     "noMessagesYetTitle": "ఇంకా సందేశాలు లేవు",
     "noMessagesYetDescription": "మీ సందేశాలను ఇక్కడ చూడటానికి కొత్త సంభాషణను ప్రారంభించండి.",
+    "noPostsYetTitle": "ఇంకా పోస్ట్‌లు లేవు",
+    "noPostsYetDescription": "ఇతర రైతులను అనుసరించండి వారి నవీకరణలను ఇక్కడ చూడటానికి.",
     "startNewChatButton": "కొత్త చాట్ ప్రారంభించండి",
     "userNotAuthenticatedError": "వినియోగదారు ఆధీకరించబడలేదు. దయచేసి లాగిన్ అవ్వండి.",
     "failedToLoadConversationsError": "సంభాషణలను లోడ్ చేయడం విఫలమైంది.",

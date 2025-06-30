@@ -1,3 +1,4 @@
+
 {
   "feed": "ফিড",
   "discover": "আবিষ্কার করুন",
@@ -168,6 +169,8 @@
   "searchMessagesPlaceholder": "বার্তা বা ব্যবহারকারী অনুসন্ধান করুন...",
   "noMessagesYetTitle": "এখনও কোন বার্তা নেই",
   "noMessagesYetDescription": "আপনার বার্তা দেখতে একটি নতুন কথোপকথন শুরু করুন।",
+  "noPostsYetTitle": "এখনও কোন পোস্ট নেই",
+  "noPostsYetDescription": "অন্যান্য কৃষকদের ফলো করুন তাদের আপডেট এখানে দেখতে।",
   "startNewChatButton": "নতুন চ্যাট শুরু করুন",
   "userNotAuthenticatedError": "ব্যবহারকারী অনুমোদিত নয়। লগইন করুন।",
   "failedToLoadConversationsError": "কথোপকথন লোড করতে ব্যর্থ।",

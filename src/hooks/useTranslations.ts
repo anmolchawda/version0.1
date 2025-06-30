@@ -1,3 +1,4 @@
+
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -69,6 +70,7 @@ export type TranslationKey =
   | 'discoverMatchingCropsTitle' | 'discoverInfoFooter'
   | 'messagesTitle' | 'newMessageAriaLabel' | 'searchMessagesPlaceholder'
   | 'noMessagesYetTitle' | 'noMessagesYetDescription' | 'startNewChatButton'
+  | 'noPostsYetTitle' | 'noPostsYetDescription'
   | 'userNotAuthenticatedError' | 'failedToLoadConversationsError'
   | 'newMessageModalTitle' | 'newMessageModalDescription' | 'searchUsersPlaceholder'
   | 'noUsersFoundError'
