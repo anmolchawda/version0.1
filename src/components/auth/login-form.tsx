@@ -106,7 +106,14 @@ export function LoginForm() {
 
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
-      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+ if (error.code === 'auth/popup-closed-by-user') {
+ toast({
+ title: 'Login Cancelled',
+ description: 'The Google sign-in window was closed.',
+ });
+ } else {
+ toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+ }
     } finally {
       setIsGoogleLoading(false);
     }

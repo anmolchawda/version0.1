@@ -79,8 +79,15 @@ export function SignupForm() {
       // Let the app layout's auth state listener and gatekeeper handle redirection.
       router.push('/feed');
     } catch (error: any) {
-        console.error('Google Sign-up error:', error.code, error.message);
+      console.error('Google Sign-up error:', error.code, error.message);
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+          title: 'Sign-up Cancelled',
+          description: 'The Google sign-up window was closed.',
+        });
+      } else {
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
+      }
     } finally {
         setIsGoogleLoading(false);
     }
