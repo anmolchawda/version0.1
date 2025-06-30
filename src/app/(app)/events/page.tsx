@@ -1,20 +1,23 @@
 // src/app/(app)/events/page.tsx
 'use client';
 
-import { useState, useEffect, type ReactNode, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CalendarDays, MapPin } from "lucide-react";
-import { format, isSameDay, addDays, startOfMonth, startOfDay } from 'date-fns';
+import { format, isSameDay, startOfDay } from 'date-fns';
 
 import * as eventsData from '@/data/events';
 
+// Helper component to render SVG strings safely
+const SvgIcon = ({ svgString }: { svgString: string }) => {
+  if (!svgString || typeof svgString !== 'string') return null;
+  // This is safe because the SVG strings are static and controlled within the app.
+  return <div dangerouslySetInnerHTML={{ __html: svgString }} />;
+};
 
 const today = new Date();
-const monthStart = startOfMonth(today);
-
-
 
 export default function EventsPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(today);
@@ -49,36 +52,34 @@ export default function EventsPage() {
             Discover upcoming agricultural events, workshops, and exhibitions. Click on a date to see events.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col md:flex-row gap-6">
-          <div className="flex justify-center md:justify-start">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border shadow-sm bg-card p-3"
-              initialFocus
-              month={selectedDate}
-              onMonthChange={setSelectedDate} // Allows month navigation to update selected date context
-              modifiers={{ hasEvent: eventDays }}
-              modifiersStyles={{
-                hasEvent: {
-                  color: 'hsl(var(--primary))',
-                  fontWeight: 'bold'
-                }
-              }}
-            />
-          </div>
-          <div className="flex-1 space-y-4">
+        <CardContent className="flex flex-col items-center gap-6">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            className="rounded-md border shadow-sm bg-card p-3"
+            initialFocus
+            month={selectedDate}
+            onMonthChange={setSelectedDate}
+            modifiers={{ hasEvent: eventDays }}
+            modifiersStyles={{
+              hasEvent: {
+                color: 'hsl(var(--primary))',
+                fontWeight: 'bold'
+              }
+            }}
+          />
+          <div className="w-full space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
               Events for: {selectedDate ? format(selectedDate, "PPP") : "No date selected"}
             </h3>
-            <ScrollArea className="h-[300px] pr-3">
+            <ScrollArea className="h-[300px] w-full pr-3">
               {eventsForSelectedDate.length > 0 ? (
                 <div className="space-y-3">
                   {eventsForSelectedDate.map(event => (
                     <Card key={event.id} className="p-4 shadow-sm hover:shadow-md transition-shadow bg-muted/30">
-                      <div className="flex items-start space-x-3">import React from 'react';  // Ensure React is imported if not already
-                        {event.icon && <div className="mt-1">{event.icon}</div>}
+                      <div className="flex items-start space-x-3">
+                        {event.icon && <div className="mt-1"><SvgIcon svgString={event.icon} /></div>}
                         <div>
                           <h4 className="font-semibold text-primary">{event.title}</h4>
                           {event.description && <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>}
