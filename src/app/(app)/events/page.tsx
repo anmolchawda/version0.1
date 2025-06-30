@@ -64,19 +64,17 @@ export default function EventsPage() {
             Discover upcoming agricultural events, workshops, and exhibitions. Click on a date to see events.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col md:flex-row items-start gap-6 p-4">
-          <div className="w-full md:w-auto md:flex-shrink-0">
-             <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                initialFocus
-                className="p-3 rounded-md border shadow-sm bg-card"
-                modifiers={{ hasEvent: eventDates }}
-                modifiersClassNames={{ hasEvent: 'has-event-dot' }}
-              />
-          </div>
-          <div className="flex-grow w-full space-y-3">
+        <CardContent className="flex flex-col items-center gap-8 p-4">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            initialFocus
+            className="rounded-md border shadow-sm bg-card"
+            modifiers={{ hasEvent: eventDates }}
+            modifiersClassNames={{ hasEvent: 'has-event-dot' }}
+          />
+          <div className="w-full max-w-md space-y-3">
              <h2 className="text-lg font-semibold text-foreground border-b pb-2">
                 Events for: {selectedDate ? format(selectedDate, "PPP") : 'No date selected'}
              </h2>
