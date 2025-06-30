@@ -40,6 +40,7 @@ export async function suggestHashtags(input: SuggestHashtagsInput): Promise<Sugg
 
 const suggestHashtagsPrompt = ai.definePrompt({
   name: 'suggestHashtagsPrompt',
+  model: 'googleai/gemini-1.5-flash-latest', // Explicitly use the Flash model to avoid rate limits
   input: {schema: SuggestHashtagsInputSchema},
   output: {schema: SuggestHashtagsOutputSchema},
   prompt: `You are a social media expert specializing in agriculture. Given the following post text and image (if available), suggest relevant hashtags to increase its visibility and engagement.  Return ONLY an array of hashtags. Do not include any surrounding text or explanation.
