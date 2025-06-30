@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -39,7 +38,10 @@ export function HashtagSuggester({
     try {
       const input = postImageDataUri ? { postText, postImage: postImageDataUri } : { postText };
       const result: SuggestHashtagsOutput = await suggestHashtags(input);
-      setSuggestions(result.hashtags.map(tag => tag.startsWith('#') ? tag : `#${tag}`));
+
+      // Modified line with optional chaining and default empty array
+      setSuggestions(result?.hashtags?.map(tag => tag.startsWith('#') ? tag : `#${tag}`) || []);
+
     } catch (e) {
       console.error("Error fetching hashtag suggestions:", e);
       setError("Failed to load suggestions.");
