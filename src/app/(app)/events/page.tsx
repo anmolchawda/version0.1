@@ -52,23 +52,25 @@ export default function EventsPage() {
             Discover upcoming agricultural events, workshops, and exhibitions. Click on a date to see events.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-6">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="rounded-md border shadow-sm bg-card p-3"
-            initialFocus
-            month={selectedDate}
-            onMonthChange={setSelectedDate}
-            modifiers={{ hasEvent: eventDays }}
-            modifiersStyles={{
-              hasEvent: {
-                color: 'hsl(var(--primary))',
-                fontWeight: 'bold'
-              }
-            }}
-          />
+        <CardContent className="flex flex-col gap-6 p-4">
+          <div className="flex justify-center">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border shadow-sm bg-card"
+              initialFocus
+              month={selectedDate}
+              onMonthChange={setSelectedDate}
+              modifiers={{ hasEvent: eventDays }}
+              modifiersStyles={{
+                hasEvent: {
+                  color: 'hsl(var(--primary))',
+                  fontWeight: 'bold'
+                }
+              }}
+            />
+          </div>
           <div className="w-full space-y-4">
             <h3 className="text-lg font-semibold text-foreground">
               Events for: {selectedDate ? format(selectedDate, "PPP") : "No date selected"}
