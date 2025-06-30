@@ -28,7 +28,7 @@ const firebaseConfig = {
     authDomain: "fieldverse-m99ip.firebaseapp.com",
     databaseURL: "https://fieldverse-m99ip-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "fieldverse-m99ip",
-    storageBucket: "fieldverse-m99ip.appspot.com",
+    storageBucket: "fieldverse-m99ip.firebasestorage.app",
     messagingSenderId: "1084327516741",
     appId: "1:1084327516741:web:0eb1efac54766dc625612c",
     measurementId: "G-FVS7PM8WTB"
