@@ -1,30 +1,5 @@
-
 {
   "indexes": [
-    {
-      "collectionGroup": "posts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "posts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "userId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
-      ]
-    },
     {
       "collectionGroup": "conversations",
       "queryScope": "COLLECTION",
@@ -40,15 +15,15 @@
       ]
     },
     {
-      "collectionGroup": "items",
-      "queryScope": "COLLECTION_GROUP",
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "read",
+          "fieldPath": "userId",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "timestamp",
+          "fieldPath": "createdAt",
           "order": "DESCENDING"
         }
       ]
