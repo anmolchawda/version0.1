@@ -47,7 +47,7 @@ service cloud.firestore {
       }
 
       // Subcollection: likes
-      match /likes/{userId} {
+      match /likedByUsers/{userId} {
         allow read: if true;
         allow create, delete: if request.auth.uid == userId;
       }
