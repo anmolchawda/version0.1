@@ -5,12 +5,12 @@
 import { Sidebar } from '@/components/layout/sidebar';
 import { TopHeader } from '@/components/layout/top-header';
 import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { cn } from '@/lib/utils';
-import { auth, db, doc, getDoc } from '@/lib/firebase';
+import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 
 interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
@@ -23,35 +23,56 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
   const [error, setError] = useState<string | null>(null);
+  const profileUnsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setContextAuthUserId(user?.uid || null);
+
+      // Clean up previous profile listener if it exists
+      if (profileUnsubscribeRef.current) {
+        profileUnsubscribeRef.current();
+        profileUnsubscribeRef.current = null;
+      }
+
       if (!user) {
         setAuthStatus('unauthenticated');
         return;
       }
+
       if (!db) {
         setError("Database connection error. Please try again later.");
         setAuthStatus('loading');
         return;
       }
-      try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
-          setAuthStatus('authenticated_ready');
-        } else {
-          setAuthStatus('authenticated_needs_profile');
+
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      profileUnsubscribeRef.current = onSnapshot(userDocRef, 
+        (userDocSnap) => {
+          if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
+            setAuthStatus('authenticated_ready');
+          } else {
+            setAuthStatus('authenticated_needs_profile');
+          }
+        },
+        (profileError) => {
+          console.error("Error fetching user profile:", profileError);
+          setError("Could not verify your profile status. Please try refreshing.");
+          setAuthStatus('loading');
         }
-      } catch (profileError) {
-        console.error("Error fetching user profile:", profileError);
-        setError("Could not verify your profile status. Please try refreshing.");
-        setAuthStatus('loading');
-      }
+      );
     });
-    return () => unsubscribe();
+
+    // Cleanup function for the effect.
+    return () => {
+      authUnsubscribe();
+      if (profileUnsubscribeRef.current) {
+        profileUnsubscribeRef.current();
+      }
+    };
   }, [setContextAuthUserId]);
+
 
   useEffect(() => {
     if (authStatus === 'unauthenticated') {
