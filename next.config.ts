@@ -1,5 +1,7 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
@@ -16,7 +18,9 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {},
+  experimental: {
+    // This is required to allow the Next.js dev server to be accessed from the Firebase Studio preview pane.
+  },
   webpack: (config, { dev }) => {
     if (dev) {
       config.cache = false;
@@ -25,4 +29,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;
