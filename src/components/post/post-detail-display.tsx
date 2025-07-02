@@ -13,6 +13,7 @@ import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft, Loader2 } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from './share-modal';
+import { PostLikersModal } from './post-likers-modal';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
 import { Timestamp } from 'firebase/firestore';
@@ -27,6 +28,7 @@ interface PostDetailDisplayProps {
 export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const timeAgo = post.createdAt instanceof Timestamp ? formatTimeAgo(post.createdAt) : 'Invalid date';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
   const [currentPostUrl, setCurrentPostUrl] = useState('');
   const { toast } = useToast();
   const router = useRouter();
@@ -227,7 +229,9 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
           </div>
           
           {localLikesCount > 0 && (
-            <p className="text-sm font-semibold">{localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}</p>
+             <Button variant="link" className="text-sm font-semibold p-0 h-auto text-foreground hover:no-underline" onClick={() => setIsLikesModalOpen(true)}>
+                {localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}
+            </Button>
           )}
         </CardFooter>
       </Card>
@@ -240,6 +244,12 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
           postCaption={post.caption}
         />
       )}
+
+      <PostLikersModal
+        postId={post.id}
+        isOpen={isLikesModalOpen}
+        onOpenChange={setIsLikesModalOpen}
+      />
     </>
   );
 }
