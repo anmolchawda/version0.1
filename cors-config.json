@@ -3,7 +3,9 @@
       "origin": [
         "https://fieldverse-m99ip.web.app",
         "https://fieldverse-m99ip.firebaseapp.com",
-        "https://6000-firebase-studio-1748099875903.cluster-htdgsbmflbdmov5xrjithceibm.cloudworkstations.dev"
+        "https://6000-firebase-studio-1748099875903.cluster-htdgsbmflbdmov5xrjithceibm.cloudworkstations.dev",
+        "https://4000-firebase-studio-1748099875903.cluster-htdgsbmflbdmov5xrjithceibm.cloudworkstations.dev",
+        "https://3000-firebase-studio-1748099875903.cluster-htdgsbmflbdmov5xrjithceibm.cloudworkstations.dev"
     ],
       "method": ["GET", "POST", "PUT", "DELETE"],
       "maxAgeSeconds": 3600
