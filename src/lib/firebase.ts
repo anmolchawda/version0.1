@@ -18,6 +18,9 @@ import {
   writeBatch,
   increment,
   Timestamp,
+  arrayUnion,
+  arrayRemove,
+  collectionGroup,
   type Firestore,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from 'firebase/storage';
@@ -63,6 +66,9 @@ export {
   writeBatch,
   increment,
   Timestamp,
+  arrayUnion,
+  arrayRemove,
+  collectionGroup,
   // Storage specific exports
   ref,
   uploadBytes,

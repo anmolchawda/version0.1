@@ -38,6 +38,8 @@ export interface Comment {
   createdAt: FirebaseTimestamp;
   parentId?: string | null;
   replies?: Comment[];
+  likesCount?: number;
+  likedBy?: string[];
 }
 
 export interface NavLink {
