@@ -17,8 +17,7 @@ interface FungicideItem {
   "S/C": string;
   "TL/OVI": string;
   "TARGET ": string;
-  "DOSE": string;
-  [key: string]: any; 
+  "DOSE": string; 
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5fW9-cuZpEhXsiz2riv4CwVUr78-hREC5wINice9F2I0UVgHQDEzE_RHmnh_YfQw_GA/exec";

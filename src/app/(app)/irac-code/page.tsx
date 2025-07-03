@@ -51,7 +51,7 @@ export default function IracCodePage() {
             <h3 className="font-semibold text-lg text-primary mb-2">Key Principles for IRM using IRAC Codes</h3>
              <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground pl-4">
                 <li><strong>Rotate MoA Groups:</strong> Avoid repeated use of insecticides from the same IRAC MoA group against successive generations of a pest.</li>
-                <li><strong>Use Spray Windows:</strong> Apply products from the same MoA group within a defined "spray window" or "treatment block" and then switch to a different MoA group for the next window.</li>
+                <li><strong>Use Spray Windows:</strong> Apply products from the same MoA group within a defined spray window or treatment block and then switch to a different MoA group for the next window.</li>
                 <li><strong>Follow Label Instructions:</strong> Always adhere to product label recommendations regarding application rates, timing, and resistance management advice.</li>
                 <li><strong>Integrate Pest Management (IPM):</strong> Use IRAC codes as part of a broader IPM strategy that includes cultural, biological, and other non-chemical control methods.</li>
             </ul>

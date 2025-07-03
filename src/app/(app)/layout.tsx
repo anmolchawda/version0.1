@@ -146,7 +146,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
               `flex-1 py-6 overflow-y-auto mb-16` 
             )}
           >
-            <div className="max-w-2xl mx-auto px-4 h-full"> 
+            <div className="max-w-2xl mx-auto px-4"> 
             {children}
             </div>
           </main>

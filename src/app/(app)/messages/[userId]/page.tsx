@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { ChevronLeft, Send, MoreVertical, Phone, Video, Trash2, ShieldAlert, UserX, Paperclip, X as XIcon, Loader2 } from 'lucide-react';
+import { ChevronLeft, Send, MoreVertical, Phone, Video, Trash2, ShieldAlert, UserX, Paperclip, X as XIcon, Loader2, } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,9 +29,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
-import type { User, ChatMessage, FirestoreMessage, FirestoreConversation } from '@/types';
+import type { User, ChatMessage, FirestoreMessage, FirestoreConversation, } from '@/types';
 import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
 import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, getDoc } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 
@@ -51,7 +50,6 @@ export default function ChatPage() {
   const [chatPartner, setChatPartner] = useState<User | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [error, setError] = useState<string | null>(null);

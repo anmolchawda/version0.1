@@ -52,8 +52,8 @@ export default function FracCodePage() {
             <h3 className="font-semibold text-lg text-primary mb-2">Key Principles for FRM using FRAC Codes</h3>
              <ul className="list-disc list-inside mt-2 space-y-1 text-muted-foreground pl-4">
                 <li><strong>Rotate MoA Groups:</strong> Avoid consecutive applications of fungicides from the same FRAC MoA group. Alternate with fungicides from different groups.</li>
-                <li><strong>Use Mixtures:</strong> Tank-mixing or using pre-packaged mixtures of fungicides from different MoA groups can be an effective strategy, provided it's supported by product labels and local recommendations.</li>
-                <li><strong>Limit Applications:</strong> Adhere to the recommended maximum number of applications for fungicides within a specific FRAC group per season or crop cycle.</li>
+                <li><strong>Use Mixtures:</strong> Tank-mixing or using pre-packaged mixtures of fungicides from different MoA groups can be an effective strategy, provided it&apos;s supported by product labels and local recommendations.</li>
+ <li><strong>Limit Applications:</strong> Adhere to the recommended maximum number of applications for fungicides within a specific FRAC group per season or crop cycle.</li>
                 <li><strong>Follow Label Instructions:</strong> Always read and follow product label recommendations regarding application rates, timing, and specific resistance management advice.</li>
                 <li><strong>Integrated Disease Management (IDM):</strong> Incorporate FRAC code-based strategies as part of a broader IDM program that includes cultural practices, resistant varieties, and biological controls where appropriate.</li>
             </ul>

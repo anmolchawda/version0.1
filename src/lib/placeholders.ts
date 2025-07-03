@@ -1,4 +1,4 @@
-import type { User, Post, Comment, MandiListing, ChatMessage, FirestoreConversation, DisplayConversation, Yojna, DiscoverDisease, BuyerRequirement } from '@/types'; // Updated imports
+import type { User, Post, Comment, MandiListing } from '@/types'; // Updated imports
 import { formatDistanceToNow } from 'date-fns';
 import { Timestamp } from 'firebase/firestore'; // Import Firebase Timestamp
 // Removed NotebookText import as icon field is removed from Yojna

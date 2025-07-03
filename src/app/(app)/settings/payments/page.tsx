@@ -2,8 +2,8 @@
 // src/app/(app)/settings/payments/page.tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { CreditCard, Wallet, ListChecks, DollarSign } from "lucide-react"; // Using Wallet as a generic for GPay
+import { Separator } from '@/components/ui/separator';
+import { CreditCard, ListChecks, DollarSign } from "lucide-react";
 
 // A simple SVG for Google Pay as Lucide doesn't have a direct one.
 const GooglePayLogo = () => (

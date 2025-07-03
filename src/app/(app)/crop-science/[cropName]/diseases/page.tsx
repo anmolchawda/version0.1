@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ShieldAlert, Leaf, Loader2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ShieldAlert, Loader2, AlertTriangle } from "lucide-react";
 
 interface DiseaseDataItem {
   // General fields
@@ -24,7 +24,7 @@ interface DiseaseDataItem {
   "SYMPTOMS"?: string;
   "MANAGEMENT"?: string;
 
-  [key: string]: any; // To accommodate other potential fields
+  [key: string]: string | undefined; // Assuming other potential fields are strings
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrbyhJ85nt_dMLSnTt3JHC-WJ3Ll9C3HiQ8N-Eo7fyYuBPek6lAX2L75fFj30KOrsww/exec";
@@ -55,9 +55,9 @@ export default function DiseasesPage() {
         if (!response.ok) {
           let errorText = `Failed to fetch data from ${APPS_SCRIPT_URL}: ${response.status} ${response.statusText}`;
           try {
-            const body = await response.text(); 
-            errorText += `\nResponse body (first 500 chars): ${body.substring(0, 500)}`; 
-          } catch (e) { /* Ignore error reading body */ }
+            const body = await response.text(); // ignore is unused here
+            errorText += `\nResponse body (first 500 chars): ${body.substring(0, 500)}`; // ignore is unused here
+          } catch (ignore) { /* Ignore error reading body */ }
           throw new Error(errorText);
         }
         
@@ -71,7 +71,7 @@ export default function DiseasesPage() {
             const dataArrayKey = Object.keys(data).find(key => Array.isArray(data[key]));
             if (dataArrayKey && Array.isArray(data[dataArrayKey])) {
                 processedData = data[dataArrayKey];
-            } else if (Object.values(data).every(val => typeof val === 'object' && val !== null && Object.keys(val).length > 0)) {
+            } else if (Object.values(data).every(val => typeof val === 'object' && val !== null)) {
                 processedData = Object.values(data) as DiseaseDataItem[];
             } else {
                throw new Error("Fetched data format is not a recognized array or object containing an array of items.");
@@ -105,7 +105,7 @@ export default function DiseasesPage() {
         setError(detailedErrorMessage);
         setDiseasesData([]); 
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); 
       }
     };
 
@@ -227,7 +227,7 @@ export default function DiseasesPage() {
                       </div>
                       <div className="flex flex-col">
                         <CardTitle className="text-md text-primary">{diseaseName}</CardTitle>
-                        {cropSlug === 'tomato' && (
+ {cropSlug === 'tomato' && (
                           <p className="text-xs text-muted-foreground uppercase mt-1">TOMATO</p>
                         )}
                       </div>
