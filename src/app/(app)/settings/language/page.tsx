@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useSidebarContext } from '@/hooks/useSidebarContext';
-import { db, doc, setDoc } from '@/lib/firebase';
+import { db, doc, setDoc, getDoc } from '@/lib/firebase';
 
 
 interface Language {
@@ -78,14 +78,27 @@ export default function LanguageSettingsPage() {
     if (authUserId && db) {
       try {
         const userDocRef = doc(db, 'users', authUserId);
+
+        // Fetch user data to check if profile is already complete
+        const userDocSnap = await getDoc(userDocRef);
+        const isProfileComplete = userDocSnap.exists() && userDocSnap.data().profileSetupComplete === true;
+
         await setDoc(userDocRef, {
             languageSelected: true,
             languagePreference: value,
         }, { merge: true });
         
-        // This will trigger the auth guard in the layout to redirect
-        // We push to account page as a faster UX transition
-        router.push('/settings/account');
+        if (isProfileComplete) {
+            // Existing user changing language from settings
+            toast({
+              title: "Language Updated",
+              description: `Language preference has been saved.`,
+            });
+            router.push('/feed'); // Redirect to feed
+        } else {
+            // New user, redirect to profile setup
+            router.push('/settings/account');
+        }
 
       } catch (error) {
         console.error("Error updating user language preference:", error);
