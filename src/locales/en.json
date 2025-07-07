@@ -1,4 +1,3 @@
-
 {
   "feed": "Feed",
   "discover": "Discover",
@@ -261,8 +260,38 @@
   "mandiRequirementDeletedDesc": "Your requirement for \"{itemName}\" has been deleted.",
   "databaseNotAvailableError": "Database is not available.",
   "yojnasTitle": "Yojnas (Schemes)",
-      "failedToLoadYojnasError": "Failed to load schemes.",
-      "learnMoreButton": "Learn More",
-      "noYojnasFoundTitle": "No Schemes Found",
-      "noYojnasFoundDescription": "There are no schemes available at the moment."
-}
+  "failedToLoadYojnasError": "Failed to load schemes.",
+  "learnMoreButton": "Learn More",
+  "noYojnasFoundTitle": "No Schemes Found",
+  "noYojnasFoundDescription": "There are no schemes available at the moment.",
+  "editComment": "Edit Comment",
+  "deleteComment": "Delete Comment",
+  "deleteCommentConfirmTitle": "Are you sure?",
+  "deleteCommentConfirmDescription": "This will permanently delete your comment. This action cannot be undone.",
+  "deleteConfirmButton": "Delete",
+  "commentUpdatedSuccess": "Comment updated successfully.",
+  "commentDeletedSuccess": "Comment has been removed.",
+  "commentUpdateFailed": "Failed to update comment.",
+  "commentDeleteFailed": "Failed to delete comment.",
+  "saveButton": "Save",
+  "likesByTitle": "Liked By",
+  "noLikesYet": "No likes yet. Be the first!",
+  "loadMoreComments": "Load more comments",
+  "viewReplies": "View {count} replies",
+  "hideReplies": "Hide replies",
+  "loadMoreReplies": "Load more replies",
+  "reply": "Reply",
+  "send": "Send",
+  "comment": "Comment",
+  "comments": "Comments",
+  "likes": "Likes",
+  "share": "Share",
+  "copiedLink": "Link copied!",
+  "copyLink": "Copy link",
+  "shareTo": "Share to",
+  "shareViaWhatsapp": "Share via WhatsApp",
+  "shareViaFacebook": "Share via Facebook",
+  "sendToUser": "Send to user",
+  "cancelButton":"cancelButton"
+  }
+  

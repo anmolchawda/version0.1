@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, MailCheck } from 'lucide-react';
-import { auth } from '@/lib/firebase'; // Firebase Auth
+import { auth, db, doc, setDoc, serverTimestamp } from '@/lib/firebase'; // Firebase Auth
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification } from 'firebase/auth';
 
 // Simple Google G logo SVG
@@ -46,7 +47,7 @@ export function SignupForm() {
       return;
     }
     setIsLoading(true);
-    if (!auth) {
+    if (!auth || !db) {
         toast({ title: "Signup Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
         setIsLoading(false);
         return;
@@ -54,6 +55,23 @@ export function SignupForm() {
     
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      const user = userCredential.user;
+      const userDocRef = doc(db, 'users', user.uid);
+      await setDoc(userDocRef, {
+        id: user.uid,
+        username: username.trim(),
+        email: user.email,
+        name: '',
+        avatarUrl: '',
+        createdAt: serverTimestamp(),
+        languageSelected: false,
+        profileSetupComplete: false,
+        followersCount: 0,
+        followingCount: 0,
+        postCount: 0
+      });
+
       await sendEmailVerification(userCredential.user);
       
       setSignupSuccess(true); // Update UI to show verification message
@@ -77,7 +95,7 @@ export function SignupForm() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       // Let the app layout's auth state listener and gatekeeper handle redirection.
-      router.push('/feed');
+      router.push('/');
     } catch (error: any) {
       console.error('Google Sign-up error:', error.code, error.message);
       if (error.code === 'auth/popup-closed-by-user') {

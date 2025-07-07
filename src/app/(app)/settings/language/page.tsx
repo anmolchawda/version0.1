@@ -1,3 +1,4 @@
+
 // src/app/(app)/settings/language/page.tsx
 'use client';
 
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +20,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useSidebarContext } from '@/hooks/useSidebarContext';
+import { db, doc, setDoc } from '@/lib/firebase';
 
 
 interface Language {
@@ -50,25 +53,58 @@ const DEFAULT_LANG_CODE = 'en';
 export default function LanguageSettingsPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const { authUserId } = useSidebarContext();
+
   const [selectedLanguage, setSelectedLanguage] = useState<string>(DEFAULT_LANG_CODE);
+  const [isSaving, setIsSaving] = useState(false);
   const [showReloadDialog, setShowReloadDialog] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('selectedAppLanguage');
     if (storedLanguage && allSupportedLanguages.some(lang => lang.code === storedLanguage)) {
       setSelectedLanguage(storedLanguage);
     }
+    setIsInitialLoad(false);
   }, []);
 
-  const handleLanguageChange = (value: string) => {
+  const handleLanguageChange = async (value: string) => {
+    if (isSaving || isInitialLoad) return;
+    
+    setIsSaving(true);
     setSelectedLanguage(value);
     localStorage.setItem('selectedAppLanguage', value);
-    const selectedLangInfo = allSupportedLanguages.find(l => l.code === value);
-    toast({
-      title: "Language Preference Saved",
-      description: `App language set to ${selectedLangInfo?.englishName || value}. Reload for changes to take full effect.`,
-    });
-    setShowReloadDialog(true); // Show the reload dialog
+    
+    if (authUserId && db) {
+      try {
+        const userDocRef = doc(db, 'users', authUserId);
+        await setDoc(userDocRef, {
+            languageSelected: true,
+            languagePreference: value,
+        }, { merge: true });
+        
+        // This will trigger the auth guard in the layout to redirect
+        // We push to account page as a faster UX transition
+        router.push('/settings/account');
+
+      } catch (error) {
+        console.error("Error updating user language preference:", error);
+        toast({
+            title: 'Error',
+            description: 'Could not save your language selection. Please try again.',
+            variant: 'destructive',
+        });
+        setIsSaving(false);
+      }
+    } else {
+        // Fallback for non-ideal situations (e.g., user not logged in but on this page)
+        toast({
+          title: "Language Preference Saved",
+          description: `App language set to ${value}. Reload for changes to take full effect.`,
+        });
+        setShowReloadDialog(true);
+        setIsSaving(false);
+    }
   };
 
   const handleReload = () => {
@@ -86,6 +122,7 @@ export default function LanguageSettingsPage() {
               onClick={() => router.back()}
               className="absolute left-0 top-1/2 -translate-y-1/2 sm:left-0 h-9 w-9"
               aria-label="Go back"
+              disabled={isSaving}
             >
               <ChevronLeft className="h-6 w-6" />
             </Button>
@@ -94,8 +131,14 @@ export default function LanguageSettingsPage() {
               <span className="block text-xl font-semibold text-primary mt-1">SELECT LANGUAGE</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-0 sm:px-2">
-            <RadioGroup value={selectedLanguage} onValueChange={handleLanguageChange} className="space-y-0">
+          <CardContent className="px-0 sm:px-2 relative">
+             {isSaving && (
+                <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="mt-2 text-sm text-muted-foreground">Saving...</p>
+                </div>
+             )}
+            <RadioGroup value={selectedLanguage} onValueChange={handleLanguageChange} className="space-y-0" disabled={isSaving}>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
                 {mainLanguages.map((lang) => (
                   <Label

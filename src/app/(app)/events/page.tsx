@@ -6,9 +6,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { CalendarDays, MapPin, ListChecks } from "lucide-react";
-import { format, isSameDay } from 'date-fns'; // Assuming isSameDay is still used internally by Calendar
+import { format, isSameDay } from 'date-fns';
 import { mockEventsData } from '@/data/events';
+import type { MockEvent } from '@/data/events';
 
 // Helper component to render SVG strings safely
 const SvgIcon = ({ svgString }: { svgString: string }) => {

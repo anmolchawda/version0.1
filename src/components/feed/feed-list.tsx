@@ -95,7 +95,7 @@ export function FeedList() {
       setIsLoading(false);
       setPullDeltaY(0);
     }, 500);
-  }, [mockPlaceholderPosts]);
+  }, []);
 
   useEffect(() => {
     if (COMPONENT_USE_MOCK_DATA) {

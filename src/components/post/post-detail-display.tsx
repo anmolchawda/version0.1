@@ -13,7 +13,7 @@ import type { Post } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark, CalendarDays, ChevronLeft, Loader2 } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from './share-modal';
-import { PostLikersModal } from './post-likers-modal';
+import { LikesModal } from './likes-modal'; // Import the new modal
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
 import { Timestamp } from 'firebase/firestore';
@@ -28,7 +28,7 @@ interface PostDetailDisplayProps {
 export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
   const timeAgo = post.createdAt instanceof Timestamp ? formatTimeAgo(post.createdAt) : 'Invalid date';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
+  const [isLikesModalOpen, setIsLikesModalOpen] = useState(false); // State for the new modal
   const [currentPostUrl, setCurrentPostUrl] = useState('');
   const { toast } = useToast();
   const router = useRouter();
@@ -229,8 +229,9 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
           </div>
           
           {localLikesCount > 0 && (
-             <Button variant="link" className="text-sm font-semibold p-0 h-auto text-foreground hover:no-underline" onClick={() => setIsLikesModalOpen(true)}>
-                {localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}
+            <Button variant="link" className="p-0 h-auto text-sm font-semibold text-foreground hover:no-underline" onClick={() => setIsLikesModalOpen(true)}>
+              <Heart className="h-4 w-4 mr-1.5 fill-muted-foreground text-muted-foreground" />
+              {localLikesCount} {localLikesCount === 1 ? t('likeCountSingular') : t('likeCountPlural')}
             </Button>
           )}
         </CardFooter>
@@ -244,11 +245,10 @@ export function PostDetailDisplay({ post }: PostDetailDisplayProps) {
           postCaption={post.caption}
         />
       )}
-
-      <PostLikersModal
-        postId={post.id}
+      <LikesModal
         isOpen={isLikesModalOpen}
         onOpenChange={setIsLikesModalOpen}
+        postId={post.id}
       />
     </>
   );

@@ -17,6 +17,7 @@ interface InsecticideItem {
   "TL/OVI": string;
   "TARGET PEST": string;
   "DOSE": string;
+  [key: string]: any; 
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0n3BY-ZJRPSL-NbPHBrnFGlalSgEdpbH9Mvd6kPzJcRASmBCmzZOc0aQ8pt-j-7gHSQ/exec";

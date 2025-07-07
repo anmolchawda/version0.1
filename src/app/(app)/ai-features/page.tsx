@@ -4,12 +4,12 @@
 
 import { useState, type ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label"; 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; 
-import { Loader2, Brain, Image as ImageIcon, Sparkles, AlertCircle, CheckCircle, Leaf, X } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2, Brain, UploadCloud, Image as ImageIcon, Sparkles, AlertCircle, CheckCircle, Leaf, X } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow';
 import { useTranslations } from '@/hooks/useTranslations';

@@ -129,7 +129,7 @@ export default function FollowersPage() {
             <div className="text-center py-10 text-muted-foreground px-4">
               <Users className="mx-auto h-12 w-12 mb-4 text-gray-400" />
               <p className="text-lg">@{profileUser.username} has no followers yet.</p>
-              <p className="text-sm">When people follow them, they&apos;ll appear here.</p>
+              <p className="text-sm">When people follow them, they'll appear here.</p>
             </div>
           )}
         </CardContent>

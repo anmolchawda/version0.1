@@ -110,10 +110,23 @@ export type TranslationKey =
   // Added keys for YojnaPage:
   | 'databaseNotAvailableError'
   | 'yojnasTitle'
+ | 'likesByTitle'
+ | 'noLikesYet'
+ | 'loadMoreComments'
   | 'failedToLoadYojnasError'
   | 'learnMoreButton'
   | 'noYojnasFoundTitle'
-  | 'noYojnasFoundDescription';
+  | 'noYojnasFoundDescription'
+  | 'loadMoreReplies'
+  // Added for comment actions
+  | 'editComment' | 'deleteComment' | 'deleteCommentConfirmTitle'
+  | 'deleteCommentConfirmDescription' | 'deleteConfirmButton'
+ | 'hideReplies'
+  | 'viewReplies'
+  | 'commentUpdatedSuccess' | 'commentDeletedSuccess'
+  | 'commentUpdateFailed' | 'commentDeleteFailed'
+  | 'saveButton'
+  ;
 
 
 type Translations = Record<TranslationKey, string>;

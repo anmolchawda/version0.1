@@ -15,6 +15,8 @@ export interface User {
   followingCount?: number;
   postCount?: number;
   profileSetupComplete?: boolean;
+  languageSelected?: boolean;
+  languagePreference?: string;
   createdAt?: FirebaseTimestamp | FieldValue | undefined;
 }
 
@@ -38,8 +40,8 @@ export interface Comment {
   createdAt: FirebaseTimestamp;
   parentId?: string | null;
   replies?: Comment[];
+  replyCount?: number;
   likesCount?: number;
-  likedBy?: string[];
 }
 
 export interface NavLink {

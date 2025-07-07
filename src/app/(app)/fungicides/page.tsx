@@ -6,7 +6,8 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
-import { SprayCan, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react"; // Removed unused 'e' variable import
+import { Button } from '@/components/ui/button';
+import { SprayCan, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react";
 
 interface FungicideItem {
   "TRADE NAME ": string;
@@ -18,6 +19,7 @@ interface FungicideItem {
   "TL/OVI": string;
   "TARGET ": string;
   "DOSE": string;
+  [key: string]: any; 
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5fW9-cuZpEhXsiz2riv4CwVUr78-hREC5wINice9F2I0UVgHQDEzE_RHmnh_YfQw_GA/exec";
@@ -40,7 +42,7 @@ export default function FungicidesPage() {
             const body = await response.text(); 
             errorText += `\nResponse body: ${body.substring(0, 500)}`; 
           } catch (e) {
-            // Ignore error reading body if it fails, use `e` to satisfy linter
+            // Ignore error reading body
           }
           throw new Error(errorText);
         }
@@ -116,7 +118,7 @@ export default function FungicidesPage() {
               placeholder="Search by Trade Name, Company, Target, etc..."
               className="w-full pl-10 py-2 rounded-lg"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </CardHeader>
@@ -140,7 +142,7 @@ export default function FungicidesPage() {
           {!isLoading && !error && fungicidesData.length > 0 && filteredFungicides.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
               <ListChecks className="mx-auto h-12 w-12 mb-4 text-gray-400" />
-              <p className="text-lg">No fungicides found matching &quot;{searchTerm}&quot;.</p>
+              <p className="text-lg">No fungicides found matching "{searchTerm}".</p>
               <p className="text-sm">Try a different search term.</p>
             </div>
           )}

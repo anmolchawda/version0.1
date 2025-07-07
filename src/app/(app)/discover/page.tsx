@@ -4,18 +4,28 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Added Card imports
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { ProfileCard } from '@/components/profile/profile-card';
-import { placeholderUsers, placeholderPosts, placeholderListings } from '@/lib/placeholders';
+import { placeholderUsers, placeholderPosts, placeholderListings, formatTimeAgo } from '@/lib/placeholders';
 import { PostCard } from '@/components/feed/post-card';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
-import { Search, Users, Image as ImageIcon, Store, ListChecks, Info, CalendarDays } from 'lucide-react';
+import { Search, Users, Image as ImageIcon, Store, ListChecks, Tractor, Info, NotebookText, ShieldAlert as DiseaseIcon, CalendarDays } from 'lucide-react';
+import type { User, Post, MandiListing, Yojna, DiscoverDisease } from '@/types';
 import { mockEventsData } from '@/data/events'; // Importing mock events
+import { useTranslations } from '@/hooks/useTranslations';
+import { format, isSameDay, addDays, startOfMonth } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+// For UI display after fetching and converting timestamp
+// Assuming this type is not globally defined or needs to be here for clarity
+interface DisplayMandiListing extends Omit<MandiListing, 'createdAt'> {
+  listedDate: string; // Formatted date string
+}
 
 // Helper function to format Firebase Timestamp (assuming you have one or need a basic one)
 // Replace this with your actual timestamp formatting logic if available elsewhere
-const formatFirebaseTimestamp = (timestamp: { toDate: () => Date }): string => {
+const formatFirebaseTimestamp = (timestamp: any): string => {
   if (timestamp && timestamp.toDate) {
     // Example formatting using date-fns: "Jan 20, 2023"
     // Make sure you have date-fns installed: npm install date-fns or yarn add date-fns
@@ -24,18 +34,6 @@ const formatFirebaseTimestamp = (timestamp: { toDate: () => Date }): string => {
   }
   return 'Invalid Date'; // Or a placeholder like '-'
 };
-
-
-import { useTranslations } from '@/hooks/useTranslations'; // Keep useTranslations
-import { format } from 'date-fns'; // Keep format
-import type { MandiListing } from '@/types'; // Keep MandiListing if used as type annotation
-
-
-// For UI display after fetching and converting timestamp
-// Assuming this type is not globally defined or needs to be here for clarity
-interface DisplayMandiListing extends Omit<MandiListing, 'createdAt'> {
-  listedDate: string; // Formatted date string
-}
 
 
 export default function DiscoverPage() {

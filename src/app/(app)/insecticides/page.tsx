@@ -4,8 +4,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
 import { Bug, Loader2, AlertTriangle, Search, ListChecks } from "lucide-react";
 
 interface InsecticideItem {
@@ -111,7 +112,7 @@ export default function InsecticidesPage() {
               placeholder="Search by Trade Name, Company, Target Pest, etc..."
               className="w-full pl-10 py-2 rounded-lg"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </CardHeader>

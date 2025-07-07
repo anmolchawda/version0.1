@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
-import { auth } from '@/lib/firebase';
+import { auth, db, doc, setDoc, serverTimestamp } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification, signOut, type User as FirebaseUser } from 'firebase/auth';
 
 // Simple Google G logo SVG
@@ -80,7 +81,7 @@ export function LoginForm() {
         });
       } else {
         // Email is verified. The main app layout will handle redirection.
-        router.push('/feed');
+        router.push('/');
       }
 
     } catch (error: any) {
@@ -93,27 +94,47 @@ export function LoginForm() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    if (!auth) {
+    if (!auth || !db) {
       toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
       setIsGoogleLoading(false);
       return;
     }
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      const additionalInfo = getAdditionalUserInfo(userCredential);
+      if (additionalInfo?.isNewUser) {
+        const user = userCredential.user;
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, {
+            id: user.uid,
+            email: user.email,
+            username: user.email?.split('@')[0] || `user_${user.uid.substring(0, 6)}`,
+            name: user.displayName || '',
+            avatarUrl: user.photoURL || '',
+            createdAt: serverTimestamp(),
+            languageSelected: false,
+            profileSetupComplete: false,
+            followersCount: 0,
+            followingCount: 0,
+            postCount: 0
+        });
+      }
+
       // Let the app layout's auth state listener and gatekeeper handle redirection.
-      router.push('/feed');
+      router.push('/');
 
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
- if (error.code === 'auth/popup-closed-by-user') {
- toast({
- title: 'Login Cancelled',
- description: 'The Google sign-in window was closed.',
- });
- } else {
- toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
- }
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+        title: 'Login Cancelled',
+        description: 'The Google sign-in window was closed.',
+        });
+      } else {
+        toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+      }
     } finally {
       setIsGoogleLoading(false);
     }

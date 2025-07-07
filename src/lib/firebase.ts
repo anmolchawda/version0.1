@@ -18,9 +18,10 @@ import {
   writeBatch,
   increment,
   Timestamp,
-  arrayUnion,
-  arrayRemove,
-  collectionGroup,
+  limit,
+  startAfter,
+  type QueryDocumentSnapshot,
+  type DocumentData,
   type Firestore,
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from 'firebase/storage';
@@ -66,11 +67,13 @@ export {
   writeBatch,
   increment,
   Timestamp,
-  arrayUnion,
-  arrayRemove,
-  collectionGroup,
+  limit,
+  startAfter,
   // Storage specific exports
   ref,
   uploadBytes,
   getDownloadURL,
+  // Firestore specific type exports
+  type QueryDocumentSnapshot,
+  type DocumentData,
 };

@@ -26,7 +26,8 @@ interface DiseaseDataItem {
   "CAUSING AGENT"?: string;
   "FAVOURABLE CLIMATE"?: string;
   "SYMPTOMS"?: string;
-  [key: string]: string | undefined | null;
+  "MANAGEMENT"?: string;
+  [key: string]: any;
 }
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyGrbyhJ85nt_dMLSnTt3JHC-WJ3Ll9C3HiQ8N-Eo7fyYuBPek6lAX2L75fFj30KOrsww/exec";
@@ -89,7 +90,7 @@ export default function DiseaseDetailPage() {
             }
         } else {
           throw new Error("Fetched data format is not as expected.");
-				}
+        }
         
         const cropDisplayNameForError = cropNameParam.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         const foundDisease = allItems.find(item => 

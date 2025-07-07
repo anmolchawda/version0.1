@@ -128,8 +128,8 @@ export default function FollowingPage() {
           ) : (
             <div className="text-center py-10 text-muted-foreground px-4">
               <Users className="mx-auto h-12 w-12 mb-4 text-gray-400" />
- <p className="text-lg">@{profileUser.username} isn&apos;t following anyone yet.</p>
- <p className="text-sm">When they follow people, they&apos;ll appear here.</p>
+              <p className="text-lg">@{profileUser.username} isn't following anyone yet.</p>
+              <p className="text-sm">When they follow people, they'll appear here.</p>
             </div>
           )}
         </CardContent>

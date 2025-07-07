@@ -8,7 +8,7 @@ import { UserPostGrid } from '@/components/profile/user-post-grid';
 import type { Post } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bookmark, ChevronLeft, Loader2, AlertTriangle } from 'lucide-react'; // Removed ListChecks
+import { Bookmark, ListChecks, ChevronLeft, Loader2, AlertTriangle } from 'lucide-react';
 import { useSidebarContext } from '@/hooks/useSidebarContext';
 import { db, doc, getDoc, collection, getDocs, query, Timestamp } from '@/lib/firebase';
 
@@ -105,7 +105,7 @@ export default function FavoritesPage() {
           {!error && !isLoading && favoritePosts.length === 0 && (
             <div className="text-center py-10 text-muted-foreground">
               <Bookmark className="mx-auto h-12 w-12 mb-4 text-gray-400" />
-              <p className="text-lg">You haven&apos;t saved any posts yet.</p>
+              <p className="text-lg">You haven't saved any posts yet.</p>
               <p className="text-sm">Click the bookmark icon on a post to save it here.</p>
             </div>
           )}

@@ -191,7 +191,7 @@ export default function MandiDetailPage() {
             </div>
           </div>
            {!seller.phoneNumber && (
-                <p className="text-xs text-destructive w-full text-center py-2">Seller&apos;s phone number is not available.</p>
+                <p className="text-xs text-destructive w-full text-center py-2">Seller's phone number is not available.</p>
            )}
         </CardFooter>
       </Card>

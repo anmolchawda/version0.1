@@ -1,56 +1,149 @@
 "use client"
 
+import * as React from "react"
 import { DayPicker } from "react-day-picker"
-
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { db } from "@/lib/firebase"
+import { collection, getDocs } from "firebase/firestore"
+import { isWithinInterval, format, startOfDay, endOfDay } from "date-fns"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+type CalendarEvent = {
+  id: string
+  title: string
+  description: string
+  start: Date
+  end: Date
+}
 
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
+export function CalendarWithEventModal() {
+  const [events, setEvents] = React.useState<CalendarEvent[]>([])
+  const [selectedDateEvents, setSelectedDateEvents] = React.useState<CalendarEvent[]>([])
+  const [open, setOpen] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "events"))
+        const data = snapshot.docs.map(doc => {
+          const d = doc.data()
+          return {
+            id: doc.id,
+            title: d.title,
+            description: d.description,
+            start: d.start.toDate(),
+            end: d.end.toDate(),
+          } as CalendarEvent
+        })
+        setEvents(data)
+      } catch (error) {
+        console.error("Error fetching events:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEvents()
+  }, [])
+
+  const handleDateClick = (date: Date) => {
+    const matches = events.filter(e =>
+      isWithinInterval(date, {
+        start: startOfDay(e.start),
+        end: endOfDay(e.end),
+      })
+    )
+
+    if (matches.length > 0) {
+      setSelectedDateEvents(matches)
+      setOpen(true)
+    }
+  }
+
+  // Collect all individual days covered by events
+  const allEventDates = events.flatMap(e => {
+    const days: Date[] = []
+    const cur = new Date(e.start)
+    while (cur <= e.end) {
+      days.push(new Date(cur))
+      cur.setDate(cur.getDate() + 1)
+    }
+    return days
+  })
+
+  if (loading) return <p className="text-center text-sm text-muted-foreground">Loading calendar...</p>
+
   return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
-      classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-between pt-1 items-center",
-        caption_label: "text-sm font-medium",
-        nav: "flex items-center gap-1",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        ),
-        table: "w-full border-collapse space-y-1 mt-4",
-        head_row: "flex",
-        head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(
-          buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-        ),
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
-        day_outside: "text-muted-foreground opacity-50",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
-        ...classNames,
-      }}
-      {...props}
-    />
+    <>
+      <DayPicker
+        mode={"none" as any}
+        showOutsideDays
+        modifiers={{ event: allEventDates }}
+        modifiersClassNames={{
+          event: "bg-green-600 text-white font-bold rounded-full",
+        }}
+        classNames={{
+          day: "h-9 w-9 p-0 text-sm flex items-center justify-center",
+       }}
+       dayContent={(date: Date) => {
+          const hasEvent = allEventDates.some(
+            d =>
+              d.getDate() === date.getDate() &&
+              d.getMonth() === date.getMonth() &&
+              d.getFullYear() === date.getFullYear()
+          )
+
+          return (
+            <div
+              onClick={() => handleDateClick(date)}
+              className={cn(
+                "h-9 w-9 flex items-center justify-center rounded-full",
+                hasEvent ? "cursor-pointer font-bold text-primary" : "text-muted-foreground"
+              )}
+            >
+              {date.getDate()}
+            </div>
+          )
+        }}
+      />
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-lg">
+              {selectedDateEvents.length > 1
+                ? `Events`
+                : selectedDateEvents[0]?.title}
+            </DialogTitle>
+            {selectedDateEvents.length === 1 && (
+              <DialogDescription className="mt-2 whitespace-pre-wrap text-sm">
+                {selectedDateEvents[0]?.description}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {selectedDateEvents.length > 1 && (
+            <div className="space-y-4 mt-4">
+              {selectedDateEvents.map((event) => (
+                <div key={event.id} className="border p-3 rounded-md bg-gray-50">
+                  <p className="font-semibold">{event.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {format(event.start, "MMM d")} – {format(event.end, "MMM d")}
+                  </p>
+                  <p className="text-sm">{event.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
-Calendar.displayName = "Calendar"
-
-export { Calendar }

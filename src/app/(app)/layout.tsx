@@ -20,7 +20,7 @@ interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
+  const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_language' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
   const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
   const [error, setError] = useState<string | null>(null);
   const profileUnsubscribeRef = useRef<(() => void) | null>(null);
@@ -29,7 +29,6 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setContextAuthUserId(user?.uid || null);
 
-      // Clean up previous profile listener if it exists
       if (profileUnsubscribeRef.current) {
         profileUnsubscribeRef.current();
         profileUnsubscribeRef.current = null;
@@ -50,10 +49,17 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       
       profileUnsubscribeRef.current = onSnapshot(userDocRef, 
         (userDocSnap) => {
-          if (userDocSnap.exists() && userDocSnap.data()?.profileSetupComplete) {
-            setAuthStatus('authenticated_ready');
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            if (!userData.languageSelected) {
+              setAuthStatus('authenticated_needs_language');
+            } else if (!userData.profileSetupComplete) {
+              setAuthStatus('authenticated_needs_profile');
+            } else {
+              setAuthStatus('authenticated_ready');
+            }
           } else {
-            setAuthStatus('authenticated_needs_profile');
+            setAuthStatus('authenticated_needs_language');
           }
         },
         (profileError) => {
@@ -64,7 +70,6 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       );
     });
 
-    // Cleanup function for the effect.
     return () => {
       authUnsubscribe();
       if (profileUnsubscribeRef.current) {
@@ -80,9 +85,12 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       if (!isAuthPage) {
         router.replace('/login');
       }
+    } else if (authStatus === 'authenticated_needs_language') {
+      if (pathname !== '/settings/language') {
+        router.replace('/settings/language');
+      }
     } else if (authStatus === 'authenticated_needs_profile') {
-      const isSetupPage = pathname === '/settings/account';
-      if (!isSetupPage) {
+      if (pathname !== '/settings/account') {
         router.replace('/settings/account');
       }
     }
@@ -118,6 +126,15 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
+
+  if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Redirecting to language selection...</p>
+      </div>
+    );
+  }
   
   if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
     return (
@@ -128,7 +145,12 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  if (authStatus === 'authenticated_ready' || (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account')) {
+  const isAllowedToRender = 
+    authStatus === 'authenticated_ready' ||
+    (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
+    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language');
+
+  if (isAllowedToRender) {
     return (
       <>
         <TopHeader />
@@ -141,12 +163,8 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
               aria-hidden="true"
             />
           )}
-          <main
-            className={cn(
-              `flex-1 py-6 overflow-y-auto mb-16` 
-            )}
-          >
-            <div className="max-w-2xl mx-auto px-4"> 
+          <main className="flex-1 overflow-y-auto mb-16">
+            <div className="max-w-2xl mx-auto px-4 py-6 h-full"> 
             {children}
             </div>
           </main>

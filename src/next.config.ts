@@ -1,16 +1,6 @@
-
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/feed',
-        permanent: true,
-      },
-    ]
-  },
   images: {
     remotePatterns: [
       {
@@ -29,12 +19,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     // This is required to allow the Next.js dev server to be accessed from the Firebase Studio preview pane.
-  },
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.cache = false;
-    }
-    return config;
   },
 };
 

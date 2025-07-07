@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogOverlay, DialogTrigger, DialogHeader, Dial
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, writeBatch, increment, serverTimestamp, setDoc, deleteDoc } from 'firebase/firestore'; // eslint-disable-line no-unused-vars
+import { doc, getDoc, setDoc, deleteDoc, writeBatch, increment, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProfileDetailsProps {

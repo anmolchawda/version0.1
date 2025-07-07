@@ -18,11 +18,12 @@ import {
 import {
   Card,
   CardContent,
- CardDescription,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase, ClipboardList, PackageSearch, Loader2 } from 'lucide-react';
 import { placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';

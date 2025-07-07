@@ -7,7 +7,7 @@
   },
   "apphosting": [
     {
-      "backendId": "krishixapphosting",
+      "backendId": "apphosting",
       "rootDir": ".",
       "ignore": [
         "node_modules",
@@ -29,7 +29,7 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "krishixapphosting",
+          "serviceId": "apphosting",
           "region": "us-central1"
         }
       }

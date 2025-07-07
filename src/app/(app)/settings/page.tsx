@@ -14,7 +14,7 @@ import {
   Settings as SettingsIcon
 } from "lucide-react";
 import Link from "next/link";
-import { useTranslations, TranslationKey } from '@/hooks/useTranslations'; // Import the hook
+import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
 
 export default function SettingsPage() {
   const { t } = useTranslations(); // Initialize the hook
@@ -51,7 +51,7 @@ export default function SettingsPage() {
             >
               <div className="flex items-center space-x-4">
                 <item.icon className="h-6 w-6 text-primary" />
-                <span className="text-base font-medium">{t(item.labelKey as TranslationKey)}</span>
+                <span className="text-base font-medium">{t(item.labelKey as any)}</span>
               </div>
               <ChevronRight className="h-5 w-5 text-muted-foreground" />
             </Link>

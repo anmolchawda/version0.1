@@ -5,7 +5,7 @@ import { useParams, notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { PostDetailDisplay } from '@/components/post/post-detail-display';
 import { CommentSection } from '@/components/comment/comment-section';
-import { db, doc, getDoc } from '@/lib/firebase';
+import { db, doc, getDoc, Timestamp } from '@/lib/firebase';
 import type { Post } from '@/types';
 import { Loader2 } from 'lucide-react';
 
