@@ -1,15 +1,17 @@
+
 // src/components/comment/comment-item.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import type { Comment as CommentType } from '@/types';
+import type { Comment as CommentType, User } from '@/types';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { useTranslations } from '@/hooks/useTranslations';
-import { db, Timestamp, collection, query, where, orderBy, limit, getDocs, startAfter, onSnapshot, doc } from '@/lib/firebase';
+import { db, Timestamp, collection, query, where, orderBy, limit, getDocs, startAfter, onSnapshot, doc, writeBatch, increment, serverTimestamp, getDoc, deleteDoc } from '@/lib/firebase';
 import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
-import { MoreHorizontal, Edit, Trash2, Loader2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, Loader2, Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 interface CommentItemProps {
   comment: CommentType;
@@ -46,6 +49,7 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
   const [editedText, setEditedText] = useState(comment.text);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
+  const { toast } = useToast();
   
   const [replies, setReplies] = useState<CommentType[]>([]);
   const [showReplies, setShowReplies] = useState(false);
@@ -54,9 +58,12 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
   const [hasMoreReplies, setHasMoreReplies] = useState(false);
   const [localReplyCount, setLocalReplyCount] = useState(comment.replyCount ?? 0);
 
+  const [isLiked, setIsLiked] = useState(false);
+  const [localLikesCount, setLocalLikesCount] = useState(comment.likesCount ?? 0);
+  const [isLoadingLike, setIsLoadingLike] = useState(true);
+
   const isOwner = currentUserId === comment.user.id;
 
-  // Listen for real-time updates on reply count
   useEffect(() => {
     if (!db) return;
     const commentRef = doc(db, 'posts', postId, 'comments', comment.id);
@@ -64,10 +71,20 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
         if (doc.exists()) {
             const data = doc.data();
             setLocalReplyCount(data.replyCount ?? 0);
+            setLocalLikesCount(data.likesCount ?? 0);
         }
     });
+
+    if (currentUserId) {
+        setIsLoadingLike(true);
+        const likeRef = doc(db, 'posts', postId, 'comments', comment.id, 'likedByUsers', currentUserId);
+        getDoc(likeRef).then(doc => setIsLiked(doc.exists())).finally(() => setIsLoadingLike(false));
+    } else {
+        setIsLoadingLike(false);
+    }
+    
     return () => unsubscribe();
-  }, [postId, comment.id]);
+  }, [postId, comment.id, currentUserId]);
 
   const fetchReplies = useCallback(async (loadMore = false) => {
     if (!db) return;
@@ -100,40 +117,80 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
     if (showReplies && replies.length === 0 && localReplyCount > 0) {
       fetchReplies();
     }
-    // This effect should only trigger when showReplies becomes true.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showReplies, localReplyCount]);
+  }, [showReplies, localReplyCount, fetchReplies, replies.length]);
   
   useEffect(() => {
     setEditedText(comment.text);
   }, [comment.text]);
   
-  const handleToggleReplies = () => {
-    setShowReplies(prev => !prev);
-  };
-  
-  const handleReplyClick = () => {
-    onStartReply(comment.id, comment.user.username);
-  };
+  const handleToggleReplies = () => setShowReplies(prev => !prev);
+  const handleReplyClick = () => onStartReply(comment.id, comment.user.username);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editedText.trim() === comment.text.trim() || !editedText.trim()) {
         setIsEditing(false);
-        setEditedText(comment.text); // revert changes if empty or same
+        setEditedText(comment.text);
         return;
     }
     await onUpdate(comment.id, editedText.trim());
     setIsEditing(false);
   };
   
-  const handleDeleteClick = () => {
-    onDelete(comment.id, comment.parentId || null);
-  };
+  const handleDeleteClick = () => onDelete(comment.id, comment.parentId || null);
 
   const handleReplyDelete = async (replyIdToDelete: string, replysParentId: string | null) => {
     await onDelete(replyIdToDelete, replysParentId);
     setReplies(currentReplies => currentReplies.filter(r => r.id !== replyIdToDelete));
+  };
+  
+  const handleToggleCommentLike = async () => {
+      if (isLoadingLike || !currentUserId || !db) return;
+      setIsLoadingLike(true);
+
+      const newLikedState = !isLiked;
+      const commentRef = doc(db, 'posts', postId, 'comments', comment.id);
+      const likeRef = doc(commentRef, 'likedByUsers', currentUserId);
+
+      setIsLiked(newLikedState);
+      setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev-1));
+
+      try {
+          const batch = writeBatch(db);
+          if (newLikedState) {
+              batch.set(likeRef, { likedAt: serverTimestamp() });
+              batch.update(commentRef, { likesCount: increment(1) });
+              
+              if (currentUserId !== comment.user.id) {
+                  const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+                  if (currentUserDoc.exists()) {
+                      const actorData = currentUserDoc.data() as User;
+                      const notifRef = doc(collection(db, 'notifications', comment.user.id, 'items'));
+                      batch.set(notifRef, {
+                          type: 'like_comment',
+                          actor: { id: actorData.id, name: actorData.name, username: actorData.username, avatarUrl: actorData.avatarUrl },
+                          targetUserId: comment.user.id,
+                          postId: postId,
+                          commentId: comment.id,
+                          commentText: comment.text,
+                          read: false,
+                          timestamp: serverTimestamp(),
+                      });
+                  }
+              }
+          } else {
+              batch.delete(likeRef);
+              batch.update(commentRef, { likesCount: increment(-1) });
+          }
+          await batch.commit();
+      } catch (error) {
+          console.error("Error liking comment:", error);
+          toast({ title: t('errorToastTitle'), description: "Could not update like status.", variant: 'destructive'});
+          setIsLiked(!newLikedState);
+          setLocalLikesCount(comment.likesCount ?? 0);
+      } finally {
+          setIsLoadingLike(false);
+      }
   };
 
 
@@ -174,36 +231,31 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
             {!isEditing && (
               <div className="flex items-center space-x-2 mt-0.5 pl-2">
                 <p className="text-xs text-muted-foreground">{timeAgo}</p>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="p-0 h-auto text-xs text-muted-foreground hover:text-primary"
-                  onClick={handleReplyClick}
-                >
+                <Button variant="link" size="sm" className="p-0 h-auto text-xs text-muted-foreground hover:text-primary" onClick={handleReplyClick}>
                   {t('replyButtonText')}
                 </Button>
+                 {localLikesCount > 0 && <span className="text-xs text-muted-foreground">{localLikesCount} {t('likesLabel')}</span>}
               </div>
             )}
           </div>
-          {isOwner && !isEditing && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { setIsEditing(true); }}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  <span>{t('editComment')}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="text-destructive focus:text-destructive">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>{t('deleteComment')}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex items-center">
+            {isOwner && !isEditing && (
+                <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity">
+                    <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => { setIsEditing(true); }}><Edit className="mr-2 h-4 w-4" /><span>{t('editComment')}</span></DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="text-destructive focus:text-destructive"><Trash2 className="mr-2 h-4 w-4" /><span>{t('deleteComment')}</span></DropdownMenuItem>
+                </DropdownMenuContent>
+                </DropdownMenu>
+            )}
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleToggleCommentLike} disabled={isLoadingLike || !currentUserId}>
+                {isLoadingLike ? <Loader2 className="h-3 w-3 animate-spin"/> : <Heart className={cn("h-4 w-4", isLiked ? 'text-red-500 fill-red-500' : 'text-muted-foreground')} />}
+            </Button>
+          </div>
         </div>
         
         {localReplyCount > 0 && (
@@ -241,15 +293,11 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteCommentConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('deleteCommentConfirmDescription')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('deleteCommentConfirmDescription')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('cancelButtonText')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteClick} className="bg-destructive hover:bg-destructive/90">
-              {t('deleteConfirmButton')}
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteClick} className="bg-destructive hover:bg-destructive/90">{t('deleteConfirmButton')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

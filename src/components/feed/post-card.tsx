@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,13 +8,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { Post } from '@/types';
+import type { Post, User } from '@/types';
 import { Heart, MessageCircle, Send, Bookmark, Loader2 } from 'lucide-react';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { ShareModal } from '../post/share-modal';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { db, doc, updateDoc, getDoc, setDoc, deleteDoc, increment, serverTimestamp, writeBatch, Timestamp } from '@/lib/firebase';
+import { db, doc, updateDoc, getDoc, setDoc, deleteDoc, increment, serverTimestamp, writeBatch, Timestamp, collection } from '@/lib/firebase';
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 
@@ -50,7 +51,6 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
     const checkInitialStatus = async () => {
       if (!db || !isMounted) return;
 
-      // Check Like Status
       const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
       const savedDocRef = doc(db, 'users', authUserId, 'bookmarks', post.id);
 
@@ -119,7 +119,6 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
     const likedDocRef = doc(db, 'posts', post.id, 'likedByUsers', authUserId);
     const postDocRef = doc(db, 'posts', post.id);
     
-    // Optimistic UI update
     setIsLiked(newLikedState);
     setLocalLikesCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1));
 
@@ -128,16 +127,37 @@ const PostCardComponent = ({ post, priority = false }: PostCardProps) => {
       if (newLikedState) {
         batch.set(likedDocRef, { likedAt: serverTimestamp() });
         batch.update(postDocRef, { likesCount: increment(1) });
+        
+        if (authUserId !== post.user.id) {
+          const currentUserDoc = await getDoc(doc(db, 'users', authUserId));
+          if(currentUserDoc.exists()){
+            const currentUserData = currentUserDoc.data() as User;
+            const notificationRef = doc(collection(db, 'notifications', post.user.id, 'items'));
+            batch.set(notificationRef, {
+                type: 'like',
+                actor: {
+                    id: authUserId,
+                    username: currentUserData.username,
+                    name: currentUserData.name,
+                    avatarUrl: currentUserData.avatarUrl,
+                },
+                targetUserId: post.user.id,
+                postId: post.id,
+                postImageUrl: post.imageUrl || '',
+                read: false,
+                timestamp: serverTimestamp(),
+            });
+          }
+        }
       } else {
         batch.delete(likedDocRef);
         batch.update(postDocRef, { likesCount: increment(-1) });
       }
-       await batch.commit();
+      await batch.commit();
 
     } catch (error) {
       console.error("Error updating like status:", error);
       toast({ title: t('errorToastTitle'), description: t('likeUpdateErrorToastDescription'), variant: "destructive" });
-      // Revert optimistic updates
       setIsLiked(!newLikedState);
       setLocalLikesCount(post.likesCount);
     } finally {

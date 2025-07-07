@@ -1,14 +1,15 @@
+
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { Comment as CommentType, User } from '@/types';
+import type { Comment as CommentType, Post, User } from '@/types';
 import { CommentItem } from './comment-item';
 import { CommentInput } from './comment-input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { useTranslations } from '@/hooks/useTranslations';
-import { useSidebarContext } from '@/hooks/useSidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db, collection, query, orderBy, addDoc, doc, getDoc, serverTimestamp, writeBatch, Timestamp, increment, deleteDoc, updateDoc, onSnapshot, where, getDocs, limit, startAfter, type QueryDocumentSnapshot, type DocumentData } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 
@@ -72,6 +73,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     fetchComments();
     
     // Listener for total comments count
+    if (!db || !postId) return;
     const postRef = doc(db, 'posts', postId);
     const unsubscribePost = onSnapshot(postRef, (doc) => {
         if (doc.exists()) {
@@ -82,8 +84,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     return () => {
       unsubscribePost();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [postId]);
+  }, [postId, fetchComments]);
 
   const handleStartReply = (commentId: string, username: string) => {
     setReplyingToCommentId(commentId);
@@ -112,7 +113,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
         const commentToAdd: Omit<CommentType, 'id'> = {
             user: { id: authUserId, username: userData.username, name: userData.name, avatarUrl: userData.avatarUrl },
             postId: postId, text: newCommentData.text, createdAt: serverTimestamp() as Timestamp,
-            parentId: replyingToCommentId, replyCount: 0,
+            parentId: replyingToCommentId, replyCount: 0, likesCount: 0,
         };
         
         batch.set(newCommentRef, commentToAdd);
@@ -125,14 +126,58 @@ export function CommentSection({ postId }: CommentSectionProps) {
         
         await batch.commit();
         
-        // If it's a top-level comment, refresh the list to show it
         if (!replyingToCommentId) {
             fetchComments();
         }
-        // Replies are handled inside CommentItem
+
+        // --- Notification Logic ---
+        const postDoc = await getDoc(postRef);
+        if (postDoc.exists()) {
+            const postData = postDoc.data() as Post;
+            const notificationBatch = writeBatch(db);
+            const postOwnerId = postData.userId;
+
+            // Notify post owner if someone else commented
+            if (authUserId !== postOwnerId) {
+                const notifRef = doc(collection(db, 'notifications', postOwnerId, 'items'));
+                notificationBatch.set(notifRef, {
+                    type: 'comment',
+                    actor: { id: authUserId, name: userData.name, username: userData.username, avatarUrl: userData.avatarUrl },
+                    targetUserId: postOwnerId,
+                    postId: postId,
+                    postImageUrl: postData.imageUrl || '',
+                    commentText: newCommentData.text,
+                    read: false,
+                    timestamp: serverTimestamp(),
+                });
+            }
+
+            // If it's a reply, notify parent comment owner
+            if (replyingToCommentId) {
+                const parentCommentDoc = await getDoc(doc(db, 'posts', postId, 'comments', replyingToCommentId));
+                if (parentCommentDoc.exists()) {
+                    const parentCommentData = parentCommentDoc.data() as CommentType;
+                    const parentOwnerId = parentCommentData.user.id;
+                    if (authUserId !== parentOwnerId && parentOwnerId !== postOwnerId) {
+                        const replyNotifRef = doc(collection(db, 'notifications', parentOwnerId, 'items'));
+                        notificationBatch.set(replyNotifRef, {
+                            type: 'comment',
+                            actor: { id: authUserId, name: userData.name, username: userData.username, avatarUrl: userData.avatarUrl },
+                            targetUserId: parentOwnerId,
+                            postId: postId,
+                            postImageUrl: postData.imageUrl || '',
+                            commentText: newCommentData.text,
+                            read: false,
+                            timestamp: serverTimestamp(),
+                        });
+                    }
+                }
+            }
+            await notificationBatch.commit();
+        }
 
     } catch (error) {
-        console.error("Error adding comment:", error);
+        console.error("Error adding comment or notification:", error);
     }
     
     handleCancelReply();
@@ -153,7 +198,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const handleDeleteComment = async (commentId: string, parentId: string | null) => {
     if (!db) return;
     
-    // Basic deletion, does not handle recursive deletion of child replies
     const commentRef = doc(db, 'posts', postId, 'comments', commentId);
     const postRef = doc(db, 'posts', postId);
     
@@ -164,10 +208,10 @@ export function CommentSection({ postId }: CommentSectionProps) {
       if (!commentDoc.exists()) return;
       
       const commentData = commentDoc.data() as CommentType;
+      // Note: This simplified delete won't recursively find all child replies.
+      // A robust solution would use a Cloud Function for recursive deletion.
       const numToDelete = 1 + (commentData.replyCount || 0);
 
-      // This is a simplified delete. A robust solution needs a cloud function for recursion.
-      // We will just delete the comment and its direct replies if we fetch them.
       batch.delete(commentRef);
       batch.update(postRef, { commentsCount: increment(-numToDelete) });
       

@@ -128,16 +128,17 @@ export interface ActorInfo {
 
 export interface Notification {
   id: string; // Firestore document ID
-  type: 'like' | 'comment' | 'follow';
+  type: 'like' | 'comment' | 'follow' | 'like_comment';
   actor: ActorInfo; // User who performed the action
+  targetUserId: string; // The user ID for whom this notification is intended
   postId?: string; // ID of the post, if applicable
   postImageUrl?: string; // For visual cue if it's a post-related notification
-  postCaption?: string; // For context on post-related notifications
+  commentId?: string; // ID of the comment, if applicable
   commentText?: string; // Snippet of the comment
-  timestamp: FirebaseTimestamp; // Firestore Timestamp when the notification occurred
   read: boolean; // If the notification has been read by the targetUser
-  targetUserId: string; // The user ID for whom this notification is intended
+  timestamp: FirebaseTimestamp; // Firestore Timestamp when the notification occurred
 }
+
 
 export interface Yojna {
   id: string;

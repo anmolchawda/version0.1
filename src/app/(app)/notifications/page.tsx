@@ -1,3 +1,4 @@
+
 // src/app/(app)/notifications/page.tsx
 'use client';
 
@@ -7,10 +8,10 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight, Trash2, AlertTriangle } from "lucide-react";
+import { BellRing, Loader2, ListChecks, ThumbsUp, MessageSquare, UserPlus, ChevronRight, Trash2, AlertTriangle, Heart } from "lucide-react";
 import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Timestamp, getDocs } from '@/lib/firebase';
 import type { Notification as NotificationType, ActorInfo } from '@/types';
-import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
+import { formatTimeAgo } from '@/lib/placeholders';
 import { cn } from '@/lib/utils';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { useToast } from '@/hooks/use-toast';
@@ -29,30 +30,32 @@ import { useTranslations } from '@/hooks/useTranslations';
 
 function NotificationItem({ notification }: { notification: NotificationType }) {
   const { t } = useTranslations();
-  const { actor, type, postImageUrl, postId, commentText, timestamp, read } = notification;
-  // Ensure timestamp is a Timestamp object before passing to formatTimeAgo
+  const { actor, type, postImageUrl, postId, commentText, timestamp } = notification;
   const timeAgo = timestamp instanceof Timestamp ? formatTimeAgo(timestamp) : 'Invalid date';
-
-  const actorDetails = getPlaceholderUser(actor.id) || actor;
 
   let message = '';
   let link = `/profile/${actor.id}`;
-  let actionIcon = <UserPlus className="h-5 w-5 text-blue-500" />;
+  let actionIcon = <UserPlus className="h-5 w-5 text-purple-500" />;
 
   switch (type) {
     case 'like':
-      message = `${actorDetails.name || actorDetails.username} ${t('likedYourPostText') || 'liked your post.'}`;
+      message = `${actor.name || actor.username} ${t('likedYourPostText') || 'liked your post.'}`;
       if (postId) link = `/post/${postId}`;
-      actionIcon = <ThumbsUp className="h-5 w-5 text-pink-500" />;
+      actionIcon = <Heart className="h-5 w-5 text-pink-500 fill-pink-500" />;
+      break;
+    case 'like_comment':
+      message = `${actor.name || actor.username} liked your comment: "${commentText ? (commentText.length > 40 ? commentText.substring(0, 37) + '...' : commentText) : ''}"`;
+      if (postId) link = `/post/${postId}`;
+      actionIcon = <Heart className="h-5 w-5 text-pink-500 fill-pink-500" />;
       break;
     case 'comment':
-      message = `${actorDetails.name || actorDetails.username} ${t('commentedOnYourPostText') || 'commented:'} "${commentText ? (commentText.length > 50 ? commentText.substring(0, 47) + '...' : commentText) : t('onYourPostText') || 'on your post.'}"`;
+      message = `${actor.name || actor.username} ${t('commentedOnYourPostText') || 'commented:'} "${commentText ? (commentText.length > 50 ? commentText.substring(0, 47) + '...' : commentText) : t('onYourPostText') || 'on your post.'}"`;
       if (postId) link = `/post/${postId}#comments`;
       actionIcon = <MessageSquare className="h-5 w-5 text-green-500" />;
       break;
     case 'follow':
-      message = `${actorDetails.name || actorDetails.username} ${t('startedFollowingYouText') || 'started following you.'}`;
-      actionIcon = <UserPlus className="h-5 w-5 text-purple-500" />;
+      message = `${actor.name || actor.username} ${t('startedFollowingYouText') || 'started following you.'}`;
+      actionIcon = <UserPlus className="h-5 w-5 text-blue-500" />;
       break;
     default:
       message = t('newNotificationText') || 'New notification.';
@@ -63,13 +66,13 @@ function NotificationItem({ notification }: { notification: NotificationType }) 
       <div
         className={cn(
           "flex items-start space-x-3 p-3 hover:bg-muted/50 transition-colors rounded-lg",
-          !read && "bg-primary/5 border border-primary/20"
+          !notification.read && "bg-primary/5"
         )}
       >
         <div className="mt-1 shrink-0">{actionIcon}</div>
         <Avatar className="h-10 w-10 border shrink-0">
-          <AvatarImage src={actorDetails.avatarUrl} alt={actorDetails.username} data-ai-hint="person user" />
-          <AvatarFallback>{actorDetails.username?.charAt(0).toUpperCase()}</AvatarFallback>
+          <AvatarImage src={actor.avatarUrl} alt={actor.username} data-ai-hint="person user" />
+          <AvatarFallback>{actor.username?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="flex-grow min-w-0">
           <p className="text-sm text-foreground whitespace-normal break-words">
@@ -100,7 +103,6 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!db || !authUserId) {
-      console.log("[NotificationsPage] Mock mode or no authUserId. Skipping Firestore listener for notifications.");
       setNotifications([]);
       setIsLoading(false);
       setNotificationCount(0);
@@ -127,7 +129,6 @@ export default function NotificationsPage() {
       setNotifications(fetchedNotifications);
       setIsLoading(false);
 
-      // If there are unread notifications, mark them as read in a batch
       if (unreadNotificationIds.length > 0) {
         const batch = writeBatch(db);
         unreadNotificationIds.forEach(id => {
@@ -137,13 +138,11 @@ export default function NotificationsPage() {
         
         try {
           await batch.commit();
-          // The listener in TopHeader will automatically update the count
         } catch (e) {
           console.error("Error marking notifications as read:", e);
         }
       }
       
-      // Also ensure context count is zero since we are on the page
       setNotificationCount(0);
 
     }, (err) => {
@@ -158,17 +157,8 @@ export default function NotificationsPage() {
   }, [authUserId, setNotificationCount, t]);
 
   const handleClearAllNotifications = async () => {
-    if (isClearing) return;
+    if (isClearing || !db || !authUserId) return;
     setIsClearing(true);
-
-    if (!db || !authUserId) {
-      setNotifications([]);
-      setNotificationCount(0);
-      toast({ title: t('toastNotificationsClearedMockTitle'), description: t('toastNotificationsClearedMockDescription') });
-      setIsClearing(false);
-      setShowClearConfirmDialog(false);
-      return;
-    }
 
     try {
       const notificationsRef = collection(db, 'notifications', authUserId, 'items');
@@ -187,8 +177,6 @@ export default function NotificationsPage() {
       });
       await batch.commit();
       
-      setNotifications([]); 
-      setNotificationCount(0);
       toast({ title: t('toastNotificationsClearedTitle'), description: t('toastNotificationsClearedDescription') });
 
     } catch (e) {
@@ -252,7 +240,7 @@ export default function NotificationsPage() {
                 {t('notificationsTitle')}
               </CardTitle>
               <CardDescription>
-                Your new updates and alerts from KrishiX.
+                {t('notificationsDescription')}
               </CardDescription>
             </div>
             {notifications.length > 0 && (

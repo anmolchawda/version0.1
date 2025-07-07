@@ -1,3 +1,4 @@
+
 // src/components/layout/top-header.tsx
 'use client';
 
@@ -16,14 +17,13 @@ const TopHeaderComponent = () => { // Changed to named component
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
+    // This effect is for demonstration and would be replaced by a real-time listener
     if (pathname.startsWith('/messages')) {
       setUnreadMessageCount(0);
     }
-    // Notification count is now handled by the listener below
-    // and cleared on the notifications page itself.
   }, [pathname]);
 
-  // New listener for unread notifications count
+  // Listener for unread notifications count
   useEffect(() => {
     if (!authUserId || !db) {
       setNotificationCount(0);

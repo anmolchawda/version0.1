@@ -1,3 +1,4 @@
+
 // src/components/profile/profile-details.tsx
 'use client';
 
@@ -12,7 +13,7 @@ import { Dialog, DialogContent, DialogOverlay, DialogTrigger, DialogHeader, Dial
 import { useTranslations } from '@/hooks/useTranslations';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, deleteDoc, writeBatch, increment, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, writeBatch, increment, serverTimestamp, collection } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 interface ProfileDetailsProps {
@@ -82,6 +83,24 @@ function ProfileDetailsComponent({ user, isCurrentUser = false }: ProfileDetails
         batch.set(viewedUserFollowersRef, { followedAt: serverTimestamp() });
         batch.update(currentUserDocRef, { followingCount: increment(1) });
         batch.update(viewedUserDocRef, { followersCount: increment(1) });
+        
+        const currentUserProfileDoc = await getDoc(currentUserDocRef);
+        if (currentUserProfileDoc.exists()) {
+            const actorData = currentUserProfileDoc.data() as User;
+            const notificationRef = doc(collection(db, 'notifications', user.id, 'items'));
+            batch.set(notificationRef, {
+                type: 'follow',
+                actor: {
+                    id: authUserId,
+                    username: actorData.username,
+                    name: actorData.name,
+                    avatarUrl: actorData.avatarUrl,
+                },
+                targetUserId: user.id,
+                read: false,
+                timestamp: serverTimestamp(),
+            });
+        }
       } else { // Unfollow
         batch.delete(currentUserFollowingRef);
         batch.delete(viewedUserFollowersRef);
