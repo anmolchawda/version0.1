@@ -60,8 +60,10 @@ export function CalendarWithEventModal() {
   const EventDay = (props: DayProps) => {
     // FIX: The error "Invalid time value" occurs when `props.date` is not a valid
     // Date object. This guard prevents the crash by checking for validity before formatting.
+    // It also prevents hydration errors by returning a consistent element type.
     if (!props.date || isNaN(props.date.getTime())) {
-      return <div className="h-9 w-9 p-0" />;
+      // Returning a disabled button makes the element type consistent with the valid case.
+      return <button disabled className="h-9 w-9 p-0" />;
     }
     
     const dateStr = format(props.date, 'yyyy-MM-dd');
@@ -70,12 +72,13 @@ export function CalendarWithEventModal() {
     return (
       <button 
         type="button"
-        onClick={() => handleDateClick(props.date)}
+        onClick={() => hasEvent && handleDateClick(props.date)}
         className={cn(
             "h-9 w-9 p-0 text-sm flex items-center justify-center rounded-full relative",
-            hasEvent ? "has-event-dot font-bold text-foreground cursor-pointer hover:bg-accent/50" : "text-muted-foreground",
+            hasEvent ? "has-event-dot font-bold text-foreground cursor-pointer hover:bg-accent/50" : "text-muted-foreground cursor-default",
             "focus-within:relative focus-within:z-20 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         )}
+        disabled={!hasEvent}
       >
         {props.date.getDate()}
       </button>
