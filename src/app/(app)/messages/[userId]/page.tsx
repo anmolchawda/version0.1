@@ -53,6 +53,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
+  const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
