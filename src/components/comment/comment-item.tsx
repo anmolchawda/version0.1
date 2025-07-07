@@ -86,38 +86,53 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
     return () => unsubscribe();
   }, [postId, comment.id, currentUserId]);
 
-  const fetchReplies = useCallback(async (loadMore = false) => {
-    if (!db) return;
+  const loadMoreReplies = useCallback(async () => {
+    if (!db || !lastReplyDoc) return;
     setIsLoadingReplies(true);
     try {
+      const repliesRef = collection(db, 'posts', postId, 'comments');
+      const q = query(repliesRef, where('parentId', '==', comment.id), orderBy('createdAt', 'asc'), startAfter(lastReplyDoc), limit(REPLIES_PER_PAGE));
+      
+      const snapshot = await getDocs(q);
+      const fetchedReplies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CommentType));
+      
+      setReplies(prev => [...prev, ...fetchedReplies]);
+      const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+      setLastReplyDoc(newLastVisible);
+      setHasMoreReplies(snapshot.docs.length === REPLIES_PER_PAGE);
+    } catch (error) {
+      console.error("Error fetching more replies:", error);
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  }, [lastReplyDoc, postId, comment.id]);
+
+  useEffect(() => {
+    const fetchInitialReplies = async () => {
+      if (!db) return;
+      setIsLoadingReplies(true);
+      try {
         const repliesRef = collection(db, 'posts', postId, 'comments');
-        let q;
-        if (loadMore && lastReplyDoc) {
-            q = query(repliesRef, where('parentId', '==', comment.id), orderBy('createdAt', 'asc'), startAfter(lastReplyDoc), limit(REPLIES_PER_PAGE));
-        } else {
-            q = query(repliesRef, where('parentId', '==', comment.id), orderBy('createdAt', 'asc'), limit(REPLIES_PER_PAGE));
-        }
+        const q = query(repliesRef, where('parentId', '==', comment.id), orderBy('createdAt', 'asc'), limit(REPLIES_PER_PAGE));
         
         const snapshot = await getDocs(q);
         const fetchedReplies = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CommentType));
         
-        setReplies(prev => loadMore ? [...prev, ...fetchedReplies] : fetchedReplies);
+        setReplies(fetchedReplies);
         const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
         setLastReplyDoc(newLastVisible);
         setHasMoreReplies(snapshot.docs.length === REPLIES_PER_PAGE);
-
-    } catch (error) {
-        console.error("Error fetching replies:", error);
-    } finally {
+      } catch (error) {
+        console.error("Error fetching initial replies:", error);
+      } finally {
         setIsLoadingReplies(false);
-    }
-  }, [postId, comment.id, lastReplyDoc]);
+      }
+    };
 
-  useEffect(() => {
     if (showReplies && replies.length === 0 && localReplyCount > 0) {
-      fetchReplies();
+      fetchInitialReplies();
     }
-  }, [showReplies, localReplyCount, fetchReplies, replies.length]);
+  }, [showReplies, replies.length, localReplyCount, postId, comment.id]);
   
   useEffect(() => {
     setEditedText(comment.text);
@@ -281,7 +296,7 @@ const CommentItemComponent = ({ comment, postId, onStartReply, currentUserId, on
             ))}
             {isLoadingReplies && <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin" /></div>}
             {hasMoreReplies && !isLoadingReplies && (
-                <Button variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => fetchReplies(true)}>
+                <Button variant="link" size="sm" className="p-0 h-auto text-xs" onClick={loadMoreReplies}>
                     {t('loadMoreReplies')}
                 </Button>
             )}

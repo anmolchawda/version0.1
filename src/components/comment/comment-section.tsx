@@ -33,47 +33,40 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const { authUserId } = useSidebarContext();
   const { toast } = useToast();
 
-  const fetchComments = useCallback(async (loadMore = false) => {
+  useEffect(() => {
     if (!db || !postId) {
       setIsLoading(false);
       return;
     }
     setIsLoading(true);
 
-    try {
-      const commentsRef = collection(db, 'posts', postId, 'comments');
-      let q;
-      if (loadMore && lastVisibleDoc) {
-        q = query(commentsRef, where('parentId', '==', null), orderBy('createdAt', 'asc'), startAfter(lastVisibleDoc), limit(COMMENTS_PER_PAGE));
-      } else {
-        q = query(commentsRef, where('parentId', '==', null), orderBy('createdAt', 'asc'), limit(COMMENTS_PER_PAGE));
+    const initialFetch = async () => {
+      try {
+        const commentsRef = collection(db, 'posts', postId, 'comments');
+        const q = query(commentsRef, where('parentId', '==', null), orderBy('createdAt', 'asc'), limit(COMMENTS_PER_PAGE));
+        
+        const snapshot = await getDocs(q);
+        const fetchedComments = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        } as CommentType));
+        
+        setComments(fetchedComments);
+        const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+        setLastVisibleDoc(newLastVisible);
+        setHasMore(snapshot.docs.length === COMMENTS_PER_PAGE);
+
+      } catch (error) {
+         console.error("Error fetching initial comments:", error);
+         toast({ title: t('errorToastTitle'), description: "Could not load comments.", variant: "destructive" });
+      } finally {
+        setIsLoading(false);
       }
-      
-      const snapshot = await getDocs(q);
-      const fetchedComments = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      } as CommentType));
-      
-      setComments(prev => loadMore ? [...prev, ...fetchedComments] : fetchedComments);
-      const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
-      setLastVisibleDoc(newLastVisible);
-      setHasMore(snapshot.docs.length === COMMENTS_PER_PAGE);
+    };
 
-    } catch (error) {
-       console.error("Error fetching comments:", error);
-       toast({ title: t('errorToastTitle'), description: "Could not load comments.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [postId, lastVisibleDoc, t, toast]);
+    initialFetch();
 
-
-  useEffect(() => {
-    fetchComments();
-    
     // Listener for total comments count
-    if (!db || !postId) return;
     const postRef = doc(db, 'posts', postId);
     const unsubscribePost = onSnapshot(postRef, (doc) => {
         if (doc.exists()) {
@@ -84,7 +77,35 @@ export function CommentSection({ postId }: CommentSectionProps) {
     return () => {
       unsubscribePost();
     };
-  }, [postId, fetchComments]);
+  }, [postId, toast, t]);
+
+  const loadMoreComments = useCallback(async () => {
+    if (!db || !postId || !lastVisibleDoc) return;
+    setIsLoading(true);
+
+    try {
+      const commentsRef = collection(db, 'posts', postId, 'comments');
+      const q = query(commentsRef, where('parentId', '==', null), orderBy('createdAt', 'asc'), startAfter(lastVisibleDoc), limit(COMMENTS_PER_PAGE));
+      
+      const snapshot = await getDocs(q);
+      const fetchedComments = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      } as CommentType));
+      
+      setComments(prev => [...prev, ...fetchedComments]);
+      const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+      setLastVisibleDoc(newLastVisible);
+      setHasMore(snapshot.docs.length === COMMENTS_PER_PAGE);
+
+    } catch (error) {
+       console.error("Error fetching more comments:", error);
+       toast({ title: t('errorToastTitle'), description: "Could not load more comments.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [postId, lastVisibleDoc, t, toast]);
+
 
   const handleStartReply = (commentId: string, username: string) => {
     setReplyingToCommentId(commentId);
@@ -127,7 +148,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
         await batch.commit();
         
         if (!replyingToCommentId) {
-            fetchComments();
+            const newComment = { id: newCommentRef.id, ...commentToAdd } as CommentType;
+            setComments(prev => [...prev, newComment]);
         }
 
         // --- Notification Logic ---
@@ -188,6 +210,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     const commentRef = doc(db, 'posts', postId, 'comments', commentId);
     try {
       await updateDoc(commentRef, { text: newText });
+      setComments(prev => prev.map(c => c.id === commentId ? { ...c, text: newText } : c));
       toast({ title: t('commentUpdatedSuccess') });
     } catch (error) {
       console.error("Error updating comment:", error);
@@ -263,7 +286,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
           )}
           {hasMore && !isLoading && (
             <div className="text-center">
-                <Button variant="outline" size="sm" onClick={() => fetchComments(true)}>
+                <Button variant="outline" size="sm" onClick={loadMoreComments}>
                     {t('loadMoreComments')}
                 </Button>
             </div>

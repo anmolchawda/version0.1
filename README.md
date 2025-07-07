@@ -1,4 +1,4 @@
- import { disableNetwork, enableNetwork } from "firebase/firestore";
+ire import { disableNetwork, enableNetwork } from "firebase/firestore";
 
 await disableNetwork(db); // simulate offline
 await enableNetwork(db);  // reconnect to Firestore

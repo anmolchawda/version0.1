@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DayPicker, type DayModifiers } from "react-day-picker"
+import { DayPicker, type Modifiers } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -51,7 +51,7 @@ export function CalendarWithEventModal() {
       .filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()));
   }, [events]);
 
-  const handleDayClick = (day: Date, modifiers: DayModifiers) => {
+  const handleDayClick = (day: Date, modifiers: Modifiers) => {
     if (modifiers.hasEvent) {
       handleDateClick(day);
     }
