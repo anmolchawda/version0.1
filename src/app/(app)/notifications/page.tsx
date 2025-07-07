@@ -13,7 +13,7 @@ import { auth, db, collection, query, orderBy, onSnapshot, writeBatch, doc, Time
 import type { Notification as NotificationType, ActorInfo } from '@/types';
 import { formatTimeAgo } from '@/lib/placeholders';
 import { cn } from '@/lib/utils';
-import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useSidebarContext } from '@/hooks/useSidebarContext';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
