@@ -34,7 +34,11 @@ export function CalendarWithEventModal() {
   }, [])
 
   const handleDateClick = (date: Date) => {
-    const matches = events.filter(e => isSameDay(e.date, date));
+    // Safety check for invalid date objects
+    if (!date || isNaN(date.getTime())) {
+      return;
+    }
+    const matches = events.filter(e => e.date && !isNaN(e.date.getTime()) && isSameDay(e.date, date));
     if (matches.length > 0) {
       setSelectedDateEvents(matches)
       setSelectedDate(date);
@@ -45,12 +49,21 @@ export function CalendarWithEventModal() {
   const eventDatesSet = React.useMemo(() => {
     const dates = new Set<string>();
     events.forEach(e => {
-        dates.add(format(e.date, 'yyyy-MM-dd'));
+        // Safety check for invalid event dates
+        if (e.date && !isNaN(e.date.getTime())) {
+          dates.add(format(e.date, 'yyyy-MM-dd'));
+        }
     });
     return dates;
   }, [events]);
 
   const EventDay = (props: DayProps) => {
+    // FIX: The error "Invalid time value" occurs when `props.date` is not a valid
+    // Date object. This guard prevents the crash by checking for validity before formatting.
+    if (!props.date || isNaN(props.date.getTime())) {
+      return <div className="h-9 w-9 p-0" />;
+    }
+    
     const dateStr = format(props.date, 'yyyy-MM-dd');
     const hasEvent = eventDatesSet.has(dateStr);
     
