@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { DayPicker } from "react-day-picker"
+import { DayPicker, type DayProps } from "react-day-picker"
 import { cn } from "@/lib/utils"
 import {
   Dialog,
@@ -10,109 +10,85 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { db } from "@/lib/firebase"
-import { collection, getDocs } from "firebase/firestore"
-import { isWithinInterval, format, startOfDay, endOfDay } from "date-fns"
+import { mockEventsData, type MockEvent } from "@/data/events"
+import { isSameDay, format } from "date-fns"
+import { ScrollArea } from "./scroll-area"
 
-type CalendarEvent = {
-  id: string
-  title: string
-  description: string
-  start: Date
-  end: Date
-}
+type CalendarEvent = MockEvent
+
+const SvgIcon = ({ svgString }: { svgString: string }) => {
+  if (!svgString || typeof svgString !== 'string') return null;
+  return <div className="h-5 w-5 mr-3 shrink-0 text-primary" dangerouslySetInnerHTML={{ __html: svgString }} />;
+};
 
 export function CalendarWithEventModal() {
   const [events, setEvents] = React.useState<CalendarEvent[]>([])
   const [selectedDateEvents, setSelectedDateEvents] = React.useState<CalendarEvent[]>([])
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>();
   const [open, setOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "events"))
-        const data = snapshot.docs.map(doc => {
-          const d = doc.data()
-          return {
-            id: doc.id,
-            title: d.title,
-            description: d.description,
-            start: d.start.toDate(),
-            end: d.end.toDate(),
-          } as CalendarEvent
-        })
-        setEvents(data)
-      } catch (error) {
-        console.error("Error fetching events:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEvents()
+    setEvents(mockEventsData);
+    setLoading(false);
   }, [])
 
   const handleDateClick = (date: Date) => {
-    const matches = events.filter(e =>
-      isWithinInterval(date, {
-        start: startOfDay(e.start),
-        end: endOfDay(e.end),
-      })
-    )
-
+    const matches = events.filter(e => isSameDay(e.date, date));
     if (matches.length > 0) {
       setSelectedDateEvents(matches)
+      setSelectedDate(date);
       setOpen(true)
     }
   }
 
-  // Collect all individual days covered by events
-  const allEventDates = events.flatMap(e => {
-    const days: Date[] = []
-    const cur = new Date(e.start)
-    while (cur <= e.end) {
-      days.push(new Date(cur))
-      cur.setDate(cur.getDate() + 1)
-    }
-    return days
-  })
+  const eventDatesSet = React.useMemo(() => {
+    const dates = new Set<string>();
+    events.forEach(e => {
+        dates.add(format(e.date, 'yyyy-MM-dd'));
+    });
+    return dates;
+  }, [events]);
+
+  const EventDay = (props: DayProps) => {
+    const dateStr = format(props.date, 'yyyy-MM-dd');
+    const hasEvent = eventDatesSet.has(dateStr);
+    
+    return (
+      <button 
+        type="button"
+        onClick={() => handleDateClick(props.date)}
+        className={cn(
+            "h-9 w-9 p-0 text-sm flex items-center justify-center rounded-full relative",
+            hasEvent ? "has-event-dot font-bold text-foreground cursor-pointer hover:bg-accent/50" : "text-muted-foreground",
+            "focus-within:relative focus-within:z-20 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        )}
+      >
+        {props.date.getDate()}
+      </button>
+    );
+  }
 
   if (loading) return <p className="text-center text-sm text-muted-foreground">Loading calendar...</p>
 
   return (
     <>
       <DayPicker
-        mode={"none" as any}
         showOutsideDays
-        modifiers={{ event: allEventDates }}
-        modifiersClassNames={{
-          event: "bg-green-600 text-white font-bold rounded-full",
-        }}
+        fixedWeeks
+        components={{ Day: EventDay }}
         classNames={{
-          day: "h-9 w-9 p-0 text-sm flex items-center justify-center",
-       }}
-       components={{ // Use components prop instead of dayContent
- Day: ({ day, ...rest }) => {
- const hasEvent = allEventDates.some(
- d =>
- d.getDate() === day.date.getDate() &&
- d.getMonth() === day.date.getMonth() &&
- d.getFullYear() === day.date.getFullYear()
- );
-
- return (
- <div
- onClick={() => handleDateClick(day.date)}
- className={cn(
- "h-9 w-9 flex items-center justify-center rounded-full",
- hasEvent ? "cursor-pointer font-bold text-primary" : "text-muted-foreground"
- )}
- >
- {day.date.getDate()}
- </div>
- );
- },
+          root: "p-3 border rounded-lg shadow-inner bg-muted/20",
+          month: "space-y-4",
+          caption: "flex justify-center pt-1 relative items-center",
+          caption_label: "text-base font-medium text-primary",
+          nav: "space-x-1 flex items-center",
+          nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          table: "w-full border-collapse space-y-1",
+          head_row: "flex",
+          head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+          row: "flex w-full mt-2",
+          cell: "h-9 w-9 text-center text-sm p-0 relative",
         }}
       />
 
@@ -120,30 +96,27 @@ export function CalendarWithEventModal() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-lg">
-              {selectedDateEvents.length > 1
-                ? `Events`
-                : selectedDateEvents[0]?.title}
+              Events for {selectedDate ? format(selectedDate, "PPP") : ""}
             </DialogTitle>
-            {selectedDateEvents.length === 1 && (
-              <DialogDescription className="mt-2 whitespace-pre-wrap text-sm">
-                {selectedDateEvents[0]?.description}
-              </DialogDescription>
-            )}
+             <DialogDescription className="sr-only">
+               List of events on this date.
+            </DialogDescription>
           </DialogHeader>
 
-          {selectedDateEvents.length > 1 && (
-            <div className="space-y-4 mt-4">
+          <ScrollArea className="max-h-[60vh] -mx-4">
+            <div className="space-y-3 mt-4 px-6">
               {selectedDateEvents.map((event) => (
-                <div key={event.id} className="border p-3 rounded-md bg-gray-50">
-                  <p className="font-semibold">{event.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(event.start, "MMM d")} – {format(event.end, "MMM d")}
-                  </p>
-                  <p className="text-sm">{event.description}</p>
+                <div key={event.id} className="border p-3 rounded-md bg-card flex items-start">
+                   {event.icon && <SvgIcon svgString={event.icon} />}
+                  <div className="flex-grow">
+                    <p className="font-semibold">{event.title}</p>
+                    {event.location && <p className="text-sm text-muted-foreground">{event.location}</p>}
+                    {event.description && <p className="text-sm mt-1">{event.description}</p>}
+                  </div>
                 </div>
               ))}
             </div>
-          )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
     </>
