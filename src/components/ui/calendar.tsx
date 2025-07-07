@@ -92,25 +92,27 @@ export function CalendarWithEventModal() {
         classNames={{
           day: "h-9 w-9 p-0 text-sm flex items-center justify-center",
        }}
-       dayContent={(date: Date) => {
-          const hasEvent = allEventDates.some(
-            d =>
-              d.getDate() === date.getDate() &&
-              d.getMonth() === date.getMonth() &&
-              d.getFullYear() === date.getFullYear()
-          )
+       components={{ // Use components prop instead of dayContent
+ Day: ({ day, ...rest }) => {
+ const hasEvent = allEventDates.some(
+ d =>
+ d.getDate() === day.date.getDate() &&
+ d.getMonth() === day.date.getMonth() &&
+ d.getFullYear() === day.date.getFullYear()
+ );
 
-          return (
-            <div
-              onClick={() => handleDateClick(date)}
-              className={cn(
-                "h-9 w-9 flex items-center justify-center rounded-full",
-                hasEvent ? "cursor-pointer font-bold text-primary" : "text-muted-foreground"
-              )}
-            >
-              {date.getDate()}
-            </div>
-          )
+ return (
+ <div
+ onClick={() => handleDateClick(day.date)}
+ className={cn(
+ "h-9 w-9 flex items-center justify-center rounded-full",
+ hasEvent ? "cursor-pointer font-bold text-primary" : "text-muted-foreground"
+ )}
+ >
+ {day.date.getDate()}
+ </div>
+ );
+ },
         }}
       />
 
