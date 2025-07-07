@@ -32,7 +32,7 @@ import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders';
 import type { User, ChatMessage, FirestoreMessage, FirestoreConversation } from '@/types';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, getDoc } from '@/lib/firebase';
+import { auth, db, collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp, Timestamp, where, getDocs, getDoc, updateDoc } from '@/lib/firebase';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 // Helper to generate a consistent conversation ID
@@ -51,7 +51,6 @@ export default function ChatPage() {
   const [chatPartner, setChatPartner] = useState<User | null>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +106,15 @@ export default function ChatPage() {
 
         const convId = getFirestoreConversationId(currentAuthUser.uid, chatPartnerId);
         setConversationId(convId);
+
+        // Mark conversation as read
+        const convRef = doc(db, 'conversations', convId);
+        await setDoc(convRef, {
+            readStatus: {
+                [currentAuthUser.uid]: serverTimestamp()
+            }
+        }, { merge: true }).catch(e => console.error("Could not mark as read", e));
+
 
         const messagesCollectionRef = collection(db, 'conversations', convId, 'messages');
         const q = query(messagesCollectionRef, orderBy('timestamp', 'asc'));
@@ -198,9 +206,10 @@ export default function ChatPage() {
     if (!currentAuthUser || !conversationId || !currentUserProfile || !chatPartner || !db) return;
     if (!newMessage.trim() && !selectedFile) return;
 
+    const messageText = newMessage.trim();
     const messageData: Omit<FirestoreMessage, 'id'> = {
       senderId: currentAuthUser.uid,
-      text: newMessage.trim(),
+      text: messageText,
       timestamp: serverTimestamp() as Timestamp,
     };
 
@@ -215,11 +224,10 @@ export default function ChatPage() {
       await addDoc(messagesCollectionRef, messageData);
 
       const conversationDocRef = doc(db, 'conversations', conversationId);
-      const conversationUpdateData: Partial<FirestoreConversation> = {
+       
+      // Using set with merge to create or update the conversation document
+      await setDoc(conversationDocRef, {
         participants: [currentAuthUser.uid, chatPartnerId].sort(),
-        lastMessageText: messageData.text || (messageData.mediaType ? `${messageData.mediaType.charAt(0).toUpperCase() + messageData.mediaType.slice(1)} sent` : "Media sent"),
-        lastMessageTimestamp: serverTimestamp() as Timestamp,
-        lastMessageSenderId: currentAuthUser.uid,
         participantDetails: {
           [currentAuthUser.uid]: {
             id: currentUserProfile.id,
@@ -233,9 +241,12 @@ export default function ChatPage() {
             name: chatPartner.name,
             avatarUrl: chatPartner.avatarUrl,
           }
-        }
-      };
-      await setDoc(conversationDocRef, conversationUpdateData, { merge: true });
+        },
+        lastMessageText: messageText || (messageData.mediaType ? `${messageData.mediaType.charAt(0).toUpperCase() + messageData.mediaType.slice(1)} sent` : "Media sent"),
+        lastMessageTimestamp: serverTimestamp() as Timestamp,
+        lastMessageSenderId: currentAuthUser.uid,
+        [`readStatus.${currentAuthUser.uid}`]: serverTimestamp() // Update sender's read status with dot notation
+      }, { merge: true }); // Merge ensures we don't overwrite the other user's read status
 
       setNewMessage('');
       clearSelectedMedia();

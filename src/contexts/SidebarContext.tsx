@@ -15,6 +15,8 @@ interface SidebarContextType {
   setContextAuthUserId: (uid: string | null) => void;
   notificationCount: number;
   setNotificationCount: (count: number) => void;
+  unreadMessageCount: number;
+  setUnreadMessageCount: (count: number) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   // Simulate a logged-in user in mock mode
   useEffect(() => {
@@ -56,6 +59,10 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     setNotificationCount(count);
   }, []);
 
+  const updateUnreadMessageCount = useCallback((count: number) => {
+    setUnreadMessageCount(count);
+  }, []);
+
 
   return (
     <SidebarContext.Provider value={{ 
@@ -66,7 +73,9 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
       authUserId, 
       setContextAuthUserId,
       notificationCount,
-      setNotificationCount: updateNotificationCount
+      setNotificationCount: updateNotificationCount,
+      unreadMessageCount,
+      setUnreadMessageCount: updateUnreadMessageCount
     }}>
       {children}
     </SidebarContext.Provider>

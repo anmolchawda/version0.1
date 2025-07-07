@@ -15,8 +15,9 @@ import { getPlaceholderUser, formatTimeAgo } from '@/lib/placeholders'; // Keep 
 import type { DisplayConversation, FirestoreConversation, User } from '@/types';
 import { NewMessageModal } from '@/components/message/new-message-modal';
 import { auth, db, collection, query, where, orderBy, onSnapshot, Timestamp, doc, getDoc } from '@/lib/firebase'; // Import doc and getDoc, db can be null
-import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useSidebarContext } from '@/hooks/useSidebarContext';
 import { useTranslations } from '@/hooks/useTranslations';
+import { cn } from '@/lib/utils';
 
 export default function MessagesPage() {
   const [isNewMessageModalOpen, setIsNewMessageModalOpen] = useState(false);
@@ -80,12 +81,18 @@ export default function MessagesPage() {
             }
           }
           
+          const lastRead = data.readStatus?.[authUserId] as Timestamp | undefined;
+          const isUnread = 
+            data.lastMessageTimestamp &&
+            data.lastMessageSenderId !== authUserId &&
+            (!lastRead || data.lastMessageTimestamp.toMillis() > lastRead.toMillis());
+
           fetchedConversations.push({
             id: docSnap.id,
             otherParticipant: otherParticipantDetails,
             lastMessage: data.lastMessageText || 'No messages yet',
             lastMessageTime: data.lastMessageTimestamp ? formatTimeAgo(data.lastMessageTimestamp as Timestamp) : '',
-            unread: false, 
+            unread: !!isUnread, 
           });
         }
       });
@@ -137,21 +144,24 @@ export default function MessagesPage() {
                 <div className="divide-y">
                   {conversations.map((convo) => (
                     <Link key={convo.id} href={`/messages/${convo.otherParticipant.id}`} passHref>
-                      <div className="flex items-center p-4 hover:bg-muted/50 cursor-pointer transition-colors">
+                      <div className={cn(
+                        "flex items-center p-4 hover:bg-muted/50 cursor-pointer transition-colors",
+                        convo.unread && "bg-primary/5"
+                        )}>
                         <Avatar className="h-12 w-12 mr-4 border">
                           <AvatarImage src={convo.otherParticipant.avatarUrl} alt={convo.otherParticipant.name || convo.otherParticipant.username} data-ai-hint="person user"/>
                           <AvatarFallback>{(convo.otherParticipant.name || convo.otherParticipant.username)?.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="flex-grow overflow-hidden">
                           <div className="flex justify-between items-center">
-                            <h3 className={`font-semibold truncate ${convo.unread ? 'text-foreground' : 'text-foreground'}`}>
+                            <h3 className={cn("font-semibold truncate", convo.unread ? 'text-foreground' : 'text-foreground')}>
                               {convo.otherParticipant.name || convo.otherParticipant.username}
                             </h3>
-                            <span className={`text-xs ${convo.unread ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
+                            <span className={cn("text-xs", convo.unread ? 'text-primary font-medium' : 'text-muted-foreground')}>
                               {convo.lastMessageTime}
                             </span>
                           </div>
-                          <p className={`text-sm truncate ${convo.unread ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                          <p className={cn("text-sm truncate", convo.unread ? 'text-foreground font-medium' : 'text-muted-foreground')}>
                             {convo.lastMessage}
                           </p>
                         </div>

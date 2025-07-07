@@ -9,19 +9,12 @@ import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/core/app-logo';
 import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { db, collection, query, where, onSnapshot } from '@/lib/firebase'; // db can be null
+import { db, collection, query, where, onSnapshot, Timestamp } from '@/lib/firebase';
+import type { FirestoreConversation } from '@/types';
 
 const TopHeaderComponent = () => { // Changed to named component
-  const { toggleSidebar, notificationCount, setNotificationCount, authUserId } = useSidebarContext();
+  const { toggleSidebar, notificationCount, setNotificationCount, authUserId, unreadMessageCount, setUnreadMessageCount } = useSidebarContext();
   const pathname = usePathname();
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-
-  useEffect(() => {
-    // This effect is for demonstration and would be replaced by a real-time listener
-    if (pathname.startsWith('/messages')) {
-      setUnreadMessageCount(0);
-    }
-  }, [pathname]);
 
   // Listener for unread notifications count
   useEffect(() => {
@@ -45,8 +38,44 @@ const TopHeaderComponent = () => { // Changed to named component
   }, [authUserId, db, setNotificationCount]);
 
 
-  // Determine display count for badge.
+  // Listener for unread messages count
+  useEffect(() => {
+    if (!authUserId || !db) {
+      setUnreadMessageCount(0);
+      return;
+    }
+
+    const conversationsRef = collection(db, 'conversations');
+    const q = query(conversationsRef, where('participants', 'array-contains', authUserId));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let count = 0;
+      snapshot.forEach((doc) => {
+        const convo = doc.data() as FirestoreConversation;
+        const userReadTimestamp = convo.readStatus?.[authUserId];
+        const lastMessageTimestamp = convo.lastMessageTimestamp;
+        
+        // Count as unread if there's a last message, it wasn't sent by the current user,
+        // and it's newer than the user's last read time (or if they've never read it).
+        if (lastMessageTimestamp && convo.lastMessageSenderId !== authUserId) {
+          if (!userReadTimestamp || lastMessageTimestamp.toMillis() > userReadTimestamp.toMillis()) {
+            count++;
+          }
+        }
+      });
+      setUnreadMessageCount(count);
+    }, (error) => {
+      console.error("[TopHeader] Error fetching message count:", error);
+      setUnreadMessageCount(0);
+    });
+
+    return () => unsubscribe();
+  }, [authUserId, db, setUnreadMessageCount]);
+
+
+  // Determine display count for badges.
   const displayNotificationCount = notificationCount > 0 && !pathname.startsWith('/notifications') ? notificationCount : 0;
+  const displayMessageCount = unreadMessageCount > 0 && !pathname.startsWith('/messages') ? unreadMessageCount : 0;
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-50 shadow-sm">
@@ -83,9 +112,9 @@ const TopHeaderComponent = () => { // Changed to named component
         <Link href="/messages" passHref>
           <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Messages">
             <MessageSquare className="h-5 w-5 text-primary" />
-            {unreadMessageCount > 0 && (
+            {displayMessageCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
-                {unreadMessageCount > 9 ? '9+' : unreadMessageCount}
+                {displayMessageCount > 9 ? '9+' : displayMessageCount}
               </span>
             )}
           </Button>

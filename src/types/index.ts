@@ -97,6 +97,9 @@ export interface FirestoreConversation {
   lastMessageText?: string;
   lastMessageTimestamp?: FirebaseTimestamp;
   lastMessageSenderId?: string;
+  readStatus?: {
+    [userId: string]: FirebaseTimestamp;
+  };
 }
 
 // Structure for data in 'conversations/{convId}/messages' subcollection
@@ -115,7 +118,7 @@ export interface DisplayConversation {
   otherParticipant: Pick<User, 'id' | 'username' | 'name' | 'avatarUrl'>;
   lastMessage: string;
   lastMessageTime: string; // Formatted string e.g., "2h ago" or "10:30 AM"
-  unread?: boolean; 
+  unread: boolean;
 }
 
 // For Notifications
