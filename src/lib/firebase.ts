@@ -26,6 +26,8 @@ import {
 } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } from 'firebase/storage';
 import { getAuth, type Auth } from 'firebase/auth';
+import { firebaseApp } from '@/lib/firebase';
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyDWF0xqZ7EPCZdfAXZfDoVmT6Tf4WaN3kY",
@@ -76,4 +78,5 @@ export {
   // Firestore specific type exports
   type QueryDocumentSnapshot,
   type DocumentData,
-};
+  app as firebaseApp,
+ };

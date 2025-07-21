@@ -1,5 +1,3 @@
-
-// src/app/(app)/layout.tsx
 'use client';
 
 import { Sidebar } from '@/components/layout/sidebar';
@@ -26,6 +24,25 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   const profileUnsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    // ✅ Check if Android passed a Firebase custom token via URL
+    const params = new URLSearchParams(window.location.search);
+    const tokenFromUrl = params.get('token');
+
+    if (tokenFromUrl) {
+      import('firebase/auth').then(async ({ getAuth, signInWithCustomToken }) => {
+        const authInstance = getAuth();
+        try {
+          await signInWithCustomToken(authInstance, tokenFromUrl);
+          console.log('Signed in via custom token');
+          // Clean the token from the URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error) {
+          console.error('Custom token sign-in failed:', error);
+        }
+      });
+    }
+
+    // 🔐 Firebase Auth listener
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
       setContextAuthUserId(user?.uid || null);
 
@@ -46,8 +63,9 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       }
 
       const userDocRef = doc(db, 'users', user.uid);
-      
-      profileUnsubscribeRef.current = onSnapshot(userDocRef, 
+
+      profileUnsubscribeRef.current = onSnapshot(
+        userDocRef,
         (userDocSnap) => {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
@@ -78,7 +96,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     };
   }, [setContextAuthUserId]);
 
-
+  // 🚦 Redirect logic based on auth status
   useEffect(() => {
     if (authStatus === 'unauthenticated') {
       const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
@@ -96,6 +114,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     }
   }, [authStatus, pathname, router]);
 
+  // ⏳ Loading state
   if (authStatus === 'loading') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -105,6 +124,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
+  // ❌ Error state
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-center">
@@ -117,9 +137,10 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  
+
+  // 👤 Unauthenticated but not on /login
   if (authStatus === 'unauthenticated' && !pathname.startsWith('/login')) {
-     return (
+    return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
@@ -127,6 +148,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
+  // 🌐 Redirecting to setup pages
   if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -135,7 +157,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  
+
   if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
@@ -145,7 +167,8 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  const isAllowedToRender = 
+  // ✅ Allow full render
+  const isAllowedToRender =
     authStatus === 'authenticated_ready' ||
     (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
     (authStatus === 'authenticated_needs_language' && pathname === '/settings/language');
@@ -158,14 +181,14 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
           <Sidebar />
           {isSidebarOpen && (
             <div
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20" 
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20"
               onClick={closeSidebar}
               aria-hidden="true"
             />
           )}
           <main className="flex-1 overflow-y-auto mb-16">
-            <div className="max-w-2xl mx-auto px-4 py-6 h-full"> 
-            {children}
+            <div className="max-w-2xl mx-auto px-4 py-6 h-full">
+              {children}
             </div>
           </main>
         </div>
@@ -177,11 +200,7 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
   return null;
 }
 
-export default function AppPagesLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function AppPagesLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <AppLayoutContent>{children}</AppLayoutContent>
