@@ -38,6 +38,7 @@ export default function AddRequirementPage() {
   const [itemName, setItemName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [rate, setRate] = useState('');
   const [preferredLocation, setPreferredLocation] = useState('');
   const [specifications, setSpecifications] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,6 +82,7 @@ export default function AddRequirementPage() {
         itemName,
         category: selectedCategory,
         quantity,
+        rate,
         preferredLocation,
         specifications,
         createdAt: serverTimestamp(),
@@ -142,9 +144,15 @@ export default function AddRequirementPage() {
                     </div>
                 </div>
                 
-                <div className="space-y-1.5">
-                    <Label htmlFor="quantity" className="font-medium">{t('mandiAddRequirementQuantityLabel')} <span className="text-destructive">*</span></Label>
-                    <Input id="quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder={t('mandiAddRequirementQuantityPlaceholder')} required/>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                        <Label htmlFor="quantity" className="font-medium">{t('mandiAddRequirementQuantityLabel')} <span className="text-destructive">*</span></Label>
+                        <Input id="quantity" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder={t('mandiAddRequirementQuantityPlaceholder')} required/>
+                    </div>
+                    <div className="space-y-1.5">
+                        <Label htmlFor="rate" className="font-medium">Rate (Optional)</Label>
+                        <Input id="rate" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="e.g., ₹20/kg, ₹40,000/unit" />
+                    </div>
                 </div>
 
                 <div className="space-y-1.5">

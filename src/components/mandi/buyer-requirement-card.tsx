@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, CalendarDays, MessageSquare, Trash2 } from 'lucide-react';
+import { MapPin, CalendarDays, MessageSquare, Trash2, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
@@ -63,7 +63,10 @@ export function BuyerRequirementCard({ requirement, currentUserId, onDeleteRequi
           </div>
         </CardHeader>
         <CardContent className="space-y-2 text-sm pb-3">
-          <p><strong className="text-foreground">{t('mandiAddRequirementQuantityLabel')}:</strong> {requirement.quantity}</p>
+          <div className="flex items-center gap-x-4">
+            <p><strong className="text-foreground">{t('mandiAddRequirementQuantityLabel')}:</strong> {requirement.quantity}</p>
+            {requirement.rate && <p><strong className="text-foreground">Rate:</strong> {requirement.rate}</p>}
+          </div>
           {requirement.preferredLocation && (
             <div className="flex items-center text-muted-foreground">
               <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {requirement.preferredLocation}

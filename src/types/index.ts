@@ -171,6 +171,7 @@ export interface BuyerRequirement {
   itemName: string;
   category: string;
   quantity: string;
+  rate?: string;
   preferredLocation?: string;
   specifications?: string;
   createdAt: FirebaseTimestamp;
