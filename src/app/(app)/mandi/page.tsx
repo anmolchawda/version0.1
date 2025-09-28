@@ -29,7 +29,7 @@ import { placeholderCategories, placeholderStates, placeholderCities } from '@/l
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { BuyerRequirementCard } from '@/components/mandi/buyer-requirement-card';
 import { useTranslations } from '@/hooks/useTranslations';
-import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useSidebarContext } from '@/hooks/useSidebarContext';
 import { db, collection, getDocs, query, orderBy, Timestamp, deleteDoc, doc } from '@/lib/firebase';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -232,6 +232,24 @@ export default function MandiPage() {
     }
   };
 
+  const handleDeleteListing = async (listingId: string) => {
+    if (!db) {
+        toast({ title: 'Error', description: 'Database not available.', variant: 'destructive'});
+        return;
+    }
+    try {
+        await deleteDoc(doc(db, "mandi_listings", listingId));
+        setMarketListings(prev => prev.filter(listing => listing.id !== listingId));
+        toast({
+            title: 'Listing Deleted',
+            description: 'Your product listing has been successfully removed.',
+        });
+    } catch (error) {
+        console.error("Error deleting listing:", error);
+        toast({ title: 'Error', description: 'Could not delete the listing.', variant: 'destructive'});
+    }
+  };
+
 
   return (
     <div className="h-full flex flex-col">
@@ -395,7 +413,12 @@ export default function MandiPage() {
                   {filteredMyProducts.length > 0 ? (
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMyProducts.map((listing) => (
-                        <MandiItemCard key={listing.id} listing={listing} />
+                        <MandiItemCard 
+                          key={listing.id} 
+                          listing={listing}
+                          onDelete={handleDeleteListing}
+                          showDeleteButton={true}
+                        />
                       ))}
                     </div>
                   ) : (
