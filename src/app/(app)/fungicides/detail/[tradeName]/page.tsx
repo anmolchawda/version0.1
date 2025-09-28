@@ -79,6 +79,14 @@ export default function FungicideDetailPage() {
 
     fetchFungicideDetails();
   }, [tradeName]);
+  
+  const targetPests = fungicide?.["TARGET "]
+    ? String(fungicide["TARGET "])
+        .split(/\s*\d+\)\s*/)
+        .map(s => s.trim())
+        .filter(s => s)
+    : [];
+
 
   if (isLoading) {
     return (
@@ -139,8 +147,17 @@ export default function FungicideDetailPage() {
             <p><strong>TL/OVI:</strong> {String(fungicide["TL/OVI"] || "N/A")}</p>
             <p><strong>Dose:</strong> {String(fungicide["DOSE"] || "N/A")}</p>
           </div>
-          <div className="pt-2">
-             <p><strong>Target:</strong> {String(fungicide["TARGET "] || "N/A")}</p>
+           <div className="pt-4">
+            <h3 className="font-semibold text-md mb-2">Target Diseases:</h3>
+            {targetPests.length > 0 ? (
+                <ul className="list-disc list-inside space-y-1 pl-4 text-muted-foreground">
+                    {targetPests.map((pest, index) => (
+                        <li key={index}>{pest}</li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-muted-foreground">N/A</p>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -80,6 +80,13 @@ export default function InsecticideDetailPage() {
     fetchInsecticideDetails();
   }, [tradeName]);
 
+  const targetPests = insecticide?.["TARGET PEST"]
+    ? String(insecticide["TARGET PEST"])
+        .split(/\s*\d+\)\s*/)
+        .map(s => s.trim())
+        .filter(s => s)
+    : [];
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
@@ -138,8 +145,17 @@ export default function InsecticideDetailPage() {
             <p><strong>TL/OVI:</strong> {String(insecticide["TL/OVI"] || "N/A")}</p>
             <p><strong>Dose:</strong> {String(insecticide["DOSE"] || "N/A")}</p>
           </div>
-          <div className="pt-2">
-             <p><strong>Target Pest:</strong> {String(insecticide["TARGET PEST"] || "N/A")}</p>
+          <div className="pt-4">
+            <h3 className="font-semibold text-md mb-2">Target Pests:</h3>
+            {targetPests.length > 0 ? (
+                <ul className="list-disc list-inside space-y-1 pl-4 text-muted-foreground">
+                    {targetPests.map((pest, index) => (
+                        <li key={index}>{pest}</li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-muted-foreground">N/A</p>
+            )}
           </div>
         </CardContent>
       </Card>
