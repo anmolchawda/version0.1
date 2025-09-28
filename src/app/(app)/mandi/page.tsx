@@ -1,4 +1,3 @@
-
 // src/app/(app)/mandi/page.tsx
 'use client';
 
@@ -24,7 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase, ClipboardList, PackageSearch, Loader2 } from 'lucide-react';
+import { Search, Store, ListChecks, PlusCircle, RotateCcw, Briefcase, ClipboardList, PackageSearch, Loader2, TrendingUp } from 'lucide-react';
 import { placeholderCategories, placeholderStates, placeholderCities } from '@/lib/placeholders';
 import { MandiItemCard } from '@/components/mandi/mandi-item-card';
 import { BuyerRequirementCard } from '@/components/mandi/buyer-requirement-card';
@@ -34,7 +33,7 @@ import { db, collection, getDocs, query, orderBy, Timestamp, deleteDoc, doc } fr
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
-type MandiViewMode = 'market' | 'requests' | 'my-products';
+type MandiViewMode = 'market' | 'requests' | 'my-products' | 'rates';
 
 export default function MandiPage() {
   const { t } = useTranslations();
@@ -54,6 +53,7 @@ export default function MandiPage() {
   
   const [viewMode, setViewMode] = useState<MandiViewMode>(() => {
     const queryView = searchParams.get('view');
+    if (queryView === 'rates') return 'rates';
     if (queryView === 'my-products' || queryView === 'seller') return 'my-products';
     if (queryView === 'requests') return 'requests';
     return 'market';
@@ -267,10 +267,11 @@ export default function MandiPage() {
         </CardHeader>
         <CardContent className="p-4 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto flex-1 scrollbar-none">
           <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as MandiViewMode)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="market">{t('mandiMarketplaceTab')}</TabsTrigger>
               <TabsTrigger value="requests">{t('mandiBuyerRequestsTab')}</TabsTrigger>
               <TabsTrigger value="my-products">{t('mandiMyProductsTab')}</TabsTrigger>
+              <TabsTrigger value="rates">{t('mandiRatesTab')}</TabsTrigger>
             </TabsList>
           </Tabs>
           
@@ -429,6 +430,22 @@ export default function MandiPage() {
                     </div>
                   )}
                 </section>
+              )}
+
+              {viewMode === 'rates' && (
+                  <section>
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl sm:text-2xl font-semibold text-primary flex items-center">
+                        <TrendingUp className="mr-3 h-7 w-7"/>
+                        {t('mandiRatesTab')}
+                      </h2>
+                    </div>
+                    <div className="text-center py-16">
+                      <ListChecks className="h-16 w-16 mx-auto text-muted-foreground/50 mb-6" />
+                      <p className="text-lg sm:text-xl font-semibold text-muted-foreground">{t('featureComingSoonTitle')}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2">{t('featureComingSoonDescription')}</p>
+                    </div>
+                  </section>
               )}
             </>
           )}

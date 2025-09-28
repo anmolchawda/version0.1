@@ -209,6 +209,7 @@
     "mandiMarketplaceTab": "मार्केटप्लेस",
     "mandiBuyerRequestsTab": "खरीददार की मांगें",
     "mandiMyProductsTab": "मेरे उत्पाद",
+    "mandiRatesTab": "मंडी दरें",
     "mandiMarketplaceListings": "मार्केटप्लेस लिस्टिंग्स",
     "mandiYourListingsTitle": "आपकी लिस्टिंग्स",
     "mandiBuyerRequestsTitle": "खरीदार की मांगें",
@@ -258,6 +259,8 @@
     "mandiDeleteButtonConfirm": "हटाएं",
     "mandiRequirementDeletedTitle": "आवश्यकता हटाई गई",
     "mandiRequirementDeletedDesc": "आपकी \"{itemName}\" के लिए आवश्यकता हटा दी गई है।",
+    "featureComingSoonTitle": "सुविधा जल्द ही आ रही है!",
+    "featureComingSoonDescription": "यह खंड विकास के अधीन है और भविष्य के अपडेट में उपलब्ध होगा।",
     "databaseNotAvailableError": "डेटाबेस उपलब्ध नहीं है।",
     "yojnasTitle": "योजनाएं",
     "failedToLoadYojnasError": "योजनाएं लोड करने में विफल।",
@@ -294,4 +297,3 @@
     "sendToUser": "उपयोगकर्ता को भेजें",
     "cancelButton": "रद्द करें"
   }
-  

@@ -1,4 +1,3 @@
-
 // src/hooks/useTranslations.ts
 'use client';
 
@@ -85,7 +84,7 @@ export type TranslationKey =
   | 'likedYourPostText' | 'commentedOnYourPostText' | 'onYourPostText' | 'startedFollowingYouText' | 'newNotificationText'
   | 'loadingFeedText'
   | 'mandiViewAsBuyer' | 'mandiViewAsSeller' // Deprecated, replaced by specific tab labels
-  | 'mandiMarketplaceTab' | 'mandiBuyerRequestsTab' | 'mandiMyProductsTab' // New tab labels
+  | 'mandiMarketplaceTab' | 'mandiBuyerRequestsTab' | 'mandiMyProductsTab' | 'mandiRatesTab' // New tab labels
   | 'mandiMarketplaceListings' | 'mandiYourListingsTitle' // Deprecated page titles, now more dynamic
   | 'mandiBuyerRequestsTitle' | 'mandiMyProductsForSaleTitle' // New page titles
   | 'mandiListNewItem' | 'mandiListRequirementButton'
@@ -107,7 +106,7 @@ export type TranslationKey =
   | 'mandiRequirementPostedOn' | 'mandiContactBuyerButton' | 'mandiDeleteRequirementButton'
   | 'mandiDeleteConfirmTitle' | 'mandiDeleteConfirmDesc' | 'mandiDeleteButtonConfirm'
   | 'mandiRequirementDeletedTitle' | 'mandiRequirementDeletedDesc'
-  // Added keys for YojnaPage:
+  | 'featureComingSoonTitle' | 'featureComingSoonDescription'
   | 'databaseNotAvailableError'
   | 'yojnasTitle'
  | 'likesByTitle'

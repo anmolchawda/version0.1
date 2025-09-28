@@ -209,6 +209,7 @@
   "mandiMarketplaceTab": "Marketplace",
   "mandiBuyerRequestsTab": "Buyer Requests",
   "mandiMyProductsTab": "My Products",
+  "mandiRatesTab": "Mandi Rates",
   "mandiMarketplaceListings": "Marketplace Listings",
   "mandiYourListingsTitle": "Your Listings",
   "mandiBuyerRequestsTitle": "Buyer Requests",
@@ -258,6 +259,8 @@
   "mandiDeleteButtonConfirm": "Delete",
   "mandiRequirementDeletedTitle": "Requirement Deleted",
   "mandiRequirementDeletedDesc": "Your requirement for \"{itemName}\" has been deleted.",
+  "featureComingSoonTitle": "Feature Coming Soon!",
+  "featureComingSoonDescription": "This section is under development and will be available in a future update.",
   "databaseNotAvailableError": "Database is not available.",
   "yojnasTitle": "Yojnas (Schemes)",
   "failedToLoadYojnasError": "Failed to load schemes.",
@@ -294,4 +297,3 @@
   "sendToUser": "Send to user",
   "cancelButton":"cancelButton"
   }
-  
