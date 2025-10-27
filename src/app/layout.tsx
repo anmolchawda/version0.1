@@ -1,22 +1,37 @@
-// src/app/layout.tsx OR your root layout file
 
-'use client';
-
-import { type ReactNode } from 'react';import { SidebarProvider } from '@/contexts/SidebarContext';
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import { Toaster } from '@/components/ui/toaster';
+import { AnalyticsProvider } from '@/components/core/analytics-provider';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
 
-// This is the entire file. It is clean and has no logic.
-export default function RootLayout({ children }: { children: ReactNode }) {
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
+export const metadata: Metadata = {
+  title: 'KrishiX',
+  description: 'Connect with farmers on KrishiX',
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en">
-      <body>
-        <AuthProvider>
-          <SidebarProvider>
-            <NativeAuthHandler />
-            {children}
-          </SidebarProvider>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
+        <Toaster />
+        <AnalyticsProvider />
       </body>
     </html>
   );
