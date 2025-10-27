@@ -7,32 +7,20 @@ import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
 
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
-  return (
-    <SidebarProvider>
-      <NativeAuthHandler />
-      <AppLayoutContent>{children}</AppLayoutContent>
-    </SidebarProvider>
-  );
-}
-
-function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_language' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
-  const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext();
   const [error, setError] = useState<string | null>(null);
   const profileUnsubscribeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
-      setContextAuthUserId(user?.uid || null);
-
       if (profileUnsubscribeRef.current) {
         profileUnsubscribeRef.current();
         profileUnsubscribeRef.current = null;
@@ -80,31 +68,37 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
         profileUnsubscribeRef.current();
       }
     };
-  }, [setContextAuthUserId]);
-
+  }, []);
 
   useEffect(() => {
-    if (authStatus === 'unauthenticated') {
-      const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-      if (!isAuthPage) {
-        router.replace('/login');
-      }
-    } else if (authStatus === 'authenticated_needs_language') {
-      if (pathname !== '/settings/language') {
-        router.replace('/settings/language');
-      }
-    } else if (authStatus === 'authenticated_needs_profile') {
-      if (pathname !== '/settings/account') {
-        router.replace('/settings/account');
-      }
+    const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+    if (authStatus === 'unauthenticated' && !isAuthPage) {
+      router.replace('/login');
+    } else if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') {
+      router.replace('/settings/language');
+    } else if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
+      router.replace('/settings/account');
     }
   }, [authStatus, pathname, router]);
 
-  if (authStatus === 'loading') {
+  const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+  
+  const isAllowedToRender = 
+    authStatus === 'authenticated_ready' ||
+    (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
+    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language') ||
+    isAuthPage;
+
+  if (authStatus === 'loading' || !isAllowedToRender) {
+    let message = "Authenticating...";
+    if (authStatus === 'unauthenticated') message = "Redirecting to login...";
+    if (authStatus === 'authenticated_needs_language') message = "Redirecting to language selection...";
+    if (authStatus === 'authenticated_needs_profile') message = "Redirecting to profile setup...";
+
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Authenticating...</p>
+        <p className="mt-4 text-muted-foreground">{message}</p>
       </div>
     );
   }
@@ -122,68 +116,29 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
   
-  if (authStatus === 'unauthenticated' && !pathname.startsWith('/login')) {
-     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Redirecting to login...</p>
-      </div>
-    );
-  }
+  return (
+    <SidebarProvider>
+      {/* NativeAuthHandler is ALWAYS present, no matter the page */}
+      <NativeAuthHandler />
 
-  if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Redirecting to language selection...</p>
-      </div>
-    );
-  }
-  
-  if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">Redirecting to profile setup...</p>
-      </div>
-    );
-  }
+      {/* Main content area */}
+      <div className="flex h-screen bg-background">
+        {/* Conditionally render the sidebar if NOT on an auth page */}
+        {!isAuthPage && <Sidebar />}
+        
+        <main className="flex-1 flex flex-col overflow-y-auto">
+          {/* Conditionally render the header if NOT on an auth page */}
+          {!isAuthPage && <TopHeader />}
 
-  const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-  const isAllowedToRender = 
-    authStatus === 'authenticated_ready' ||
-    (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
-    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language') ||
-    isAuthPage;
-
-  if (isAllowedToRender) {
-    // If on an auth page, render children without the main app layout
-    if (isAuthPage) {
-        return <>{children}</>;
-    }
-
-    return (
-      <>
-        <TopHeader />
-        <div className="flex min-h-screen pt-16">
-          <Sidebar />
-          {isSidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-20" 
-              onClick={closeSidebar}
-              aria-hidden="true"
-            />
-          )}
-          <main className="flex-1 overflow-y-auto mb-16">
-            <div className="max-w-2xl mx-auto px-4 py-6 h-full"> 
+          {/* The actual page content is always rendered */}
+          <div className="p-4 md:p-8">
             {children}
-            </div>
-          </main>
-        </div>
-        <BottomNavBar />
-      </>
-    );
-  }
-
-  return null; // Or a fallback loading/error state
+          </div>
+          
+          {/* Conditionally render the bottom nav if NOT on an auth page */}
+          {!isAuthPage && <BottomNavBar />}
+        </main>
+      </div>
+    </SidebarProvider>
+  );
 }
