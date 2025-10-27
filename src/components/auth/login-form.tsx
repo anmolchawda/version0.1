@@ -50,11 +50,19 @@ export function LoginForm() {
       if (success) {
         console.log("Native Google Sign-In successful! Data:", data);
         // The native app has handled the sign-in with Firebase.
-        // We can now redirect the user to the main feed, where the auth state listener will pick up the new user session.
-        router.push('/');
-        toast({
-            title: 'Sign-in Successful',
-            description: `Welcome, ${data.email || 'friend'}!`,
+        // We need to ensure the Firebase JS SDK recognizes the new auth state.
+        auth.currentUser?.getIdToken(true).then(() => {
+            console.log("Firebase Web SDK token refreshed, expecting UI update/redirect.");
+            // Now that the token is refreshed, the app's auth state listener should trigger the redirect.
+            router.push('/');
+            toast({
+                title: 'Sign-in Successful',
+                description: `Welcome, ${data.email || 'friend'}!`,
+            });
+        }).catch(error => {
+            console.error("Error refreshing Firebase Web SDK token:", error);
+            // Fallback redirect even if token refresh fails
+            router.push('/');
         });
       } else {
         console.error("Native Google Sign-In failed!", data);
@@ -68,7 +76,7 @@ export function LoginForm() {
 
     // Cleanup function to remove the global callback when the component unmounts
     return () => {
-      // It's good practice to clean up, though for a single-page app it might not be strictly necessary.
+      // It's good practice to clean up.
       // @ts-ignore
       delete window.onNativeGoogleSignInResult;
     }
