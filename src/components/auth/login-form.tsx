@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type FormEvent, useEffect } from 'react';
+import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -13,27 +13,16 @@ import { Loader2, LogIn } from 'lucide-react';
 import { auth, db, doc, setDoc, serverTimestamp } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification, signOut, type User as FirebaseUser } from 'firebase/auth';
 
-// Simple Google G logo SVG
 const GoogleLogo = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none" fillRule="evenodd">
-      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9.02v3.481h4.844a4.14 4.14 0 01-1.796 2.725v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.624z" fill="#4285F4"/>
-      <path d="M9.02 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.836.863-2.993.863-2.31 0-4.264-1.567-4.962-3.658H1.057v2.332A8.997 8.997 0 009.02 18z" fill="#34A853"/>
-      <path d="M4.003 10.742a5.23 5.23 0 010-3.484V4.926H1.057a8.997 8.997 0 000 8.148L4.003 10.743z" fill="#FBBC05"/>
-      <path d="M9.02 3.58C10.329 3.58 11.507 4.03 12.44 4.926l2.582-2.582C13.48.891 11.434 0 9.02 0A8.997 8.997 0 001.057 4.926l2.946 2.332c.698-2.09 2.652-3.658 4.962-3.658z" fill="#EA4335"/>
-    </g>
-  </svg>
+    <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" fillRule="evenodd">
+            <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9.02v3.481h4.844a4.14 4.14 0 01-1.796 2.725v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.624z" fill="#4285F4"/>
+            <path d="M9.02 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.836.863-2.993.863-2.31 0-4.264-1.567-4.962-3.658H1.057v2.332A8.997 8.997 0 009.02 18z" fill="#34A853"/>
+            <path d="M4.003 10.742a5.23 5.23 0 010-3.484V4.926H1.057a8.997 8.997 0 000 8.148L4.003 10.743z" fill="#FBBC05"/>
+            <path d="M9.02 3.58C10.329 3.58 11.507 4.03 12.44 4.926l2.582-2.582C13.48.891 11.434 0 9.02 0A8.997 8.997 0 001.057 4.926l2.946 2.332c.698-2.09 2.652-3.658 4.962-3.658z" fill="#EA4335"/>
+        </g>
+    </svg>
 );
-
-// Define types for the Android interface for better type safety
-declare global {
-  interface Window {
-    Android?: {
-      startNativeGoogleSignIn: () => void;
-    };
-    onNativeGoogleSignInResult: (success: boolean, data: any) => void;
-  }
-}
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -42,46 +31,6 @@ export function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
-
-  useEffect(() => {
-    // Define the callback function that the native Android app will call.
-    window.onNativeGoogleSignInResult = (success, data) => {
-      setIsGoogleLoading(false);
-      if (success) {
-        console.log("Native Google Sign-In successful! Data:", data);
-        // The native app has handled the sign-in with Firebase.
-        // We need to ensure the Firebase JS SDK recognizes the new auth state.
-        auth.currentUser?.getIdToken(true).then(() => {
-            console.log("Firebase Web SDK token refreshed, expecting UI update/redirect.");
-            // Now that the token is refreshed, the app's auth state listener should trigger the redirect.
-            router.push('/');
-            toast({
-                title: 'Sign-in Successful',
-                description: `Welcome, ${data.email || 'friend'}!`,
-            });
-        }).catch(error => {
-            console.error("Error refreshing Firebase Web SDK token:", error);
-            // Fallback redirect even if token refresh fails
-            router.push('/');
-        });
-      } else {
-        console.error("Native Google Sign-In failed!", data);
-        toast({
-            title: 'Sign-in Failed',
-            description: data.message || 'An error occurred during native sign-in.',
-            variant: 'destructive'
-        });
-      }
-    };
-
-    // Cleanup function to remove the global callback when the component unmounts
-    return () => {
-      // It's good practice to clean up.
-      // @ts-ignore
-      delete window.onNativeGoogleSignInResult;
-    }
-  }, [router, toast]);
-
 
   const handleResendVerification = async (user: FirebaseUser) => {
     if (!user) return;
@@ -104,20 +53,16 @@ export function LoginForm() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-
     if (!auth) {
       toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
       setIsLoading(false);
       return;
     }
-    
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
       if (!userCredential.user.emailVerified) {
         const userToVerify = userCredential.user;
-        await signOut(auth); // Sign out the unverified user
-        
+        await signOut(auth);
         toast({
           title: 'Email Not Verified',
           description: 'Please check your inbox and verify your email address to continue.',
@@ -130,10 +75,8 @@ export function LoginForm() {
           ),
         });
       } else {
-        // Email is verified. The main app layout will handle redirection.
         router.push('/');
       }
-
     } catch (error: any) {
       console.error('Login error:', error.code, error.message);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
@@ -143,18 +86,15 @@ export function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-
-    // Check if the native Android interface is available
-    if (typeof window.Android !== 'undefined' && window.Android !== null && typeof window.Android.startNativeGoogleSignIn === 'function') {
+    if (typeof window.Android !== 'undefined' && window.Android.startNativeGoogleSignIn) {
         console.log("Requesting native Google Sign-In...");
+        setIsGoogleLoading(true);
         window.Android.startNativeGoogleSignIn();
-        // The result will be handled by the window.onNativeGoogleSignInResult callback.
         return;
     }
 
-    // Fallback to web-based Google Sign-In if native interface is not found
     console.warn("Android native interface not found. Using web flow.");
+    setIsGoogleLoading(true);
     if (!auth || !db) {
       toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
       setIsGoogleLoading(false);
@@ -163,8 +103,8 @@ export function LoginForm() {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      
       const additionalInfo = getAdditionalUserInfo(userCredential);
+
       if (additionalInfo?.isNewUser) {
         const user = userCredential.user;
         const userDocRef = doc(db, 'users', user.uid);
@@ -182,18 +122,10 @@ export function LoginForm() {
             postCount: 0
         });
       }
-
-      // Let the app layout's auth state listener and gatekeeper handle redirection.
       router.push('/');
-
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
-      if (error.code === 'auth/popup-closed-by-user') {
-        toast({
-        title: 'Login Cancelled',
-        description: 'The Google sign-in window was closed.',
-        });
-      } else {
+      if (error.code !== 'auth/popup-closed-by-user') {
         toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
       }
     } finally {
@@ -214,49 +146,25 @@ export function LoginForm() {
           onClick={handleGoogleLogin}
           disabled={isLoading || isGoogleLoading}
         >
-          {isGoogleLoading ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          ) : (
-            <GoogleLogo />
-          )}
+          {isGoogleLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <GoogleLogo />}
           <span className="ml-2">{isGoogleLoading ? 'Signing in...' : 'Log in with Google'}</span>
         </Button>
 
         <div className="relative my-4">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              Or continue with
-            </span>
+            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading || isGoogleLoading}
-            />
+            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading || isGoogleLoading} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading || isGoogleLoading}
-            />
+            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading || isGoogleLoading} />
           </div>
           <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || isGoogleLoading}>
             {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}

@@ -1,5 +1,4 @@
 
-// src/app/(app)/layout.tsx
 'use client';
 
 import { Sidebar } from '@/components/layout/sidebar';
@@ -9,19 +8,24 @@ import { useEffect, useState, type ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
-import { cn } from '@/lib/utils';
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
+import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
 
-interface AppSidebarContextType extends ReturnType<typeof useSidebarContext> {
-  setContextAuthUserId: (uid: string | null) => void;
+export default function AppPagesLayout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <NativeAuthHandler />
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </SidebarProvider>
+  );
 }
 
 function AppLayoutContent({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_language' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
-  const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext() as AppSidebarContextType;
+  const { isSidebarOpen, closeSidebar, setContextAuthUserId } = useSidebarContext();
   const [error, setError] = useState<string | null>(null);
   const profileUnsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -145,12 +149,19 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
+  const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
   const isAllowedToRender = 
     authStatus === 'authenticated_ready' ||
     (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
-    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language');
+    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language') ||
+    isAuthPage;
 
   if (isAllowedToRender) {
+    // If on an auth page, render children without the main app layout
+    if (isAuthPage) {
+        return <>{children}</>;
+    }
+
     return (
       <>
         <TopHeader />
@@ -174,17 +185,5 @@ function AppLayoutContent({ children }: { children: ReactNode }) {
     );
   }
 
-  return null;
-}
-
-export default function AppPagesLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  return (
-    <SidebarProvider>
-      <AppLayoutContent>{children}</AppLayoutContent>
-    </SidebarProvider>
-  );
+  return null; // Or a fallback loading/error state
 }
