@@ -82,23 +82,12 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
   }, [authStatus, pathname, router]);
 
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-  
-  const isAllowedToRender = 
-    authStatus === 'authenticated_ready' ||
-    (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
-    (authStatus === 'authenticated_needs_language' && pathname === '/settings/language') ||
-    isAuthPage;
 
-  if (authStatus === 'loading' || !isAllowedToRender) {
-    let message = "Authenticating...";
-    if (authStatus === 'unauthenticated') message = "Redirecting to login...";
-    if (authStatus === 'authenticated_needs_language') message = "Redirecting to language selection...";
-    if (authStatus === 'authenticated_needs_profile') message = "Redirecting to profile setup...";
-
+  if (authStatus === 'loading') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-muted-foreground">{message}</p>
+        <p className="mt-4 text-muted-foreground">Authenticating...</p>
       </div>
     );
   }
