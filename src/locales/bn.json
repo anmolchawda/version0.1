@@ -1,3 +1,4 @@
+
 {
   "feed": "ফিড",
   "discover": "আবিষ্কার করুন",
@@ -209,6 +210,7 @@
   "mandiMarketplaceTab": "বাজার",
   "mandiBuyerRequestsTab": "ক্রেতার অনুরোধ",
   "mandiMyProductsTab": "আমার পণ্য",
+  "mandiRatesTab": "মandi दर",
   "mandiMarketplaceListings": "বাজার তালিকা",
   "mandiYourListingsTitle": "আপনার তালিকা",
   "mandiBuyerRequestsTitle": "ক্রেতার অনুরোধসমূহ",
@@ -258,6 +260,8 @@
   "mandiDeleteButtonConfirm": "মুছে ফেলুন",
   "mandiRequirementDeletedTitle": "প্রয়োজন মুছে ফেলা হয়েছে",
   "mandiRequirementDeletedDesc": "\"{itemName}\" এর প্রয়োজন মুছে ফেলা হয়েছে।",
+  "featureComingSoonTitle": "নতুন ফিচার শীঘ্রই আসছে!",
+  "featureComingSoonDescription": "এই বিভাগটি নির্মানের অধীনে আছে এবং ভবিষ্যতের আপডেটে পাওয়া যাবে।",
   "databaseNotAvailableError": "ডাটাবেস উপলব্ধ নয়।",
   "yojnasTitle": "যোজনা (স্কিম)",
   "failedToLoadYojnasError": "স্কিম লোড করতে ব্যর্থ।",
@@ -294,3 +298,5 @@
   "sendToUser": "ব্যবহারকারীকে পাঠান",
   "cancelButton": "বাতিল করুন"
 }
+
+    

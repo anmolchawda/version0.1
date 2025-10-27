@@ -1,3 +1,4 @@
+
 {
   "feed": "फीड",
   "discover": "खोजीं",
@@ -134,7 +135,7 @@
   "toastNotAuthenticatedTitle": "लॉग इन नइखे",
   "toastNotAuthenticatedDescription": "प्रोफाइल अपडेट करे खातिर लॉग इन करीं।",
   "toastProfileUpdatedMockTitle": "प्रोफाइल अपडेट भइल (डेमो)",
-  "toastProfileUpdatedMockDescription": "प्रोफाइल जानकारी 'सेव' कर देहल गइल बा।",
+  "toastProfileUpdatedMockDescription": "आपके प्रोफाइल जानकारी 'सेव' कर देहल गइल बा।",
   "toastProfileUpdatedTitle": "प्रोफाइल अपडेट भइल",
   "toastProfileUpdatedDescription": "प्रोफाइल जानकारी सेव कर देहल गइल।",
   "toastUpdateFailedTitle": "सेव फेल भइल",
@@ -209,6 +210,7 @@
   "mandiMarketplaceTab": "बाजार",
   "mandiBuyerRequestsTab": "खरीदार मांग",
   "mandiMyProductsTab": "हमार समान",
+  "mandiRatesTab": "मंडी भाव",
   "mandiMarketplaceListings": "बाजार सूची",
   "mandiYourListingsTitle": "आपके सूची",
   "mandiBuyerRequestsTitle": "खरीदार मांग",
@@ -258,6 +260,8 @@
   "mandiDeleteButtonConfirm": "हटाईं",
   "mandiRequirementDeletedTitle": "मांग हटा देहल गइल",
   "mandiRequirementDeletedDesc": "\"{itemName}\" के मांग हटा देहल गइल बा।",
+  "featureComingSoonTitle": "फीचर जल्द आ रहल बा!",
+  "featureComingSoonDescription": "ई सेक्शन अभी बन रहल बा आउर जल्द उपलब्ध होई।",
   "databaseNotAvailableError": "डेटाबेस उपलब्ध नइखे।",
   "yojnasTitle": "योजना",
   "failedToLoadYojnasError": "योजना लोड नइखे हो पावल।",
@@ -294,3 +298,5 @@
   "sendToUser": "यूजर के भेजीं",
   "cancelButton": "रद्द करीं"
 }
+
+    

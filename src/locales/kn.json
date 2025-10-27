@@ -1,3 +1,4 @@
+
 {
   "feed": "ಫೀಡ್",
   "discover": "ಅನುಷಂಧಾನ",
@@ -9,7 +10,7 @@
   "yojna": "ಯೋಜನೆ",
   "events": "ಕಾರ್ಯಕ್ರಮಗಳು",
   "fungicides": "ಫಂಜಿಸೈಡ್ಸ್",
-  "insecticides": "ಕೀಟನಾಶಕಗಳು",
+  "insecticides": "ಕೀਟನಾಶಕಗಳು",
   "iracCode": "IRAC ಕೋಡ್",
   "fracCode": "FRAC ಕೋಡ್",
   "settings": "ಸೆಟ್ಟಿಂಗ್ಗಳು",
@@ -84,7 +85,7 @@
   "aiAnalysisErrorAlertTitle": "ವಿಶ್ಲೇಷಣಾ ದೋಷ",
   "aiAnalysisResultsTitle": "ವಿಶ್ಲೇಷಣಾ ಫಲಿತಾಂಶಗಳು",
   "aiObjectIdentificationTitle": "ವಸ್ತು ಗುರುತింపు",
-  "aiObjectNotIdentifiedDescription": "AI ಸ್ಪಷ್ಟವಾಗಿ ಗಿಡವನ್ನು ಗುರುತಿಸಲು ವಿಫಲವಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟ ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+  "aiObjectNotIdentifiedDescription": "AI ಸ್ಪಷ್ಟವಾಗಿ ಗಿಡವನ್ನು ಗುರುತಿಸಲು ವಿಫలವಾಗಿದೆ. ದಯವಿಟ್ಟು ಸ್ಪಷ್ಟ ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
   "aiPlantIdentifiedTitle": "ಗಿಡ ಗುರುತಿಸಲಾಗಿದೆ",
   "aiPlantIdentifiedDefaultDescription": "ಗಿಡವನ್ನು ಗುರುತಿಸಲಾಗಿದೆ.",
   "aiAnalysisDetailDiseaseTitle": "ರೋಗ",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "ಮಾರುಕಟ್ಟೆ",
     "mandiBuyerRequestsTab": "ಖರೀದಿದಾರರ ಬೇಡಿಕೆಗಳು",
     "mandiMyProductsTab": "ನನ್ನ ಉತ್ಪನ್ನಗಳು",
+    "mandiRatesTab": "ಮಾರುಕಟ್ಟೆ ದರಗಳು",
     "mandiMarketplaceListings": "ಮಾರುಕಟ್ಟೆ ಜಾಹೀರಾತುಗಳು",
     "mandiYourListingsTitle": "ನಿಮ್ಮ ಜಾಹೀರಾತುಗಳು",
     "mandiBuyerRequestsTitle": "ಖರೀದಿದಾರರ ಬೇಡಿಕೆಗಳು",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "ಅಳಿಸಿ",
     "mandiRequirementDeletedTitle": "ಬೇಡಿಕೆ ಅಳಿಸಲಾಗಿದೆ",
     "mandiRequirementDeletedDesc": "\"{itemName}\" ಗೆ ಸಂಬಂಧಿಸಿದ ನಿಮ್ಮ ಬೇಡಿಕೆಯನ್ನು ಅಳಿಸಲಾಗಿದೆ.",
+    "featureComingSoonTitle": "ವೈಶಿಷ್ಟ್ಯ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ!",
+    "featureComingSoonDescription": "ಈ ವಿಭಾಗವು ನಿರ್ಮಾಣ ಹಂತದಲ್ಲಿದೆ ಮತ್ತು ಭವಿಷ್ಯದ ಅಪ್‌ಡೇಟ್‌ನಲ್ಲಿ ಲಭ್ಯವಾಗಲಿದೆ.",
     "databaseNotAvailableError": "ಡೇಟಾಬೇಸ್ ಲಭ್ಯವಿಲ್ಲ.",
     "yojnasTitle": "ಯೋಜನೆಗಳು (Yojnas)",
     "failedToLoadYojnasError": "ಯೋಜನೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ.",
@@ -294,4 +298,5 @@
     "sendToUser": "ಬಳಕೆದಾರರಿಗೆ ಕಳುಹಿಸಿ",
     "cancelButton": "ರದ್ದುಗೊಳಿಸಿ"
   }
-  
+
+    

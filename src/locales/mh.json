@@ -1,3 +1,4 @@
+
 {
   "feed": "फीड",
   "discover": "शोधा",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "मंडईपणा",
     "mandiBuyerRequestsTab": "खरेदी विनंत्या",
     "mandiMyProductsTab": "माझी उत्पादने",
+    "mandiRatesTab": "मंडई दर",
     "mandiMarketplaceListings": "मंडी लिस्टिंग्स",
     "mandiYourListingsTitle": "तुमच्या लिस्टिंग्स",
     "mandiBuyerRequestsTitle": "खरेदी विनंत्या",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "हटवा",
     "mandiRequirementDeletedTitle": "आवश्यकता हटवली",
     "mandiRequirementDeletedDesc": "\"{itemName}\" साठीची तुमची आवश्यकता हटवली आहे.",
+    "featureComingSoonTitle": "सुविधा लवकरच येत आहे!",
+    "featureComingSoonDescription": "हा विभाग विकासाधीन आहे आणि भविष्यातील अद्यतनामध्ये उपलब्ध होईल.",
     "databaseNotAvailableError": "डेटाबेस उपलब्ध नाही.",
     "yojnasTitle": "योजना (Schemes)",
     "failedToLoadYojnasError": "योजना लोड करण्यात अयशस्वी.",
@@ -294,4 +298,5 @@
     "sendToUser": "वापरकर्त्याला पाठवा",
     "cancelButton": "रद्द करा"
   }
-  
+
+    

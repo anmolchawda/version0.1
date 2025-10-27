@@ -1,3 +1,4 @@
+
 {
   "feed": "ഫീഡ്",
   "discover": "കണ്ടെത്തുക",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "മാർക്കറ്റ്‌പ്ലേസ്",
     "mandiBuyerRequestsTab": "വാങ്ങൽ അഭ്യർത്ഥനകൾ",
     "mandiMyProductsTab": "എൻ്റെ ഉൽപ്പന്നങ്ങൾ",
+    "mandiRatesTab": "മാണ്ടി നിരക്കുകൾ",
     "mandiMarketplaceListings": "മാർക്കറ്റ്‌പ്ലേസ് ലിസ്റ്റിംഗുകൾ",
     "mandiYourListingsTitle": "നിങ്ങളുടെ ലിസ്റ്റിംഗുകൾ",
     "mandiBuyerRequestsTitle": "വാങ്ങൽ അഭ്യർത്ഥനകൾ",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "ഡിലീറ്റ് ചെയ്യുക",
     "mandiRequirementDeletedTitle": "ആവശ്യം ഡിലീറ്റ് ചെയ്തു",
     "mandiRequirementDeletedDesc": "\"{itemName}\" ആവശ്യത്തിനായി നൽകിയ ലിസ്റ്റ് നീക്കം ചെയ്തു.",
+    "featureComingSoonTitle": "സവിശേഷത ഉടൻ വരുന്നു!",
+    "featureComingSoonDescription": "ഈ വിഭാഗം നിർമ്മാണത്തിലാണ്, ഭാവിയിലെ അപ്‌ഡേറ്റിൽ ലഭ്യമാകും.",
     "databaseNotAvailableError": "ഡാറ്റാബേസ് ലഭ്യമല്ല.",
     "yojnasTitle": "യോജനകൾ (പദ്ധതികൾ)",
     "failedToLoadYojnasError": "പദ്ധതികൾ ലോഡ് ചെയ്യാൻ പരാജയപ്പെട്ടു.",
@@ -294,4 +298,5 @@
     "sendToUser": "ഉപയോക്താവിലേക്ക് അയയ്ക്കുക",
     "cancelButton": "റദ്ദാക്കുക"
   }
-  
+
+    

@@ -1,3 +1,4 @@
+
 {
   "feed": "ਫੀਡ",
   "discover": "ਖੋਜੋ",
@@ -86,7 +87,7 @@
   "aiObjectIdentificationTitle": "ਚੀਜ਼ ਪਛਾਣ",
   "aiObjectNotIdentifiedDescription": "AI ਨੇ ਪੌਦੇ ਨੂੰ ਪਛਾਣ ਨਹੀਂ ਸਕਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਸਾਫ਼ ਤਸਵੀਰ ਅੱਪਲੋਡ ਕਰੋ।",
   "aiPlantIdentifiedTitle": "ਪੌਦਾ ਪਛਾਣਿਆ ਗਿਆ",
-  "aiPlantIdentifiedDefaultDescription": "ਇੱਕ ਪੌਦਾ ਪਛਾਣਿਆ ਗਿਆ।",
+  "aiPlantIdentifiedDefaultDescription": "ਇੱਕ ਪੌਦਾ ਪਛਾณਿਆ ਗਿਆ।",
   "aiAnalysisDetailDiseaseTitle": "ਬੀਮਾਰੀ",
   "aiAnalysisDetailNutrientTitle": "ਪੋਸ਼ਣ ਦੀ ਘਾਟ",
   "aiAnalysisDetailInsectTitle": "ਕੀੜੇ ਦੀ ਮੌਜੂਦਗੀ",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "ਬਾਜ਼ਾਰ",
     "mandiBuyerRequestsTab": "ਖਰੀਦਦਾਰ ਦੀ ਮੰਗ",
     "mandiMyProductsTab": "ਮੇਰੇ ਉਤਪਾਦ",
+    "mandiRatesTab": "ਮੰਡੀ ਦਰਾਂ",
     "mandiMarketplaceListings": "ਬਾਜ਼ਾਰ ਲਿਸਟਿੰਗ",
     "mandiYourListingsTitle": "ਤੁਹਾਡੀਆਂ ਲਿਸਟਿੰਗਾਂ",
     "mandiBuyerRequestsTitle": "ਖਰੀਦਦਾਰ ਦੀ ਮੰਗ",
@@ -235,7 +237,7 @@
     "mandiAddRequirementLocationLabel": "ਪਸੰਦੀਦਾ ਟਿਕਾਣਾ (ঐਛਿਕ)",
     "mandiAddRequirementLocationPlaceholder": "ਉਦਾਹਰਨ: ਪੁਣੇ ਨੇੜੇ, ਮਹਾਰਾਸ਼ਟਰ",
     "mandiAddRequirementSpecsLabel": "ਖਾਸ ਯੋਗਤਾ / ਵੇਰਵੇ",
-    "mandiAddRequirementSpecsPlaceholder": "ਉਦਾਹਰਨ: ਕਿਸਮ, ਗਰੇਡ, ਡਿਲੀਵਰੀ ਸਮਾਂ, ਆਦਿ",
+    "mandiAddRequirementSpecsPlaceholder": "ਉਦਾਹਰਨ: ਕਿਸਮ, ਗਰੇਡ, ਡਿਲੀਵરી ਸਮਾਂ, ਆਦਿ",
     "mandiAddRequirementNote": "ਤੁਹਾਡੀ ਮੰਗ ਵੇਚਣ ਵਾਲਿਆਂ ਨੂੰ ਦਿਸੇਗੀ। ਉਹ ਤੁਹਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰ ਸਕਦੇ ਹਨ।",
     "mandiAddRequirementSubmitButton": "ਮੰਗ ਪੋਸਟ ਕਰੋ",
     "mandiAddRequirementSubmittingButton": "ਮੰਗ ਪੋਸਟ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "ਹਟਾਓ",
     "mandiRequirementDeletedTitle": "ਮੰਗ ਹਟਾ ਦਿੱਤੀ ਗਈ",
     "mandiRequirementDeletedDesc": "\"{itemName}\" ਲਈ ਤੁਹਾਡੀ ਮੰਗ ਹਟਾ ਦਿੱਤੀ ਗਈ ਹੈ।",
+    "featureComingSoonTitle": "ਫੀਚਰ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ!",
+    "featureComingSoonDescription": "ਇਹ ਸੈਕਸ਼ਨ ਨਿਰਮਾਣ ਅਧੀਨ ਹੈ ਅਤੇ ਭਵਿੱਖ ਦੇ ਅਪਡੇਟ ਵਿੱਚ ਉਪਲਬਧ ਹੋਵੇਗਾ।",
     "databaseNotAvailableError": "ਡਾਟਾਬੇਸ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।",
     "yojnasTitle": "ਯੋਜਨਾਵਾਂ",
     "failedToLoadYojnasError": "ਯੋਜਨਾਵਾਂ ਲੋਡ ਨਹੀਂ ਹੋ ਸਕੀਆਂ।",
@@ -294,4 +298,5 @@
     "sendToUser": "ਯੂਜ਼ਰ ਨੂੰ ਭੇਜੋ",
     "cancelButton": "ਰੱਦ ਕਰੋ"
   }
-  
+
+    

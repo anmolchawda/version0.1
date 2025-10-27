@@ -1,3 +1,4 @@
+
 {
   "feed": "ଫିଡ୍",
   "discover": "ଆବିଷ୍କାର",
@@ -174,7 +175,7 @@
     "userNotAuthenticatedError": "ବ୍ୟବହାରକାରୀ ପ୍ରମାଣିତ ନୁହେଁ। ଦୟାକରି ଲଗିନ୍ କରନ୍ତୁ।",
     "failedToLoadConversationsError": "କଥାବାର୍ତ୍ତା ଲୋଡ୍ କରିବାରେ ବିଫଳ ହେଲା।",
     "newMessageModalTitle": "ନୂଆ ବାର୍ତ୍ତା",
-    "newMessageModalDescription": "କଥାବාର୍ତ୍ତା ଆରମ୍ଭ କରିବା ପାଇଁ ବ୍ୟବହାରକାରୀଙ୍କୁ ଖୋଜନ୍ତୁ।",
+    "newMessageModalDescription": "କଥାବﺍର୍ତ୍ତା ଆରମ୍ଭ କରିବା ପାଇଁ ବ୍ୟବହାରକାରୀଙ୍କୁ ଖୋଜନ୍ତୁ।",
     "searchUsersPlaceholder": "ବ୍ୟବହାରକାରୀ ଖୋଜନ୍ତୁ…",
     "noUsersFoundError": "ଆପଣଙ୍କର ସନ୍ଧାନ ଅନୁଯାୟୀ କୌଣସି ବ୍ୟବହାରକାରୀ ମିଳିଲେ ନାହିଁ।",
     "notificationsTitle": "ସୂଚନା",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "ମାଣ୍ଡି ବଜାର",
     "mandiBuyerRequestsTab": "କ୍ରେତା ଅନୁରୋଧ",
     "mandiMyProductsTab": "ମୋର ଉତ୍ପାଦ",
+    "mandiRatesTab": "ମାଣ୍ଡି ଦର",
     "mandiMarketplaceListings": "ବଜାର ତାଲିକା",
     "mandiYourListingsTitle": "ଆପଣଙ୍କର ତାଲିକା",
     "mandiBuyerRequestsTitle": "କ୍ରେତାଙ୍କ ଅନୁରୋଧ",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "ଅପସାରଣ",
     "mandiRequirementDeletedTitle": "ଆବଶ୍ୟକତା ଅପସାରଣ ହେଲା",
     "mandiRequirementDeletedDesc": "\"{itemName}\" ପାଇଁ ଆପଣଙ୍କର ଆବଶ୍ୟକତା ଅବସାରଣ ହେଇଛି।",
+    "featureComingSoonTitle": "ଫିଚର ଶୀଘ୍ର ଆସୁଛି!",
+    "featureComingSoonDescription": "ଏହି ବିଭାଗ ନିର୍ମାଣାଧୀନ ଅଛି ଏବଂ ଭବିଷ୍ୟତର ଅପଡେଟରେ ଉପଲବ୍ଧ ହେବ।",
     "databaseNotAvailableError": "ଡେଟାବେସ୍ ଉପଲବ୍ଧ ନୁହେଁ।",
     "yojnasTitle": "ଯୋଜନା",
     "failedToLoadYojnasError": "ଯୋଜନା ଲୋଡ୍ କରିପାରିଲା ନାହିଁ।",
@@ -294,4 +298,5 @@
     "sendToUser": "ବ୍ୟବହାରକାରୀଙ୍କୁ ପଠାନ୍ତୁ",
     "cancelButton": "ବାତିଲ୍"
   }
-  
+
+    

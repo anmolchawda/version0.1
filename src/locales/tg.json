@@ -1,3 +1,4 @@
+
 {
   "feed": "ఫీడ్",
   "discover": "డిస్కవర్",
@@ -209,6 +210,7 @@
     "mandiMarketplaceTab": "మార్కెట్‌ప్లేస్",
     "mandiBuyerRequestsTab": "కొనుగోలుదారుల అభ్యర్థనలు",
     "mandiMyProductsTab": "నా ఉత్పత్తులు",
+    "mandiRatesTab": "మండి ధరలు",
     "mandiMarketplaceListings": "మార్కెట్‌ప్లేస్ జాబితాలు",
     "mandiYourListingsTitle": "మీ జాబితాలు",
     "mandiBuyerRequestsTitle": "కొనుగోలుదారుల అభ్యర్థనలు",
@@ -258,6 +260,8 @@
     "mandiDeleteButtonConfirm": "తొలగించండి",
     "mandiRequirementDeletedTitle": "అవసరం తొలగించబడింది",
     "mandiRequirementDeletedDesc": "\"{itemName}\" అవసరం తొలగించబడింది.",
+    "featureComingSoonTitle": "ఫీచర్ త్వరలో వస్తుంది!",
+    "featureComingSoonDescription": "ఈ విభాగం నిర్మాణంలో ఉంది మరియు భవిష్యత్ అప్‌డేట్‌లో అందుబాటులోకి వస్తుంది.",
     "databaseNotAvailableError": "డేటాబేస్ అందుబాటులో లేదు.",
     "yojnasTitle": "యోజనాలు (పథకాలు)",
     "failedToLoadYojnasError": "పథకాలను లోడ్ చేయడంలో విఫలమైంది.",
@@ -294,4 +298,5 @@
     "sendToUser": "వాడుకరికి పంపండి",
     "cancelButton": "రద్దు చేయి"
   }
-  
+
+    

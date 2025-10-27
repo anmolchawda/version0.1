@@ -1,3 +1,4 @@
+
 {
     "feed": "போஸ்ட் விவரம்",
     "discover": "கண்டறிதல்",
@@ -209,6 +210,7 @@
         "mandiMarketplaceTab": "சந்தை",
         "mandiBuyerRequestsTab": "வாங்குநர் கோரிக்கைகள்",
         "mandiMyProductsTab": "என் பொருட்கள்",
+        "mandiRatesTab": "சந்தை விலைகள்",
         "mandiMarketplaceListings": "சந்தைப் பட்டியல்கள்",
         "mandiYourListingsTitle": "உங்கள் பட்டியல்கள்",
         "mandiBuyerRequestsTitle": "வாங்குநர் கோரிக்கைகள்",
@@ -258,6 +260,8 @@
         "mandiDeleteButtonConfirm": "நீக்கு",
         "mandiRequirementDeletedTitle": "தேவை நீக்கப்பட்டது",
         "mandiRequirementDeletedDesc": "\"{itemName}\" குறித்த உங்கள் தேவை நீக்கப்பட்டது.",
+        "featureComingSoonTitle": "புதிய அம்சம் விரைவில் வருகிறது!",
+        "featureComingSoonDescription": "இந்த பகுதி வளர்ச்சியில் உள்ளது மற்றும் எதிர்கால புதுப்பிப்பில் கிடைக்கும்.",
         "databaseNotAvailableError": "தரவுத்தளம் கிடைக்கவில்லை.",
         "yojnasTitle": "திட்டங்கள்",
         "failedToLoadYojnasError": "திட்டங்களை ஏற்ற முடியவில்லை.",
@@ -294,4 +298,5 @@
         "sendToUser": "பயனருக்கு அனுப்பு",
         "cancelButton": "ரத்து செய்"
       }
-      
+
+    
