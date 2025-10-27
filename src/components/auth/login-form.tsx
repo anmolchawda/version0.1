@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,16 @@ const GoogleLogo = () => (
   </svg>
 );
 
+// Define types for the Android interface for better type safety
+declare global {
+  interface Window {
+    Android?: {
+      startNativeGoogleSignIn: () => void;
+    };
+    onNativeGoogleSignInResult: (success: boolean, data: any) => void;
+  }
+}
+
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +42,38 @@ export function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    // Define the callback function that the native Android app will call.
+    window.onNativeGoogleSignInResult = (success, data) => {
+      setIsGoogleLoading(false);
+      if (success) {
+        console.log("Native Google Sign-In successful! Data:", data);
+        // The native app has handled the sign-in with Firebase.
+        // We can now redirect the user to the main feed, where the auth state listener will pick up the new user session.
+        router.push('/');
+        toast({
+            title: 'Sign-in Successful',
+            description: `Welcome, ${data.email || 'friend'}!`,
+        });
+      } else {
+        console.error("Native Google Sign-In failed!", data);
+        toast({
+            title: 'Sign-in Failed',
+            description: data.message || 'An error occurred during native sign-in.',
+            variant: 'destructive'
+        });
+      }
+    };
+
+    // Cleanup function to remove the global callback when the component unmounts
+    return () => {
+      // It's good practice to clean up, though for a single-page app it might not be strictly necessary.
+      // @ts-ignore
+      delete window.onNativeGoogleSignInResult;
+    }
+  }, [router, toast]);
+
 
   const handleResendVerification = async (user: FirebaseUser) => {
     if (!user) return;
@@ -94,6 +136,17 @@ export function LoginForm() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
+
+    // Check if the native Android interface is available
+    if (typeof window.Android !== 'undefined' && window.Android !== null && typeof window.Android.startNativeGoogleSignIn === 'function') {
+        console.log("Requesting native Google Sign-In...");
+        window.Android.startNativeGoogleSignIn();
+        // The result will be handled by the window.onNativeGoogleSignInResult callback.
+        return;
+    }
+
+    // Fallback to web-based Google Sign-In if native interface is not found
+    console.warn("Android native interface not found. Using web flow.");
     if (!auth || !db) {
       toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
       setIsGoogleLoading(false);
