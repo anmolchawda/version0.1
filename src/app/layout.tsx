@@ -3,8 +3,8 @@
 'use client';
 
 import { type ReactNode } from 'react';import { SidebarProvider } from '@/contexts/SidebarContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
-import { AuthProvider } from '@/contexts/AuthContext'; // Your new provider
 
 // This is the entire file. It is clean and has no logic.
 export default function RootLayout({ children }: { children: ReactNode }) {
