@@ -11,8 +11,27 @@ import { SidebarProvider } from '@/contexts/SidebarContext';
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
+import { AuthProvider } from '@/contexts/AuthContext';
 
-export default function AppPagesLayout({ children }: { children: ReactNode }) {
+
+export default function AppPagesLayout({ children }: { children: ReactNode }) {{
+
+  return (
+    <html lang="en">
+      <body>
+        {/* AuthProvider now manages loading and user state */}
+        <AuthProvider>
+            {/* Your other providers go inside AuthProvider */}
+            <SidebarProvider>
+                {/* NativeAuthHandler is still permanent */}
+                <NativeAuthHandler />
+                {children}
+            </SidebarProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
   const router = useRouter();
   const pathname = usePathname();
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_language' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
