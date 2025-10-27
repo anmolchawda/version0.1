@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -7,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
 
 /**
- * A client component dedicated to handling the callback from native Android Google Sign-In.
+ * A client component dedicated to handling communication with the native Android shell.
  * This should be placed in the root layout to ensure it's always available.
  */
 export function NativeAuthHandler() {
@@ -15,7 +14,8 @@ export function NativeAuthHandler() {
   const router = useRouter();
 
   useEffect(() => {
-    // Define the global callback function that the native Android app will call.
+    // 1. Define the global callback function that the native Android app will call
+    // after a sign-in attempt.
     window.onNativeGoogleSignInResult = (success, data) => {
       console.log(`NativeAuthHandler received sign-in result: success=${success}, data=`, data);
       
@@ -23,7 +23,7 @@ export function NativeAuthHandler() {
         // The native app has handled the sign-in with Firebase.
         // We must now ensure the Firebase JS SDK's auth state is synchronized.
         auth.currentUser?.getIdToken(true)
-          .then((idToken) => {
+          .then(() => {
             console.log("Firebase Web SDK token refreshed successfully after native sign-in.");
             // The onAuthStateChanged listener in the main layout will now detect the user
             // and handle the appropriate redirects or UI updates.
@@ -49,12 +49,20 @@ export function NativeAuthHandler() {
       }
     };
 
-    // Cleanup function to remove the global callback when the component unmounts.
+    // 2. Announce that the web app is ready and ask for the cached user.
+    // The native shell listens for this event to know when it can send startup data.
+    if (typeof window.Android?.onWebAppReady === 'function') {
+        console.log("NativeAuthHandler: Web app is ready, notifying native shell.");
+        window.Android.onWebAppReady();
+    }
+
+
+    // 3. Cleanup function to remove the global callback when the component unmounts.
     return () => {
       // @ts-ignore
       delete window.onNativeGoogleSignInResult;
     };
-    // The dependencies array is empty because this effect should only run once to set up the global handler.
+    // This effect should only run once to set up the global handlers.
   }, [router, toast]);
 
   // This component does not render anything to the DOM.
@@ -66,6 +74,7 @@ declare global {
   interface Window {
     Android?: {
       startNativeGoogleSignIn: () => void;
+      onWebAppReady: () => void;
     };
     onNativeGoogleSignInResult: (success: boolean, data: any) => void;
   }
