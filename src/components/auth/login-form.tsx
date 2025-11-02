@@ -31,42 +31,50 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
+  // ====================================================================
+  // ▼▼▼ FINAL ANDROID LISTENER LOGIC ▼▼▼
+  // This listens for a simple success signal from Android.
+  // ====================================================================
   useEffect(() => {
-    const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
-      console.log('Signal received from Android app!');
-      setIsGoogleLoading(false);
-
-      if (isSuccess && dataString) {
+    const handleAuthSuccess = async () => {
+      console.log('onAuthSuccess signal received from Android.');
+      if (auth.currentUser) {
         try {
-          const userData = JSON.parse(dataString);
-          console.log('Login successful via Android. User data:', userData);
-          
-          // === THIS IS THE FIX ===
-          // We are going back to pushing the router.
-          // The AuthProvider is now set up to handle the flicker if it occurs.
-          router.push('/feed');
-
+          console.log('Forcing Firebase auth state reload on the web app...');
+          await auth.currentUser.reload();
+          console.log('Firebase auth state reloaded. AuthProvider will now handle redirection.');
+          // After this, the onAuthStateChanged listener in AuthContext will fire with the new user,
+          // and the redirection logic there will send the user to "/feed".
         } catch (error) {
-          console.error('Error processing data from Android:', error);
-          toast({ title: 'Login Error', description: 'Could not process login data from the app.', variant: 'destructive' });
+          console.error('Error during auth.currentUser.reload():', error);
+          toast({ title: 'Login Error', description: 'Failed to sync authentication state.', variant: 'destructive' });
         }
       } else {
-        console.error('Android app reported a login failure.');
-        toast({ title: 'Login Failed', description: 'The sign-in process was cancelled or failed.', variant: 'destructive' });
+        // This case might happen if there's a delay. Waiting a moment and checking again is a fallback.
+        console.error('onAuthSuccess called, but auth.currentUser was not immediately available.');
+        setTimeout(async () => {
+            if (auth.currentUser) {
+                await auth.currentUser.reload();
+            } else {
+                toast({ title: 'Login Sync Failed', description: 'Could not sync login from the native app.', variant: 'destructive' });
+            }
+        }, 1000);
       }
+      setIsGoogleLoading(false); // Stop the spinner on the button
     };
 
-    (window as any).onNativeGoogleSignInResult = handleNativeSignInResult;
-    console.log('Android login listener has been set up.');
+    (window as any).onAuthSuccess = handleAuthSuccess;
+    console.log('Android onAuthSuccess listener has been set up.');
 
     return () => {
-      delete (window as any).onNativeGoogleSignInResult;
-      console.log('Android login listener has been removed.');
+      delete (window as any).onAuthSuccess;
+      console.log('Android onAuthSuccess listener has been removed.');
     };
-  }, [router, toast]); // Put router back in the dependency array
+  }, [toast]); // Depends only on toast, which is stable.
 
-  // ... (The rest of your functions: handleResendVerification, handleSubmit, handleGoogleLogin are fine)
-  // ... (Your JSX is fine)
+  // ====================================================================
+  // ▲▲▲ END OF THE LISTENER LOGIC ▲▲▲
+  // ====================================================================
 
   const handleResendVerification = async (user: FirebaseUser) => {
     if (!user) return;
@@ -96,7 +104,7 @@ export function LoginForm() {
     }
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // AuthProvider will handle the redirect.
+      // AuthProvider will handle the redirect automatically.
     } catch (error: any) {
       console.error('Login error:', error.code, error.message);
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
@@ -207,4 +215,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
