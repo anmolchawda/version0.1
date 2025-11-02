@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent, useEffect } from 'react';
+import { useState, type FormEvent, useEffect, useCallback } from 'react'; // Import useCallback
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -32,11 +32,12 @@ export function LoginForm() {
   const router = useRouter();
 
   // ====================================================================
-  // ▼▼▼ LISTENER FOR THE ANDROID APP (FINAL VERSION) ▼▼▼
+  // ▼▼▼ ANDROID LISTENER (RE-CORRECTED) ▼▼▼
   // ====================================================================
   useEffect(() => {
     const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
       console.log('Signal received from Android app!');
+      // Use a callback with setIsGoogleLoading to ensure it gets the latest state setter
       setIsGoogleLoading(false);
 
       if (isSuccess && dataString) {
@@ -44,9 +45,7 @@ export function LoginForm() {
           const userData = JSON.parse(dataString);
           console.log('Login successful via Android. User data:', userData);
           
-          // === THIS IS THE FIX ===
-          // Force a page reload. This makes the AuthProvider re-run and detect
-          // the new user from Firebase's persistent storage, then redirect correctly.
+          // Force a page reload to make AuthProvider detect the new user state.
           window.location.reload();
 
         } catch (error) {
@@ -59,32 +58,114 @@ export function LoginForm() {
       }
     };
 
+    // This attaches the listener function to the window, so the Android app can call it.
     (window as any).onNativeGoogleSignInResult = handleNativeSignInResult;
     console.log('Android login listener has been set up.');
 
+    // Cleanup function to remove the listener when you leave the login page.
     return () => {
       delete (window as any).onNativeGoogleSignInResult;
       console.log('Android login listener has been removed.');
     };
-  }, [toast]);
+  }, [toast]); // Only depends on toast, which is stable.
   // ====================================================================
   // ▲▲▲ END OF THE LISTENER CODE BLOCK ▲▲▲
   // ====================================================================
 
   const handleResendVerification = async (user: FirebaseUser) => {
-    // ... (this code is fine)
+    if (!user) return;
+    try {
+      await sendEmailVerification(user);
+      toast({
+        title: "Verification Email Sent",
+        description: `A new verification link has been sent to ${user.email}.`,
+      });
+    } catch (error: any) {
+      console.error("Error resending verification email:", error);
+      toast({
+        title: "Error Sending Email",
+        description: "Could not send verification email. Please try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (event: FormEvent) => {
-    // ... (this code is fine)
+    event.preventDefault();
+    setIsLoading(true);
+    if (!auth) {
+      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // The AuthProvider will handle the redirect automatically.
+    } catch (error: any) {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            toast({ title: 'Login Failed', description: 'Invalid email or password.', variant: 'destructive' });
+        } else {
+            console.error('Login error:', error.code, error.message);
+            toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+        }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = async () => {
-    // ... (this code is fine)
+    // Check if the code is running inside our Android app.
+    const androidInterface = (window as any).Android;
+    if (androidInterface && typeof androidInterface.requestGoogleSignIn === 'function') {
+        console.log("Requesting native Google Sign-In...");
+        setIsGoogleLoading(true);
+        // Tell the Android app to start its native login flow.
+        androidInterface.requestGoogleSignIn();
+        return; // Stop and wait for the listener to get the result.
+    }
+
+    // If not in the Android app, use the normal web browser login flow.
+    console.warn("Android native interface not found. Using web flow.");
+    setIsGoogleLoading(true);
+    if (!auth || !db) {
+      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
+      setIsGoogleLoading(false);
+      return;
+    }
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const additionalInfo = getAdditionalUserInfo(userCredential);
+
+      if (additionalInfo?.isNewUser) {
+        const user = userCredential.user;
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, {
+            id: user.uid,
+            email: user.email,
+            username: user.email?.split('@')[0] || `user_${user.uid.substring(0, 6)}`,
+            name: user.displayName || '',
+            avatarUrl: user.photoURL || '',
+            createdAt: serverTimestamp(),
+            languageSelected: false,
+            profileSetupComplete: false,
+            followersCount: 0,
+            followingCount: 0,
+            postCount: 0
+        });
+      }
+      // The AuthProvider will handle the redirect.
+    } catch (error: any) {
+      console.error('Google Sign-in error:', error.code, error.message);
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
   
   return (
-    // ... (your JSX is fine)
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary">Welcome Back!</CardTitle>
@@ -134,3 +215,4 @@ export function LoginForm() {
     </Card>
   );
 }
+
