@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AnalyticsProvider } from '@/components/core/analytics-provider';
-import { AuthProvider } from '@/contexts/AuthContext'; // This import is correct
+import { AuthProvider } from '@/contexts/AuthContext';
+import { Suspense } from 'react';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,13 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* ▼▼▼ THIS IS THE ONLY CHANGE ▼▼▼ */}
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
-        {/* ▲▲▲ END OF THE CHANGE ▲▲▲ */}
-        
+        <Suspense fallback={<div>Loading...</div>}>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </Suspense>
+        <Toaster />
         <AnalyticsProvider />
       </body>
     </html>

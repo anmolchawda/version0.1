@@ -11,7 +11,6 @@ import { Loader2, AlertTriangle } from 'lucide-react';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
-import { NativeAuthHandler } from '@/components/auth/native-auth-handler';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
@@ -120,28 +119,19 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
   
   return (
     <SidebarProvider>
-      {/* NativeAuthHandler is ALWAYS present, no matter the page */}
-      <NativeAuthHandler />
-
-      {/* Main content area */}
       <div className="flex h-screen bg-background">
-        {/* Conditionally render the sidebar if NOT on an auth page */}
         {!isAuthPage && <Sidebar />}
         
         <main className="flex-1 flex flex-col overflow-y-auto">
-          {/* Conditionally render the header if NOT on an auth page */}
           {!isAuthPage && <TopHeader />}
 
-          {/* The actual page content is always rendered */}
           <div className="p-4 md:p-8">
             {children}
           </div>
           
-          {/* Conditionally render the bottom nav if NOT on an auth page */}
           {!isAuthPage && <BottomNavBar />}
         </main>
       </div>
     </SidebarProvider>
   );
 }
-
