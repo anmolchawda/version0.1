@@ -1,37 +1,38 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { usePathname, useRouter } from 'next/navigation'; // <-- 1. IMPORT THESE
 import { auth } from '@/lib/firebase';
-// Make sure to import the User type from the firebase/auth SDK
 import { onAuthStateChanged, type User } from 'firebase/auth'; 
 import { Loader2 } from 'lucide-react';
 
-// 1. Define the "shape" of our context data
 interface AuthContextType {
-  user: User | null; // The user can be a Firebase User object or null
+  user: User | null;
   authStatus: 'loading' | 'authenticated' | 'unauthenticated';
 }
 
-// 2. Create the context with a default value that matches the type.
-//    We use 'as' here to tell TypeScript to trust us about the default shape.
 const AuthContext = createContext<AuthContextType>({ 
   user: null, 
   authStatus: 'loading' 
 });
 
+// List of pages that do not require a user to be logged in
+const PUBLIC_ROUTES = ['/login', '/signup']; // <-- 2. ADD THIS LIST
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // 3. The state now correctly uses the User type
   const [user, setUser] = useState<User | null>(null);
   const [authStatus, setAuthStatus] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+  const router = useRouter();   // <-- 3. ADD ROUTER
+  const pathname = usePathname(); // <-- 4. ADD PATHNAME
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser(firebaseUser); // This is a User object
+        setUser(firebaseUser);
         setAuthStatus('authenticated');
         console.log("AuthContext: User is authenticated.", firebaseUser.uid);
       } else {
-        setUser(null); // This is null
+        setUser(null);
         setAuthStatus('unauthenticated');
         console.log("AuthContext: User is not authenticated.");
       }
@@ -39,6 +40,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => unsubscribe();
   }, []);
+
+  // ================================================================
+  // ▼▼▼ THIS IS THE NEW LOGIC THAT FIXES THE REDIRECTION PROBLEM ▼▼▼
+  // ================================================================
+  useEffect(() => {
+    // Wait until we know for sure if the user is logged in or not.
+    if (authStatus === 'loading') {
+      return; 
+    }
+
+    const isPublicPage = PUBLIC_ROUTES.includes(pathname);
+
+    // If user is LOGGED OUT but on a PROTECTED page...
+    if (authStatus === 'unauthenticated' && !isPublicPage) {
+      console.log('Redirecting logged-out user to login page...');
+      router.replace('/login'); // ...kick them to the login screen.
+    }
+
+    // If user is LOGGED IN but on a PUBLIC page (like /login)...
+    if (authStatus === 'authenticated' && isPublicPage) {
+      console.log('Redirecting logged-in user to home page...');
+      router.replace('/'); // ...send them to the main app screen.
+    }
+
+  }, [authStatus, pathname, router]); // This runs when auth status or page changes
+  // ================================================================
+  // ▲▲▲ END OF THE NEW LOGIC ▲▲▲
+  // ================================================================
+
 
   if (authStatus === 'loading') {
     return (
@@ -56,5 +86,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 4. The hook now provides proper types, so other components know about 'user.uid' etc.
 export const useAuth = () => useContext(AuthContext);
