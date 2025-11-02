@@ -28,55 +28,71 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [isFinalizing, setIsFinalizing] = useState(false); // New state to show a "waiting" message
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
-    const handleAuthSuccess = () => {
-      console.log('onAuthSuccess signal received from Android. Waiting for AuthProvider...');
-      setIsGoogleLoading(false); // Stop the original Google spinner
-      setIsFinalizing(true);     // Show a new "Finalizing..." message
-      // We do nothing else. We just wait.
-      // The onAuthStateChanged listener in AuthProvider is the source of truth
-      // and will eventually fire, see the logged-in user, and redirect to /feed.
+    const handleNativeLogin = (dataString: string) => {
+      console.log('Native login success signal received from Android.');
+      setIsGoogleLoading(false);
+      try {
+        const userData = JSON.parse(dataString);
+        console.log('User data from native login:', userData);
+        // Force the navigation. The AuthProvider will catch up.
+        router.push('/feed');
+      } catch (e) {
+        console.error("Failed to parse user data from native login", e);
+        toast({ title: "Login Error", description: "Received invalid data from the app.", variant: "destructive" });
+      }
     };
 
-    (window as any).onAuthSuccess = handleAuthSuccess;
+    (window as any).onNativeLoginSuccess = handleNativeLogin;
+    console.log('Android `onNativeLoginSuccess` listener is ready.');
+
     return () => {
-      delete (window as any).onAuthSuccess;
+      delete (window as any).onNativeLoginSuccess;
     };
-  }, []);
+  }, [router, toast]);
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     const androidInterface = (window as any).Android;
     if (androidInterface && typeof androidInterface.requestGoogleSignIn === 'function') {
-      console.log("Requesting native Google Sign-In...");
-      setIsGoogleLoading(true);
-      androidInterface.requestGoogleSignIn();
-      return;
+        console.log("Requesting native Google Sign-In...");
+        setIsGoogleLoading(true);
+        androidInterface.requestGoogleSignIn();
+        return;
     }
-    // Web fallback can go here...
+    
+    // Web fallback
     console.warn("Android native interface not found. Using web flow.");
+    setIsGoogleLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      // AuthProvider will handle web redirect
+    } catch (error: any) {
+      if (error.code !== 'auth/popup-closed-by-user') {
+        toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+      }
+    } finally {
+        setIsGoogleLoading(false);
+    }
   };
 
-  // The rest of your functions (handleSubmit, etc.) are fine and don't need changes.
-  // ...
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // AuthProvider will handle redirect
+    } catch (error: any) {
+      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  if (isFinalizing) {
-    return (
-      <Card className="w-full max-w-md shadow-2xl rounded-xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">Login Successful</CardTitle>
-          <CardDescription>Finalizing your session...</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center items-center py-10">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        </CardContent>
-      </Card>
-    );
-  }
-
+  // Your original UI is restored.
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
@@ -93,10 +109,37 @@ export function LoginForm() {
           {isGoogleLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <GoogleLogo />}
           <span className="ml-2">{isGoogleLoading ? 'Signing in...' : 'Log in with Google'}</span>
         </Button>
-        {/* ... Rest of your JSX ... */}
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading || isGoogleLoading} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading || isGoogleLoading} />
+          </div>
+          <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || isGoogleLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <LogIn className="mr-2 h-5 w-5" />}
+            {isLoading ? 'Logging In...' : 'Log In'}
+          </Button>
+        </form>
       </CardContent>
-      {/* ... CardFooter ... */}
+      <CardFooter className="flex flex-col gap-4 pt-0">
+        <p className="text-sm text-muted-foreground">
+          Don&apos;t have an account?{' '}
+          <Button variant="link" asChild className="p-0 h-auto text-primary">
+            <Link href="/signup">Sign up</Link>
+          </Button>
+        </p>
+      </CardFooter>
     </Card>
   );
 }
-
