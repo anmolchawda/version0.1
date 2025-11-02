@@ -33,6 +33,17 @@
           "region": "us-central1"
         }
       }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' 'unsafe-eval'; connect-src 'self' https://*.firebaseio.com https://securetoken.googleapis.com https://*.googleapis.com; frame-src 'self' https://*.firebaseapp.com https://*.firebaseauth.com https://accounts.google.com;"
+          }
+        ]
+      }
     ]
   },
   "storage": {
