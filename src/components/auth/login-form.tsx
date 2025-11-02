@@ -44,7 +44,7 @@ export function LoginForm() {
           // === THIS IS THE FIX ===
           // We are going back to pushing the router.
           // The AuthProvider is now set up to handle the flicker if it occurs.
-          router.push('/');
+          router.push('/feed');
 
         } catch (error) {
           console.error('Error processing data from Android:', error);
