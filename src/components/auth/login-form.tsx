@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent, useEffect, useCallback } from 'react'; // Import useCallback
+import { useState, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,9 @@ export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
-  // ====================================================================
-  // ▼▼▼ ANDROID LISTENER (RE-CORRECTED) ▼▼▼
-  // ====================================================================
   useEffect(() => {
     const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
       console.log('Signal received from Android app!');
-      // Use a callback with setIsGoogleLoading to ensure it gets the latest state setter
       setIsGoogleLoading(false);
 
       if (isSuccess && dataString) {
@@ -45,8 +41,10 @@ export function LoginForm() {
           const userData = JSON.parse(dataString);
           console.log('Login successful via Android. User data:', userData);
           
-          // Force a page reload to make AuthProvider detect the new user state.
-          window.location.reload();
+          // === THIS IS THE FIX ===
+          // We are going back to pushing the router.
+          // The AuthProvider is now set up to handle the flicker if it occurs.
+          router.push('/');
 
         } catch (error) {
           console.error('Error processing data from Android:', error);
@@ -58,19 +56,17 @@ export function LoginForm() {
       }
     };
 
-    // This attaches the listener function to the window, so the Android app can call it.
     (window as any).onNativeGoogleSignInResult = handleNativeSignInResult;
     console.log('Android login listener has been set up.');
 
-    // Cleanup function to remove the listener when you leave the login page.
     return () => {
       delete (window as any).onNativeGoogleSignInResult;
       console.log('Android login listener has been removed.');
     };
-  }, [toast]); // Only depends on toast, which is stable.
-  // ====================================================================
-  // ▲▲▲ END OF THE LISTENER CODE BLOCK ▲▲▲
-  // ====================================================================
+  }, [router, toast]); // Put router back in the dependency array
+
+  // ... (The rest of your functions: handleResendVerification, handleSubmit, handleGoogleLogin are fine)
+  // ... (Your JSX is fine)
 
   const handleResendVerification = async (user: FirebaseUser) => {
     if (!user) return;
@@ -100,14 +96,10 @@ export function LoginForm() {
     }
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // The AuthProvider will handle the redirect automatically.
+      // AuthProvider will handle the redirect.
     } catch (error: any) {
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            toast({ title: 'Login Failed', description: 'Invalid email or password.', variant: 'destructive' });
-        } else {
-            console.error('Login error:', error.code, error.message);
-            toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
-        }
+      console.error('Login error:', error.code, error.message);
+      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -154,7 +146,7 @@ export function LoginForm() {
             postCount: 0
         });
       }
-      // The AuthProvider will handle the redirect.
+      // AuthProvider will handle the redirect.
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
       if (error.code !== 'auth/popup-closed-by-user') {
