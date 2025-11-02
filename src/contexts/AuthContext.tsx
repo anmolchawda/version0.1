@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // If user is LOGGED IN but on a PUBLIC page (like /login)...
     if (authStatus === 'authenticated' && isPublicPage) {
       console.log('Redirecting logged-in user to home page...');
-      router.replace('/'); // ...send them to the main app screen.
+      router.replace('/feed'); // ...send them to the main app screen.
     }
 
   }, [authStatus, pathname, router]); // This runs when auth status or page changes
