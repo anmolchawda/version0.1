@@ -73,6 +73,7 @@ export function NativeAuthHandler() {
 declare global {
   interface Window {
     Android?: {
+      requestGoogleSignIn: any;
       startNativeGoogleSignIn: () => void;
       onWebAppReady: () => void;
     };
