@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
 import { auth, db, doc, setDoc, serverTimestamp } from '@/lib/firebase';
-import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification, signOut, type User as FirebaseUser } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, getAdditionalUserInfo, sendEmailVerification, signInWithCustomToken, type User as FirebaseUser } from 'firebase/auth';
 
 const GoogleLogo = () => (
     <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
@@ -32,26 +32,40 @@ export function LoginForm() {
   const router = useRouter();
 
   // ====================================================================
-  // ▼▼▼ FINAL, SIMPLIFIED ANDROID LISTENER ▼▼▼
+  // ▼▼▼ FINAL, FOOLPROOF ANDROID LISTENER ▼▼▼
   // ====================================================================
   useEffect(() => {
-    const handleAuthSuccess = () => {
-      console.log('onAuthSuccess signal received from Android. AuthProvider will now take over.');
-      // We do nothing here. We simply wait for the onAuthStateChanged listener
-      // in AuthContext.tsx to fire, which it will automatically.
-      // That listener is the single source of truth for navigation.
-      setIsGoogleLoading(false); // Just stop the spinner on the button
+    const handleTokenReceipt = async (token: string) => {
+      console.log('ID Token received from Android. Attempting to sign in...');
+      setIsGoogleLoading(true);
+      if (!token) {
+          toast({ title: 'Login Error', description: 'Received an empty token from the app.', variant: 'destructive' });
+          setIsGoogleLoading(false);
+          return;
+      }
+
+      try {
+        // SIGN IN THE WEB APP USING THE TOKEN FROM ANDROID
+        await signInWithCustomToken(auth, token);
+        console.log('Web app signed in successfully with custom token. AuthProvider will now redirect.');
+        // At this point, onAuthStateChanged fires and AuthProvider does its job.
+        // We don't need to do anything else.
+      } catch (error: any) {
+        console.error('Error signing in with custom token:', error);
+        toast({ title: 'Login Sync Failed', description: 'Could not log in using the token from the app.', variant: 'destructive' });
+      } finally {
+        setIsGoogleLoading(false);
+      }
     };
 
-    (window as any).onAuthSuccess = handleAuthSuccess;
-    console.log('Android onAuthSuccess listener has been set up.');
+    (window as any).onReceiveIdToken = handleTokenReceipt;
+    console.log('Android onReceiveIdToken listener has been set up.');
 
     return () => {
-      delete (window as any).onAuthSuccess;
-      console.log('Android onAuthSuccess listener has been removed.');
+      delete (window as any).onReceiveIdToken;
+      console.log('Android onReceiveIdToken listener has been removed.');
     };
-  }, []); // The empty dependency array is correct and final.
-
+  }, [toast]);
   // ====================================================================
   // ▲▲▲ END OF THE LISTENER LOGIC ▲▲▲
   // ====================================================================
