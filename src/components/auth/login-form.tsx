@@ -32,35 +32,15 @@ export function LoginForm() {
   const router = useRouter();
 
   // ====================================================================
-  // ▼▼▼ FINAL ANDROID LISTENER LOGIC ▼▼▼
-  // This listens for a simple success signal from Android.
+  // ▼▼▼ FINAL, SIMPLIFIED ANDROID LISTENER ▼▼▼
   // ====================================================================
   useEffect(() => {
-    const handleAuthSuccess = async () => {
-      console.log('onAuthSuccess signal received from Android.');
-      if (auth.currentUser) {
-        try {
-          console.log('Forcing Firebase auth state reload on the web app...');
-          await auth.currentUser.reload();
-          console.log('Firebase auth state reloaded. AuthProvider will now handle redirection.');
-          // After this, the onAuthStateChanged listener in AuthContext will fire with the new user,
-          // and the redirection logic there will send the user to "/feed".
-        } catch (error) {
-          console.error('Error during auth.currentUser.reload():', error);
-          toast({ title: 'Login Error', description: 'Failed to sync authentication state.', variant: 'destructive' });
-        }
-      } else {
-        // This case might happen if there's a delay. Waiting a moment and checking again is a fallback.
-        console.error('onAuthSuccess called, but auth.currentUser was not immediately available.');
-        setTimeout(async () => {
-            if (auth.currentUser) {
-                await auth.currentUser.reload();
-            } else {
-                toast({ title: 'Login Sync Failed', description: 'Could not sync login from the native app.', variant: 'destructive' });
-            }
-        }, 1000);
-      }
-      setIsGoogleLoading(false); // Stop the spinner on the button
+    const handleAuthSuccess = () => {
+      console.log('onAuthSuccess signal received from Android. AuthProvider will now take over.');
+      // We do nothing here. We simply wait for the onAuthStateChanged listener
+      // in AuthContext.tsx to fire, which it will automatically.
+      // That listener is the single source of truth for navigation.
+      setIsGoogleLoading(false); // Just stop the spinner on the button
     };
 
     (window as any).onAuthSuccess = handleAuthSuccess;
@@ -70,7 +50,7 @@ export function LoginForm() {
       delete (window as any).onAuthSuccess;
       console.log('Android onAuthSuccess listener has been removed.');
     };
-  }, [toast]); // Depends only on toast, which is stable.
+  }, []); // The empty dependency array is correct and final.
 
   // ====================================================================
   // ▲▲▲ END OF THE LISTENER LOGIC ▲▲▲
