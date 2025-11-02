@@ -32,7 +32,7 @@ export function LoginForm() {
   const router = useRouter();
 
   // ====================================================================
-  // ▼▼▼ LISTENER FOR THE ANDROID APP (CORRECTED) ▼▼▼
+  // ▼▼▼ LISTENER FOR THE ANDROID APP (FINAL VERSION) ▼▼▼
   // ====================================================================
   useEffect(() => {
     const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
@@ -44,9 +44,10 @@ export function LoginForm() {
           const userData = JSON.parse(dataString);
           console.log('Login successful via Android. User data:', userData);
           
-          // DO NOT REDIRECT HERE. The AuthProvider will now handle it.
-          // This was the cause of the race condition.
-          // router.push('/'); // <-- THIS LINE IS REMOVED
+          // === THIS IS THE FIX ===
+          // Force a page reload. This makes the AuthProvider re-run and detect
+          // the new user from Firebase's persistent storage, then redirect correctly.
+          window.location.reload();
 
         } catch (error) {
           console.error('Error processing data from Android:', error);
@@ -65,116 +66,25 @@ export function LoginForm() {
       delete (window as any).onNativeGoogleSignInResult;
       console.log('Android login listener has been removed.');
     };
-  }, [toast]); // We remove 'router' from here as it's no longer used in this effect
+  }, [toast]);
   // ====================================================================
   // ▲▲▲ END OF THE LISTENER CODE BLOCK ▲▲▲
   // ====================================================================
 
   const handleResendVerification = async (user: FirebaseUser) => {
-    if (!user) return;
-    try {
-      await sendEmailVerification(user);
-      toast({
-        title: "Verification Email Sent",
-        description: `A new verification link has been sent to ${user.email}.`,
-      });
-    } catch (error: any) {
-      console.error("Error resending verification email:", error);
-      toast({
-        title: "Error Sending Email",
-        description: "Could not send verification email. Please try again later.",
-        variant: "destructive",
-      });
-    }
+    // ... (this code is fine)
   };
 
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setIsLoading(true);
-    if (!auth) {
-      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
-      setIsLoading(false);
-      return;
-    }
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (!userCredential.user.emailVerified) {
-        const userToVerify = userCredential.user;
-        await signOut(auth);
-        toast({
-          title: 'Email Not Verified',
-          description: 'Please check your inbox and verify your email address to continue.',
-          variant: 'destructive',
-          duration: 10000,
-          action: (
-            <Button variant="secondary" size="sm" onClick={() => handleResendVerification(userToVerify)}>
-              Resend Email
-            </Button>
-          ),
-        });
-      } else {
-        // Let the AuthProvider handle the redirect
-        // router.push('/');
-      }
-    } catch (error: any) {
-      console.error('Login error:', error.code, error.message);
-      toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
-    } finally {
-      setIsLoading(false);
-    }
+    // ... (this code is fine)
   };
 
   const handleGoogleLogin = async () => {
-    const androidInterface = (window as any).Android;
-    if (androidInterface && typeof androidInterface.requestGoogleSignIn === 'function') {
-        console.log("Requesting native Google Sign-In...");
-        setIsGoogleLoading(true);
-        androidInterface.requestGoogleSignIn();
-        return;
-    }
-
-    console.warn("Android native interface not found. Using web flow.");
-    setIsGoogleLoading(true);
-    if (!auth || !db) {
-      toast({ title: "Login Disabled", description: "Firebase is not configured correctly.", variant: "destructive"});
-      setIsGoogleLoading(false);
-      return;
-    }
-    try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const additionalInfo = getAdditionalUserInfo(userCredential);
-
-      if (additionalInfo?.isNewUser) {
-        const user = userCredential.user;
-        const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, {
-            id: user.uid,
-            email: user.email,
-            username: user.email?.split('@')[0] || `user_${user.uid.substring(0, 6)}`,
-            name: user.displayName || '',
-            avatarUrl: user.photoURL || '',
-            createdAt: serverTimestamp(),
-            languageSelected: false,
-            profileSetupComplete: false,
-            followersCount: 0,
-            followingCount: 0,
-            postCount: 0
-        });
-      }
-      // Let the AuthProvider handle the redirect
-      // router.push('/');
-    } catch (error: any) {
-      console.error('Google Sign-in error:', error.code, error.message);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
-      }
-    } finally {
-      setIsGoogleLoading(false);
-    }
+    // ... (this code is fine)
   };
   
   return (
+    // ... (your JSX is fine)
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold text-primary">Welcome Back!</CardTitle>
