@@ -4,7 +4,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { auth } from '@/lib/firebase/config'; // Adjust path if needed
+import { auth } from '@/lib/firebase/config';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface AuthContextType {
@@ -20,46 +20,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // ▼▼▼ DEFINE isAuthPage HERE so it's accessible everywhere ▼▼▼
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log('AuthProvider: Auth state changed. User:', firebaseUser?.uid || 'null');
       setUser(firebaseUser);
       setIsLoading(false);
     });
-
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (isLoading) {
-      return; // Do nothing while loading
+      return; // Wait until loading is complete
     }
 
-    const isAuthPage = pathname === '/login';
-
+    // Logic 1: If we have a user, but they are on an auth page, redirect them away.
     if (user && isAuthPage) {
-      // User is logged in but on the login page, redirect to feed
+      console.log(`AuthProvider: Logged-in user on auth page (${pathname}). Redirecting to /feed.`);
       router.replace('/feed');
-    } else if (!user && !isAuthPage) {
-      // User is not logged in and not on the login page, redirect to login
+    }
+
+    // Logic 2: If we DON'T have a user, and they are NOT on an auth page, force them to login.
+    if (!user && !isAuthPage) {
+      console.log(`AuthProvider: Logged-out user on protected page (${pathname}). Redirecting to /login.`);
       router.replace('/login');
     }
-  }, [user, isLoading, pathname, router]);
+    
+  }, [user, isLoading, pathname, router, isAuthPage]); // Added isAuthPage to dependency array
 
-  // While loading, show a loading spinner or a blank screen
+  // Show a loading screen while Firebase is initializing.
+  // This prevents any "flash" of the wrong content.
   if (isLoading) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-      }}>
-        {/* You can replace this with a proper spinner component */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <p>Loading...</p>
       </div>
     );
   }
 
+  // If everything is loaded and the redirects have been handled, render the page.
   return (
     <AuthContext.Provider value={{ user, isLoading }}>
       {children}
@@ -67,6 +69,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook to use the auth context in other components
 export const useAuth = () => useContext(AuthContext);
 
