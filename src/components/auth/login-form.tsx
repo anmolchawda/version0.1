@@ -32,23 +32,21 @@ export function LoginForm() {
   const router = useRouter();
 
   // ====================================================================
-  // ▼▼▼ THIS IS THE "LISTENER" FOR THE ANDROID APP ▼▼▼
-  // It listens for the result from the native Google Sign-in flow.
+  // ▼▼▼ LISTENER FOR THE ANDROID APP (CORRECTED) ▼▼▼
   // ====================================================================
   useEffect(() => {
     const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
       console.log('Signal received from Android app!');
-      setIsGoogleLoading(false); // Stop the loading spinner
+      setIsGoogleLoading(false);
 
       if (isSuccess && dataString) {
         try {
           const userData = JSON.parse(dataString);
           console.log('Login successful via Android. User data:', userData);
           
-          // Login was successful, so redirect to the main page.
-          // Your native app already handled the Firebase login,
-          // so we just need to move the user forward in the web view.
-          router.push('/');
+          // DO NOT REDIRECT HERE. The AuthProvider will now handle it.
+          // This was the cause of the race condition.
+          // router.push('/'); // <-- THIS LINE IS REMOVED
 
         } catch (error) {
           console.error('Error processing data from Android:', error);
@@ -60,16 +58,14 @@ export function LoginForm() {
       }
     };
 
-    // This attaches the listener function to the window, so the Android app can call it.
     (window as any).onNativeGoogleSignInResult = handleNativeSignInResult;
     console.log('Android login listener has been set up.');
 
-    // Cleanup function to remove the listener when you leave the login page.
     return () => {
       delete (window as any).onNativeGoogleSignInResult;
       console.log('Android login listener has been removed.');
     };
-  }, [router, toast]);
+  }, [toast]); // We remove 'router' from here as it's no longer used in this effect
   // ====================================================================
   // ▲▲▲ END OF THE LISTENER CODE BLOCK ▲▲▲
   // ====================================================================
@@ -117,7 +113,8 @@ export function LoginForm() {
           ),
         });
       } else {
-        router.push('/');
+        // Let the AuthProvider handle the redirect
+        // router.push('/');
       }
     } catch (error: any) {
       console.error('Login error:', error.code, error.message);
@@ -128,17 +125,14 @@ export function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    // Check if the code is running inside our Android app.
     const androidInterface = (window as any).Android;
     if (androidInterface && typeof androidInterface.requestGoogleSignIn === 'function') {
         console.log("Requesting native Google Sign-In...");
         setIsGoogleLoading(true);
-        // Tell the Android app to start its native login flow.
         androidInterface.requestGoogleSignIn();
-        return; // Stop and wait for the listener to get the result.
+        return;
     }
 
-    // If not in the Android app, use the normal web browser login flow.
     console.warn("Android native interface not found. Using web flow.");
     setIsGoogleLoading(true);
     if (!auth || !db) {
@@ -168,7 +162,8 @@ export function LoginForm() {
             postCount: 0
         });
       }
-      router.push('/');
+      // Let the AuthProvider handle the redirect
+      // router.push('/');
     } catch (error: any) {
       console.error('Google Sign-in error:', error.code, error.message);
       if (error.code !== 'auth/popup-closed-by-user') {
