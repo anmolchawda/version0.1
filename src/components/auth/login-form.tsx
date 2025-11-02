@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -31,6 +30,49 @@ export function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
+  // ====================================================================
+  // ▼▼▼ THIS IS THE "LISTENER" FOR THE ANDROID APP ▼▼▼
+  // It listens for the result from the native Google Sign-in flow.
+  // ====================================================================
+  useEffect(() => {
+    const handleNativeSignInResult = (isSuccess: boolean, dataString?: string) => {
+      console.log('Signal received from Android app!');
+      setIsGoogleLoading(false); // Stop the loading spinner
+
+      if (isSuccess && dataString) {
+        try {
+          const userData = JSON.parse(dataString);
+          console.log('Login successful via Android. User data:', userData);
+          
+          // Login was successful, so redirect to the main page.
+          // Your native app already handled the Firebase login,
+          // so we just need to move the user forward in the web view.
+          router.push('/');
+
+        } catch (error) {
+          console.error('Error processing data from Android:', error);
+          toast({ title: 'Login Error', description: 'Could not process login data from the app.', variant: 'destructive' });
+        }
+      } else {
+        console.error('Android app reported a login failure.');
+        toast({ title: 'Login Failed', description: 'The sign-in process was cancelled or failed.', variant: 'destructive' });
+      }
+    };
+
+    // This attaches the listener function to the window, so the Android app can call it.
+    (window as any).onNativeGoogleSignInResult = handleNativeSignInResult;
+    console.log('Android login listener has been set up.');
+
+    // Cleanup function to remove the listener when you leave the login page.
+    return () => {
+      delete (window as any).onNativeGoogleSignInResult;
+      console.log('Android login listener has been removed.');
+    };
+  }, [router, toast]);
+  // ====================================================================
+  // ▲▲▲ END OF THE LISTENER CODE BLOCK ▲▲▲
+  // ====================================================================
 
   const handleResendVerification = async (user: FirebaseUser) => {
     if (!user) return;
@@ -86,13 +128,17 @@ export function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    if (typeof window.Android !== 'undefined' && window.Android.startNativeGoogleSignIn) {
+    // Check if the code is running inside our Android app.
+    const androidInterface = (window as any).Android;
+    if (androidInterface && typeof androidInterface.requestGoogleSignIn === 'function') {
         console.log("Requesting native Google Sign-In...");
         setIsGoogleLoading(true);
-        window.Android.startNativeGoogleSignIn();
-        return;
+        // Tell the Android app to start its native login flow.
+        androidInterface.requestGoogleSignIn();
+        return; // Stop and wait for the listener to get the result.
     }
 
+    // If not in the Android app, use the normal web browser login flow.
     console.warn("Android native interface not found. Using web flow.");
     setIsGoogleLoading(true);
     if (!auth || !db) {
