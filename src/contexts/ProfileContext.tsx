@@ -2,8 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, Suspense } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from './AuthContext';
+import { db } from '@/lib/firebase';import { useAuth } from './AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,11 +12,13 @@ interface UserProfile {
   username: string;
   displayName: string;
   photoURL: string;
-  // ... any other fields
+  // This field is important for the final redirect logic
+  profileSetupComplete?: boolean;
 }
 
 interface ProfileContextType {
   userProfile: UserProfile | null;
+  // This loading state is for components to know when the profile data is ready
   isProfileLoading: boolean;
 }
 
@@ -26,9 +27,10 @@ const ProfileContext = createContext<ProfileContextType>({
   isProfileLoading: true,
 });
 
-// The inner logic component
+// The inner logic component that can use React hooks
 function ProfileProviderLogic({ children }: { children: ReactNode }) {
-  const { user, isLoading: isAuthLoading } = useAuth();
+  // We no longer get `isAuthLoading` because the new AuthContext doesn't provide it
+  const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,53 +41,61 @@ function ProfileProviderLogic({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkUserProfile = async () => {
-      // Don't do anything if auth is loading or there's no user
-      if (isAuthLoading || !user) {
-        if (!isAuthLoading) {
-          setIsProfileLoading(false);
-          setUserProfile(null);
-        }
+      // If there's no authenticated user, there's no profile to load.
+      if (!user) {
+        setUserProfile(null);
+        setIsProfileLoading(false);
         return;
       }
 
-      console.log(`[ProfileProvider] User authenticated (${user.uid}). Checking for profile...`);
+      // If there IS a user, we begin the process of loading their profile.
+      setIsProfileLoading(true);
+      console.log(`[ProfileProvider] User authenticated (${user.uid}). Checking Firestore for profile...`);
       const userDocRef = doc(db, 'users', user.uid);
       const userDocSnap = await getDoc(userDocRef);
-
-      const action = searchParams.get('action');
-
+      
       if (userDocSnap.exists()) {
         // --- PROFILE FOUND (EXISTING USER) ---
-        console.log('[ProfileProvider] Profile document exists. Loading profile.');
-        const profileData = { id: userDocSnap.id, ...userDocSnap.data() } as UserProfile;
-        setUserProfile(profileData);
-        // The main AuthContext will handle redirecting them away from /login or /signup
+        console.log('[ProfileProvider] Profile document FOUND.');
+        const profile = userDocSnap.data() as UserProfile;
+        setUserProfile(profile);
+
+        // If their profile setup isn't marked as complete, and they are not already
+        // on the language page, send them there as the final step of onboarding.
+        if (!profile.profileSetupComplete && pathname !== '/settings/language') {
+            console.log('[ProfileProvider] Profile setup is not complete. Redirecting to /settings/language.');
+            router.replace('/settings/language');
+        }
+
       } else {
         // --- PROFILE NOT FOUND (NEW USER) ---
-        console.log('[ProfileProvider] Profile document does NOT exist.');
-        
-        // Check the user's intent from the URL
+        console.log('[ProfileProvider] Profile document NOT found.');
+        setUserProfile(null);
+        const action = searchParams.get('action');
+
         if (action === 'signup') {
-          // USER INTENDED TO SIGN UP. They are in the right place.
-          console.log('[ProfileProvider] Action was "signup". Allowing user to stay on signup page.');
-          // The signup page component will handle profile creation.
-        } else { // This includes action === 'login' or no action at all
-          // USER INTENDED TO LOG IN, BUT HAS NO ACCOUNT.
-          console.log('[ProfileProvider] Action was "login". User has no profile. Redirecting to signup.');
+          // The user INTENDED to sign up. Keep them on the /signup page to complete their profile.
+          console.log('[ProfileProvider] Action was "signup". Keeping user on signup page.');
+          if (pathname !== '/signup') {
+             router.replace('/signup');
+          }
+        } else {
+          // The user INTENDED to LOG IN but has no account. Redirect them to sign up.
+          console.log('[ProfileProvider] Action was "login" or null. User has no profile. Redirecting to signup.');
           toast({
             title: "Account Not Found",
             description: "Please create an account to continue.",
-            variant: "default",
           });
           router.replace('/signup');
         }
       }
+      // We're done with the profile check.
       setIsProfileLoading(false);
     };
 
     checkUserProfile();
-    // We only want this to run when the user object becomes available
-  }, [user, isAuthLoading, router, searchParams, toast]);
+    // This effect runs whenever the user object changes or the user navigates to a new page.
+  }, [user, pathname, router, searchParams, toast]);
 
   return (
     <ProfileContext.Provider value={{ userProfile, isProfileLoading }}>
@@ -94,7 +104,7 @@ function ProfileProviderLogic({ children }: { children: ReactNode }) {
   );
 }
 
-// Main exported provider with Suspense wrapper
+// Main exported provider with the required Suspense wrapper for useSearchParams
 export function ProfileProvider({ children }: { children: ReactNode }) {
     return (
         <Suspense>
@@ -103,5 +113,5 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     );
 }
 
-// Custom hook to use the context
+// Custom hook to easily consume the context in your components
 export const useProfile = () => useContext(ProfileContext);

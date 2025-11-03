@@ -11,7 +11,7 @@ import { Loader2, UserPlus, MailCheck } from 'lucide-react';
 import { auth, db, doc, getDoc, setDoc, serverTimestamp, writeBatch } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
-// === IMPORTANT: Import the context hooks to make the component "smart" ===
+// Import the context hooks to make the component "smart"
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/contexts/ProfileContext';
 
@@ -20,13 +20,13 @@ const GoogleLogo = () => (
 );
 
 export function SignupForm() {
-  // === CONTEXT HOOKS ===
-  const { user, isLoading: isAuthLoading } = useAuth();
+  // === CONTEXT HOOKS (CORRECTED) ===
+  const { user } = useAuth(); // No longer provides `isLoading`
   const { isProfileLoading } = useProfile();
   const router = useRouter();
   const { toast } = useToast();
 
-  // === FORM STATE (used by all flows) ===
+  // === FORM STATE ===
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,23 +36,20 @@ export function SignupForm() {
   // === UI AND ERROR STATE ===
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false); // For email verification screen
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  // === LOGIC TO PRE-FILL FORM FOR NEW GOOGLE USERS ===
+  // Pre-fill the form for new Google users.
   useEffect(() => {
-    // This effect runs if a user is authenticated but doesn't have a profile yet.
     if (user && user.email) {
-      // Pre-fill details from their Google account
       setDisplayName(user.displayName || '');
       setEmail(user.email);
-      // Suggest a username based on their email, removing special characters
       const suggestedUsername = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
       setUsername(suggestedUsername);
     }
-  }, [user]); // Run whenever the user object changes.
+  }, [user]);
 
-  // --- HANDLER FOR THE EMAIL/PASSWORD SUBMIT BUTTON ---
+  // Handler for Email/Password submission
   const handleEmailSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -63,7 +60,6 @@ export function SignupForm() {
     setError('');
 
     try {
-      // First, check if the username is already taken.
       const usernameDocRef = doc(db, 'usernames', username.toLowerCase());
       const usernameDocSnap = await getDoc(usernameDocRef);
       if (usernameDocSnap.exists()) {
@@ -71,12 +67,8 @@ export function SignupForm() {
         setIsLoading(false);
         return;
       }
-
-      // If username is free, create the user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
-
-      // Now, create their profile documents in Firestore using a batch write
       const batch = writeBatch(db);
       const userDocRef = doc(db, 'users', newUser.uid);
 
@@ -85,20 +77,18 @@ export function SignupForm() {
         username: username.trim().toLowerCase(),
         email: newUser.email,
         displayName: displayName || username,
-        photoURL: '', // No photo URL for email signup initially
+        photoURL: '',
         createdAt: serverTimestamp(),
-        profileSetupComplete: true, // They completed the form
-        languageSelected: false, // They still need to select a language
+        profileSetupComplete: true,
+        languageSelected: false,
         followersCount: 0,
         followingCount: 0,
         postCount: 0
       });
-      batch.set(usernameDocRef, { userId: newUser.uid }); // Reserve the username
+      batch.set(usernameDocRef, { userId: newUser.uid });
       await batch.commit();
-
       await sendEmailVerification(newUser);
-      setSignupSuccess(true); // Show the "Verify your Email" screen
-
+      setSignupSuccess(true);
     } catch (error: any) {
       toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
     } finally {
@@ -106,23 +96,19 @@ export function SignupForm() {
     }
   };
 
-  // --- HANDLER FOR THE "SIGN UP WITH GOOGLE" BUTTON ---
+  // Handler for the "Sign Up with Google" button
   const handleGoogleSignup = async () => {
-    // 1. Call the specific Android method for a SIGNUP intent
     if (window.Android && typeof window.Android.requestGoogleSignup === 'function') {
         console.log("Requesting native Google SIGNUP...");
         setIsGoogleLoading(true);
         window.Android.requestGoogleSignup();
         return;
     }
-
-    // 2. Web fallback for desktop testing
     console.warn("Android native interface not found. Using web flow for SIGNUP.");
     setIsGoogleLoading(true);
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      // After web popup, ProfileContext will detect the new user and keep them here.
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
@@ -132,11 +118,10 @@ export function SignupForm() {
     }
   };
   
-  // --- HANDLER FOR WHEN A NEW GOOGLE USER CLICKS "COMPLETE SIGNUP" ---
+  // Handler for when a NEW GOOGLE USER finalizes their profile
   const handleFinalizeGoogleSignup = async (event: FormEvent) => {
     event.preventDefault();
-    if (!user) return; // Should never happen if this form is visible
-    
+    if (!user) return;
     setIsLoading(true);
     setError('');
 
@@ -145,7 +130,6 @@ export function SignupForm() {
     const usernameDocRef = doc(db, 'usernames', username.toLowerCase());
 
     try {
-        // Final check for username uniqueness
         const usernameDocSnap = await getDoc(usernameDocRef);
         if (usernameDocSnap.exists()) {
             setError('This username is already taken. Please choose another.');
@@ -170,23 +154,21 @@ export function SignupForm() {
         await batch.commit();
         
         toast({ title: "Welcome!", description: "Your profile has been created." });
-        router.replace('/settings/language'); // Redirect to the correct next step
-
+        router.replace('/settings/language');
     } catch (err) {
         toast({ title: "Signup Failed", description: "Could not save your profile.", variant: "destructive"});
         setIsLoading(false);
     }
   };
+  
+  // === RENDER LOGIC (CORRECTED) ===
 
-
-  // === RENDER LOGIC ===
-
-  // 1. While main contexts are loading, show a spinner
-  if (isAuthLoading || isProfileLoading) {
+  // The main loading check now only depends on isProfileLoading.
+  if (isProfileLoading) {
     return <Loader2 className="mx-auto my-12 h-10 w-10 animate-spin" />;
   }
 
-  // 2. After a successful email signup, show the verification message
+  // After a successful email signup, show the verification message
   if (signupSuccess) {
     return (
        <Card className="w-full max-w-md shadow-2xl rounded-xl">
@@ -197,7 +179,7 @@ export function SignupForm() {
     );
   }
   
-  // 3. If a user is authenticated (i.e., from Google) but needs to complete their profile
+  // If user is authenticated (e.g., via Google) but needs to complete their profile, show this form
   if (user) {
     return (
         <Card className="w-full max-w-md shadow-2xl rounded-xl">
@@ -218,7 +200,7 @@ export function SignupForm() {
     )
   }
 
-  // 4. Default View: The full signup form for a new, unauthenticated user
+  // Default view: Full signup form for new, unauthenticated users
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center"><CardTitle className="text-3xl font-bold text-primary">Join KrishiX</CardTitle><CardDescription>Create your account to connect with farmers.</CardDescription></CardHeader>

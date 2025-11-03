@@ -12,9 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, LogIn } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
-import { useAuth } from '@/contexts/AuthContext';
-
-
+// We are not importing useAuth anymore because it's no longer needed in this component.
 
 const GoogleLogo = () => (
     <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g fill="none" fillRule="evenodd"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9.02v3.481h4.844a4.14 4.14 0 01-1.796 2.725v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.624z" fill="#4285F4"/><path d="M9.02 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.836.863-2.993.863-2.31 0-4.264-1.567-4.962-3.658H1.057v2.332A8.997 8.997 0 009.02 18z" fill="#34A853"/><path d="M4.003 10.742a5.23 5.23 0 010-3.484V4.926H1.057a8.997 8.997 0 000 8.148L4.003 10.743z" fill="#FBBC05"/><path d="M9.02 3.58C10.329 3.58 11.507 4.03 12.44 4.926l2.582-2.582C13.48.891 11.434 0 9.02 0A8.997 8.997 0 001.057 4.926l2.946 2.332c.698-2.09 2.652-3.658 4.962-3.658z" fill="#EA4335"/></g></svg>
@@ -26,25 +24,27 @@ export function LoginForm() {
   const [localIsLoading, setLocalIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { toast } = useToast();
-  const { isLoading: isAuthLoading } = useAuth(); // Get loading state from AuthProvider
+  
+  // ▼▼▼ THE FIX: THIS LINE HAS BEEN REMOVED ▼▼▼
+  // const { isLoading: isAuthLoading } = useAuth(); 
+  // We no longer need it because the AuthProvider now handles the loading state internally.
 
   const handleGoogleLogin = async () => {
-    // This logic remains the same. It tries to call the native function if it exists.
-    if (window.Android && typeof window.Android.requestGoogleLoginIn === 'function') {
-        console.log("Requesting native Google Login...");
+    // Call the specific "login" method on the Android interface.
+    if (window.Android && typeof window.Android.requestGoogleLogin === 'function') {
+        console.log("Requesting native Google LOGIN...");
         setIsGoogleLoading(true);
-        window.Android.requestGoogleLoginIn();
-        // We do NOT expect a response back. The webview will be reloaded by the native app on success.
+        window.Android.requestGoogleLogin();
         return;
     }
     
-    // Web fallback for testing in a desktop browser.
-    console.warn("Android native interface not found. Using web flow.");
+    // Web fallback for desktop browsers.
+    console.warn("Android native interface not found. Using web flow for LOGIN.");
     setIsGoogleLoading(true);
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
-      // The AuthProvider will handle the redirect on its own.
+      // The AuthContext will handle the successful redirect on its own.
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
@@ -59,7 +59,7 @@ export function LoginForm() {
     setLocalIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // The AuthProvider will handle the redirect on its own.
+      // AuthContext handles the redirect.
     } catch (error: any) {
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
     } finally {
@@ -67,12 +67,10 @@ export function LoginForm() {
     }
   };
 
-  // While the main AuthProvider is initializing, show a loader.
-  if (isAuthLoading) {
-    return <Loader2 className="mx-auto my-12 h-10 w-10 animate-spin" />;
-  }
-
-  // Render the full login form.
+  // The logic for showing a loader here has been removed because the parent
+  // AuthProvider now renders immediately or shows its own specific loader.
+  // This component can now be simpler.
+  
   return (
     <Card className="w-full max-w-md shadow-2xl rounded-xl">
       <CardHeader className="text-center">
