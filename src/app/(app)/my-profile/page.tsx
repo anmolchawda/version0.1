@@ -9,6 +9,7 @@ import { ProfileDetails } from '@/components/profile/profile-details';
 import { UserPostGrid } from '@/components/profile/user-post-grid';
 import type { User, Post } from '@/types';
 import { useSidebarContext } from '@/contexts/SidebarContext';
+import { useProfile } from '@/contexts/ProfileContext';
 
 export default function MyProfilePage() {
   const router = useRouter();
