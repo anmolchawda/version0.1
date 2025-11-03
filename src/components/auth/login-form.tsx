@@ -30,10 +30,10 @@ export function LoginForm() {
 
   const handleGoogleLogin = async () => {
     // This logic remains the same. It tries to call the native function if it exists.
-    if (window.Android && typeof window.Android.requestGoogleSignIn === 'function') {
-        console.log("Requesting native Google Sign-In...");
+    if (window.Android && typeof window.Android.requestGoogleLoginIn === 'function') {
+        console.log("Requesting native Google Login...");
         setIsGoogleLoading(true);
-        window.Android.requestGoogleSignIn();
+        window.Android.requestGoogleLoginIn();
         // We do NOT expect a response back. The webview will be reloaded by the native app on success.
         return;
     }
