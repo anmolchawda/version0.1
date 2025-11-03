@@ -1,11 +1,12 @@
-// src/contexts/AuthContext.tsx'use client';
+// src/contexts/AuthContext.tsx
+
+'use client'; // <-- THIS MUST BE THE VERY FIRST LINE, BY ITSELF.
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import {
   User,
   getAuth,
   onAuthStateChanged,
-  // ▼▼▼ CRITICAL CHANGE: We are using a different set of imports now ▼▼▼
   GoogleAuthProvider,
   signInWithCredential
 } from 'firebase/auth';
@@ -54,7 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (idToken) {
         try {
-          // ▼▼▼ THIS IS THE CORRECT METHOD ▼▼▼
           // 1. Create a Google Auth credential using the ID token from the native app.
           const credential = GoogleAuthProvider.credential(idToken);
           console.log("AuthContext: Credential created. Signing in with credential...");
@@ -63,8 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await signInWithCredential(auth, credential);
           
           console.log("AuthContext: signInWithCredential SUCCEEDED.");
-          // The onAuthStateChanged listener will now fire with the correct user.
-          // It will then handle the redirect. We just need to wait.
+          // The onAuthStateChanged listener will now naturally pick up the user.
 
         } catch (error) {
           console.error("AuthContext: FAILED to sign in with credential:", error);
@@ -119,3 +118,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
+
