@@ -1,26 +1,21 @@
-// src/contexts/AuthContext.tsx
+'use client';
 
-'use client'; // <-- THIS MUST BE THE VERY FIRST LINE, BY ITSELF.
-
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import {
-  User,
-  getAuth,
+import React, { createContext, useContext, useState, useEffect, ReactNode, Suspense } from 'react';
+import {  User,
   onAuthStateChanged,
   GoogleAuthProvider,
   signInWithCredential
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
-import { useRouter, usePathname } from 'next/navigation';
+// ▼▼▼ STEP 1: IMPORT 'useSearchParams' to read URL query parameters ▼▼▼
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-// A simple loader component
 const FullPageLoader = () => (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#111', color: 'white' }}>
         <p>Loading Application...</p>
     </div>
 );
 
-// --- AuthContext and useAuth hook ---
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -28,70 +23,67 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({ user: null, isLoading: true });
 export const useAuth = () => useContext(AuthContext);
 
-// --- The Final AuthProvider ---
-export function AuthProvider({ children }: { children: ReactNode }) {
+// This is the inner component that does all the work.
+// It needs to be separate so it can use the `useSearchParams` hook.
+function AuthProviderLogic({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const tokenCheckRef = useRef(false);
+  // ▼▼▼ STEP 2: USE THE HOOK to get access to the URL's query string ▼▼▼
+  const searchParams = useSearchParams();
 
-  // --- Effect 1: One-Time Check for Native Login Token ---
+  // This one-time effect handles the token from the native app
   useEffect(() => {
-    if (tokenCheckRef.current) return;
-    tokenCheckRef.current = true;
-
+    // This function will only run once on initial load
     const handleNativeLogin = async () => {
-      if (!window.location.hash.startsWith('#/login?token=')) {
-        setIsLoading(false); // If no token, stop loading and let the other effects run.
-        return;
-      }
+      // ▼▼▼ STEP 3: READ THE TOKEN from '?token=' instead of '#' ▼▼▼
+      const idToken = searchParams.get('token');
 
-      console.log("AuthContext: Found ID token in URL. Preparing to create credential.");
-      const idToken = window.location.hash.substring('#/login?token='.length);
-      
-      // Clean the URL hash immediately
-      window.history.replaceState(null, '', window.location.pathname + window.location.search);
-      
       if (idToken) {
+        console.log("AuthContext: Found ID token in URL query. Preparing to sign in...");
+        
+        // Clean the URL by removing the query parameter.
+        // This is the modern equivalent of the old window.history.replaceState.
+        router.replace(pathname, { scroll: false });
+        
         try {
-          // 1. Create a Google Auth credential using the ID token from the native app.
           const credential = GoogleAuthProvider.credential(idToken);
-          console.log("AuthContext: Credential created. Signing in with credential...");
-
-          // 2. Sign in the web SDK using this credential.
           await signInWithCredential(auth, credential);
-          
           console.log("AuthContext: signInWithCredential SUCCEEDED.");
-          // The onAuthStateChanged listener will now naturally pick up the user.
-
+          // The onAuthStateChanged listener below will now fire and set the user.
         } catch (error) {
           console.error("AuthContext: FAILED to sign in with credential:", error);
-          setIsLoading(false); // Stop loading on failure
+          setIsLoading(false); // On failure, stop the main loader.
         }
       } else {
-        setIsLoading(false); // No token, stop loading
+        // No token was found. This is a normal web navigation, not a native login callback.
+        // We can immediately stop the loading state related to the token check.
+        setIsLoading(false);
       }
     };
 
     handleNativeLogin();
-  }, [auth, router]);
+    // We only want this effect to run when the component mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // --- Effect 2: Main Listener for Authentication State ---
+  // This effect listens for any change in Firebase's auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log(`AuthContext: onAuthStateChanged event fired. User is now: ${currentUser?.uid ?? 'null'}`);
       setUser(currentUser);
+      // If the main loader is still active, we can now turn it off.
       if (isLoading) {
         setIsLoading(false);
       }
     });
     return () => unsubscribe();
-  }, [auth, isLoading]);
+  }, [isLoading]);
 
-  // --- Effect 3: Logic for Protecting Routes ---
+  // This effect handles protecting routes and redirecting the user
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) return; // Don't do anything until all auth checks are complete
 
     const isAuthPage = pathname === '/login' || pathname === '/signup';
 
@@ -100,22 +92,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.replace('/login');
     }
 
+    // This handles the case where a logged-in user tries to visit the login/signup page.
+    // It also handles the successful login redirect.
     if (user && isAuthPage) {
       console.log(`AuthContext: User exists. Redirecting from auth page '${pathname}' to /.`);
       router.replace('/');
     }
   }, [user, isLoading, pathname, router]);
 
-  // While waiting for auth state, show a loader.
+  // While loading, show a full-page loader.
   if (isLoading) {
     return <FullPageLoader />;
   }
 
-  // Render the children once everything is resolved.
+  // Once loaded, provide the user state to the rest of the app.
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading: false }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// This is the main export. It wraps our logic component in a Suspense boundary,
+// which is required by Next.js when using `useSearchParams`.
+export function AuthProvider({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<FullPageLoader />}>
+      <AuthProviderLogic>{children}</AuthProviderLogic>
+    </Suspense>
+  );
+}
