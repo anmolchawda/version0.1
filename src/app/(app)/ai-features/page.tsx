@@ -1,8 +1,7 @@
-
 // src/app/(app)/ai-features/page.tsx
 'use client';
 
-import { useState, type ChangeEvent, useRef } from 'react';
+import { useState, type ChangeEvent, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,9 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Brain, UploadCloud, Image as ImageIcon, Sparkles, AlertCircle, CheckCircle, Leaf, X } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow';
 import { useTranslations } from '@/hooks/useTranslations';
 import type { TranslationKey } from '@/hooks/useTranslations';
+import { useFormState } from 'react-dom';
+
+// ▼▼▼ STEP 1: Change the imports. ▼▼▼
+// We import the Server Action, NOT the Genkit flow directly.
+import { analyzeImageOnServer } from 'src/action';// We only need the TYPE of the output, not the function itself.
+import type { AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow'; 
+
+// --- THIS IS THE LINE WE ARE REMOVING ---
+// import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow';
 
 // Simple SVG for a weed icon (example)
 const WeedIcon = ({ className }: { className?: string }) => (
@@ -22,17 +29,40 @@ const WeedIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// This is the initial state for our new form handling logic
+const initialState = { message: '', data: undefined };
 
 export default function AiFeaturesPage() {
   const { t } = useTranslations();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
+  // The analysisResult is now derived from the formState
   const [analysisResult, setAnalysisResult] = useState<AnalyzeCropImageOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
+
+  // ▼▼▼ STEP 2: Use the `useFormState` hook for Server Actions. ▼▼▼
+  const [formState, formAction] = useFormState(analyzeImageOnServer, initialState);
+
+  // This `useEffect` hook will run whenever the formState changes (i.e., after the server action completes)
+  useEffect(() => {
+    setIsLoading(false); // Always stop loading when we get a result
+    if (formState.message === 'Success' && formState.data) {
+      setAnalysisResult(formState.data as AnalyzeCropImageOutput);
+    } else if (formState.message && formState.message !== 'Success' && formState.message !== '') {
+      // If there was an error message from the server
+      toast({
+        title: t('toastAnalysisFailedTitle'),
+        description: formState.message,
+        variant: "destructive",
+      });
+      setAnalysisResult(null);
+    }
+  }, [formState, t, toast]);
+
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,7 +78,6 @@ export default function AiFeaturesPage() {
       }
       setImageFile(file);
       setAnalysisResult(null); // Reset previous results
-      setError(null);
 
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -65,13 +94,13 @@ export default function AiFeaturesPage() {
     setImagePreviewUrl(null);
     setImageDataUri(null);
     setAnalysisResult(null);
-    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const handleAnalyzeClick = async () => {
+  // ▼▼▼ STEP 3: The click handler now just submits the form programmatically. ▼▼▼
+  const handleAnalyzeClick = () => {
     if (!imageDataUri) {
       toast({
         title: t('toastNoImageSelectedTitle'),
@@ -80,25 +109,10 @@ export default function AiFeaturesPage() {
       });
       return;
     }
-
     setIsLoading(true);
-    setError(null);
     setAnalysisResult(null);
-
-    try {
-      const result = await analyzeCropImage({ imageDataUri });
-      setAnalysisResult(result);
-    } catch (e) {
-      console.error("Error analyzing crop image:", e);
-      setError(e instanceof Error ? e.message : "An unknown error occurred during analysis.");
-      toast({
-        title: t('toastAnalysisFailedTitle'),
-        description: t('toastAnalysisFailedDescription'),
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    // Programmatically submit the form, which will trigger the server action
+    formRef.current?.requestSubmit();
   };
 
   const AnalysisDetailCard = ({ titleKey, data, icon }: { titleKey: TranslationKey, data: { detected: boolean, name?: string, description?: string, confidence?: string }, icon: React.ReactNode }) => {
@@ -127,7 +141,6 @@ export default function AiFeaturesPage() {
     );
   };
 
-
   return (
     <div className="space-y-6">
       <Card className="shadow-xl rounded-xl">
@@ -141,60 +154,64 @@ export default function AiFeaturesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div>
-            <Label htmlFor="cropImage" className="text-base font-medium">{t('aiUploadCropImageLabel')}</Label>
-            <div className={`
-              mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
-              rounded-md group hover:border-primary transition-colors
-              ${imagePreviewUrl ? 'border-primary bg-muted/20' : 'border-input'}
-            `}>
-              <div className="space-y-1 text-center">
-                {imagePreviewUrl ? (
-                  <div className="relative mx-auto mb-2 h-48 w-auto max-w-xs group">
-                    <Image
-                      src={imagePreviewUrl}
-                      alt="Crop preview"
-                      layout="fill"
-                      objectFit="contain"
-                      className="rounded-md"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute -top-2 -right-2 bg-destructive/80 hover:bg-destructive text-destructive-foreground rounded-full h-7 w-7 z-10"
-                      onClick={removeImage}
-                      aria-label="Remove image"
+          {/* We now wrap the image selection and button in a form */}
+          <form action={formAction} ref={formRef}>
+            <div>
+              <Label htmlFor="cropImage" className="text-base font-medium">{t('aiUploadCropImageLabel')}</Label>
+              <div className={`
+                mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed 
+                rounded-md group hover:border-primary transition-colors
+                ${imagePreviewUrl ? 'border-primary bg-muted/20' : 'border-input'}
+              `}>
+                <div className="space-y-1 text-center">
+                  {imagePreviewUrl ? (
+                    <div className="relative mx-auto mb-2 h-48 w-auto max-w-xs group">
+                      <Image
+                        src={imagePreviewUrl}
+                        alt="Crop preview"
+                        layout="fill"
+                        objectFit="contain"
+                        className="rounded-md"
+                      />
+                       <input type="hidden" name="imageDataUri" value={imageDataUri || ''} />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute -top-2 -right-2 bg-destructive/80 hover:bg-destructive text-destructive-foreground rounded-full h-7 w-7 z-10"
+                        onClick={removeImage}
+                        aria-label="Remove image"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors" />
+                  )}
+                  <div className="flex text-sm text-muted-foreground group-hover:text-primary transition-colors justify-center items-center">
+                    <Label
+                      htmlFor="cropImage"
+                      className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 py-1 px-2"
                     >
-                      <X className="h-4 w-4" />
-                    </Button>
+                      <span>{imagePreviewUrl ? t('aiChangeImageButton') : t('aiUploadAnImageButton')}</span>
+                      <Input
+                        id="cropImage"
+                        name="cropImage"
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleImageChange}
+                        ref={fileInputRef}
+                        disabled={isLoading}
+                      />
+                    </Label>
+                    {!imagePreviewUrl && <p className="pl-1">{t('aiDragAndDropText')}</p>}
                   </div>
-                ) : (
-                  <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary transition-colors" />
-                )}
-                 <div className="flex text-sm text-muted-foreground group-hover:text-primary transition-colors justify-center items-center">
-                  <Label
-                    htmlFor="cropImage"
-                    className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 py-1 px-2"
-                  >
-                    <span>{imagePreviewUrl ? t('aiChangeImageButton') : t('aiUploadAnImageButton')}</span>
-                    <Input
-                      id="cropImage"
-                      name="cropImage"
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={handleImageChange}
-                      ref={fileInputRef}
-                      disabled={isLoading}
-                    />
-                  </Label>
-                  {!imagePreviewUrl && <p className="pl-1">{t('aiDragAndDropText')}</p>}
+                  {!imagePreviewUrl && <p className="text-xs text-muted-foreground">{t('aiImageFormatsAcceptedWithLimit')}</p>}
                 </div>
-                {!imagePreviewUrl && <p className="text-xs text-muted-foreground">{t('aiImageFormatsAcceptedWithLimit')}</p>}
               </div>
             </div>
-          </div>
+          </form>
 
           {imageFile && (
             <Button onClick={handleAnalyzeClick} disabled={isLoading || !imageFile} className="w-full text-lg py-3 bg-accent hover:bg-accent/90">
@@ -215,15 +232,7 @@ export default function AiFeaturesPage() {
             </div>
           )}
 
-          {error && !isLoading && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>{t('aiAnalysisErrorAlertTitle')}</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {analysisResult && !isLoading && !error && (
+          {analysisResult && !isLoading && (
             <Card className="mt-6 bg-background shadow-inner">
               <CardHeader>
                 <CardTitle className="text-xl text-primary">{t('aiAnalysisResultsTitle')}</CardTitle>
@@ -238,7 +247,7 @@ export default function AiFeaturesPage() {
                 ) : (
                   <>
                     <Alert variant="default" className="border-primary/30 bg-primary/5">
-                       <CheckCircle className="h-4 w-4 text-primary" />
+                      <CheckCircle className="h-4 w-4 text-primary" />
                       <AlertTitle className="text-primary">{t('aiPlantIdentifiedTitle')}</AlertTitle>
                       <AlertDescription>
                         {analysisResult.plantTypeGuess || t('aiPlantIdentifiedDefaultDescription')}
