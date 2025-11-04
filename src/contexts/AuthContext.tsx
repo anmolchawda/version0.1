@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, Suspense } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode, Suspense } from 'react';
 import {  User,
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -8,6 +8,7 @@ import {  User,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase/config';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useLoading } from '@/hooks/useLoading';
 
 // A full screen loader, but now it will only be used when processing a native token.
 const FullPageLoader = () => (
@@ -16,18 +17,19 @@ const FullPageLoader = () => (
     </div>
 );
 
-// --- NEW: The public context no longer provides `isLoading` ---
+// --- The public context no longer provides `isLoading` ---
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
-const AuthContext = createContext<AuthContextType>({ user: null });
+const AuthContext = createContext<AuthContextType>({ user: null, setUser: () => {} });
 export const useAuth = () => useContext(AuthContext);
 
 // This is the inner component that does all the work.
 function AuthProviderLogic({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  // --- NEW: A different kind of loading state, only for the token callback ---
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  // --- REFACTORED: Use the useLoading hook ---
+  const { isLoading: isAuthenticating, startLoading: startAuthenticating, stopLoading: stopAuthenticating } = useLoading();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -36,9 +38,8 @@ function AuthProviderLogic({ children }: { children: ReactNode }) {
   useEffect(() => {
     const idToken = searchParams.get('token');
     if (idToken) {
-      // --- CHANGE: Set the new loading state to true ---
-      // This is the ONLY time the FullPageLoader will be shown.
-      setIsAuthenticating(true);
+      // --- REFACTORED: Use startLoading function ---
+      startAuthenticating();
 
       const authenticateWithToken = async () => {
         try {
@@ -50,8 +51,8 @@ function AuthProviderLogic({ children }: { children: ReactNode }) {
           // onAuthStateChanged will handle setting the user and turning off the loader.
         } catch (error) {
           console.error("AuthContext: FAILED to sign in with credential:", error);
-          // --- CHANGE: On failure, stop the new loader and go to login ---
-          setIsAuthenticating(false);
+          // --- REFACTORED: Use stopLoading function ---
+          stopAuthenticating();
           router.replace('/login');
         }
       };
@@ -66,36 +67,30 @@ function AuthProviderLogic({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log(`AuthContext: onAuthStateChanged event fired. User is now: ${currentUser?.uid ?? 'null'}`);
       setUser(currentUser);
-      // --- CHANGE: Turn off the new loader if it was active ---
-      if (isAuthenticating) {
-        setIsAuthenticating(false);
-      }
+      // --- REFACTORED: Always stop loading on auth state change ---
+      // This is safe because stopLoading is idempotent.
+      stopAuthenticating();
     });
     return () => unsubscribe();
-    // This effect should only depend on the state it controls.
-  }, [isAuthenticating]);
+    // Run this effect only once, when the component mounts.
+    // stopAuthenticating is stable and won't cause re-renders.
+  }, [stopAuthenticating]);
 
   // Effect 3: Main redirection logic.
   useEffect(() => {
-    // --- CHANGE: This logic no longer depends on `isLoading`. It runs continuously. ---
     const isAuthPage = pathname === '/login' || pathname === '/signup';
 
-    // Scenario 1: User is logged in but is on an auth page (e.g., /login).
-    // This happens right after a successful login. Redirect them to the main app.
     if (user && isAuthPage) {
       console.log(`AuthContext: User is on auth page '${pathname}'. Redirecting to /.`);
       router.replace('/');
     }
-    // Scenario 2: User is NOT logged in and tries to access any page that ISN'T for auth.
     else if (!user && !isAuthPage) {
       console.log(`AuthContext: No user on protected page '${pathname}'. Redirecting to /login.`);
       router.replace('/login');
     }
-    // In all other cases (logged-in user on a protected page, or logged-out user on an auth page),
-    // no redirect is needed, so we do nothing.
   }, [user, pathname, router]);
 
-  // --- NEW RENDER LOGIC ---
+  // --- RENDER LOGIC ---
 
   // 1. If we are actively processing a token from the native app, show the loader.
   if (isAuthenticating) {
@@ -103,9 +98,8 @@ function AuthProviderLogic({ children }: { children: ReactNode }) {
   }
 
   // 2. In ALL other cases, render the app immediately.
-  // This is what gets rid of the initial black screen.
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, setUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -115,8 +109,6 @@ function AuthProviderLogic({ children }: { children: ReactNode }) {
 // which is required by Next.js when using `useSearchParams`.
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
-    // The fallback here is for the Suspense boundary itself, not our logic.
-    // It will likely never be seen by the user.
     <Suspense>
       <AuthProviderLogic>{children}</AuthProviderLogic>
     </Suspense>

@@ -6,6 +6,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useLoading } from '@/hooks/useLoading';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
@@ -36,16 +37,16 @@ function ProfileProviderLogic({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const { isLoading: isProfileLoading, startLoading: startProfileLoading, stopLoading: stopProfileLoading } = useLoading(true);
 
   useEffect(() => {
     const checkUserProfile = async () => {
-      setIsProfileLoading(true);
+      startProfileLoading();
 
       // If no user is authenticated, we just finish loading.
       if (!user) {
         setUserProfile(null);
-        setIsProfileLoading(false);
+        stopProfileLoading();
         return;
       }
       
@@ -93,11 +94,11 @@ function ProfileProviderLogic({ children }: { children: ReactNode }) {
         }
       }
 
-      setIsProfileLoading(false);
+      stopProfileLoading();
     };
 
     checkUserProfile();
-  }, [user, pathname, searchParams, router, toast]);
+  }, [user, pathname, searchParams, router, toast, startProfileLoading, stopProfileLoading]);
 
   return (
     <ProfileContext.Provider value={{ userProfile, isProfileLoading }}>
