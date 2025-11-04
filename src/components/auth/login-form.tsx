@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useLoading } from '@/hooks/useLoading';
 import { Loader2, LogIn } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
@@ -21,8 +22,8 @@ const GoogleLogo = () => (
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [localIsLoading, setLocalIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { isLoading: localIsLoading, startLoading: startLocalLoading, stopLoading: stopLocalLoading } = useLoading();
+  const { isLoading: isGoogleLoading, startLoading: startGoogleLoading, stopLoading: stopGoogleLoading } = useLoading();
   const { toast } = useToast();
   
   // ▼▼▼ THE FIX: THIS LINE HAS BEEN REMOVED ▼▼▼
@@ -33,14 +34,14 @@ export function LoginForm() {
     // Call the specific "login" method on the Android interface.
     if (window.Android && typeof window.Android.requestGoogleLogin === 'function') {
         console.log("Requesting native Google LOGIN...");
-        setIsGoogleLoading(true);
+        startGoogleLoading();
         window.Android.requestGoogleLogin();
         return;
     }
     
     // Web fallback for desktop browsers.
     console.warn("Android native interface not found. Using web flow for LOGIN.");
-    setIsGoogleLoading(true);
+    startGoogleLoading();
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -50,20 +51,20 @@ export function LoginForm() {
         toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
       }
     } finally {
-        setIsGoogleLoading(false);
+        stopGoogleLoading();
     }
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setLocalIsLoading(true);
+    startLocalLoading();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // AuthContext handles the redirect.
     } catch (error: any) {
       toast({ title: 'Login Failed', description: error.message, variant: 'destructive' });
     } finally {
-      setLocalIsLoading(false);
+      stopLocalLoading();
     }
   };
 

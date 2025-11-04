@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, type FormEvent } from 'react';import Link from 'next/link';
+import React, { useState, useEffect, type FormEvent } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useLoading } from '@/hooks/useLoading';
 import { Loader2, UserPlus, MailCheck } from 'lucide-react';
 import { auth, db, doc, getDoc, setDoc, serverTimestamp, writeBatch } from '@/lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
@@ -34,8 +36,8 @@ export function SignupForm() {
   const [displayName, setDisplayName] = useState('');
 
   // === UI AND ERROR STATE ===
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const { isLoading: isGoogleLoading, startLoading: startGoogleLoading, stopLoading: stopGoogleLoading } = useLoading();
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [error, setError] = useState('');
 
@@ -56,7 +58,7 @@ export function SignupForm() {
       toast({ title: 'Password Mismatch', description: 'Passwords do not match.', variant: 'destructive' });
       return;
     }
-    setIsLoading(true);
+    startLoading();
     setError('');
 
     try {
@@ -64,7 +66,7 @@ export function SignupForm() {
       const usernameDocSnap = await getDoc(usernameDocRef);
       if (usernameDocSnap.exists()) {
         setError('This username is already taken.');
-        setIsLoading(false);
+        stopLoading();
         return;
       }
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -92,7 +94,7 @@ export function SignupForm() {
     } catch (error: any) {
       toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
     } finally {
-      setIsLoading(false);
+      stopLoading();
     }
   };
 
@@ -100,12 +102,12 @@ export function SignupForm() {
   const handleGoogleSignup = async () => {
     if (window.Android && typeof window.Android.requestGoogleSignup === 'function') {
         console.log("Requesting native Google SIGNUP...");
-        setIsGoogleLoading(true);
+        startGoogleLoading();
         window.Android.requestGoogleSignup();
         return;
     }
     console.warn("Android native interface not found. Using web flow for SIGNUP.");
-    setIsGoogleLoading(true);
+    startGoogleLoading();
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
@@ -114,7 +116,7 @@ export function SignupForm() {
         toast({ title: 'Signup Failed', description: error.message, variant: 'destructive' });
       }
     } finally {
-      setIsGoogleLoading(false);
+      stopGoogleLoading();
     }
   };
   
@@ -122,7 +124,7 @@ export function SignupForm() {
   const handleFinalizeGoogleSignup = async (event: FormEvent) => {
     event.preventDefault();
     if (!user) return;
-    setIsLoading(true);
+    startLoading();
     setError('');
 
     const batch = writeBatch(db);
@@ -133,7 +135,7 @@ export function SignupForm() {
         const usernameDocSnap = await getDoc(usernameDocRef);
         if (usernameDocSnap.exists()) {
             setError('This username is already taken. Please choose another.');
-            setIsLoading(false);
+            stopLoading();
             return;
         }
 
@@ -157,7 +159,7 @@ export function SignupForm() {
         router.replace('/settings/language');
     } catch (err) {
         toast({ title: "Signup Failed", description: "Could not save your profile.", variant: "destructive"});
-        setIsLoading(false);
+        stopLoading();
     }
   };
   
