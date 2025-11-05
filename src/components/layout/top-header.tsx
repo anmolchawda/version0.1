@@ -78,9 +78,9 @@ const TopHeaderComponent = () => { // Changed to named component
 
   return (
     // =================================================================
-    // === THE FIX IS HERE: "safe-area-top" has been added to this line ===
+    // === THE FIX IS HERE: Changed "bg-card" to "bg-background"      ===
     // =================================================================
-    <header className="safe-area-top fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-30 shadow-sm">
+    <header className="safe-area-top fixed top-0 left-0 right-0 h-16 bg-background border-b flex items-center justify-between px-2 sm:px-4 z-40 shadow-sm">
       <div className="flex items-center">
         <Button
           variant="ghost"

@@ -1,5 +1,4 @@
-
-
+// src/app/(main)/layout.tsx  (or wherever this file is located)
 'use client';
 
 import { Sidebar } from '@/components/layout/sidebar';
@@ -8,17 +7,21 @@ import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { SidebarProvider } from '@/contexts/SidebarContext';
+import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext'; // Import useSidebarContext
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils'; // Import cn utility
 
-export default function AppPagesLayout({ children }: { children: ReactNode }) {
+// This is the inner component that can now access the sidebar context
+function MainLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated_needs_language' | 'authenticated_needs_profile' | 'authenticated_ready'>('loading');
   const [error, setError] = useState<string | null>(null);
   const profileUnsubscribeRef = useRef<(() => void) | null>(null);
+
+  // Grab sidebar state and toggle function from our context
+  const { isSidebarOpen, toggleSidebar } = useSidebarContext();
 
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged((user) => {
@@ -26,31 +29,23 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
         profileUnsubscribeRef.current();
         profileUnsubscribeRef.current = null;
       }
-
       if (!user) {
         setAuthStatus('unauthenticated');
         return;
       }
-
       if (!db) {
         setError("Database connection error. Please try again later.");
         setAuthStatus('loading');
         return;
       }
-
       const userDocRef = doc(db, 'users', user.uid);
-      
-      profileUnsubscribeRef.current = onSnapshot(userDocRef, 
+      profileUnsubscribeRef.current = onSnapshot(userDocRef,
         (userDocSnap) => {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
-            if (!userData.languageSelected) {
-              setAuthStatus('authenticated_needs_language');
-            } else if (!userData.profileSetupComplete) {
-              setAuthStatus('authenticated_needs_profile');
-            } else {
-              setAuthStatus('authenticated_ready');
-            }
+            if (!userData.languageSelected) setAuthStatus('authenticated_needs_language');
+            else if (!userData.profileSetupComplete) setAuthStatus('authenticated_needs_profile');
+            else setAuthStatus('authenticated_ready');
           } else {
             setAuthStatus('authenticated_needs_language');
           }
@@ -62,29 +57,21 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
         }
       );
     });
-
     return () => {
       authUnsubscribe();
-      if (profileUnsubscribeRef.current) {
-        profileUnsubscribeRef.current();
-      }
+      if (profileUnsubscribeRef.current) profileUnsubscribeRef.current();
     };
   }, []);
 
   useEffect(() => {
     const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-    if (authStatus === 'unauthenticated' && !isAuthPage) {
-      router.replace('/login');
-    } else if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') {
-      router.replace('/settings/language');
-    } else if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') {
-      router.replace('/settings/account');
-    }
+    if (authStatus === 'unauthenticated' && !isAuthPage) router.replace('/login');
+    else if (authStatus === 'authenticated_needs_language' && pathname !== '/settings/language') router.replace('/settings/language');
+    else if (authStatus === 'authenticated_needs_profile' && pathname !== '/settings/account') router.replace('/settings/account');
   }, [authStatus, pathname, router]);
 
   const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
-  
-  const isAllowedToRender = 
+  const isAllowedToRender =
     authStatus === 'authenticated_ready' ||
     (authStatus === 'authenticated_needs_profile' && pathname === '/settings/account') ||
     (authStatus === 'authenticated_needs_language' && pathname === '/settings/language') ||
@@ -95,7 +82,6 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
     if (authStatus === 'unauthenticated') message = "Redirecting to login...";
     if (authStatus === 'authenticated_needs_language') message = "Redirecting to language selection...";
     if (authStatus === 'authenticated_needs_profile') message = "Redirecting to profile setup...";
-
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -110,27 +96,57 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-xl font-semibold text-destructive">Application Error</h1>
         <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-        <Button onClick={() => window.location.reload()} className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground">
-          Try Again
-        </Button>
+        <Button onClick={() => window.location.reload()} className="mt-6">Try Again</Button>
       </div>
     );
   }
-  
+
+  if (isAuthPage) {
+    return <main>{children}</main>;
+  }
+
+  return (
+    <div className="relative h-screen w-screen overflow-hidden bg-background">
+      {/* ===================================================================== */}
+      {/* === FIX #1: CLICKABLE BACKDROP FOR CLOSING THE SIDEBAR          === */}
+      {/* ===================================================================== */}
+      {isSidebarOpen && (
+        <div
+          onClick={toggleSidebar}
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm md:hidden"
+          aria-hidden="true"
+        />
+      )}
+      
+      {/* ===================================================================== */}
+      {/* === FIX #2: SIDEBAR POSITIONING                                 === */}
+      {/* ===================================================================== */}
+      <aside className={cn(
+        "fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:hidden",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <Sidebar />
+      </aside>
+
+      {/* Main content container */}
+      <div className="flex h-full flex-col">
+        <TopHeader />
+        <main className="flex-1 overflow-y-auto pt-16 pb-16">
+          <div className="p-4 md:p-8">
+            {children}
+          </div>
+        </main>
+        <BottomNavBar />
+      </div>
+    </div>
+  );
+}
+
+// The top-level export now wraps everything in the SidebarProvider
+export default function AppPagesLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex h-screen bg-background">
-        {!isAuthPage && <Sidebar />}
-        <div className="flex flex-1 flex-col md:pl-20">
-          {!isAuthPage && <TopHeader />}
-          <main className="flex-1 overflow-y-auto pt-16 pb-16 md:pb-0">
-            <div className="p-4 md:p-8">
-              {children}
-            </div>
-          </main>
-          {!isAuthPage && <BottomNavBar />}
-        </div>
-      </div>
+      <MainLayout>{children}</MainLayout>
     </SidebarProvider>
   );
 }
