@@ -23,7 +23,7 @@ const TopHeaderComponent = () => { // Changed to named component
       return;
     }
 
-    const notificationsRef = collection(db, 'notifications', authUserId, 'items');
+    const notificationsRef = collection(db, 'notifications', authUserId, 'items';
     const q = query(notificationsRef, where('read', '==', false));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -78,18 +78,20 @@ const TopHeaderComponent = () => { // Changed to named component
   const displayMessageCount = unreadMessageCount > 0 && !pathname.startsWith('/messages') ? unreadMessageCount : 0;
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-50 shadow-sm">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleSidebar}
-        className="h-10 w-10"
-        aria-label="Toggle sidebar"
-      >
-        <Menu className="h-6 w-6" />
-      </Button>
+    <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-30 shadow-sm">
+      <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-10 w-10 md:hidden"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      </div>
 
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="flex-1 flex justify-center items-center">
         <AppLogo iconClassName="h-12 w-12" textClassName="hidden" />
       </div>
 
