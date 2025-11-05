@@ -28,14 +28,14 @@ import { getStorage, ref, uploadBytes, getDownloadURL, type FirebaseStorage } fr
 import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDWF0xqZ7EPCZdfAXZfDoVmT6Tf4WaN3kY",
-    authDomain: "fieldverse-m99ip.firebaseapp.com",
-    databaseURL: "https://fieldverse-m99ip-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "fieldverse-m99ip",
-    storageBucket: "fieldverse-m99ip.firebasestorage.app",
-    messagingSenderId: "1084327516741",
-    appId: "1:1084327516741:web:0eb1efac54766dc625612c",
-    measurementId: "G-FVS7PM8WTB"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
