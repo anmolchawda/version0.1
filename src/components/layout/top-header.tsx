@@ -23,7 +23,7 @@ const TopHeaderComponent = () => { // Changed to named component
       return;
     }
 
-    const notificationsRef = collection(db, 'notifications', authUserId, 'items';
+    const notificationsRef = collection(db, 'notifications', authUserId, 'items');
     const q = query(notificationsRef, where('read', '==', false));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
