@@ -121,7 +121,7 @@ export default function AppPagesLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <div className="flex h-screen bg-background">
         {!isAuthPage && <Sidebar />}
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col md:pl-20">
           {!isAuthPage && <TopHeader />}
           <main className="flex-1 overflow-y-auto pt-16 pb-16 md:pb-0">
             <div className="p-4 md:p-8">

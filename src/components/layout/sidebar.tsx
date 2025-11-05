@@ -205,7 +205,7 @@ function SidebarComponent() {
         onClick={handleLogout}
         aria-label={!isSidebarOpen ? logoutLabel : undefined}
       >
-        <LogOut className="h-5 w-5" />
+        <LogOut className={cn("h-5 w-5", isSidebarOpen && "mr-2")} />
         {isSidebarOpen && <span>{logoutLabel}</span>}
       </Button>
   );
@@ -256,13 +256,13 @@ function SidebarComponent() {
   return (
     <aside
       className={cn(
-        "bg-card text-card-foreground border-r flex flex-col",
-        "fixed left-0 top-16 h-[calc(100vh-8rem)] shadow-lg", 
-        "transition-transform duration-300 ease-in-out z-30",
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'
+        "bg-card text-card-foreground border-r flex-col",
+        "fixed left-0 top-0 h-full shadow-lg z-40 md:z-30",
+        "transition-transform duration-300 ease-in-out",
+        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 md:w-20 md:translate-x-0'
       )}
     >
-      <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {primaryNavLinks.length > 0 && (
           <>
             {primaryNavLinks.map((link) => (
