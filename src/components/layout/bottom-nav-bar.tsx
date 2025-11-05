@@ -1,4 +1,5 @@
 // src/components/layout/bottom-nav-bar.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -7,16 +8,14 @@ import React, { useEffect, useState } from 'react';
 import { Home, Cpu, PlusSquare, Store, User as UserIconLucide } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { NavLink as NavLinkType } from '@/types';
-import { useTranslations } from '@/hooks/useTranslations'; // Import the hook
+import { useTranslations } from '@/hooks/useTranslations';
 
-const MOCK_USER_ID_FALLBACK = '1'; 
-
-const getBottomNavLinks = (t: (key: any) => string): NavLinkType[] => [ // Pass t function
+const getBottomNavLinks = (t: (key: any) => string): NavLinkType[] => [
   { href: '/feed', label: t('feed'), icon: <Home className="h-5 w-5" /> },
   { href: '/ai-features', label: t('aiFeatures'), icon: <Cpu className="h-5 w-5" /> },
   { href: '/post/create', label: t('create'), icon: <PlusSquare className="h-5 w-5" /> },
   { href: '/mandi', label: t('mandi'), icon: <Store className="h-5 w-5" /> },
-  { href: `/my-profile`, label: t('profile'), icon: <UserIconLucide className="h-5 w-5" /> }, // Changed href to /my-profile
+  { href: `/my-profile`, label: t('profile'), icon: <UserIconLucide className="h-5 w-5" /> },
 ];
 
 interface BottomNavLinkItemProps {
@@ -46,38 +45,41 @@ const BottomNavLinkItemComponent: React.FC<BottomNavLinkItemProps> = ({ link, is
 
 const BottomNavLinkItem = React.memo(BottomNavLinkItemComponent);
 
-
 function BottomNavBarComponent() {
   const pathname = usePathname();
-  const { t, currentLanguage, isLoadingTranslations } = useTranslations(); // Use the hook
+  const { t, currentLanguage, isLoadingTranslations } = useTranslations();
   const [links, setLinks] = useState(() => getBottomNavLinks(t));
 
   useEffect(() => {
-    if (!isLoadingTranslations) { // Ensure translations are loaded before setting links
+    if (!isLoadingTranslations) {
       setLinks(getBottomNavLinks(t));
     }
   }, [currentLanguage, t, isLoadingTranslations]);
 
-
   return (
-    // ===============================================================================
-    // === THE FIX IS HERE: "safe-area-bottom" has been added to this line.        ===
-    // === I also removed "pb-4" as the safe area class handles the bottom space.  ===
-    // ===============================================================================
-    <nav className="safe-area-bottom fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40">
-      {links.map((link) => {
-        const isActive = link.href === '/feed'
-          ? pathname === '/feed' || pathname === '/'
-          : pathname.startsWith(link.href);
+    // ======================================================================
+    // === THE FIX IS HERE: Added the "safe-area-bottom" class for padding. ===
+    // ======================================================================
+    <nav className={cn(
+      "safe-area-bottom", // This adds the necessary bottom padding automatically
+      "h-auto bg-card border-t border-border shadow-md flex items-center justify-around z-40"
+    )}>
+       {/* Container for the actual icons, to keep a fixed height before padding is added */}
+      <div className="flex items-center justify-around w-full h-16">
+        {links.map((link) => {
+          const isActive = link.href === '/feed'
+            ? pathname === '/feed' || pathname === '/'
+            : pathname.startsWith(link.href);
 
-        return (
-          <BottomNavLinkItem
-            key={link.href}
-            link={link}
-            isActive={isActive}
-          />
-        );
-      })}
+          return (
+            <BottomNavLinkItem
+              key={link.href}
+              link={link}
+              isActive={isActive}
+            />
+          );
+        })}
+      </div>
     </nav>
   );
 }

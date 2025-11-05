@@ -1,7 +1,8 @@
 // src/components/layout/top-header.tsx
+
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Added React
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,13 @@ import { Menu, MessageSquare, Search, Bell } from 'lucide-react';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { db, collection, query, where, onSnapshot, Timestamp } from '@/lib/firebase';
 import type { FirestoreConversation } from '@/types';
+import { cn } from '@/lib/utils'; // Make sure cn is imported
 
-const TopHeaderComponent = () => { // Changed to named component
+const TopHeaderComponent = () => {
   const { toggleSidebar, notificationCount, setNotificationCount, authUserId, unreadMessageCount, setUnreadMessageCount } = useSidebarContext();
   const pathname = usePathname();
 
+  // ... (all your useEffect hooks for notifications and messages remain the same) ...
   // Listener for unread notifications count
   useEffect(() => {
     if (!authUserId || !db) {
@@ -54,8 +57,6 @@ const TopHeaderComponent = () => { // Changed to named component
         const userReadTimestamp = convo.readStatus?.[authUserId];
         const lastMessageTimestamp = convo.lastMessageTimestamp;
         
-        // Count as unread if there's a last message, it wasn't sent by the current user,
-        // and it's newer than the user's last read time (or if they've never read it).
         if (lastMessageTimestamp && convo.lastMessageSenderId !== authUserId) {
           if (!userReadTimestamp || lastMessageTimestamp.toMillis() > userReadTimestamp.toMillis()) {
             count++;
@@ -77,55 +78,61 @@ const TopHeaderComponent = () => { // Changed to named component
   const displayMessageCount = unreadMessageCount > 0 && !pathname.startsWith('/messages') ? unreadMessageCount : 0;
 
   return (
-    // =================================================================
-    // === THE FIX IS HERE: Changed "bg-card" to "bg-background"      ===
-    // =================================================================
-    <header className="safe-area-top fixed top-0 left-0 right-0 h-16 bg-background border-b flex items-center justify-between px-2 sm:px-4 z-40 shadow-sm">
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="h-10 w-10 md:hidden"
-          aria-label="Toggle sidebar"
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
-      </div>
+    // ======================================================================
+    // === THE FIX IS HERE: Added the "safe-area-top" class for padding.  ===
+    // ======================================================================
+    <header className={cn(
+      "safe-area-top", // This adds the necessary top padding automatically
+      "h-auto bg-background border-b flex items-center justify-between px-2 sm:px-4 z-40 shadow-sm"
+    )}>
+      {/* Container for the actual icons, to keep them vertically centered */}
+      <div className="flex items-center justify-between w-full h-16">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="h-10 w-10 md:hidden"
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+        </div>
 
-      <div className="flex-1 flex justify-center items-center">
-        <AppLogo iconClassName="h-12 w-12" textClassName="hidden" />
-      </div>
+        <div className="flex-1 flex justify-center items-center">
+          <AppLogo iconClassName="h-12 w-12" textClassName="hidden" />
+        </div>
 
-      <div className="flex items-center space-x-1 sm:space-x-2">
-        <Link href="/discover" passHref>
-          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" aria-label="Search">
-            <Search className="h-5 w-5 text-primary" />
-          </Button>
-        </Link>
-        <Link href="/notifications" passHref>
-          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Notifications">
-            <Bell className="h-5 w-5 text-primary" />
-            {displayNotificationCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
-                {displayNotificationCount > 9 ? '9+' : displayNotificationCount}
-              </span>
-            )}
-          </Button>
-        </Link>
-        <Link href="/messages" passHref>
-          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Messages">
-            <MessageSquare className="h-5 w-5 text-primary" />
-            {displayMessageCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
-                {displayMessageCount > 9 ? '9+' : displayMessageCount}
-              </span>
-            )}
-          </Button>
-        </Link>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Link href="/discover" passHref>
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" aria-label="Search">
+              <Search className="h-5 w-5 text-primary" />
+            </Button>
+          </Link>
+          <Link href="/notifications" passHref>
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Notifications">
+              <Bell className="h-5 w-5 text-primary" />
+              {displayNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
+                  {displayNotificationCount > 9 ? '9+' : displayNotificationCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+          <Link href="/messages" passHref>
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full relative" aria-label="Messages">
+              <MessageSquare className="h-5 w-5 text-primary" />
+              {displayMessageCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-bold">
+                  {displayMessageCount > 9 ? '9+' : displayMessageCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+        </div>
       </div>
     </header>
   );
 }
 
-export const TopHeader = React.memo(TopHeaderComponent); // Memoize
+export const TopHeader = React.memo(TopHeaderComponent);
