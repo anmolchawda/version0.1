@@ -1,4 +1,3 @@
-
 // src/components/layout/top-header.tsx
 'use client';
 
@@ -78,7 +77,10 @@ const TopHeaderComponent = () => { // Changed to named component
   const displayMessageCount = unreadMessageCount > 0 && !pathname.startsWith('/messages') ? unreadMessageCount : 0;
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-30 shadow-sm">
+    // =================================================================
+    // === THE FIX IS HERE: "safe-area-top" has been added to this line ===
+    // =================================================================
+    <header className="safe-area-top fixed top-0 left-0 right-0 h-16 bg-card border-b flex items-center justify-between px-2 sm:px-4 z-30 shadow-sm">
       <div className="flex items-center">
         <Button
           variant="ghost"

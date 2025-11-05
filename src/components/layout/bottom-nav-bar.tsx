@@ -60,7 +60,11 @@ function BottomNavBarComponent() {
 
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40 pb-4">
+    // ===============================================================================
+    // === THE FIX IS HERE: "safe-area-bottom" has been added to this line.        ===
+    // === I also removed "pb-4" as the safe area class handles the bottom space.  ===
+    // ===============================================================================
+    <nav className="safe-area-bottom fixed bottom-0 left-0 right-0 w-full h-16 bg-card border-t border-border shadow-md flex items-center justify-around z-40">
       {links.map((link) => {
         const isActive = link.href === '/feed'
           ? pathname === '/feed' || pathname === '/'

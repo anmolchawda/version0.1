@@ -29,6 +29,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* 
+        ===========================================================
+        === THE FIX IS HERE: We've added the <head> section     ===
+        === with the critical 'viewport-fit=cover' instruction. ===
+        ===========================================================
+      */}
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
+
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Suspense fallback={<div>Loading...</div>}>
           <AuthProvider>
