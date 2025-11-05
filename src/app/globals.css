@@ -86,3 +86,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ================================================ */
+/* === Safe Area & Layout Fixes (NEWLY ADDED) === */
+/* ================================================ */
+@layer components {
+  /* 
+    Apply the .safe-area-top class to your app's top header/navigation bar.
+    This pushes it down from behind the status bar and camera notch.
+  */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /*
+    Apply the .safe-area-bottom class to your app's bottom navigation bar.
+    This pushes it up from behind the Android/iOS home gesture bar.
+  */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /*
+    OPTIONAL but Recommended:
+    You can use this class on your main scrollable content area.
+    It prevents the very last item in a list from being cut off by the
+    bottom navigation bar. It's not for the nav bar itself, but for the
+    content above it.
+  */
+  .content-scroll-padding {
+    padding-bottom: 5rem; /* Adjust this value to be taller than your bottom nav bar */
+  }
+}
