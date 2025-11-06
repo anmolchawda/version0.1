@@ -7,10 +7,10 @@ import { BottomNavBar } from '@/components/layout/bottom-nav-bar';
 import { useEffect, useState, type ReactNode, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext'; // Import useSidebarContext
+import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
 import { auth, db, doc, onSnapshot } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils'; // Import cn utility
+import { cn } from '@/lib/utils';
 
 // This is the inner component that can now access the sidebar context
 function MainLayout({ children }: { children: ReactNode }) {
@@ -107,9 +107,6 @@ function MainLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-background">
-      {/* ===================================================================== */}
-      {/* === FIX #1: CLICKABLE BACKDROP FOR CLOSING THE SIDEBAR          === */}
-      {/* ===================================================================== */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -118,11 +115,8 @@ function MainLayout({ children }: { children: ReactNode }) {
         />
       )}
       
-      {/* ===================================================================== */}
-      {/* === FIX #2: SIDEBAR POSITIONING                                 === */}
-      {/* ===================================================================== */}
       <aside className={cn(
-        "fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:hidden",
+        "fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:hidden",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <Sidebar />
@@ -130,12 +124,21 @@ function MainLayout({ children }: { children: ReactNode }) {
 
       {/* Main content container */}
       <div className="flex h-full flex-col">
+        {/* The TopHeader is absolutely positioned now, so it doesn't take up layout space */}
         <TopHeader />
-        <main className="flex-1 overflow-y-auto pt-16 pb-16">
-          <div className="p-4 md:p-8">
+        
+        {/* 
+          ======================================================================
+          === THE FIX IS HERE: We've removed "pt-16" from this line.         ===
+          ======================================================================
+        */}
+        <main className="flex-1 overflow-y-auto pb-16">
+          {/* We add the padding here to push content below the header */}
+          <div className="pt-20 p-4 md:p-8"> 
             {children}
           </div>
         </main>
+
         <BottomNavBar />
       </div>
     </div>
