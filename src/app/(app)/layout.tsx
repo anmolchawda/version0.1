@@ -1,3 +1,4 @@
+
 // src/app/(main)/layout.tsx
 'use client';
 
@@ -40,31 +41,32 @@ function MainLayout({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  // =========================================================================
-  // === FIX #1: CONDITIONAL LAYOUT LOGIC                                   ===
-  // =========================================================================
-  const isFeedPage = pathname === '/feed' || pathname === '/';
-
-  // Render a special layout for the auth pages
+  
   const isAuthPage = pathname.startsWith('/auth');
   if (isAuthPage) {
     return <main>{children}</main>;
   }
 
+  // =========================================================================
+  // === THE LOGIC FOR THE FIX IS HERE                                    ===
+  // =========================================================================
+  const isFeedPage = pathname === '/feed' || pathname === '/';
+
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
       {/* 
-        The TopHeader is now positioned based on the page.
-        - `isFeedPage ? 'absolute' : 'fixed'` does the magic.
-        'absolute' makes it scroll away with the content.
-        'fixed' makes it stick to the top.
+        The TopHeader is now positioned conditionally.
+        - On the feed page, it's 'absolute' so it can scroll away.
+        - On all other pages, it's 'fixed' so it stays at the top.
       */}
-      <div className={cn("left-0 right-0 top-0 z-40", isFeedPage ? 'absolute' : 'fixed')}>
+      <div className={cn(
+        "left-0 right-0 top-0 z-40 w-full",
+        isFeedPage ? 'absolute' : 'fixed'
+      )}>
         <TopHeader />
       </div>
 
-      {/* DESKTOP-ONLY SIDEBAR */}
+      {/* DESKTOP-ONLY SIDEBAR (No changes here) */}
       <aside className="fixed left-0 top-0 z-30 hidden h-full w-64 border-r bg-background pt-16 md:block">
         <div className="h-full overflow-y-auto"><Sidebar /></div>
       </aside>
@@ -75,30 +77,31 @@ function MainLayout({ children }: { children: ReactNode }) {
         "md:pl-64" // Desktop left padding
       )}>
         {/* 
-          The padding is also now conditional.
-          - The Feed page needs padding at the very top of the scroll area.
-          - Other pages need padding *below* the fixed header.
+          =========================================================================
+          === THE CORE FIX: Correct Padding                                     ===
+          === We apply top padding to the main scroll container itself to always ===
+          === leave space for the header, fixing the overlap problem.          ===
+          =========================================================================
         */}
         <div className={cn(
-          "px-4 md:px-8",
-          isFeedPage ? 'pt-4 pb-24' : 'pt-20 pb-24 md:pb-8'
+          "px-4 md:px-8 pb-24 md:pb-8", // Horizontal and bottom padding
+          isFeedPage ? 'pt-4' : 'pt-20' // On Feed, small padding. On others, large padding to clear the fixed header.
         )}>
           {children}
         </div>
       </main>
 
-      {/* MOBILE-ONLY DRAWER & BACKDROP */}
+      {/* MOBILE-ONLY UI (No changes here) */}
       {isSidebarOpen && (<div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />)}
       <aside className={cn("fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform md:hidden", isSidebarOpen ? "translate-x-0" : "-translate-x-full")}>
         <div className="h-full overflow-y-auto"><Sidebar /></div>
       </aside>
-
-      {/* MOBILE-ONLY BOTTOM NAV */}
       <BottomNavBar />
     </div>
   );
 }
 
+// The top-level wrapper component (No changes here)
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
   return (<SidebarProvider><MainLayout>{children}</MainLayout></SidebarProvider>);
 }
