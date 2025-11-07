@@ -16,7 +16,7 @@ function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isSidebarOpen, toggleSidebar } = useSidebarContext();
   
-  // --- All auth logic remains the same ---
+  // --- All auth logic can remain the same ---
   const [authStatus, setAuthStatus] = useState('loading');
   const router = useRouter();
   useEffect(() => {
@@ -42,23 +42,23 @@ function MainLayout({ children }: { children: ReactNode }) {
   
   return (
     <div className="h-screen w-screen bg-background">
-      {/* Fixed Top Header (z-40) */}
+      {/* Fixed Top Header (z-index 40) */}
       <TopHeader />
 
       {/* 
         ========================================================================
-        === FIX #3: SIDEBAR FOR DESKTOP                                      ===
-        === This sidebar is *always* visible on medium screens and up (md).  ===
+        === FIX #2: DESKTOP SIDEBAR (Now with Scrolling)                     ===
+        === This sidebar is always visible on medium screens and up (md).    ===
         ========================================================================
       */}
       <aside className="fixed left-0 top-0 z-30 hidden h-full w-64 border-r bg-background md:block">
-        {/* The inner content needs padding to appear below the header */}
-        <div className="pt-16 h-full">
+        {/* The inner div has padding-top and allows its own content to scroll */}
+        <div className="h-full overflow-y-auto pt-16">
           <Sidebar />
         </div>
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - has left padding on desktop to avoid the sidebar */}
       <main className="h-full w-full overflow-y-auto md:pl-64">
         {/* Padding to push content below header and above bottom nav */}
         <div className="pt-20 pb-20 px-4 md:px-8">
@@ -66,8 +66,8 @@ function MainLayout({ children }: { children: ReactNode }) {
         </div>
       </main>
 
-      {/* --- MOBILE SIDEBAR & BACKDROP --- */}
-      {/* Clickable backdrop (z-40) */}
+      {/* --- MOBILE-ONLY UI (SIDEBAR & BACKDROP) --- */}
+      {/* Clickable backdrop (z-index 40) */}
       {isSidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -77,27 +77,27 @@ function MainLayout({ children }: { children: ReactNode }) {
       
       {/* 
         ========================================================================
-        === FIX #1: MOBILE SIDEBAR HEIGHT                                    ===
-        === This sidebar now correctly covers the full height (h-full).      ===
+        === FIX #1: MOBILE SIDEBAR (Now starts below the header)            ===
+        === It starts from `top-16` and takes the remaining screen height.   ===
         ========================================================================
       */}
       <aside className={cn(
-        "fixed left-0 top-0 z-50 h-full w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:hidden",
+        "fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform duration-300 ease-in-out md:hidden",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        {/* Inner div provides padding for the content to clear the header */}
-        <div className="pt-16 h-full">
+        {/* This inner div can scroll if the content is too long for the screen */}
+        <div className="h-full overflow-y-auto">
           <Sidebar />
         </div>
       </aside>
 
-      {/* Fixed Bottom Nav (z-40) - hidden on desktop */}
+      {/* Fixed Bottom Nav (z-index 40) - correctly hidden on desktop */}
       <BottomNavBar />
     </div>
   );
 }
 
-// Top-level export providing the context
+// Top-level export providing the context to the whole layout
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
