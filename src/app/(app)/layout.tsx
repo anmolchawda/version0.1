@@ -50,43 +50,40 @@ function MainLayout({ children }: { children: ReactNode }) {
   return (
     // The screen is a flex container for the desktop layout
     <div className="h-screen w-screen bg-background md:flex">
-      {/* 1. DESKTOP-ONLY SIDEBAR (No changes) */}
+      {/* 1. DESKTOP-ONLY SIDEBAR */}
       <aside className="hidden h-full w-64 flex-shrink-0 border-r bg-background md:block">
         <Sidebar />
       </aside>
 
       {/* 
-        =========================================================================
-        === THE "NO OVERLAP" FIX: USING FLEXBOX
-        =========================================================================
         This is the main container for the mobile view.
         - `flex-col` stacks its children vertically.
         - `h-full` ensures it takes up the full screen height.
       */}
       <div className="flex h-full w-full flex-col">
-        {/* Item 1: The Header. It takes up only the space it needs. */}
+        {/* Item 1: The Header. It is NOT an overlay. */}
         <TopHeader />
 
         {/* 
           Item 2: The Main Content.
           - `flex-1` makes it grow to fill ALL available remaining space.
           - `overflow-y-auto` makes ONLY this section scrollable.
-          This physically cannot underlap the header.
+          - `id="main-scroll-area"` allows child components to find and listen to it.
         */}
-        <main className="flex-1 overflow-y-auto">
+        <main id="main-scroll-area" className="flex-1 overflow-y-auto">
           {/* We add padding here for aesthetics, not for layout. */}
           <div className="p-4 md:p-6">
             {children}
           </div>
         </main>
 
-        {/* Item 3: The Bottom Nav. Only on mobile. It takes up only the space it needs. */}
+        {/* Item 3: The Bottom Nav. Only on mobile. */}
         <div className="md:hidden">
           <BottomNavBar />
         </div>
       </div>
 
-      {/* MOBILE-ONLY DRAWER & BACKDROP (No functional changes) */}
+      {/* MOBILE-ONLY DRAWER & BACKDROP */}
       {isSidebarOpen && (
         <div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />
       )}
