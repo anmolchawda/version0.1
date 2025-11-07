@@ -41,67 +41,55 @@ function MainLayout({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  
+
   const isAuthPage = pathname.startsWith('/auth');
   if (isAuthPage) {
     return <main>{children}</main>;
   }
 
-  // =========================================================================
-  // === THE LOGIC FOR THE FIX IS HERE                                    ===
-  // =========================================================================
-  const isFeedPage = pathname === '/feed' || pathname === '/';
-
   return (
-    <div className="h-screen w-screen overflow-hidden bg-background">
-      {/* 
-        The TopHeader is now positioned conditionally.
-        - On the feed page, it's 'absolute' so it can scroll away.
-        - On all other pages, it's 'fixed' so it stays at the top.
-      */}
-      <div className={cn(
-        "left-0 right-0 top-0 z-40 w-full",
-        isFeedPage ? 'absolute' : 'fixed'
-      )}>
-        <TopHeader />
-      </div>
-
-      {/* DESKTOP-ONLY SIDEBAR (No changes here) */}
-      <aside className="fixed left-0 top-0 z-30 hidden h-full w-64 border-r bg-background pt-16 md:block">
-        <div className="h-full overflow-y-auto"><Sidebar /></div>
+    <div className="h-screen w-screen bg-background md:flex">
+      <aside className="hidden h-full w-64 flex-shrink-0 border-r bg-background md:block">
+        <Sidebar />
       </aside>
 
-      {/* MAIN SCROLLABLE CONTENT AREA */}
-      <main className={cn(
-        "h-full w-full overflow-y-auto",
-        "md:pl-64" // Desktop left padding
-      )}>
-        {/* 
-          =========================================================================
-          === THE CORE FIX: Correct Padding                                     ===
-          === We apply top padding to the main scroll container itself to always ===
-          === leave space for the header, fixing the overlap problem.          ===
-          =========================================================================
-        */}
-        <div className={cn(
-          "px-4 md:px-8 pb-24 md:pb-8", // Horizontal and bottom padding
-          isFeedPage ? 'pt-4' : 'pt-20' // On Feed, small padding. On others, large padding to clear the fixed header.
-        )}>
+      <div className="relative flex h-full flex-1 flex-col overflow-y-auto">
+        {/* Main Content ALWAYS has padding to avoid the bars */}
+        <main className="h-full w-full overflow-y-auto pt-16 pb-16">
           {children}
-        </div>
-      </main>
+        </main>
 
-      {/* MOBILE-ONLY UI (No changes here) */}
-      {isSidebarOpen && (<div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />)}
-      <aside className={cn("fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform md:hidden", isSidebarOpen ? "translate-x-0" : "-translate-x-full")}>
-        <div className="h-full overflow-y-auto"><Sidebar /></div>
-      </aside>
-      <BottomNavBar />
+        {/* TOP HEADER is a fixed overlay */}
+        <div className="absolute top-0 left-0 z-20 w-full">
+          <TopHeader />
+        </div>
+
+        {/* MOBILE-ONLY BOTTOM NAV is a fixed overlay */}
+        <div className="absolute bottom-0 left-0 z-20 w-full md:hidden">
+          <BottomNavBar />
+        </div>
+
+        {/* MOBILE-ONLY DRAWER & BACKDROP */}
+        {isSidebarOpen && (
+          <div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />
+        )}
+        <aside
+          className={cn(
+            'fixed top-0 left-0 z-50 h-full w-64 transform bg-background transition-transform md:hidden',
+            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          )}
+        >
+          <Sidebar />
+        </aside>
+      </div>
     </div>
   );
 }
 
-// The top-level wrapper component (No changes here)
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
-  return (<SidebarProvider><MainLayout>{children}</MainLayout></SidebarProvider>);
+  return (
+    <SidebarProvider>
+      <MainLayout>{children}</MainLayout>
+    </SidebarProvider>
+  );
 }
