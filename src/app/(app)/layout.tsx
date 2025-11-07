@@ -8,36 +8,30 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { SidebarProvider, useSidebarContext } from '@/contexts/SidebarContext';
-import { auth, db, doc, onSnapshot } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 
-// This is the inner component that can now access the sidebar context
 function MainLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { isSidebarOpen, toggleSidebar } = useSidebarContext();
-
-  // --- This is a simplified and robust authentication flow ---
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated'>('loading');
 
+  // --- Auth Flow ---
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        setAuthStatus('authenticated');
-      } else {
-        setAuthStatus('unauthenticated');
-      }
+      setAuthStatus(user ? 'authenticated' : 'unauthenticated');
     });
     return () => authUnsubscribe();
   }, []);
 
   useEffect(() => {
-    const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+    const isAuthPage = pathname.startsWith('/auth');
     if (authStatus === 'unauthenticated' && !isAuthPage) {
       router.replace('/login');
     }
   }, [authStatus, pathname, router]);
-  // --- End of Authentication Flow ---
+  // --- End Auth Flow ---
 
   if (authStatus === 'loading') {
     return (
@@ -47,61 +41,64 @@ function MainLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  const isAuthPage = pathname.startsWith('/auth') || pathname === '/login' || pathname === '/signup';
+  // =========================================================================
+  // === FIX #1: CONDITIONAL LAYOUT LOGIC                                   ===
+  // =========================================================================
+  const isFeedPage = pathname === '/feed' || pathname === '/';
+
+  // Render a special layout for the auth pages
+  const isAuthPage = pathname.startsWith('/auth');
   if (isAuthPage) {
     return <main>{children}</main>;
   }
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-background">
-      {/* 1. FIXED TOP HEADER (Always Visible) */}
-      <TopHeader />
+      {/* 
+        The TopHeader is now positioned based on the page.
+        - `isFeedPage ? 'absolute' : 'fixed'` does the magic.
+        'absolute' makes it scroll away with the content.
+        'fixed' makes it stick to the top.
+      */}
+      <div className={cn("left-0 right-0 top-0 z-40", isFeedPage ? 'absolute' : 'fixed')}>
+        <TopHeader />
+      </div>
 
-      {/* 2. DESKTOP-ONLY SIDEBAR (Permanent & Scrollable) */}
+      {/* DESKTOP-ONLY SIDEBAR */}
       <aside className="fixed left-0 top-0 z-30 hidden h-full w-64 border-r bg-background pt-16 md:block">
-        <div className="h-full overflow-y-auto">
-          <Sidebar />
-        </div>
+        <div className="h-full overflow-y-auto"><Sidebar /></div>
       </aside>
 
-      {/* 3. MAIN SCROLLABLE CONTENT AREA */}
+      {/* MAIN SCROLLABLE CONTENT AREA */}
       <main className={cn(
         "h-full w-full overflow-y-auto",
-        "md:pl-64" // On desktop, add left padding to not overlap with the permanent sidebar
+        "md:pl-64" // Desktop left padding
       )}>
-        {/* Padding top/bottom keeps content from being hidden by fixed bars */}
-        <div className="pt-20 pb-24 px-4 md:pb-8 md:px-8">
+        {/* 
+          The padding is also now conditional.
+          - The Feed page needs padding at the very top of the scroll area.
+          - Other pages need padding *below* the fixed header.
+        */}
+        <div className={cn(
+          "px-4 md:px-8",
+          isFeedPage ? 'pt-4 pb-24' : 'pt-20 pb-24 md:pb-8'
+        )}>
           {children}
         </div>
       </main>
 
-      {/* 4. MOBILE-ONLY DRAWER & BACKDROP */}
-      {/* Backdrop */}
-      {isSidebarOpen && (
-        <div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />
-      )}
-
-      {/* Drawer */}
-      <aside className={cn(
-        "fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform md:hidden",
-        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        <div className="h-full overflow-y-auto">
-          <Sidebar />
-        </div>
+      {/* MOBILE-ONLY DRAWER & BACKDROP */}
+      {isSidebarOpen && (<div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />)}
+      <aside className={cn("fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-64 transform border-r bg-background transition-transform md:hidden", isSidebarOpen ? "translate-x-0" : "-translate-x-full")}>
+        <div className="h-full overflow-y-auto"><Sidebar /></div>
       </aside>
 
-      {/* 5. MOBILE-ONLY BOTTOM NAV */}
+      {/* MOBILE-ONLY BOTTOM NAV */}
       <BottomNavBar />
     </div>
   );
 }
 
-// The top-level export that provides the context
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
-  return (
-    <SidebarProvider>
-      <MainLayout>{children}</MainLayout>
-    </SidebarProvider>
-  );
+  return (<SidebarProvider><MainLayout>{children}</MainLayout></SidebarProvider>);
 }
