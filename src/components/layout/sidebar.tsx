@@ -2,344 +2,160 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useMemo, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import type { User, NavLink as NavLinkType } from '@/types';
-import {
-  FlaskConical,
-  SprayCan,
-  Bug,
-  Code2,
-  Settings as SettingsIcon,
-  ScrollText,
-  CloudSun,
-  CalendarDays,
-  LogOut,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarContext } from '@/contexts/SidebarContext';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { auth, db, doc, getDoc } from '@/lib/firebase';
-import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast';
-import { useTranslations } from '@/hooks/useTranslations';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useEffect } from 'react';
+import { db, doc, onSnapshot } from '@/lib/firebase';
 
-interface NavLinkItemProps {
-  href: string;
-  label: string;
-  icon: JSX.Element;
-  isActive: boolean;
-  isSidebarOpen: boolean;
-  itemClassName?: string;
-  ariaLabel?: string;
-  badgeCount?: number;
-}
+// Import ALL icons you need for both sets of navigation
+import {
+  Home, Cpu, PlusSquare, Store, User as UserIcon,
+  FlaskConical, CloudSun, BookOpen, Calendar, Bug, Binary, Settings, LogOut, Loader2
+} from 'lucide-react';
 
-const NavLinkItem: React.FC<NavLinkItemProps> = ({ href, label, icon, isActive, isSidebarOpen, itemClassName, ariaLabel, badgeCount }) => {
-  const { closeSidebar: contextCloseSidebar } = useSidebarContext();
+// --- TYPE DEFINITIONS ---
+type NavLink = { href: string; label: string; icon: React.ReactNode; };
 
+// --- NAVIGATION DATA (Organized into logical groups) ---
+const PRIMARY_LINKS: NavLink[] = [
+  { href: '/feed', label: 'Feed', icon: <Home className="h-5 w-5" /> },
+  { href: '/ai-features', label: 'AI Features', icon: <Cpu className="h-5 w-5" /> },
+  { href: '/post/create', label: 'Create', icon: <PlusSquare className="h-5 w-5" /> },
+  { href: '/mandi', label: 'Mandi', icon: <Store className="h-5 w-5" /> },
+  { href: '/my-profile', label: 'My Profile', icon: <UserIcon className="h-5 w-5" /> },
+];
+
+const SECONDARY_LINKS: NavLink[] = [
+  { href: '/crop-science', label: 'Crop Science', icon: <FlaskConical className="h-5 w-5" /> },
+  { href: '/weather', label: 'Weather', icon: <CloudSun className="h-5 w-5" /> },
+  { href: '/yojna', label: 'Yojna', icon: <BookOpen className="h-5 w-5" /> },
+  { href: '/events', label: 'Events', icon: <Calendar className="h-5 w-5" /> },
+  { href: '/fungicides', label: 'Fungicides', icon: <Bug className="h-5 w-5" /> },
+  { href: '/insecticides', label: 'Insecticides', icon: <Bug className="h-5 w-5" /> },
+  { href: '/irac-code', label: 'IRAC Code', icon: <Binary className="h-5 w-5" /> },
+  { href: '/frac-code', label: 'FRAC Code', icon: <Binary className="h-5 w-5" /> },
+];
+
+const SETTINGS_LINK: NavLink = {
+  href: '/settings/account', label: 'Settings', icon: <Settings className="h-5 w-5" />,
+};
+
+// --- Reusable NavLink Component ---
+const NavLinkItem = ({ href, label, icon }: NavLink) => {
+  const pathname = usePathname();
+  const { isSidebarOpen, toggleSidebar } = useSidebarContext();
+  const isActive = pathname === href || (href !== '/feed' && pathname.startsWith(href));
+
+  // On mobile, close the sidebar when a link is clicked.
   const handleClick = () => {
-    if (contextCloseSidebar) {
-      contextCloseSidebar();
+    if (isSidebarOpen) {
+      toggleSidebar();
     }
   };
 
-  const linkElement = (
-    <Link
-      href={href}
-      className={cn(
-        'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors relative',
-        isActive
-          ? 'bg-primary/10 text-primary'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-        !isSidebarOpen && "justify-center",
-        itemClassName
-      )}
-      onClick={handleClick}
-      aria-label={!isSidebarOpen ? ariaLabel || label : undefined}
-    >
-      {React.cloneElement(icon, { className: cn(icon.props.className, 'h-5 w-5') })}
-      {isSidebarOpen && <span className="truncate">{label}</span>}
-      {isSidebarOpen && badgeCount !== undefined && badgeCount > 0 && (
-        <span className="ml-auto h-5 min-w-[1.25rem] px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
-          {badgeCount > 99 ? '99+' : badgeCount}
-        </span>
-      )}
+  return (
+    <Link href={href} onClick={handleClick} className={cn(
+      'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+      isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+    )}>
+      {icon}
+      <span>{label}</span>
     </Link>
   );
-
-  if (!isSidebarOpen) {
-    return (
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="relative">
-              {linkElement}
-              {badgeCount !== undefined && badgeCount > 0 && (
-                <span className="absolute top-1 right-1 h-4 w-4 min-w-[1rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center pointer-events-none">
-                  {badgeCount > 9 ? '9+' : badgeCount}
-                </span>
-              )}
-            </div>
-          </TooltipTrigger>
-          {label && (
-            <TooltipContent side="right" className="bg-background text-foreground border">
-              <p>{label} {badgeCount !== undefined && badgeCount > 0 ? `(${badgeCount})` : ''}</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
-  return linkElement;
 };
 
-function SidebarComponent() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { toast } = useToast();
-  const { isSidebarOpen, closeSidebar, authUserId } = useSidebarContext();
-  const { t } = useTranslations();
-  
-  const [currentUserDetails, setCurrentUserDetails] = useState<User | null>(null);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+// --- THE MAIN SIDEBAR COMPONENT ---
+export function Sidebar() {
+  const { authUserId } = useSidebarContext();
+  const [profile, setProfile] = useState<any | null>(null); // Using 'any' to avoid type errors with Firestore data
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!authUserId || !db) {
-      setIsLoadingProfile(false);
+      setLoading(false);
       return;
     }
-
-    const fetchUserProfile = async () => {
-      setIsLoadingProfile(true);
-      try {
-        const userDocRef = doc(db, 'users', authUserId);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          setCurrentUserDetails({ id: userDocSnap.id, ...userDocSnap.data() } as User);
-        } else {
-          setCurrentUserDetails(null);
-        }
-      } catch (error) {
-        console.error("Error fetching user profile for sidebar:", error);
-        setCurrentUserDetails(null);
-      } finally {
-        setIsLoadingProfile(false);
+    const userDocRef = doc(db, 'users', authUserId);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setProfile(docSnap.data());
+      } else {
+        setProfile(null);
       }
-    };
-
-    fetchUserProfile();
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching user profile in sidebar:", error);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, [authUserId]);
 
-  const currentUserName = currentUserDetails?.name || currentUserDetails?.username || 'User';
-  const currentUserAvatar = currentUserDetails?.avatarUrl;
-  const currentUserUsername = currentUserDetails?.username || 'krishix_user';
-
-  const userProfileLink = "/my-profile";
-
-  const primaryNavLinks = useMemo((): NavLinkType[] => [], []);
-
-  const secondaryNavLinks = useMemo((): NavLinkType[] => [
-    { href: '/crop-science', label: t('cropScience'), icon: <FlaskConical /> },
-    { href: '/weather', label: t('weather'), icon: <CloudSun /> },
-    { href: '/yojna', label: t('yojna'), icon: <ScrollText /> },
-    { href: '/events', label: t('events'), icon: <CalendarDays /> },
-    { href: '/fungicides', label: t('fungicides'), icon: <SprayCan /> },
-    { href: '/insecticides', label: t('insecticides'), icon: <Bug /> },
-    { href: '/irac-code', label: t('iracCode'), icon: <Code2 /> },
-    { href: '/frac-code', label: t('fracCode'), icon: <Code2 /> },
-  ], [t]);
-
-  const settingsLabel = useMemo(() => t('settings'), [t]);
-  const logoutLabel = useMemo(() => t('logout'), [t]);
-
-  const userAvatarFallback = currentUserName.substring(0, 2).toUpperCase();
-  
   const handleLogout = async () => {
-    closeSidebar();
-    if (!auth) {
-      toast({ title: 'Logged Out (Mock)', description: 'You have been successfully logged out.' });
-      router.push('/login');
-      return;
-    }
-    try {
-      await signOut(auth);
-      toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
-      router.push('/login'); 
-    } catch (error) {
-      console.error("Error signing out:", error);
-      toast({ title: 'Logout Failed', description: 'Could not log out. Please try again.', variant: 'destructive' });
-    }
+    const { auth } = await import('@/lib/firebase');
+    await auth.signOut();
   };
 
-  const settingsLinkElement = (
-      <Button
-        asChild
-        variant={isSidebarOpen ? "outline" : "ghost"}
-        className={cn(
-          "w-full justify-start gap-3",
-           !isSidebarOpen && "justify-center p-2 h-auto"
-        )}
-        onClick={closeSidebar}
-        aria-label={!isSidebarOpen ? settingsLabel : undefined}
-      >
-        <Link href="/settings">
-          <SettingsIcon className="h-5 w-5" />
-          {isSidebarOpen && <span>{settingsLabel}</span>}
-        </Link>
-      </Button>
-  );
-
-  const logoutButtonElement = (
-     <Button
-        variant={isSidebarOpen ? "destructive" : "ghost"}
-        className={cn(
-          "w-full justify-start gap-3",
-          isSidebarOpen ? "bg-destructive/10 hover:bg-destructive/20 text-destructive" : "text-destructive hover:bg-destructive/10",
-           !isSidebarOpen && "justify-center p-2 h-auto"
-        )}
-        onClick={handleLogout}
-        aria-label={!isSidebarOpen ? logoutLabel : undefined}
-      >
-        <LogOut className={cn("h-5 w-5", isSidebarOpen && "mr-2")} />
-        {isSidebarOpen && <span>{logoutLabel}</span>}
-      </Button>
-  );
-
-  const renderUserProfile = () => {
-    if (isLoadingProfile) {
-      return (
-        <div className={cn("flex items-center gap-3 p-2", !isSidebarOpen && "justify-center")}>
-          <Skeleton className="h-9 w-9 rounded-full" />
-          {isSidebarOpen && (
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[100px]" />
-              <Skeleton className="h-3 w-[70px]" />
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (!currentUserDetails) return null; // Don't show anything if profile doesn't exist
-
+  if (loading) {
     return (
-      <Link
-        href={userProfileLink}
-        className={cn(
-          "flex items-center gap-3 group p-2 rounded-md hover:bg-muted",
-          !isSidebarOpen && "justify-center"
-        )}
-        onClick={closeSidebar}
-        aria-label={!isSidebarOpen ? `${currentUserName} Profile` : undefined}
-      >
-        <Avatar className="h-9 w-9 border">
-          <AvatarImage src={currentUserAvatar || `https://placehold.co/36x36.png?text=${userAvatarFallback}`} alt={currentUserName} data-ai-hint="person farmer"/>
-          <AvatarFallback>{userAvatarFallback}</AvatarFallback>
-        </Avatar>
-        {isSidebarOpen && (
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-medium group-hover:text-primary truncate">{currentUserName}</span>
-            <span className="text-xs text-muted-foreground truncate">@{currentUserUsername}</span>
-          </div>
-        )}
-      </Link>
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
     );
-  };
-
-  const userProfileElement = renderUserProfile();
+  }
 
   return (
-    <aside
-      className={cn(
-        "bg-card text-card-foreground border-r flex-col",
-        "fixed left-0 top-0 h-full shadow-lg z-40 md:z-30",
-        "transition-transform duration-300 ease-in-out",
-        isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 md:w-20 md:translate-x-0'
-      )}
-    >
-       <div className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {primaryNavLinks.length > 0 && (
-          <>
-            {primaryNavLinks.map((link) => (
-            <NavLinkItem
-                key={link.href}
-                href={link.href}
-                label={link.label}
-                icon={link.icon || <span></span>}
-                isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
-                isSidebarOpen={isSidebarOpen}
-                ariaLabel={link.label}
-                badgeCount={link.badgeCount}
-            />
-            ))}
-            <Separator className="my-2"/>
-          </>
-        )}
-        {secondaryNavLinks.map((link) => (
-           <NavLinkItem
-            key={link.href}
-            href={link.href}
-            label={link.label}
-            icon={link.icon || <span></span>}
-            isActive={pathname === link.href || (pathname.startsWith(link.href) && link.href !== '/' && link.href.length > 1)}
-            isSidebarOpen={isSidebarOpen}
-            ariaLabel={link.label}
-          />
-        ))}
+    <div className="flex h-full flex-col">
+      {/* Scrollable area for all navigation links */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <nav className="flex flex-col space-y-4">
+          {/* Group 1: Primary Navigation */}
+          <div className="space-y-1">
+            {PRIMARY_LINKS.map((link) => <NavLinkItem key={link.href} {...link} />)}
+          </div>
+
+          {/* Divider */}
+          <hr className="my-2 border-border/50" />
+
+          {/* Group 2: Secondary Tools */}
+          <div className="space-y-1">
+            <h3 className="px-3 py-1 text-xs font-semibold text-muted-foreground/80">
+              Tools & Resources
+            </h3>
+            {SECONDARY_LINKS.map((link) => <NavLinkItem key={link.href} {...link} />)}
+          </div>
+        </nav>
       </div>
 
-      <div className="mt-auto p-2 space-y-2 border-t">
-        {!isSidebarOpen ? (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>{settingsLinkElement}</TooltipTrigger>
-              {settingsLabel && (
-                 <TooltipContent side="right" className="bg-background text-foreground border">
-                    <p>{settingsLabel}</p>
-                 </TooltipContent>
-              )}
-            </Tooltip>
-             <Tooltip>
-              <TooltipTrigger asChild>{logoutButtonElement}</TooltipTrigger>
-              {logoutLabel && (
-                 <TooltipContent side="right" className="bg-background text-foreground border">
-                    <p>{logoutLabel}</p>
-                 </TooltipContent>
-              )}
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          <>
-            {settingsLinkElement}
-            {logoutButtonElement}
-          </>
-        )}
+      {/* Sticky Bottom Section of Sidebar */}
+      <div className="border-t p-4">
+        <div className="space-y-2">
+          {/* Settings Link */}
+          <NavLinkItem {...SETTINGS_LINK} />
 
-        <Separator />
+          {/* Logout Button */}
+          <Button variant="ghost" onClick={handleLogout} className="flex w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive">
+            <LogOut className="h-5 w-5" />
+            <span>Logout</span>
+          </Button>
 
-        {!isSidebarOpen ? (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>{userProfileElement}</TooltipTrigger>
-               {currentUserName && (
-                  <TooltipContent side="right" className="bg-background text-foreground border">
-                    <p>{currentUserName}</p>
-                    {currentUserUsername && <p className="text-xs text-muted-foreground">@{currentUserUsername}</p>}
-                  </TooltipContent>
-               )}
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          userProfileElement
-        )}
+          {/* User Profile Block */}
+          {profile && (
+            <Link href="/my-profile" className="mt-4 flex items-center space-x-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={profile.photoURL} />
+                <AvatarFallback>{profile.displayName?.charAt(0) || 'U'}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col text-sm">
+                <span className="font-semibold text-foreground">{profile.displayName}</span>
+                <span className="text-muted-foreground">@{profile.username}</span>
+              </div>
+            </Link>
+          )}
+        </div>
       </div>
-    </aside>
+    </div>
   );
 }
-
-export const Sidebar = React.memo(SidebarComponent);
