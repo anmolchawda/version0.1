@@ -18,7 +18,7 @@ function MainLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, toggleSidebar } = useSidebarContext();
   const [authStatus, setAuthStatus] = useState<'loading' | 'unauthenticated' | 'authenticated'>('loading');
 
-  // --- Auth Flow ---
+  // --- Auth Flow (No changes here) ---
   useEffect(() => {
     const authUnsubscribe = auth.onAuthStateChanged(user => {
       setAuthStatus(user ? 'authenticated' : 'unauthenticated');
@@ -48,44 +48,61 @@ function MainLayout({ children }: { children: ReactNode }) {
   }
 
   return (
+    // The screen is a flex container for the desktop layout
     <div className="h-screen w-screen bg-background md:flex">
+      {/* 1. DESKTOP-ONLY SIDEBAR (No changes) */}
       <aside className="hidden h-full w-64 flex-shrink-0 border-r bg-background md:block">
         <Sidebar />
       </aside>
 
-      <div className="relative flex h-full flex-1 flex-col overflow-y-auto">
-        {/* Main Content ALWAYS has padding to avoid the bars */}
-        <main className="h-full w-full overflow-y-auto pt-16 pb-16">
-          {children}
+      {/* 
+        =========================================================================
+        === THE "NO OVERLAP" FIX: USING FLEXBOX
+        =========================================================================
+        This is the main container for the mobile view.
+        - `flex-col` stacks its children vertically.
+        - `h-full` ensures it takes up the full screen height.
+      */}
+      <div className="flex h-full w-full flex-col">
+        {/* Item 1: The Header. It takes up only the space it needs. */}
+        <TopHeader />
+
+        {/* 
+          Item 2: The Main Content.
+          - `flex-1` makes it grow to fill ALL available remaining space.
+          - `overflow-y-auto` makes ONLY this section scrollable.
+          This physically cannot underlap the header.
+        */}
+        <main className="flex-1 overflow-y-auto">
+          {/* We add padding here for aesthetics, not for layout. */}
+          <div className="p-4 md:p-6">
+            {children}
+          </div>
         </main>
 
-        {/* TOP HEADER is a fixed overlay */}
-        <div className="absolute top-0 left-0 z-20 w-full">
-          <TopHeader />
-        </div>
-
-        {/* MOBILE-ONLY BOTTOM NAV is a fixed overlay */}
-        <div className="absolute bottom-0 left-0 z-20 w-full md:hidden">
+        {/* Item 3: The Bottom Nav. Only on mobile. It takes up only the space it needs. */}
+        <div className="md:hidden">
           <BottomNavBar />
         </div>
-
-        {/* MOBILE-ONLY DRAWER & BACKDROP */}
-        {isSidebarOpen && (
-          <div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />
-        )}
-        <aside
-          className={cn(
-            'fixed top-0 left-0 z-50 h-full w-64 transform bg-background transition-transform md:hidden',
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          )}
-        >
-          <Sidebar />
-        </aside>
       </div>
+
+      {/* MOBILE-ONLY DRAWER & BACKDROP (No functional changes) */}
+      {isSidebarOpen && (
+        <div onClick={toggleSidebar} className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden" />
+      )}
+      <aside
+        className={cn(
+          'fixed top-0 left-0 z-50 h-full w-64 transform bg-background transition-transform md:hidden',
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <Sidebar />
+      </aside>
     </div>
   );
 }
 
+// The top-level export that provides the context (No changes)
 export default function AppPagesLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
