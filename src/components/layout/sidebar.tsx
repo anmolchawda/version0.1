@@ -1,4 +1,3 @@
-
 // src/components/layout/sidebar.tsx
 'use client';
 
@@ -68,16 +67,12 @@ export function Sidebar() {
   if (loading) { return <div className="flex h-full items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>; }
 
   return (
-    <div className="flex h-full flex-col">
+    // =========================================================================
+    // === FIX #1: Add top padding for the phone's status bar/notch area
+    // =========================================================================
+    <div className="flex h-full flex-col pt-[env(safe-area-inset-top)]">
       <div className="flex-1 overflow-y-auto p-4">
         <nav className="flex flex-col space-y-4">
-          {/* 
-            =========================================================================
-            === FIX #3: HIDE PRIMARY LINKS ON MOBILE                                ===
-            =========================================================================
-            This entire block will be hidden on mobile (hidden) and shown on 
-            desktop (md:block) because it's redundant with the bottom nav.
-          */}
           <div className="hidden space-y-1 md:block">
             {PRIMARY_LINKS.map((link) => <NavLinkItem key={link.href} {...link} />)}
             <hr className="my-2 border-border/50" />
@@ -91,7 +86,14 @@ export function Sidebar() {
         </nav>
       </div>
 
-      <div className="border-t p-4">
+      {/* 
+        =========================================================================
+        === FIX #2: Add bottom padding for the phone's home gesture bar
+        =========================================================================
+        The `pb-[env(safe-area-inset-bottom)]` class adds the necessary space
+        at the very bottom, pushing your profile section up into view.
+      */}
+      <div className="border-t p-4 pb-[env(safe-area-inset-bottom)]">
         <div className="space-y-2">
           <NavLinkItem {...SETTINGS_LINK} />
           <Button variant="ghost" onClick={handleLogout} className="flex w-full justify-start space-x-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 hover:text-destructive">
