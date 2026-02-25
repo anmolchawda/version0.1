@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Sidebar } from './sidebar'; // Your existing components
-import { TopHeader } from './top-header';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { Sidebar } from '@/components/layout/sidebar';
+import { TopHeader } from '@/components/layout/top-header';
 
-export default function ProtectedLayout({ children }) {
+export default function MainAppLayout({ children }: { children: React.ReactNode }) {
   const { authStatus } = useAuth();
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function ProtectedLayout({ children }) {
     }
   }, [authStatus, router]);
 
-  // If the user is authenticated, render the full app layout
+  // If the user is authenticated, render the full app layout.
   if (authStatus === 'authenticated') {
     return (
       <div className="flex h-screen bg-background">
@@ -33,7 +33,7 @@ export default function ProtectedLayout({ children }) {
     );
   }
 
-  // While redirecting or if in an unexpected state, render nothing.
-  // The AuthProvider already shows a loading spinner.
+  // While checking auth or if unauthenticated and redirecting, render nothing here.
+  // The AuthProvider will show a loading spinner.
   return null;
 }
