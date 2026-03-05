@@ -1,7 +1,7 @@
 // src/app/(app)/ai-features/page.tsx
 'use client';
 
-import { useState, type ChangeEvent, useRef, useEffect } from 'react';
+import { useState, type ChangeEvent, useRef, useEffect, useActionState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,10 @@ import { Loader2, Brain, UploadCloud, Image as ImageIcon, Sparkles, AlertCircle,
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from '@/hooks/useTranslations';
 import type { TranslationKey } from '@/hooks/useTranslations';
-import { useFormState } from 'react-dom';
 
-// ▼▼▼ STEP 1: Change the imports. ▼▼▼
 // We import the Server Action, NOT the Genkit flow directly.
 import { analyzeImageOnServer } from 'src/action';// We only need the TYPE of the output, not the function itself.
 import type { AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow'; 
-
-// --- THIS IS THE LINE WE ARE REMOVING ---
-// import { analyzeCropImage, type AnalyzeCropImageOutput } from '@/ai/flows/analyze-crop-image-flow';
 
 // Simple SVG for a weed icon (example)
 const WeedIcon = ({ className }: { className?: string }) => (
@@ -44,8 +39,8 @@ export default function AiFeaturesPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
-  // ▼▼▼ STEP 2: Use the `useFormState` hook for Server Actions. ▼▼▼
-  const [formState, formAction] = useFormState(analyzeImageOnServer, initialState);
+  // ▼▼▼ THE FIX: Use the `useActionState` hook for Server Actions. ▼▼▼
+  const [formState, formAction] = useActionState(analyzeImageOnServer, initialState);
 
   // This `useEffect` hook will run whenever the formState changes (i.e., after the server action completes)
   useEffect(() => {
@@ -99,7 +94,6 @@ export default function AiFeaturesPage() {
     }
   };
 
-  // ▼▼▼ STEP 3: The click handler now just submits the form programmatically. ▼▼▼
   const handleAnalyzeClick = () => {
     if (!imageDataUri) {
       toast({
